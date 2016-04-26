@@ -7,25 +7,26 @@
     <FrameLayout
         android:layout_width="@dimen/connection_button_outer"
         android:layout_height="@dimen/connection_button_outer"
-        android:background="@drawable/connection_button_shadow"
-        android:layout_centerHorizontal="true">
-        <View
-            android:layout_width="@dimen/connection_button_inner"
-            android:layout_height="@dimen/connection_button_inner"
-            android:background="@drawable/connection_button_normal_color"
-            android:layout_gravity="center"
-            ></View>
+        android:background="@drawable/connection_button_nomal"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/connection_button_bg">
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/connection_button_windmill"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:id="@+id/connection_button_windmill"/>
     </FrameLayout>
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_blank_fragment"
+        android:id="@+id/connection_message"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:textSize="@dimen/large_text"
+        android:textColor="@color/primary_black_text"/>
 
 </RelativeLayout>
