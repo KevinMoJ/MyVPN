@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
-            android:theme="@style/AppTheme.FullScreen"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ConnectionActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

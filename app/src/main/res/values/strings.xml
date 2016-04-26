@@ -5,5 +5,10 @@
     <string name="connect_success">You are coonected!</string>
     <string name="rate_your_experience">Rate your experience</string>
     <string name="rating">rating</string>
+    <string name="share">Share</string>
+    <string name="rate_us">Rate us</string>
+    <string name="contact_us">Contact us</string>
+    <string name="about">About</string>
+
 
 </resources>
