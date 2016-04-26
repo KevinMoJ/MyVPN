@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="splash_background">#0E85B7</color>
+    <color name="primary_white_text">@android:color/white</color>
+    <color name="secondary_white_text">#B3ffffff</color>
+    <color name="dhi_white_text">#80ffffff</color>
+    <color name="primary_black_text">#DE000000</color>
+    <color name="secondary_black_text">#8A000000</color>
+    <color name="dhi_black_text">#61000000</color>
 </resources>
