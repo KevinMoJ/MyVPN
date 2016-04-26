@@ -1,0 +1,17 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.androapplite.shadowsocks.fragment.ConnectionFragment">
+
+    <ImageButton
+        android:layout_width="@dimen/connection_button"
+        android:layout_height="@dimen/connection_button"
+        android:layout_gravity="center_horizontal"/>
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/hello_blank_fragment" />
+
+</FrameLayout>
