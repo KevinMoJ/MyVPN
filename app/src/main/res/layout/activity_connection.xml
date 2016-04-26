@@ -17,5 +17,12 @@
         tools:layout="@layout/fragment_connection"
         android:layout_centerHorizontal="true"/>
 
-
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
+        android:tag="@string/rate_your_experience"
+        android:layout_alignParentBottom="true"
+        tools:layout="@layout/fragment_rate_us"
+        />
 </RelativeLayout>

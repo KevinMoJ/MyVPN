@@ -10,4 +10,5 @@
     <color name="primary_black_text">#DE000000</color>
     <color name="secondary_black_text">#8A000000</color>
     <color name="dhi_black_text">#61000000</color>
+    <color name="grey_e3">#E3E3E3</color>
 </resources>

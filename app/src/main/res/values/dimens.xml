@@ -3,6 +3,10 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="twice_margin">32dp</dimen>
+    <dimen name="standard_margin">16dp</dimen>
+    <dimen name="half_standard_margin">8dp</dimen>
+    <dimen name="corner_8dp">8dp</dimen>
+    <dimen name="corner_4dp">4dp</dimen>
 
     <!--12、14、16、20 和 34-->
     <dimen name="extra_large_text">34sp</dimen>
