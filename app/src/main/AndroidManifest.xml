@@ -10,14 +10,16 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
-            android:theme="@style/AppTheme.FullScreen">
+            android:theme="@style/AppTheme.FullScreen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ConnectionActivity"></activity>
+        <activity android:name=".activity.ConnectionActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
