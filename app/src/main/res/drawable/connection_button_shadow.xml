@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval"
+    android:useLevel="false"
+    >
+    <gradient
+        android:startColor="@android:color/black"
+        android:endColor="@android:color/white"
+        android:gradientRadius="@dimen/connection_button_outer_radius"
+        android:type="radial"/>
+</shape>

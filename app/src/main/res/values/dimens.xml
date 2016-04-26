@@ -6,5 +6,9 @@
 
     <!--12、14、16、20 和 34-->
     <dimen name="extra_large_text">34sp</dimen>
-    <dimen name="connection_button">162dp</dimen>
+    <dimen name="connection_button_outer">162dp</dimen>
+    <dimen name="connection_button_inner">144dp</dimen>
+    <dimen name="connection_button_outer_radius">81dp</dimen>
+    <dimen name="connection_button_inner_radius">72dp</dimen>
+
 </resources>
