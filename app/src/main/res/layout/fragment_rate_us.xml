@@ -25,7 +25,8 @@
             android:layout_alignParentRight="true"
             android:src="@drawable/ic_close_24dp"
             android:tint="@android:color/white"
-            android:background="@null"/>
+            android:background="@null"
+            android:id="@+id/rate_us_close_btn"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -75,7 +76,8 @@
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/large_text"
-            android:background="@drawable/rating_button"/>
+            android:background="@drawable/rating_button"
+            android:id="@+id/rate_us_btn"/>
     </RelativeLayout>
 
 

@@ -22,6 +22,18 @@ public class DefaultSharedPrefeencesUtil {
     }
 
     public static final void markAsOldUser(Context context){
-        getDefaultSharedPreferencesEditor(context).putBoolean(SharedPreferenceKey.IS_NEW_USER, false).apply();
+        final SharedPreferences.Editor editor = getDefaultSharedPreferencesEditor(context);
+        editor.putBoolean(SharedPreferenceKey.IS_NEW_USER, false).apply();
+    }
+
+    public static final boolean isRateUsFragmentShown(Context context){
+        SharedPreferences sharedPreferences = getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false);
+    }
+
+    public static final void markRateUsFragmentAsShowed(Context context){
+        final SharedPreferences.Editor editor = getDefaultSharedPreferencesEditor(context);
+        editor.putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
+
     }
 }

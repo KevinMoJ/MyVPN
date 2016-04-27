@@ -40,14 +40,21 @@
             tools:layout="@layout/fragment_connection"
             android:layout_centerHorizontal="true"/>
 
-        <fragment
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:id="@+id/rate_us_fragment_container"
+            android:layout_alignParentBottom="true"
+            ></FrameLayout>
+
+<!--        <fragment
             android:layout_width="match_parent"
             android:layout_height="130dp"
             android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
-            android:tag="@string/rate_your_experience"
+            android:id="@+id/rate_us_fragment"
             android:layout_alignParentBottom="true"
             tools:layout="@layout/fragment_rate_us"
-            />
+            />-->
     </RelativeLayout>
 
 </LinearLayout>
