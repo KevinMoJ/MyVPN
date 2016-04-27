@@ -1,6 +1,7 @@
 package com.androapplite.shadowsocks.fragment;
 
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
@@ -24,8 +25,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class NewUserGuideFragment extends Fragment {
 
-    private static final String RESOURCE_ID_ARRAY = "resource_id_array";
-
+    private static final String RESOURCE_IDS = "resource_ids";
 
     public static final int IMAGE = 0;
     public static final int TITLE = 1;
@@ -43,7 +43,7 @@ public class NewUserGuideFragment extends Fragment {
     public static NewUserGuideFragment newInstance(int[] userGuideResourceIds){
         NewUserGuideFragment fragment = new NewUserGuideFragment();
         Bundle args = new Bundle();
-        args.putIntArray(RESOURCE_ID_ARRAY, userGuideResourceIds);
+        args.putIntArray(RESOURCE_IDS, userGuideResourceIds);
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,7 +64,7 @@ public class NewUserGuideFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_new_user_guide, container, false);
         Bundle arguments = getArguments();
         if(arguments != null){
-            int[] resourceIds = arguments.getIntArray(RESOURCE_ID_ARRAY);
+            int[] resourceIds = arguments.getIntArray(RESOURCE_IDS);
             if(resourceIds != null){
                 @DrawableRes int imageResourceId = resourceIds[IMAGE];
                 ImageView userGuideImage = (ImageView)rootView.findViewById(R.id.user_guide_image);

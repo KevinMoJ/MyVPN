@@ -14,12 +14,7 @@ import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
 public class NewUserGuideActivity extends BaseShadowsocksActivity {
     private ViewPager mWizardPager;
     private NewUserGuidePagerAdapter mNewUserGuidePagerAdapter;
-//    private static final int[][] mNewUserGuideResourceIds = {
-//            {R.drawable.new_user_guide_1, R.string.forever_free, R.string.forever_free_explain},
-//            {R.drawable.new_user_guide_2, R.string.browse_without_borders, R.string.browse_without_borders_explain},
-//            {R.drawable.new_user_guide_3, R.string.protect_your_identify, R.string.protect_your_identity_explain}
-//    };
-    private TypedArray[] mNewUserGuideResourceIds;
+    private int[][] mNewUserGuideResourceIds;
 
 
     @Override
@@ -33,20 +28,22 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
 
     }
 
-    private TypedArray[] createNewUserGuideResourceIds(){
+    private int[][] createNewUserGuideResourceIds(){
         final Resources resources = getResources();
         TypedArray rows = resources.obtainTypedArray(R.array.new_user_guide_resources);
         int len = rows.length();
-        TypedArray[] resourceIds = new TypedArray[len];
+        int[][] resourceIds = new int[len][];
         for(int i=0; i < len; i++){
-            resourceIds[i] = resources.obtainTypedArray(rows.getResourceId(i, 0));
+            int resid = rows.getResourceId(i, 0);
+            TypedArray row = resources.obtainTypedArray(resid);
+            int rowlen= row.length();
+            int[] rowResourceIds = new int[len];
+            for(int j=0; j<rowlen; j++){
+                rowResourceIds[j] = row.getResourceId(j, 0);
+            }
+            resourceIds[i] = rowResourceIds;
         }
         return resourceIds;
-//        return new int[][]{
-//          new int[]{},
-//                new int[]{},
-//                new int[]{},
-//        };
     }
     private void initWizardPager(){
         mWizardPager.setAdapter(mNewUserGuidePagerAdapter);
