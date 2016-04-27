@@ -14,9 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/new_user_guide_1"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/standard_margin"
+            android:layout_centerInParent="true"
             android:id="@+id/user_guide_image"
             />
     </RelativeLayout>
@@ -32,9 +30,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/forever_free"
+            android:text="@string/protect_your_identify"
             android:textColor="@color/primary_white_text"
-            android:textSize="@dimen/extra_large_text"
+            android:textSize="@dimen/large_text_27"
             android:layout_marginTop="@dimen/standard_margin"
             android:id="@+id/user_guide_title"
             />

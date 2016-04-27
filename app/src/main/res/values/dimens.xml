@@ -13,5 +13,5 @@
     <dimen name="large_text">20sp</dimen>
     <dimen name="medium_text">16sp</dimen>
     <dimen name="connection_button_outer">162dp</dimen>
-
+    <dimen name="large_text_27">27sp</dimen>
 </resources>

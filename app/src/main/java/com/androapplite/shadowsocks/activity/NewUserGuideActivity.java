@@ -1,14 +1,17 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
 
 public class NewUserGuideActivity extends BaseShadowsocksActivity {
@@ -65,5 +68,11 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
         public int getCount() {
             return mResourceIds.length;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
     }
 }
