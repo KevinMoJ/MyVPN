@@ -20,6 +20,7 @@ import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
 import com.androapplite.shadowsocks.fragment.PagerIndicatorFragment;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
 public class NewUserGuideActivity extends BaseShadowsocksActivity {
     private ViewPager mWizardPager;
@@ -92,6 +93,7 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
             @Override
             public void onClick(View v) {
                 Activity activity = NewUserGuideActivity.this;
+                DefaultSharedPrefeencesUtil.markAsOldUser(activity);
                 startActivity(new Intent(activity, ConnectionActivity.class));
             }
         });

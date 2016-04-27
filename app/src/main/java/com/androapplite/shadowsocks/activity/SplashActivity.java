@@ -1,12 +1,16 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.broadcast.Action;
 
 import java.util.concurrent.TimeUnit;
@@ -24,8 +28,10 @@ public class SplashActivity extends BaseShadowsocksActivity {
         getWindow().getDecorView().postDelayed(new Runnable() {
             @Override
             public void run() {
-//                startActivity(new Intent(SplashActivity.this, ConnectionActivity.class));
-                startActivity(new Intent(SplashActivity.this, NewUserGuideActivity.class));
+                Activity activity = SplashActivity.this;
+                startActivity(new Intent(activity,
+                        DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectionActivity.class
+                ));
 
             }
         }, TimeUnit.SECONDS.toMillis(2));
