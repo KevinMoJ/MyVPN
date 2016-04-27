@@ -11,4 +11,13 @@
         android:id="@+id/wizard_pager">
 
     </android.support.v4.view.ViewPager>
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.androapplite.shadowsocks.fragment.PagerIndicatorFragment"
+        android:id="@+id/pager_indicator"
+        tools:layout="@layout/fragment_pager_indicator"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="140dp"/>
 </RelativeLayout>
