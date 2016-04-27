@@ -11,7 +11,10 @@
     <string name="about">About</string>
     <string name="forever_free">Forever Free</string>
     <string name="forever_free_explain">no registration, forever free, simple operation, click to connect</string>
-
+    <string name="browse_without_borders">Browse Without Borders</string>
+    <string name="browse_without_borders_explain">unlock any website, application or service</string>
+    <string name="protect_your_identify">Protect Your Identity</string>
+    <string name="protect_your_identity_explain">everything you do online is encrypted and anonymized with on logs</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

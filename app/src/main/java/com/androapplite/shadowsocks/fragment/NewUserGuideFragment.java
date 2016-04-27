@@ -2,12 +2,20 @@ package com.androapplite.shadowsocks.fragment;
 
 
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IntDef;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,52 +23,64 @@ import com.androapplite.shadowsocks.R;
  * create an instance of this fragment.
  */
 public class NewUserGuideFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String RESOURCE_ID_ARRAY = "resource_id_array";
+
+
+    public static final int IMAGE = 0;
+    public static final int TITLE = 1;
+    public static final int EXPLAIN = 2;
+//    @IntDef({IMAGE, TITLE, EXPLAIN})
+//    @Retention(RetentionPolicy.SOURCE)
+//    public @interface USER_GUIDE_RESOURCE_ID {}
 
 
     public NewUserGuideFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NewUserGuideFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NewUserGuideFragment newInstance(String param1, String param2) {
+
+    public static NewUserGuideFragment newInstance(int[] userGuideResourceIds){
         NewUserGuideFragment fragment = new NewUserGuideFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putIntArray(RESOURCE_ID_ARRAY, userGuideResourceIds);
         fragment.setArguments(args);
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        if (getArguments() != null) {
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
+//        }
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_new_user_guide, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_new_user_guide, container, false);
+        Bundle arguments = getArguments();
+        if(arguments != null){
+            int[] resourceIds = arguments.getIntArray(RESOURCE_ID_ARRAY);
+            if(resourceIds != null){
+                @DrawableRes int imageResourceId = resourceIds[IMAGE];
+                ImageView userGuideImage = (ImageView)rootView.findViewById(R.id.user_guide_image);
+                userGuideImage.setImageResource(imageResourceId);
+
+                @StringRes int titleResourceId = resourceIds[TITLE];
+                TextView titleTextView = (TextView)rootView.findViewById(R.id.user_guide_title);
+                titleTextView.setText(titleResourceId);
+
+                @StringRes int explainResourceId = resourceIds[EXPLAIN];
+                TextView explainTextView = (TextView)rootView.findViewById(R.id.user_guide_explain);
+                explainTextView.setText(explainResourceId);
+            }
+
+        }
+        return rootView;
     }
 
 }

@@ -18,6 +18,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/standard_margin"
+            android:id="@+id/user_guide_image"
             />
     </RelativeLayout>
 
@@ -36,6 +37,7 @@
             android:textColor="@color/primary_white_text"
             android:textSize="@dimen/extra_large_text"
             android:layout_marginTop="@dimen/standard_margin"
+            android:id="@+id/user_guide_title"
             />
 
         <TextView
@@ -46,7 +48,9 @@
             android:textSize="@dimen/medium_text"
             android:gravity="center_horizontal"
             android:lines="2"
-            android:layout_marginTop="@dimen/twice_margin"/>
+            android:layout_marginTop="@dimen/twice_margin"
+            android:id="@+id/user_guide_explain"
+            />
     </LinearLayout>
     <!-- TODO: Update blank fragment layout -->
 

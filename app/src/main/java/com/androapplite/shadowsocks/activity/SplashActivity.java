@@ -24,7 +24,9 @@ public class SplashActivity extends BaseShadowsocksActivity {
         getWindow().getDecorView().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, ConnectionActivity.class));
+//                startActivity(new Intent(SplashActivity.this, ConnectionActivity.class));
+                startActivity(new Intent(SplashActivity.this, NewUserGuideActivity.class));
+
             }
         }, TimeUnit.SECONDS.toMillis(2));
     }
