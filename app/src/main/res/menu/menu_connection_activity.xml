@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/share_icon"
+        android:icon="@drawable/ic_share_24dp"
+        android:title="@string/share"
+        app:showAsAction="always" />
     <item android:id="@+id/share"
         android:title="@string/share"
+        app:showAsAction="never" />
+    <item android:id="@+id/rate_us"
+        android:title="@string/rate_us"
+        app:showAsAction="never" />
+    <item android:id="@+id/contact_us"
+        android:title="@string/contact_us"
+        app:showAsAction="never" />
+    <item android:id="@+id/about"
+        android:title="@string/about"
         app:showAsAction="never" />
 </menu>
