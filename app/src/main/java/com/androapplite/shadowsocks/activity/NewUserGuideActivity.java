@@ -13,11 +13,13 @@ import android.os.Bundle;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
+import com.androapplite.shadowsocks.fragment.PagerIndicatorFragment;
 
 public class NewUserGuideActivity extends BaseShadowsocksActivity {
     private ViewPager mWizardPager;
     private NewUserGuidePagerAdapter mNewUserGuidePagerAdapter;
     private int[][] mNewUserGuideResourceIds;
+    private PagerIndicatorFragment mPagerIndicatorFragment;
 
 
     @Override
@@ -26,9 +28,16 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
         setContentView(R.layout.activity_new_user_guide);
         mWizardPager = (ViewPager)findViewById(R.id.wizard_pager);
         mNewUserGuideResourceIds = createNewUserGuideResourceIds();
-        mNewUserGuidePagerAdapter = new NewUserGuidePagerAdapter(getSupportFragmentManager(), mNewUserGuideResourceIds);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mNewUserGuidePagerAdapter = new NewUserGuidePagerAdapter(fragmentManager, mNewUserGuideResourceIds);
+        mPagerIndicatorFragment = (PagerIndicatorFragment)fragmentManager.findFragmentById(R.id.pager_indicator);
+        initPagerIndicatorFragment();
         initWizardPager();
+    }
 
+    private void initPagerIndicatorFragment(){
+        mPagerIndicatorFragment.setSpotCount(mNewUserGuideResourceIds.length);
+        mPagerIndicatorFragment.setCurrent(0);
     }
 
     private int[][] createNewUserGuideResourceIds(){
@@ -50,6 +59,14 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
     }
     private void initWizardPager(){
         mWizardPager.setAdapter(mNewUserGuidePagerAdapter);
+        mWizardPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                if(mPagerIndicatorFragment != null){
+                    mPagerIndicatorFragment.setCurrent(position);
+                }
+            }
+        });
     }
 
     private static class NewUserGuidePagerAdapter extends FragmentPagerAdapter{
