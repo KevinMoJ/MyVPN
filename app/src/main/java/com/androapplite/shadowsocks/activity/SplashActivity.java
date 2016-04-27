@@ -19,7 +19,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
         setContentView(R.layout.activity_splash);
 
         initBackgroundReceiver();
-        initIntentFilter();
+        initBackgroundReceiverIntentFilter();
 
         getWindow().getDecorView().postDelayed(new Runnable() {
             @Override
@@ -35,15 +35,17 @@ public class SplashActivity extends BaseShadowsocksActivity {
         mBackgroundReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(intent.getAction().equals(Action.CONNECTION_ACTIVITY_SHOW)){
+                final String action = intent.getAction();
+                if(action.equals(Action.CONNECTION_ACTIVITY_SHOW) || action.equals(Action.NEW_USER_GUIDE_ACTIVITY_SHOW)){
                     finish();
                 }
             }
         };
     }
 
-    private void initIntentFilter(){
+    private void initBackgroundReceiverIntentFilter(){
         mBackgroundReceiverIntentFilter = new IntentFilter();
         mBackgroundReceiverIntentFilter.addAction(Action.CONNECTION_ACTIVITY_SHOW);
+        mBackgroundReceiverIntentFilter.addAction(Action.NEW_USER_GUIDE_ACTIVITY_SHOW);
     }
 }

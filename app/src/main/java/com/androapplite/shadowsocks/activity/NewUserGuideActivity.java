@@ -1,6 +1,10 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v4.app.Fragment;
@@ -9,6 +13,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -20,6 +26,7 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
     private NewUserGuidePagerAdapter mNewUserGuidePagerAdapter;
     private int[][] mNewUserGuideResourceIds;
     private PagerIndicatorFragment mPagerIndicatorFragment;
+    private Button mNewUserGuideFinishButton;
 
 
     @Override
@@ -31,8 +38,12 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         mNewUserGuidePagerAdapter = new NewUserGuidePagerAdapter(fragmentManager, mNewUserGuideResourceIds);
         mPagerIndicatorFragment = (PagerIndicatorFragment)fragmentManager.findFragmentById(R.id.pager_indicator);
+        mNewUserGuideFinishButton = (Button)findViewById(R.id.new_user_guide_finish_button);
         initPagerIndicatorFragment();
         initWizardPager();
+        initNewUserGuideFinishButton();
+        initBackgroundReceiverIntentFilter();
+        initBackgroundReceiver();
     }
 
     private void initPagerIndicatorFragment(){
@@ -59,12 +70,29 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
     }
     private void initWizardPager(){
         mWizardPager.setAdapter(mNewUserGuidePagerAdapter);
-        mWizardPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        mWizardPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                if(mPagerIndicatorFragment != null){
+                if (mPagerIndicatorFragment != null) {
                     mPagerIndicatorFragment.setCurrent(position);
                 }
+                if (mNewUserGuideFinishButton != null) {
+                    mNewUserGuideFinishButton.setVisibility(isLastWizardStep(position) ? View.VISIBLE : View.GONE);
+                }
+            }
+        });
+    }
+
+    private boolean isLastWizardStep(int current){
+        return current == mNewUserGuideResourceIds.length - 1;
+    }
+
+    private void initNewUserGuideFinishButton(){
+        mNewUserGuideFinishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Activity activity = NewUserGuideActivity.this;
+                startActivity(new Intent(activity, ConnectionActivity.class));
             }
         });
     }
@@ -90,6 +118,23 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.NEW_USER_GUIDE_ACTIVITY_SHOW));
+    }
+
+    private void initBackgroundReceiver(){
+        mBackgroundReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+                if(action.equals(Action.CONNECTION_ACTIVITY_SHOW)){
+                    finish();
+                }
+            }
+        };
+    }
+
+    private void initBackgroundReceiverIntentFilter(){
+        mBackgroundReceiverIntentFilter = new IntentFilter();
+        mBackgroundReceiverIntentFilter.addAction(Action.CONNECTION_ACTIVITY_SHOW);
     }
 }

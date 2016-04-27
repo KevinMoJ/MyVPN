@@ -8,7 +8,7 @@
     <array name="new_user_guide_step_2_resources">
         <item>@drawable/new_user_guide_2</item>
         <item>@string/browse_without_borders</item>
-        <item>@string/browse_without_borders</item>
+        <item>@string/browse_without_borders_explain</item>
     </array>
     <array name="new_user_guide_step_3_resources">
         <item>@drawable/new_user_guide_3</item>

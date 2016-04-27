@@ -11,4 +11,5 @@
     <color name="secondary_black_text">#8A000000</color>
     <color name="dhi_black_text">#61000000</color>
     <color name="grey_e3">#E3E3E3</color>
+    <color name="ok_btn_green">#54CB6C</color>
 </resources>

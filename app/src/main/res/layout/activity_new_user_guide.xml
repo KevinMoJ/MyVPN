@@ -21,13 +21,18 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="140dp"/>
     <Button
-        android:layout_width="400dp"
-        android:layout_height="70dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="40dp"
         android:text="@android:string/ok"
         android:textColor="@color/primary_white_text"
         android:textSize="@dimen/large_text"
+        android:background="@drawable/new_user_guide_finish_button"
+        android:visibility="gone"
+        android:id="@+id/new_user_guide_finish_button"
         />
 </RelativeLayout>
