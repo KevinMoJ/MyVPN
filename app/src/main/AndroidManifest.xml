@@ -10,16 +10,22 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ConnectionActivity"
-            android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".activity.ConnectionActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.NewUserGuideActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen"
+            ></activity>
     </application>
 
 </manifest>
