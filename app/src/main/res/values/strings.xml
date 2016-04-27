@@ -9,6 +9,11 @@
     <string name="rate_us">Rate us</string>
     <string name="contact_us">Contact us</string>
     <string name="about">About</string>
+    <string name="forever_free">Forever Free</string>
+    <string name="forever_free_explain">no registration, forever free, simple operation, click to connect</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

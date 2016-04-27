@@ -11,6 +11,7 @@
     <!--12、14、16、20 和 34-->
     <dimen name="extra_large_text">34sp</dimen>
     <dimen name="large_text">20sp</dimen>
+    <dimen name="medium_text">16sp</dimen>
     <dimen name="connection_button_outer">162dp</dimen>
 
 </resources>

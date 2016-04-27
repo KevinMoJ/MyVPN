@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 import com.androapplite.shadowsocks.R;
 
-public class NewUserGuideActivity extends AppCompatActivity {
+public class NewUserGuideActivity extends BaseShadowsocksActivity {
     private ViewPager mWizardPager;
     private NewUserGuidePagerAdapter mNewUserGuidePagerAdapter;
 

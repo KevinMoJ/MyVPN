@@ -11,7 +11,7 @@ import android.view.Menu;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 
-public class ConnectionActivity extends AppCompatActivity {
+public class ConnectionActivity extends BaseShadowsocksActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

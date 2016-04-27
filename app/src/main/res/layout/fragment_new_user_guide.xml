@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/background_dark"
+    tools:context="com.androapplite.shadowsocks.fragment.NewUserGuideFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/new_user_guide_1"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/standard_margin"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/forever_free"
+            android:textColor="@color/primary_white_text"
+            android:textSize="@dimen/extra_large_text"
+            android:layout_marginTop="@dimen/standard_margin"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/forever_free_explain"
+            android:textColor="@color/secondary_white_text"
+            android:textSize="@dimen/medium_text"
+            android:gravity="center_horizontal"
+            android:lines="2"
+            android:layout_marginTop="@dimen/twice_margin"/>
+    </LinearLayout>
+    <!-- TODO: Update blank fragment layout -->
+
+
+</LinearLayout>
