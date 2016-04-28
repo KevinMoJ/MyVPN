@@ -1,5 +1,7 @@
 package yyf.shadowsocks.utils;
 
+import com.androapplite.shadowsocks.BuildConfig;
+
 /**
  * Created by yyf on 2015/6/18.
  */
@@ -16,7 +18,7 @@ public class Constants {
     public enum Msg {CONNECT_FINISH,CONNECT_SUCCESS,CONNECT_FAIL,VPN_ERROR};
 
     public static class Path {
-        public static String BASE = "/data/data/yyf.shadowsocks/";
+        public static String BASE = "/data/data/" + BuildConfig.APPLICATION_ID + "/";
     }
 
     public static class Key {
