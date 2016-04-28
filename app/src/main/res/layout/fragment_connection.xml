@@ -10,19 +10,33 @@
         android:background="@drawable/connection_button_nomal"
         android:layout_centerHorizontal="true"
         android:id="@+id/connection_button_bg">
-        <ImageButton
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/connection_button_windmill"
             android:layout_gravity="center"
-            android:id="@+id/connection_button_windmill"/>
+            android:id="@+id/connection_button_windmill"
+            android:visibility="gone"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/tap_to_connect"
+            android:textSize="@dimen/large_text"
+            android:textColor="@color/primary_white_text"
+            android:textAllCaps="false"
+            android:id="@+id/connection_button"
+            android:background="@null"/>
     </FrameLayout>
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/connect_success"
+        android:text="@string/tap_to_connect_explain"
         android:id="@+id/connection_message"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/twice_margin"

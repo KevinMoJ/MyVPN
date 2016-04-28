@@ -32,6 +32,11 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         >
+        <ImageView
+            android:layout_width="49dp"
+            android:layout_height="32dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/flag_us"/>
         <fragment
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
