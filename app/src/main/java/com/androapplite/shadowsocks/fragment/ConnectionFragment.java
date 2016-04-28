@@ -6,6 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 
 import com.androapplite.shadowsocks.R;
 
@@ -13,6 +16,7 @@ import com.androapplite.shadowsocks.R;
  * A simple {@link Fragment} subclass.
  */
 public class ConnectionFragment extends Fragment {
+    private ImageButton mConnectionButton;
 
 
     public ConnectionFragment() {
@@ -24,7 +28,20 @@ public class ConnectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_connection, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_connection, container, false);
+        mConnectionButton = (ImageButton)rootView.findViewById(R.id.connection_button_windmill);
+        initConnectionButton();
+        return rootView;
+    }
+
+    private void initConnectionButton(){
+        mConnectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Animation rotate = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+                mConnectionButton.startAnimation(rotate);
+            }
+        });
     }
 
 }
