@@ -22,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.androapplite.shadowsocks.R;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,7 +92,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+//        setContentView(R.layout.main);
 
         /* Set up the action bar.*/
         final ActionBar actionBar = getSupportActionBar();
@@ -99,7 +101,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
-        mainPager = (ViewPager) findViewById(R.id.pager);
         mainPager.setAdapter(mSectionsPagerAdapter);
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
@@ -180,7 +181,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -189,30 +189,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch(item.getItemId()){
-            case R.id.action_settings:
-                //设置
-                Log.v("ss-log","settings");
-                return true;
-            case R.id.action_swipe:
-                //ss开关
-                Log.v("ss-log", "swipe");
-                Log.v("ss-vpn","------ start VPN -----");
-                prepareStartService();
-                //startService(new Intent(this,ShadowsocksVpnService.class));
-                return true;
-            case R.id.loadFromFile:
-                //加载JSON
-                ServerListDB sldb = new ServerListDB(this);
-                sldb.deleteAll();
-                Log.v("ss-log", "deleteDB");
-                sldb.add(JsonPreference.getServerPerferenc());
-                Log.v("ss-log", "addDB");
-                sldb.close();
-                Log.v("ss-log", "loadFromFile");
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+            return true;
+
     }
     private void copyAssets(String path) {
         AssetManager assetManager = getAssets();
@@ -279,7 +257,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         @Override
         public Fragment getItem(int position) {
-            return TabFragment.newInstance(position + 1);
+            return null;
         }
 
         @Override

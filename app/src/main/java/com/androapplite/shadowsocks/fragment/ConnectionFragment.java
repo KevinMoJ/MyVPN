@@ -60,7 +60,7 @@ public class ConnectionFragment extends Fragment {
         mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
         mConnectionMessageTextView.setText(R.string.please_wait);
 
-        Animation rotate = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+        Animation rotate = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate);
         mWindMillImageView.startAnimation(rotate);
         mWindMillImageView.setVisibility(View.VISIBLE);
     }

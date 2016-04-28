@@ -11,6 +11,9 @@ import android.net.VpnService;
 import android.os.*;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.shadowsocks.R;
+
 import org.apache.http.conn.util.InetAddressUtils;
 import org.xbill.DNS.AAAARecord;
 import org.xbill.DNS.ARecord;
@@ -32,13 +35,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import yyf.shadowsocks.BuildConfig;
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
-import yyf.shadowsocks.R;
+
 /**
  * Created by yyf on 2015/6/18.
  */

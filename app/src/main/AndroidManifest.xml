@@ -30,6 +30,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.FullScreen"
             ></activity>
+
+        <service android:name="yyf.shadowsocks.service.ShadowsocksVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:process=":vpn">
+            <intent-filter>
+                <action android:name="android.net.VpnService"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
