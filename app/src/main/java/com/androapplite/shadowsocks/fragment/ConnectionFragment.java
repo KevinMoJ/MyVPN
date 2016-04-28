@@ -40,20 +40,19 @@ public class ConnectionFragment extends Fragment {
         mConnectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mConnectionButton.getAnimation() == null){
-                    connect();
-                }else{
+                if (mConnectionButton.getAnimation() == null) {
+                    connecting();
+                } else {
                     stop();
                 }
             }
         });
     }
 
-    private void connect(){
+    private void connecting(){
         Animation rotate = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
         mConnectionButton.startAnimation(rotate);
-        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_connecting);
-
+        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
     }
 
     private void stop(){
@@ -61,4 +60,13 @@ public class ConnectionFragment extends Fragment {
         mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
     }
 
+    private void connected(){
+        mConnectionButton.clearAnimation();
+        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_conneced);
+    }
+
+    protected void error(){
+        mConnectionButton.clearAnimation();
+        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_error);
+    }
 }
