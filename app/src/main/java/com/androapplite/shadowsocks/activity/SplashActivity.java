@@ -15,6 +15,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.broadcast.Action;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.jni.*;
+import yyf.shadowsocks.jni.System;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
 
@@ -49,14 +51,10 @@ public class SplashActivity extends BaseShadowsocksActivity {
         new Thread() {
             @Override
             public void run() {
-                super.run();
-                copyAssets(yyf.shadowsocks.jni.System.getABI());
-                String ab = "chmod 755 " + Constants.Path.BASE + "pdnsd"+"\n";
-                ab+="chmod 755 " + Constants.Path.BASE + "redsocks"+"\n";
-                ab+="chmod 755 " + Constants.Path.BASE + "ss-local"+"\n";
-                ab+="chmod 755 " + Constants.Path.BASE + "ss-tunnel"+"\n";
-                ab+="chmod 755 " + Constants.Path.BASE + "tun2socks";
-                Console.runCommand(ab);
+                long t2 = java.lang.System.currentTimeMillis();
+                checkAndCopyAsset(yyf.shadowsocks.jni.System.getABI());
+                long t3 = java.lang.System.currentTimeMillis();
+                Log.d("ss-vpn", String.valueOf(t3-t2));
             }
         }.start();
     }
@@ -94,13 +92,10 @@ public class SplashActivity extends BaseShadowsocksActivity {
     }
     private void copyFile(InputStream in,OutputStream out) throws IOException{
         byte buffer[] = new byte[1024];
-        int read = 0;
-        while(true){
+        int read = in.read(buffer);
+        while(read != -1){
+            out.write(buffer, 0, read);
             read = in.read(buffer);
-            if(read!=-1)
-                out.write(buffer, 0, read);
-            else
-                break;
         }
     }
 
@@ -122,7 +117,42 @@ public class SplashActivity extends BaseShadowsocksActivity {
         mBackgroundReceiverIntentFilter.addAction(Action.NEW_USER_GUIDE_ACTIVITY_SHOW);
     }
 
-    private void checkAndCopyAsset(){
+    private void checkAndCopyAsset(String path){
+        AssetManager assetManager = getAssets();
+        String[] filenames = null;
+        try {
+            filenames = assetManager.list(path);
+        } catch(IOException e) {
+            Log.e("ss-error", e.getMessage());
+        }
+        if (filenames != null) {
+            for (String filename:filenames) {
+                File outFile = new File(Constants.Path.BASE, filename);
+                if(!outFile.exists()) {
+                    InputStream in = null;
+                    try {
+                        if (!path.isEmpty()) {
+                            in = assetManager.open(path + "/" + filename);
+                        } else {
+                            in = assetManager.open(filename);
+                        }
 
+                        OutputStream out = new FileOutputStream(outFile);
+                        copyFile(in, out);
+                        in.close();
+                        in = null;
+                        out.flush();
+                        out.close();
+                        out = null;
+
+                    } catch (Exception e) {
+                        Log.e("ss-error", e.getMessage());
+                    }
+                }
+                if (!(outFile.canRead() && outFile.canExecute())) {
+                    Console.runCommand("chmod 755 " + outFile.getAbsolutePath());
+                }
+            }
+        }
     }
 }
