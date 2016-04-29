@@ -1,6 +1,7 @@
 package com.androapplite.shadowsocks.fragment;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ public class ConnectionFragment extends Fragment {
     private ImageView mWindMillImageView;
     private FrameLayout mConnectionButtonFrameLayout;
     private TextView mConnectionMessageTextView;
+    private OnFragmentInteractionListener mListener;
 
     public ConnectionFragment() {
         // Required empty public constructor
@@ -46,16 +48,19 @@ public class ConnectionFragment extends Fragment {
         mConnectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mWindMillImageView.getVisibility() != View.VISIBLE) {
+/*                if (mWindMillImageView.getVisibility() != View.VISIBLE) {
                     connecting();
                 } else {
                     stop();
+                }*/
+                if(mListener != null){
+                    mListener.onClickConnectionButton();
                 }
             }
         });
     }
 
-    private void connecting(){
+    public void connecting(){
         mConnectionButton.setText(R.string.connecting);
         mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
         mConnectionMessageTextView.setText(R.string.please_wait);
@@ -65,7 +70,7 @@ public class ConnectionFragment extends Fragment {
         mWindMillImageView.setVisibility(View.VISIBLE);
     }
 
-    private void stop(){
+    public void stop(){
         mConnectionButton.setText(R.string.tap_to_connect);
         mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
         mConnectionMessageTextView.setText(R.string.tap_to_connect_explain);
@@ -73,7 +78,7 @@ public class ConnectionFragment extends Fragment {
         mWindMillImageView.setVisibility(View.GONE);
     }
 
-    private void connected(){
+    public void connected(){
         mConnectionButton.setText(R.string.tap_to_disconnect);
         mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_conneced);
         mConnectionMessageTextView.setText(R.string.connect_success);
@@ -87,5 +92,26 @@ public class ConnectionFragment extends Fragment {
         mConnectionMessageTextView.setText("");
         mWindMillImageView.clearAnimation();
         mWindMillImageView.setVisibility(View.GONE);
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onClickConnectionButton();
+    }
+
+    @Override
+    public void onAttach(Activity context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 }

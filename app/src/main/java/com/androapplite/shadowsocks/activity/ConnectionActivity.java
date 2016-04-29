@@ -1,37 +1,83 @@
 
 package com.androapplite.shadowsocks.activity;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.net.VpnService;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
-public class ConnectionActivity extends BaseShadowsocksActivity implements RateUsFragment.OnFragmentInteractionListener {
+import yyf.shadowsocks.Config;
+import yyf.shadowsocks.IShadowsocksService;
+import yyf.shadowsocks.utils.Constants;
+
+public class ConnectionActivity extends BaseShadowsocksActivity implements
+        RateUsFragment.OnFragmentInteractionListener, ConnectionFragment.OnFragmentInteractionListener {
     private RateUsFragment mRateUsFragment;
+    private static int REQUEST_CONNECT = 1;
+    private IShadowsocksService mShadowsocksService;
+    private ServiceConnection mShadowsocksServiceConnection;
+    private ConnectionFragment mConnectionFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
+        mConnectionFragment = findConectionFragment();
         initToobar();
+        showRateUsFragmentWhenFirstOpen();
+        mShadowsocksServiceConnection = createShadowsocksServiceConnection();
+        ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
+
+    }
+
+    private void showRateUsFragmentWhenFirstOpen() {
         if(!DefaultSharedPrefeencesUtil.isRateUsFragmentShown(this)) {
             mRateUsFragment = RateUsFragment.newInstance();
             initRateUsFragment();
             DefaultSharedPrefeencesUtil.markRateUsFragmentAsShowed(this);
         }
+    }
+
+    private ConnectionFragment findConectionFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        return (ConnectionFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
+    }
+
+    private ServiceConnection createShadowsocksServiceConnection(){
+        return new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mShadowsocksService = null;
+            }
+        };
     }
 
     private void initRateUsFragment(){
@@ -152,5 +198,51 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements RateU
     @Override
     public void onRateUs() {
         rateUs();
+    }
+
+    private void prepareStartService(){
+        Intent intent = VpnService.prepare(this);
+        if (intent != null) {
+            startActivityForResult(intent, REQUEST_CONNECT);
+            Log.v("ss-vpn", "startActivityForResult");
+        } else {
+            onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
+            Log.v("ss-vpn", "onActivityResult");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            //Intent intent = new Intent(this, ShadowsocksVpnService.class);
+            //bindService(intent,connection,BIND_AUTO_CREATE);
+            if(mShadowsocksService != null){
+                try {
+                    Config config = new Config();
+                    mShadowsocksService.start(config);
+                    Log.v("ss-vpn", "bgService.StartVpn");
+                }catch(RemoteException e){
+                    e.getStackTrace();
+                }
+            }else{
+                Log.v("ss-vpn","bgServiceIsNull");
+            }
+        }
+    }
+
+    @Override
+    public void onClickConnectionButton() {
+        try {
+            if (mShadowsocksService == null || mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()) {
+                mConnectionFragment.connecting();
+                prepareStartService();
+            }else{
+                mShadowsocksService.stop();
+                mConnectionFragment.stop();
+            }
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
+
     }
 }
