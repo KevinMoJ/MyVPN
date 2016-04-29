@@ -19,7 +19,7 @@ import yyf.shadowsocks.IShadowsocksServiceCallback;
 public abstract class BaseService extends VpnService {
         volatile private Constants.State state = Constants.State.INIT;
         volatile private int callbackCount = 0;
-        final RemoteCallbackList callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
+        final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
         IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
             public int getMode(){
                     return getServiceMode().ordinal();
@@ -79,7 +79,7 @@ public abstract class BaseService extends VpnService {
                             int n = callbacks.beginBroadcast();
                             for (int i = 0; i < n; i++) {
                                 try {
-                                    ((IShadowsocksServiceCallback)callbacks.getBroadcastItem(i)).stateChanged(s.ordinal(), msg);
+                                    callbacks.getBroadcastItem(i).stateChanged(s.ordinal(), msg);
                                 } catch (RemoteException e) {
                                     e.printStackTrace();
                                 }

@@ -298,4 +298,12 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             }
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mShadowsocksServiceConnection != null){
+            unbindService(mShadowsocksServiceConnection);
+        }
+    }
 }
