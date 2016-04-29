@@ -35,13 +35,13 @@ import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
 
 public class ConnectionActivity extends BaseShadowsocksActivity implements
-        RateUsFragment.OnFragmentInteractionListener, ConnectionFragment.OnFragmentInteractionListener,
-        IShadowsocksServiceCallback{
+        RateUsFragment.OnFragmentInteractionListener, ConnectionFragment.OnFragmentInteractionListener{
     private RateUsFragment mRateUsFragment;
     private static int REQUEST_CONNECT = 1;
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
     private ConnectionFragment mConnectionFragment;
+    private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +51,37 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         initToobar();
         showRateUsFragmentWhenFirstOpen();
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
+        mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
 
     }
 
+    private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
+        return new IShadowsocksServiceCallback.Stub(){
+            @Override
+            public void stateChanged(final int state, String msg) throws RemoteException {
+                getWindow().getDecorView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mConnectionFragment != null) {
+                            if (state == Constants.State.CONNECTED.ordinal()) {
+                                mConnectionFragment.connected();
+                            }else if(state == Constants.State.STOPPED.ordinal()) {
+                                mConnectionFragment.stop();
+                            }else if(state == Constants.State.CONNECTING.ordinal()){
+                                mConnectionFragment.connecting();
+                            }
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
+
+            }
+        };
+    }
     private void showRateUsFragmentWhenFirstOpen() {
         if(!DefaultSharedPrefeencesUtil.isRateUsFragmentShown(this)) {
             mRateUsFragment = RateUsFragment.newInstance();
@@ -248,7 +275,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
     }
 
-    @Override
+/*    @Override
     public void stateChanged(int state, String msg) throws RemoteException {
         if(state == Constants.State.CONNECTED.ordinal()){
             mConnectionFragment.connected();
@@ -264,9 +291,9 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
     @Override
     public IBinder asBinder() {
-        return null;
+        return this;
     }
-
+*/
     @Override
     protected void onStart() {
         super.onStart();
@@ -276,7 +303,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private void registerShadowsocksCallback() {
         if(mShadowsocksService != null){
             try {
-                mShadowsocksService.registerCallback(this);
+                mShadowsocksService.registerCallback(mShadowsocksServiceCallbackBinder);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -292,7 +319,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private void unregisterShadowsocksCallback() {
         if(mShadowsocksService != null){
             try {
-                mShadowsocksService.unregisterCallback(this);
+                mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
