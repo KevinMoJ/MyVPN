@@ -5,20 +5,21 @@ import android.content.Context;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.RemoteCallbackList;
+import android.os.RemoteException;
 import android.util.Log;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.Config;
-//import yyf.shadowsocks.aidl.IShadowsocksServiceCallback;
+import yyf.shadowsocks.IShadowsocksServiceCallback;
 
 /**
  * Created by yyf on 2015/6/18.
  */
 public abstract class BaseService extends VpnService {
         volatile private Constants.State state = Constants.State.INIT;
-        //volatile private int callbackCount = 0;
-        //final RemoteCallbackList callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
+        volatile private int callbackCount = 0;
+        final RemoteCallbackList callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
         IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
             public int getMode(){
                     return getServiceMode().ordinal();
@@ -26,6 +27,16 @@ public abstract class BaseService extends VpnService {
 
             public int getState(){
                     return state.ordinal();
+            }
+
+            @Override
+            public void registerCallback(IShadowsocksServiceCallback cb) throws RemoteException {
+                    BaseService.this.registerCallback(cb);
+            }
+
+            @Override
+            public void unregisterCallback(IShadowsocksServiceCallback cb) throws RemoteException {
+                    BaseService.this.unregisterCallback(cb);
             }
 
             public void stop() {
@@ -60,27 +71,44 @@ public abstract class BaseService extends VpnService {
         }
 
         protected void changeState(final Constants.State s,final String msg) {
-//            Handler handler = new Handler(getContext().getMainLooper());
-//            handler.post(new Runnable() {
-//                public void run() {
-//                    if (state != s) {
-//                        if (callbackCount > 0) {
-//                            int n = callbacks.beginBroadcast();
-//                            for (int i = 0; i < n; i++) {
-//                                //callbacks.getBroadcastItem(i).stateChanged(s.ordinal(),msg);
-//                                Log.v("ss-error", "badbad");
-//                            }
-//                            callbacks.finishBroadcast();
-//                        }
-//                        state = s;
-//                    }
-//                }
-//            });
+            Handler handler = new Handler(getContext().getMainLooper());
+            handler.post(new Runnable() {
+                public void run() {
+                    if (state != s) {
+                        if (callbackCount > 0) {
+                            int n = callbacks.beginBroadcast();
+                            for (int i = 0; i < n; i++) {
+                                try {
+                                    ((IShadowsocksServiceCallback)callbacks.getBroadcastItem(i)).stateChanged(s.ordinal(), msg);
+                                } catch (RemoteException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            callbacks.finishBroadcast();
+                        }
+                        state = s;
+                    }
+                }
+            });
 
         }
 
         void initSoundVibrateLights(Notification notification) {
         notification.sound = null;
+    }
+
+    public void registerCallback(IShadowsocksServiceCallback callback){
+        if(callback != null) {
+            callbacks.register(callback);
+            callbackCount += 1;
+        }
+    }
+
+    public void unregisterCallback(IShadowsocksServiceCallback callback){
+        if(callback != null) {
+            callbacks.unregister(callback);
+            callbackCount -= 1;
+        }
     }
 
 }

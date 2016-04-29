@@ -31,10 +31,12 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
+import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
 
 public class ConnectionActivity extends BaseShadowsocksActivity implements
-        RateUsFragment.OnFragmentInteractionListener, ConnectionFragment.OnFragmentInteractionListener {
+        RateUsFragment.OnFragmentInteractionListener, ConnectionFragment.OnFragmentInteractionListener,
+        IShadowsocksServiceCallback{
     private RateUsFragment mRateUsFragment;
     private static int REQUEST_CONNECT = 1;
     private IShadowsocksService mShadowsocksService;
@@ -71,6 +73,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
+                registerShadowsocksCallback();
             }
 
             @Override
@@ -233,16 +236,66 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     @Override
     public void onClickConnectionButton() {
         try {
-            if (mShadowsocksService == null || mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()) {
-                mConnectionFragment.connecting();
+            if (mShadowsocksService == null || mShadowsocksService.getState() == Constants.State.INIT.ordinal()
+                    || mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()) {
                 prepareStartService();
             }else{
                 mShadowsocksService.stop();
-                mConnectionFragment.stop();
             }
         }catch (RemoteException e){
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void stateChanged(int state, String msg) throws RemoteException {
+        if(state == Constants.State.CONNECTED.ordinal()){
+            mConnectionFragment.connected();
+        }else if(state == Constants.State.STOPPED.ordinal()){
+            mConnectionFragment.stop();
+        }
+    }
+
+    @Override
+    public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
+
+    }
+
+    @Override
+    public IBinder asBinder() {
+        return null;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerShadowsocksCallback();
+    }
+
+    private void registerShadowsocksCallback() {
+        if(mShadowsocksService != null){
+            try {
+                mShadowsocksService.registerCallback(this);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterShadowsocksCallback();
+    }
+
+    private void unregisterShadowsocksCallback() {
+        if(mShadowsocksService != null){
+            try {
+                mShadowsocksService.unregisterCallback(this);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

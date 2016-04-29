@@ -69,7 +69,6 @@ public class ShadowsockServiceHelper {
 
     public static final void startService(Context context){
         Intent intent = new Intent(context, ShadowsocksVpnService.class);
-        intent.setAction(Constants.Action.SERVICE);
         context.startService(intent);
     }
 
