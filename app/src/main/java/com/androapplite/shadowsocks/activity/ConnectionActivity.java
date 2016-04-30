@@ -63,15 +63,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 getWindow().getDecorView().post(new Runnable() {
                     @Override
                     public void run() {
-                        if(mConnectionFragment != null) {
-                            if (state == Constants.State.CONNECTED.ordinal()) {
-                                mConnectionFragment.connected();
-                            }else if(state == Constants.State.STOPPED.ordinal()) {
-                                mConnectionFragment.stop();
-                            }else if(state == Constants.State.CONNECTING.ordinal()){
-                                mConnectionFragment.connecting();
-                            }
-                        }
+                        updateConnectionState(state);
                     }
                 });
             }
@@ -82,6 +74,19 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             }
         };
     }
+
+    private void updateConnectionState(int state) {
+        if(mConnectionFragment != null) {
+            if (state == Constants.State.CONNECTED.ordinal()) {
+                mConnectionFragment.connected();
+            }else if(state == Constants.State.STOPPED.ordinal()) {
+                mConnectionFragment.stop();
+            }else if(state == Constants.State.CONNECTING.ordinal()){
+                mConnectionFragment.connecting();
+            }
+        }
+    }
+
     private void showRateUsFragmentWhenFirstOpen() {
         if(!DefaultSharedPrefeencesUtil.isRateUsFragmentShown(this)) {
             mRateUsFragment = RateUsFragment.newInstance();
@@ -101,6 +106,11 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
                 registerShadowsocksCallback();
+                try {
+                    updateConnectionState(mShadowsocksService.getState());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -275,25 +285,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
     }
 
-/*    @Override
-    public void stateChanged(int state, String msg) throws RemoteException {
-        if(state == Constants.State.CONNECTED.ordinal()){
-            mConnectionFragment.connected();
-        }else if(state == Constants.State.STOPPED.ordinal()){
-            mConnectionFragment.stop();
-        }
-    }
 
-    @Override
-    public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
-
-    }
-
-    @Override
-    public IBinder asBinder() {
-        return this;
-    }
-*/
     @Override
     protected void onStart() {
         super.onStart();

@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'shadowsocks'
+            keyPassword '123456'
+            storeFile file('shadowsocks.jks')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion 22
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "com.androapplite.shadowsocks"
         minSdkVersion 16
@@ -11,7 +18,6 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
     //添加NDK自定义android.mk 支持
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
@@ -22,12 +28,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:support-v4:22.2.0'
