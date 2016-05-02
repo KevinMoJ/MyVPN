@@ -22,16 +22,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.google.android.gms.analytics.HitBuilders;
+
+import java.lang.System;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
+import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.utils.Constants;
 
 public class ConnectionActivity extends BaseShadowsocksActivity implements
@@ -42,6 +48,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private ServiceConnection mShadowsocksServiceConnection;
     private ConnectionFragment mConnectionFragment;
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
+    private long mConnectOrDisconnectStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +86,18 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         if(mConnectionFragment != null) {
             if (state == Constants.State.CONNECTED.ordinal()) {
                 mConnectionFragment.connected();
+                if(mConnectOrDisconnectStartTime > 0) {
+                    long t = System.currentTimeMillis();
+                    GAHelper.sendTimingEvent(ConnectionActivity.this, "VPN计时", "连接", t-mConnectOrDisconnectStartTime);
+                    mConnectOrDisconnectStartTime = 0;
+                }
             }else if(state == Constants.State.STOPPED.ordinal()) {
                 mConnectionFragment.stop();
+                if(mConnectOrDisconnectStartTime > 0){
+                    long t = System.currentTimeMillis();
+                    GAHelper.sendTimingEvent(ConnectionActivity.this, "VPN计时", "断开", t-mConnectOrDisconnectStartTime);
+                    mConnectOrDisconnectStartTime = 0;
+                }
             }else if(state == Constants.State.CONNECTING.ordinal()){
                 mConnectionFragment.connecting();
             }
@@ -148,17 +165,24 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         int id = item.getItemId();
         switch (id){
             case R.id.share_icon:
+                share();
+                GAHelper.sendEvent(this, "菜单", "分享", "图标");
+                break;
             case R.id.share:
                 share();
+                GAHelper.sendEvent(this, "菜单", "分享", "文字");
                 break;
             case R.id.rate_us:
                 rateUs();
+                GAHelper.sendEvent(this, "菜单", "给我们打分");
                 break;
             case R.id.contact_us:
                 contactUs();
+                GAHelper.sendEvent(this, "菜单", "联系我们");
                 break;
             case R.id.about:
                 about();
+                GAHelper.sendEvent(this, "菜单", "关于");
                 break;
         }
         return true;
@@ -232,12 +256,15 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().remove(mRateUsFragment).commit();
             mRateUsFragment = null;
+
+            GAHelper.sendEvent(this, "给我们打分", "关闭");
         }
     }
 
     @Override
     public void onRateUs() {
         rateUs();
+        GAHelper.sendEvent(this, "给我们打分", "打开");
     }
 
     private void prepareStartService(){
@@ -276,9 +303,14 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             if (mShadowsocksService == null || mShadowsocksService.getState() == Constants.State.INIT.ordinal()
                     || mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()) {
                 prepareStartService();
+                mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                GAHelper.sendEvent(this, "连接VPN", "打开");
             }else{
                 mShadowsocksService.stop();
+                mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                GAHelper.sendEvent(this, "连接VPN", "关闭");
             }
+
         }catch (RemoteException e){
             e.printStackTrace();
         }
