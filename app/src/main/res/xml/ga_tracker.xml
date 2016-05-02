@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="ga_trackingId">UA-0000-1</string>
+    <string name="ga_sampleFrequency">100.0</string>
+    <integer name="ga_sessionTimeout">1800</integer>
+    <bool name="ga_autoActivityTracking">true</bool>
+    <bool name="ga_anonymizeIp">false</bool>
+    <bool name="ga_reportUncaughtExceptions">true</bool>
+
+    <screenName name="com.androapplite.shadowsocks.activity.SplashActivity">启动屏幕</screenName>
+    <screenName name="com.androapplite.shadowsocks.activity.ConnectionActivity">VPN连接屏幕</screenName>
+    <screenName name="com.androapplite.shadowsocks.activity.NewUserGuideActivity">新手引导屏幕</screenName>
+</resources>
