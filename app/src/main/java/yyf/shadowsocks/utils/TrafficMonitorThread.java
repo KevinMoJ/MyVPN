@@ -16,4 +16,7 @@ public class TrafficMonitorThread extends Thread {
     public TrafficMonitorThread(@NonNull Context context){
         super(TrafficMonitorThread.class.getSimpleName());
     }
+
+    public void stopThread() {
+    }
 }

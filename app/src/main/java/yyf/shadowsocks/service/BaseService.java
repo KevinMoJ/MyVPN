@@ -62,7 +62,12 @@ public abstract class BaseService extends VpnService {
         trafficMonitorThread = new TrafficMonitorThread(this);
         trafficMonitorThread.start();
     }
-    public abstract void stopRunner();
+    public void stopRunner(){
+        if (trafficMonitorThread != null) {
+            trafficMonitorThread.stopThread();
+            trafficMonitorThread = null
+        }
+    }
     public abstract Constants.Mode getServiceMode();
     public abstract String getTag();
     public abstract Context getContext();

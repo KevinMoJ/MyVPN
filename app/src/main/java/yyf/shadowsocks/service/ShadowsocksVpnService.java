@@ -402,6 +402,7 @@ public class ShadowsocksVpnService extends BaseService {
         }
         // channge the state
         changeState(Constants.State.STOPPED);
+        super.stopRunner();
     }
 
 
