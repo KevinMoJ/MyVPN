@@ -40,6 +40,8 @@ import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
+import yyf.shadowsocks.utils.TrafficMonitor;
+import yyf.shadowsocks.utils.TrafficMonitorThread;
 
 /**
  * Created by yyf on 2015/6/18.
@@ -320,36 +322,10 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void startRunner(Config c) {
-        //android.os.Debug.waitForDebugger();
         Log.v("ss-vpn","startRunner");
         config = c;
-        // ensure the VPNService is prepared
-        //TODO 重写 StartRunner Activity
-//        if (VpnService.prepare(this) != null) {
-//            Intent i = new Intent(this);
-//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(i);
-//            return;
-//        }
+        super.startRunner(c);
 
-        // send event
-//        application.tracker.send(new HitBuilders.EventBuilder()
-//                .setCategory(TAG)
-//                .setAction("start")
-//                .setLabel(getVersionName)
-//                .build())
-
-        // register close receiver
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(Intent.ACTION_SHUTDOWN);
-//        receiver = new BroadcastReceiver {
-//            def onReceive(p1: Context, p2: Intent) {
-//                Toast.makeText(p1, R.string.stopping, Toast.LENGTH_SHORT)
-//                stopRunner()
-//            }
-//        }
-//        registerReceiver(receiver, filter);
-//
         changeState(Constants.State.CONNECTING);
         if (config != null) {
             // reset the context
