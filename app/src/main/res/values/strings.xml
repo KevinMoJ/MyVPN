@@ -2,7 +2,7 @@
     <string name="app_name">Free VPN</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="connect_success">You are coonected!</string>
+    <string name="connect_success">You are connected!</string>
     <string name="rate_your_experience">Rate your experience</string>
     <string name="rating">rating</string>
     <string name="share">Share</string>

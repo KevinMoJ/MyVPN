@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.AssetManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.File;
@@ -20,7 +21,7 @@ import yyf.shadowsocks.utils.Constants;
  * Created by jim on 16/4/29.
  */
 public class ShadowsockServiceHelper {
-    public static final void copyFile(InputStream in,OutputStream out) throws IOException {
+    public static final void copyFile(@NonNull InputStream in, @NonNull OutputStream out) throws IOException {
         byte buffer[] = new byte[1024];
         int read = in.read(buffer);
         while(read != -1){
@@ -29,7 +30,7 @@ public class ShadowsockServiceHelper {
         }
     }
 
-    public static final void checkAndCopyAsset(AssetManager assetManager, String path){
+    public static final void checkAndCopyAsset(@NonNull AssetManager assetManager, @NonNull String path){
         String[] filenames = null;
         try {
             filenames = assetManager.list(path);
@@ -67,12 +68,12 @@ public class ShadowsockServiceHelper {
         }
     }
 
-    public static final void startService(Context context){
+    public static final void startService(@NonNull Context context){
         Intent intent = new Intent(context, ShadowsocksVpnService.class);
         context.startService(intent);
     }
 
-    public static final void bindService(Context context, ServiceConnection connection){
+    public static final void bindService(@NonNull Context context, @NonNull ServiceConnection connection){
         Intent intent = new Intent(context, ShadowsocksVpnService.class);
         intent.setAction(Constants.Action.SERVICE);
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);

@@ -1,6 +1,7 @@
 package com.androapplite.shadowsocks;
 
 import android.app.Application;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -11,6 +12,7 @@ import com.google.android.gms.analytics.Tracker;
 public class ShadowsocksApplication extends Application {
     private Tracker mTracker;
 
+    @NonNull
     public Tracker getTracker(){
         if(mTracker == null){
             synchronized(this){
