@@ -22,7 +22,7 @@ import com.androapplite.shadowsocks.R;
 public class ConnectionFragment extends Fragment {
     private Button mConnectionButton;
     private ImageView mWindMillImageView;
-    private FrameLayout mConnectionButtonFrameLayout;
+//    private FrameLayout mConnectionButtonFrameLayout;
     private TextView mConnectionMessageTextView;
     private OnFragmentInteractionListener mListener;
 
@@ -36,7 +36,7 @@ public class ConnectionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_connection, container, false);
-        mConnectionButtonFrameLayout = (FrameLayout)rootView.findViewById(R.id.connection_button_bg);
+//        mConnectionButtonFrameLayout = (FrameLayout)rootView.findViewById(R.id.connection_button_bg);
         mWindMillImageView = (ImageView)rootView.findViewById(R.id.connection_button_windmill);
         mConnectionButton = (Button)rootView.findViewById(R.id.connection_button);
         mConnectionMessageTextView = (TextView)rootView.findViewById(R.id.connection_message);
@@ -62,9 +62,9 @@ public class ConnectionFragment extends Fragment {
 
     public void connecting(){
         mConnectionButton.setText(R.string.connecting);
-        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
+//        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_normal);
         mConnectionMessageTextView.setText(R.string.please_wait);
-
+        mWindMillImageView.setBackgroundResource(R.drawable.connection_button_windmill);
         Animation rotate = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate);
         mWindMillImageView.startAnimation(rotate);
         mWindMillImageView.setVisibility(View.VISIBLE);
@@ -72,7 +72,7 @@ public class ConnectionFragment extends Fragment {
 
     public void stop(){
         mConnectionButton.setText(R.string.tap_to_connect);
-        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_nomal);
+//        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_normal);
         mConnectionMessageTextView.setText(R.string.tap_to_connect_explain);
         mWindMillImageView.clearAnimation();
         mWindMillImageView.setVisibility(View.GONE);
@@ -80,18 +80,20 @@ public class ConnectionFragment extends Fragment {
 
     public void connected(){
         mConnectionButton.setText(R.string.tap_to_disconnect);
-        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_conneced);
+//        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_conneced);
         mConnectionMessageTextView.setText(R.string.connect_success);
         mWindMillImageView.clearAnimation();
-        mWindMillImageView.setVisibility(View.GONE);
+        mWindMillImageView.setVisibility(View.VISIBLE);
+        mWindMillImageView.setBackgroundResource(R.drawable.connection_button_success);
     }
 
     protected void error(){
         mConnectionButton.setText("");
-        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_error);
+//        mConnectionButtonFrameLayout.setBackgroundResource(R.drawable.connection_button_error);
         mConnectionMessageTextView.setText("");
         mWindMillImageView.clearAnimation();
-        mWindMillImageView.setVisibility(View.GONE);
+        mWindMillImageView.setVisibility(View.VISIBLE);
+        mWindMillImageView.setBackgroundResource(R.drawable.connection_button_fail);
     }
 
     public interface OnFragmentInteractionListener {

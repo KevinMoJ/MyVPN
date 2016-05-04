@@ -7,12 +7,13 @@
     <FrameLayout
         android:layout_width="@dimen/connection_button_outer"
         android:layout_height="@dimen/connection_button_outer"
-        android:background="@drawable/connection_button_nomal"
+        android:background="@drawable/connection_button_normal"
         android:layout_centerHorizontal="true"
-        android:id="@+id/connection_button_bg">
+        android:id="@+id/connection_button_bg"
+        >
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/connection_button_inner"
+            android:layout_height="@dimen/connection_button_inner"
             android:background="@drawable/connection_button_windmill"
             android:layout_gravity="center"
             android:id="@+id/connection_button_windmill"
