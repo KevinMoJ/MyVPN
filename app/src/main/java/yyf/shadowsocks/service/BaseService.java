@@ -6,7 +6,9 @@ import android.net.VpnService;
 import android.os.Handler;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.util.Log;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
@@ -20,8 +22,14 @@ import yyf.shadowsocks.utils.TrafficMonitorThread;
  */
 public abstract class BaseService extends VpnService {
     volatile private Constants.State state = Constants.State.INIT;
-    volatile private int callbackCount = 0;
-    volatile protected TrafficMonitorThread trafficMonitorThread;
+    volatile private int callbacksCount = 0;
+    private TrafficMonitorThread trafficMonitorThread;
+    private TrafficMonitor mTrafficMonitor;
+    private Timer timer;
+    private Handler handler;
+    protected Config config = null;
+
+
 
     final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
     IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
@@ -56,26 +64,36 @@ public abstract class BaseService extends VpnService {
         }
     };
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mTrafficMonitor = new TrafficMonitor();
+        handler = new Handler(getMainLooper());
+    }
+
     public abstract void stopBackgroundService();
     public void startRunner(Config config){
-        TrafficMonitor.reset();
+        this.config = config;
+        mTrafficMonitor.reset();
         trafficMonitorThread = new TrafficMonitorThread(this);
         trafficMonitorThread.start();
     }
     public void stopRunner(){
+        updateTrafficTotal(mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
+        mTrafficMonitor.reset();
         if (trafficMonitorThread != null) {
             trafficMonitorThread.stopThread();
-            trafficMonitorThread = null
+            trafficMonitorThread = null;
         }
+    }
+
+    private void updateTrafficTotal(long tx, long rx){
+
     }
     public abstract Constants.Mode getServiceMode();
     public abstract String getTag();
     public abstract Context getContext();
 
-    public int getCallbackCount(){
-        //        return callbackCount;
-        return -1;
-    }
     public Constants.State getState(){
         return state;
     }
@@ -88,7 +106,7 @@ public abstract class BaseService extends VpnService {
         handler.post(new Runnable() {
             public void run() {
                 if (state != s) {
-                    if (callbackCount > 0) {
+                    if (callbacksCount > 0) {
                         int n = callbacks.beginBroadcast();
                         for (int i = 0; i < n; i++) {
                             try {
@@ -111,17 +129,67 @@ public abstract class BaseService extends VpnService {
     }
 
     public void registerCallback(IShadowsocksServiceCallback callback){
-        if(callback != null) {
-            callbacks.register(callback);
-            callbackCount += 1;
+        if(callback != null && callbacks.register(callback)) {
+            callbacksCount += 1;
+            if (callbacksCount != 0 && timer == null) {
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(mTrafficMonitor.updateRate()){
+                            updateTrafficRate();
+                        }
+                    }
+                };
+                timer = new Timer(true);
+                timer.schedule(task, 1000, 1000);
+            }
+            mTrafficMonitor.updateRate();
+            try {
+                callback.trafficUpdated(mTrafficMonitor.txRate, mTrafficMonitor.rxRate, mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void updateTrafficRate(){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if(callbacksCount > 0){
+                    long txRate = mTrafficMonitor.txRate;
+                    long rxRate = mTrafficMonitor.rxRate;
+                    long txTotal = mTrafficMonitor.txTotal;
+                    long rxTotal = mTrafficMonitor.rxTotal;
+                    int n = callbacks.beginBroadcast();
+                    for(int i=0; i<n; i++){
+                        try {
+                            callbacks.getBroadcastItem(i).trafficUpdated(txRate, rxRate, txTotal, rxTotal);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    callbacks.finishBroadcast();
+                }
+            }
+        });
     }
 
     public void unregisterCallback(IShadowsocksServiceCallback callback){
-        if(callback != null) {
-            callbacks.unregister(callback);
-            callbackCount -= 1;
+        if (callback != null && callbacks.unregister(callback)) {
+            callbacksCount -= 1;
+            if (callbacksCount == 0 && timer != null) {
+                timer.cancel();
+                timer = null;
+            }
         }
     }
 
+    public int getCallbacksCount() {
+        return callbacksCount;
+    }
+
+    private void updateTrafficTotal(){
+
+    }
 }

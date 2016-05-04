@@ -58,7 +58,7 @@ public class ShadowsocksVpnService extends BaseService {
 
 
     //Array<ProxiedApp> apps = null; 功能去掉...
-    Config config = null;
+
 
     //private ShadowsocksApplication application = This.getApplication();//<ShadowsocksApplication>;
     boolean isByass() {
@@ -323,7 +323,6 @@ public class ShadowsocksVpnService extends BaseService {
     @Override
     public void startRunner(Config c) {
         Log.v("ss-vpn","startRunner");
-        config = c;
         super.startRunner(c);
 
         changeState(Constants.State.CONNECTING);
@@ -392,7 +391,7 @@ public class ShadowsocksVpnService extends BaseService {
             }
         }
         // stop the service if no callback registered
-        if (getCallbackCount() == 0) {
+        if (getCallbacksCount() == 0) {
             stopSelf();
         }
         // clean up the context
