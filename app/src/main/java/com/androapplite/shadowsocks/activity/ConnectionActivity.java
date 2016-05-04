@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.IBinder;
@@ -157,6 +159,10 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_connection_activity, menu);
+        MenuItem item = menu.findItem(R.id.share_icon);
+        Drawable drawable = item.getIcon();
+        drawable.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+        item.setIcon(drawable);
         return true;
     }
 
