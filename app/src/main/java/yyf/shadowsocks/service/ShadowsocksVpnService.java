@@ -37,6 +37,7 @@ import java.util.Locale;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.jni.*;
+import yyf.shadowsocks.jni.System;
 import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
@@ -131,7 +132,7 @@ public class ShadowsocksVpnService extends BaseService {
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-tunnel-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
-        Log.v("ss-vpn","DnsTunnel:write to file");
+        Log.v("ss-vpn", "DnsTunnel:write to file");
         String[] cmd = {
                 Constants.Path.BASE + "ss-tunnel"
                 , "-u"
@@ -146,7 +147,7 @@ public class ShadowsocksVpnService extends BaseService {
             Log.d(TAG, Console.mkCMD(cmd));
         //Log.d(TAG, cmd.mkString(" "))
         Console.runCommand(Console.mkCMD(cmd));
-        Log.v("ss-vpn","start DnsTun");
+        Log.v("ss-vpn", "start DnsTun");
         Log.v("ss-vpn",Console.mkCMD(cmd));
     }
 
@@ -154,9 +155,9 @@ public class ShadowsocksVpnService extends BaseService {
         String reject = getResources().getString(R.string.reject);
         String blackList = getResources().getString(R.string.black_list);
 
-        String conf = String.format(Locale.ENGLISH,ConfigUtils.PDNSD_DIRECT,"0.0.0.0", 8153,
-            Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
-        Log.v("ss-vpn","DnsDaemon:config write to file");
+        String conf = String.format(Locale.ENGLISH, ConfigUtils.PDNSD_DIRECT, "0.0.0.0", 8153,
+                Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
+        Log.v("ss-vpn", "DnsDaemon:config write to file");
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "pdnsd-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
@@ -242,18 +243,19 @@ public class ShadowsocksVpnService extends BaseService {
 
         String cmd = String.format(Locale.ENGLISH,
                 Constants.Path.BASE +
-                "tun2socks --netif-ipaddr %s "
-                + "--netif-netmask 255.255.255.0 "
-                + "--socks-server-addr 127.0.0.1:%d "
-                + "--tunfd %d "
-                + "--tunmtu %d "
-                + "--loglevel 5 "
-                + "--pid %stun2socks-vpn.pid "
-                + "--logger stdout",
+                        "tun2socks --netif-ipaddr %s "
+                        + "--netif-netmask 255.255.255.0 "
+                        + "--socks-server-addr 127.0.0.1:%d "
+                        + "--tunfd %d "
+                        + "--tunmtu %d "
+                        + "--loglevel 3 "
+                        + "--pid %stun2socks-vpn.pid "
+                        + "--sock-path %ssock_path "
+                        + "--logger stdout",
                 String.format(Locale.ENGLISH,PRIVATE_VLAN, "2"), config.localPort, fd, VPN_MTU, Constants.Path.BASE);
 
         //if (config.isUdpDns)
-        //    cmd += " --enable-udprelay";
+            cmd += " --enable-udprelay";
         //else
             cmd += String.format(Locale.ENGLISH," --dnsgw %s:8153", String.format(Locale.ENGLISH,PRIVATE_VLAN,"1"));
 
@@ -264,8 +266,27 @@ public class ShadowsocksVpnService extends BaseService {
         if (BuildConfig.DEBUG)
             Log.d(TAG, cmd);
 
-        //Console.runCommand(cmd);
-        yyf.shadowsocks.jni.System.exec(cmd);
+        Console.runCommand(cmd);
+        sendFd(fd);
+//        yyf.shadowsocks.jni.System.exec(cmd);
+    }
+
+    private boolean sendFd(int fd) {
+        if (fd != -1) {
+            int tries = 1;
+            while (tries < 5) {
+                try {
+                    Thread.sleep(1000 * tries);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (System.sendfd(fd, Constants.Path.BASE + "sock_path") != -1) {
+                    return true;
+                }
+                tries += 1;
+            }
+        }
+        return false;
     }
 
     /**
