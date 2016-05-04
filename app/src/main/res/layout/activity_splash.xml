@@ -19,7 +19,7 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="@dimen/twice_margin"
-        android:textSize="@dimen/extra_large_text"
+        android:textSize="@dimen/large_text_30"
         android:textColor="@color/primary_white_text"/>
 
 </RelativeLayout>

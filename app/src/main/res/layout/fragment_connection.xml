@@ -41,6 +41,6 @@
         android:layout_marginTop="@dimen/twice_margin"
         android:layout_below="@id/connection_button_bg"
         android:textSize="@dimen/large_text"
-        android:textColor="@color/primary_black_text"/>
+        android:textColor="@color/secondary_black_text"/>
 
 </RelativeLayout>

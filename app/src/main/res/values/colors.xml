@@ -12,4 +12,5 @@
     <color name="dhi_black_text">#61000000</color>
     <color name="grey_e3">#E3E3E3</color>
     <color name="ok_btn_green">#54CB6C</color>
+    <color name="activity_background">#f4f4f4</color>
 </resources>
