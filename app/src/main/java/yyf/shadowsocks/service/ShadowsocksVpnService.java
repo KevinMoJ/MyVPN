@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 import org.apache.http.conn.util.InetAddressUtils;
 import org.xbill.DNS.AAAARecord;
@@ -119,7 +120,7 @@ public class ShadowsocksVpnService extends BaseService {
             Log.d(TAG, cmd.toString());
         //Log.d(TAG, cmd.mkString(" "));
         Console.runCommand(Console.mkCMD(cmd));
-        ShadowsocksApplication.debug("ss-vpn",Console.mkCMD(cmd));
+        ShadowsocksApplication.debug("ss-vpn", Console.mkCMD(cmd));
     }
 
     public void startDnsTunnel() {
@@ -131,7 +132,7 @@ public class ShadowsocksVpnService extends BaseService {
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-tunnel-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
-        ShadowsocksApplication.debug("ss-vpn","DnsTunnel:write to file");
+        ShadowsocksApplication.debug("ss-vpn", "DnsTunnel:write to file");
         String[] cmd = {
                 Constants.Path.BASE + "ss-tunnel"
                 , "-u"
@@ -146,8 +147,8 @@ public class ShadowsocksVpnService extends BaseService {
             Log.d(TAG, Console.mkCMD(cmd));
         //Log.d(TAG, cmd.mkString(" "))
         Console.runCommand(Console.mkCMD(cmd));
-        ShadowsocksApplication.debug("ss-vpn","start DnsTun");
-        ShadowsocksApplication.debug("ss-vpn",Console.mkCMD(cmd));
+        ShadowsocksApplication.debug("ss-vpn", "start DnsTun");
+        ShadowsocksApplication.debug("ss-vpn", Console.mkCMD(cmd));
     }
 
     public void startDnsDaemon() {
@@ -279,7 +280,7 @@ public class ShadowsocksVpnService extends BaseService {
         if (VpnService.SERVICE_INTERFACE == action) {
             return super.onBind(intent);
         } else if (Constants.Action.SERVICE == action) {
-            ShadowsocksApplication.debug("ss-vpn","getBinder");
+            ShadowsocksApplication.debug("ss-vpn", "getBinder");
             return binder;
         }
         return null;
@@ -356,7 +357,7 @@ public class ShadowsocksVpnService extends BaseService {
     }
 
     public boolean handleConnection() {
-        ShadowsocksApplication.debug("ss-vpn","handleConnection");
+        ShadowsocksApplication.debug("ss-vpn", "handleConnection");
         startShadowsocksDaemon();
         startDnsDaemon();
         startDnsTunnel();

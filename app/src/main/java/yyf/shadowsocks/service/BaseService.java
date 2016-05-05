@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
