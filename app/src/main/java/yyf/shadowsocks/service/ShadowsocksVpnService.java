@@ -38,6 +38,7 @@ import java.util.Locale;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.jni.*;
+import yyf.shadowsocks.jni.System;
 import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
@@ -49,13 +50,14 @@ import yyf.shadowsocks.utils.TrafficMonitorThread;
  */
 public class ShadowsocksVpnService extends BaseService {
 
-    String TAG = "ShadowsocksVpnService";
-    int VPN_MTU = 1500;
-    String PRIVATE_VLAN = "25.25.25.%s";
+    private static final String TAG = "ShadowsocksVpnService";
+    private static final int VPN_MTU = 1500;
+    private static final String PRIVATE_VLAN = "25.25.25.%s";
 
-    ParcelFileDescriptor conn = null;
-    NotificationManager notificationManager = null;
-    BroadcastReceiver receiver = null;
+    private ParcelFileDescriptor conn = null;
+    private NotificationManager notificationManager = null;
+    private BroadcastReceiver receiver = null;
+    private ShadowsocksVpnThread mShadowsocksVpnThread;
 
 
     //Array<ProxiedApp> apps = null; 功能去掉...
@@ -104,6 +106,10 @@ public class ShadowsocksVpnService extends BaseService {
         //执行命令build
         String[] cmd = {
                 Constants.Path.BASE + "ss-local", "-u",
+                "-v",
+                "-V",
+//                "-A",
+                "-P", Constants.Path.BASE,
                 "-b", "127.0.0.1",
                 "-t", "600", "-c",
                 Constants.Path.BASE + "ss-local-vpn.conf", "-f ",
@@ -135,11 +141,15 @@ public class ShadowsocksVpnService extends BaseService {
         ShadowsocksApplication.debug("ss-vpn", "DnsTunnel:write to file");
         String[] cmd = {
                 Constants.Path.BASE + "ss-tunnel"
+                , "-v"
+                , "-V"
                 , "-u"
+//                , "-A"
                 , "-t", "10"
                 , "-b", "127.0.0.1"
                 , "-l", "8163"
                 , "-L", "8.8.8.8:53"
+                , "-P", Constants.Path.BASE
                 , "-c", Constants.Path.BASE + "ss-tunnel-vpn.conf"
                 , "-f", Constants.Path.BASE + "ss-tunnel-vpn.pid"};
         //执行
@@ -155,8 +165,8 @@ public class ShadowsocksVpnService extends BaseService {
         String reject = getResources().getString(R.string.reject);
         String blackList = getResources().getString(R.string.black_list);
 
-        String conf = String.format(Locale.ENGLISH,ConfigUtils.PDNSD_DIRECT,"0.0.0.0", 8153,
-            Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
+        String conf = String.format(Locale.ENGLISH, ConfigUtils.PDNSD_DIRECT, "0.0.0.0", 8153,
+                Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
         ShadowsocksApplication.debug("ss-vpn","DnsDaemon:config write to file");
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "pdnsd-vpn.conf"));
         printWriter.println(conf);
@@ -169,7 +179,6 @@ public class ShadowsocksVpnService extends BaseService {
         Console.runCommand(cmd);
         ShadowsocksApplication.debug("ss-vpn","start DnsDaemon");
         ShadowsocksApplication.debug("ss-vpn",cmd);
-
     }
 
 
@@ -218,6 +227,7 @@ public class ShadowsocksVpnService extends BaseService {
         }
 
         builder.addRoute("8.8.0.0", 16);
+        builder.addRoute("0.0.0.0", 0);
 
         for(int i = 0;i < list.length;i++) {
             String [] addr = list[i].split("/");
@@ -243,18 +253,19 @@ public class ShadowsocksVpnService extends BaseService {
 
         String cmd = String.format(Locale.ENGLISH,
                 Constants.Path.BASE +
-                "tun2socks --netif-ipaddr %s "
-                + "--netif-netmask 255.255.255.0 "
-                + "--socks-server-addr 127.0.0.1:%d "
-                + "--tunfd %d "
-                + "--tunmtu %d "
-                + "--loglevel 5 "
-                + "--pid %stun2socks-vpn.pid "
-                + "--logger stdout",
-                String.format(Locale.ENGLISH,PRIVATE_VLAN, "2"), config.localPort, fd, VPN_MTU, Constants.Path.BASE);
+                        "tun2socks --netif-ipaddr %s "
+                        + "--netif-netmask 255.255.255.0 "
+                        + "--socks-server-addr 127.0.0.1:%d "
+                        + "--tunfd %d "
+                        + "--tunmtu %d "
+                        + "--loglevel 3 "
+                        + "--pid %stun2socks-vpn.pid "
+                        + "--sock-path %ssock_path "
+                        + "--logger stdout",
+                String.format(Locale.ENGLISH,PRIVATE_VLAN, "2"), config.localPort, fd, VPN_MTU, Constants.Path.BASE, Constants.Path.BASE);
 
         //if (config.isUdpDns)
-        //    cmd += " --enable-udprelay";
+//            cmd += " --enable-udprelay";
         //else
             cmd += String.format(Locale.ENGLISH," --dnsgw %s:8153", String.format(Locale.ENGLISH,PRIVATE_VLAN,"1"));
 
@@ -265,8 +276,27 @@ public class ShadowsocksVpnService extends BaseService {
         if (BuildConfig.DEBUG)
             Log.d(TAG, cmd);
 
-        //Console.runCommand(cmd);
-        yyf.shadowsocks.jni.System.exec(cmd);
+        Console.runCommand(cmd);
+        sendFd(fd);
+//        yyf.shadowsocks.jni.System.exec(cmd);
+    }
+
+    private boolean sendFd(int fd) {
+        if (fd != -1) {
+            int tries = 1;
+            while (tries < 5) {
+                try {
+                    Thread.sleep(1000 * tries);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (System.sendfd(fd, Constants.Path.BASE + "sock_path") != -1) {
+                    return true;
+                }
+                tries += 1;
+            }
+        }
+        return false;
     }
 
     /**
@@ -325,6 +355,8 @@ public class ShadowsocksVpnService extends BaseService {
     public void startRunner(Config c) {
         ShadowsocksApplication.debug("ss-vpn","startRunner");
         super.startRunner(c);
+        mShadowsocksVpnThread = new ShadowsocksVpnThread(this);
+        mShadowsocksVpnThread.start();
 
         changeState(Constants.State.CONNECTING);
         if (config != null) {
@@ -371,7 +403,6 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void stopRunner() {
-
         // channge the state
         changeState(Constants.State.STOPPING);
         // send event
@@ -382,6 +413,10 @@ public class ShadowsocksVpnService extends BaseService {
 //                .build());
         // reset VPN
         killProcesses();
+        if(mShadowsocksVpnThread != null){
+            mShadowsocksVpnThread.stopThread();
+            mShadowsocksVpnThread = null;
+        }
         // close connections
         if (conn != null) {
             try {

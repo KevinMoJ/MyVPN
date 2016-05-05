@@ -1,13 +1,11 @@
-package yyf.shadowsocks.utils;
+package yyf.shadowsocks.service;
 
-import android.content.Context;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.net.VpnService;
-import android.support.annotation.NonNull;
 import android.util.Log;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -17,36 +15,33 @@ import java.lang.reflect.Method;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Created by jim on 16/5/3.
- */
-public class TrafficMonitorThread extends Thread {
-    private static final String TAG = "TrafficMonitorThread";
-    private static final String PATH = Constants.Path.BASE + "stat_path";
-    private volatile boolean isRunning;
-    private volatile LocalServerSocket serverSocket;
-    private VpnService mVpnService;
+import yyf.shadowsocks.utils.Constants;
 
-    public TrafficMonitorThread(@NonNull VpnService vpnService){
-        super(TrafficMonitorThread.class.getSimpleName());
-        isRunning = true;
-        mVpnService = vpnService;
+public class ShadowsocksVpnThread extends Thread {
+    private static final String TAG = "ShadowsocksVpnService";
+    private static final String PATH = Constants.Path.BASE + "protect_path";
+
+    private volatile boolean isRunning = true;
+    private volatile LocalServerSocket serverSocket;
+    private VpnService vpnService;
+
+    public ShadowsocksVpnThread(VpnService vpnService) {
+        this.vpnService = vpnService;
+    }
+
+    private void closeServerSocket() {
+        if (serverSocket != null) {
+            try {
+                serverSocket.close();
+            } catch (Exception ex) {
+            }
+            serverSocket = null;
+        }
     }
 
     public void stopThread() {
         isRunning = false;
         closeServerSocket();
-    }
-
-    private void closeServerSocket() {
-        if(serverSocket != null){
-            try {
-                serverSocket.close();
-            } catch (IOException e) {
-                ShadowsocksApplication.handleException(e);
-            }
-            serverSocket = null;
-        }
     }
 
     public void run() {
@@ -83,7 +78,7 @@ public class TrafficMonitorThread extends Thread {
                             if (fds.length > 0) {
                                 Method getInt = FileDescriptor.class.getDeclaredMethod("getInt$");
                                 int fd = (int) getInt.invoke(fds[0]);
-                                boolean ret = mVpnService.protect(fd);
+                                boolean ret = vpnService.protect(fd);
 
                                 // Trick to close file decriptor
                                 yyf.shadowsocks.jni.System.jniclose(fd);
