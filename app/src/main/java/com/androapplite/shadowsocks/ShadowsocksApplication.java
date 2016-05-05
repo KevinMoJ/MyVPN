@@ -3,8 +3,11 @@ package com.androapplite.shadowsocks;
 import android.app.Application;
 import android.support.annotation.NonNull;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by jim on 16/5/2.
@@ -29,5 +32,11 @@ public class ShadowsocksApplication extends Application {
         }else{
             return mTracker;
         }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Fabric.with(this, new Crashlytics());
     }
 }

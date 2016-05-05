@@ -15,3 +15,40 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class android.support.v7.widget.SearchView { *; }
+-keep class com.crashlytics.** { *; }
+-keep class com.crashlytics.android.**
+-keepattributes SourceFile,LineNumberTable
+#-keepattributes *Annotation*
+
+#admob
+-keep public class com.google.android.gms.ads.** {
+   public *;
+}
+
+-keep public class com.google.ads.** {
+   public *;
+}
+
+#facebook ad
+#-keep public class com.facebook.ads.** {
+#   public *;
+#}
+
+-keep public class com.flurry.android.ads.** {
+   public *;
+}
+
+-keep public class com.inmobi.ads.** {
+   public *;
+}
+
+-dontwarn com.facebook.**
+
+-dontwarn com.squareup.okhttp.**
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+}
+-dontwarn okio.**

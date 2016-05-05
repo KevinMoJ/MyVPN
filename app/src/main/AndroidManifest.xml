@@ -48,6 +48,9 @@
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="52a14ce59287e0edc5512692515ab0270feaef99" />
     </application>
 
 </manifest>
