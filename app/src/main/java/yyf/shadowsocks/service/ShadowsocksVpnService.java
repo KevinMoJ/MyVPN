@@ -119,7 +119,7 @@ public class ShadowsocksVpnService extends BaseService {
             Log.d(TAG, cmd.toString());
         //Log.d(TAG, cmd.mkString(" "));
         Console.runCommand(Console.mkCMD(cmd));
-        Log.v("ss-vpn",Console.mkCMD(cmd));
+        ShadowsocksApplication.debug("ss-vpn",Console.mkCMD(cmd));
     }
 
     public void startDnsTunnel() {
@@ -131,7 +131,7 @@ public class ShadowsocksVpnService extends BaseService {
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-tunnel-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
-        Log.v("ss-vpn","DnsTunnel:write to file");
+        ShadowsocksApplication.debug("ss-vpn","DnsTunnel:write to file");
         String[] cmd = {
                 Constants.Path.BASE + "ss-tunnel"
                 , "-u"
@@ -146,8 +146,8 @@ public class ShadowsocksVpnService extends BaseService {
             Log.d(TAG, Console.mkCMD(cmd));
         //Log.d(TAG, cmd.mkString(" "))
         Console.runCommand(Console.mkCMD(cmd));
-        Log.v("ss-vpn","start DnsTun");
-        Log.v("ss-vpn",Console.mkCMD(cmd));
+        ShadowsocksApplication.debug("ss-vpn","start DnsTun");
+        ShadowsocksApplication.debug("ss-vpn",Console.mkCMD(cmd));
     }
 
     public void startDnsDaemon() {
@@ -156,7 +156,7 @@ public class ShadowsocksVpnService extends BaseService {
 
         String conf = String.format(Locale.ENGLISH,ConfigUtils.PDNSD_DIRECT,"0.0.0.0", 8153,
             Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
-        Log.v("ss-vpn","DnsDaemon:config write to file");
+        ShadowsocksApplication.debug("ss-vpn","DnsDaemon:config write to file");
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "pdnsd-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
@@ -166,8 +166,8 @@ public class ShadowsocksVpnService extends BaseService {
         if (BuildConfig.DEBUG)
             Log.d(TAG, cmd);
         Console.runCommand(cmd);
-        Log.v("ss-vpn","start DnsDaemon");
-        Log.v("ss-vpn",cmd);
+        ShadowsocksApplication.debug("ss-vpn","start DnsDaemon");
+        ShadowsocksApplication.debug("ss-vpn",cmd);
 
     }
 
@@ -194,7 +194,7 @@ public class ShadowsocksVpnService extends BaseService {
                 .setMtu(VPN_MTU)
                 .addAddress(str, 24)
                 .addDnsServer("8.8.8.8");
-        Log.v("ss-vpn", "startRealVpn!!!!");
+        ShadowsocksApplication.debug("ss-vpn", "startRealVpn!!!!");
         if (ConfigUtils.isLollipopOrAbove()) {
             builder.allowFamily(android.system.OsConstants.AF_INET6);
             builder.addDisallowedApplication(this.getPackageName());
@@ -274,12 +274,12 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.v("ss-vpn", "onBind");
+        ShadowsocksApplication.debug("ss-vpn", "onBind");
         String action = intent.getAction();
         if (VpnService.SERVICE_INTERFACE == action) {
             return super.onBind(intent);
         } else if (Constants.Action.SERVICE == action) {
-            Log.v("ss-vpn","getBinder");
+            ShadowsocksApplication.debug("ss-vpn","getBinder");
             return binder;
         }
         return null;
@@ -288,7 +288,7 @@ public class ShadowsocksVpnService extends BaseService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.v("ss-vpn", "onCreate");
+        ShadowsocksApplication.debug("ss-vpn", "onCreate");
 
     }
 
@@ -296,7 +296,7 @@ public class ShadowsocksVpnService extends BaseService {
     @Override
     public void onRevoke() {
         stopRunner();
-        Log.v("ss-vpn", "oncreate");
+        ShadowsocksApplication.debug("ss-vpn", "oncreate");
     }
 
     public void killProcesses() {
@@ -322,7 +322,7 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void startRunner(Config c) {
-        Log.v("ss-vpn","startRunner");
+        ShadowsocksApplication.debug("ss-vpn","startRunner");
         super.startRunner(c);
 
         changeState(Constants.State.CONNECTING);
@@ -345,7 +345,7 @@ public class ShadowsocksVpnService extends BaseService {
                 resolved = true;
             }
 
-            Log.v("ss-vpn", "resolved:" + resolved);
+            ShadowsocksApplication.debug("ss-vpn", "resolved:" + resolved);
             if (resolved && handleConnection()) {
                 changeState(Constants.State.CONNECTED);
             } else {
@@ -356,7 +356,7 @@ public class ShadowsocksVpnService extends BaseService {
     }
 
     public boolean handleConnection() {
-        Log.v("ss-vpn","handleConnection");
+        ShadowsocksApplication.debug("ss-vpn","handleConnection");
         startShadowsocksDaemon();
         startDnsDaemon();
         startDnsTunnel();
