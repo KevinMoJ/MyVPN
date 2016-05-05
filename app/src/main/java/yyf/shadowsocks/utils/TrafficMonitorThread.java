@@ -24,7 +24,7 @@ import yyf.shadowsocks.service.BaseService;
  */
 public class TrafficMonitorThread extends Thread {
     private static final String TAG = "TrafficMonitorThread";
-    private static final String PATH = Constants.Path.BASE + "protect_path";
+    private static final String PATH = Constants.Path.BASE + "stat_path";
     private volatile boolean isRunning;
     private volatile LocalServerSocket serverSocket;
     private VpnService mVpnService;
