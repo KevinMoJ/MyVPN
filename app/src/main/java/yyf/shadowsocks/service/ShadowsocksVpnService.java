@@ -337,6 +337,7 @@ public class ShadowsocksVpnService extends BaseService {
                 File f = new File(Constants.Path.BASE + task + "-vpn.pid");
                 BufferedReader br = new BufferedReader(new FileReader(f));
                 Integer pid = Integer.valueOf(br.readLine());
+                br.close();
                 if(pid!=null)
                     android.os.Process.killProcess(pid);
 
