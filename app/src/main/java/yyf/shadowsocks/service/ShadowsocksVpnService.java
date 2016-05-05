@@ -105,6 +105,10 @@ public class ShadowsocksVpnService extends BaseService {
         //执行命令build
         String[] cmd = {
                 Constants.Path.BASE + "ss-local", "-u",
+                "-v",
+                "-V",
+//                "-A",
+                "-P", Constants.Path.BASE,
                 "-b", "127.0.0.1",
                 "-t", "600", "-c",
                 Constants.Path.BASE + "ss-local-vpn.conf", "-f ",
@@ -136,11 +140,15 @@ public class ShadowsocksVpnService extends BaseService {
         Log.v("ss-vpn", "DnsTunnel:write to file");
         String[] cmd = {
                 Constants.Path.BASE + "ss-tunnel"
+                , "-v"
+                , "-V"
                 , "-u"
+//                , "-A"
                 , "-t", "10"
                 , "-b", "127.0.0.1"
                 , "-l", "8163"
                 , "-L", "8.8.8.8:53"
+                , "-P", Constants.Path.BASE
                 , "-c", Constants.Path.BASE + "ss-tunnel-vpn.conf"
                 , "-f", Constants.Path.BASE + "ss-tunnel-vpn.pid"};
         //执行
@@ -219,6 +227,7 @@ public class ShadowsocksVpnService extends BaseService {
         }
 
         builder.addRoute("8.8.0.0", 16);
+        builder.addRoute("0.0.0.0", 0);
 
         for(int i = 0;i < list.length;i++) {
             String [] addr = list[i].split("/");
@@ -253,10 +262,10 @@ public class ShadowsocksVpnService extends BaseService {
                         + "--pid %stun2socks-vpn.pid "
                         + "--sock-path %ssock_path "
                         + "--logger stdout",
-                String.format(Locale.ENGLISH,PRIVATE_VLAN, "2"), config.localPort, fd, VPN_MTU, Constants.Path.BASE);
+                String.format(Locale.ENGLISH,PRIVATE_VLAN, "2"), config.localPort, fd, VPN_MTU, Constants.Path.BASE, Constants.Path.BASE);
 
         //if (config.isUdpDns)
-            cmd += " --enable-udprelay";
+//            cmd += " --enable-udprelay";
         //else
             cmd += String.format(Locale.ENGLISH," --dnsgw %s:8153", String.format(Locale.ENGLISH,PRIVATE_VLAN,"1"));
 
@@ -394,10 +403,6 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void stopRunner() {
-        if(mShadowsocksVpnThread != null){
-            mShadowsocksVpnThread.stopThread();
-            mShadowsocksVpnThread = null;
-        }
         // channge the state
         changeState(Constants.State.STOPPING);
         // send event
@@ -408,6 +413,10 @@ public class ShadowsocksVpnService extends BaseService {
 //                .build());
         // reset VPN
         killProcesses();
+        if(mShadowsocksVpnThread != null){
+            mShadowsocksVpnThread.stopThread();
+            mShadowsocksVpnThread = null;
+        }
         // close connections
         if (conn != null) {
             try {

@@ -88,7 +88,7 @@ public class ConfigUtils {
     static public String PDNSD_DIRECT =
             "global {\n" +
             " perm_cache = 2048;\n" +
-            " cache_dir = \"/data/yyf.shadowsocks\";\n" +
+            " cache_dir = \"/data/" + Constants.Path.BASE + "\";\n" +
             " server_ip = %s;\n" +
             " server_port = %d;\n" +
             " query_method = tcp_only;\n" +
