@@ -112,7 +112,7 @@ public abstract class BaseService extends VpnService {
                             try {
                                 callbacks.getBroadcastItem(i).stateChanged(s.ordinal(), msg);
                             } catch (RemoteException e) {
-                                e.printStackTrace();
+                                ShadowsocksApplication.handleException(e);
                             }
                         }
                         callbacks.finishBroadcast();
@@ -147,7 +147,7 @@ public abstract class BaseService extends VpnService {
             try {
                 callback.trafficUpdated(mTrafficMonitor.txRate, mTrafficMonitor.rxRate, mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
             } catch (RemoteException e) {
-                e.printStackTrace();
+                ShadowsocksApplication.handleException(e);
             }
         }
     }
@@ -166,7 +166,7 @@ public abstract class BaseService extends VpnService {
                         try {
                             callbacks.getBroadcastItem(i).trafficUpdated(txRate, rxRate, txTotal, rxTotal);
                         } catch (RemoteException e) {
-                            e.printStackTrace();
+                            ShadowsocksApplication.handleException(e);
                         }
                     }
                     callbacks.finishBroadcast();

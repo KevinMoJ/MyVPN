@@ -387,7 +387,7 @@ public class ShadowsocksVpnService extends BaseService {
                 conn.close();
                 conn = null;
             }catch(IOException e){
-                e.printStackTrace();
+                ShadowsocksApplication.handleException(e);
             }
         }
         // stop the service if no callback registered
@@ -449,7 +449,7 @@ public class ShadowsocksVpnService extends BaseService {
             InetAddress addr = InetAddress.getByName(host);
             return addr.getHostAddress();
         } catch (java.net.UnknownHostException e){
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
         return null;
     }

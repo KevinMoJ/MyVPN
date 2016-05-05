@@ -128,7 +128,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 try {
                     updateConnectionState(mShadowsocksService.getState());
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+                    ShadowsocksApplication.handleException(e);
                 }
             }
 
@@ -201,7 +201,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         try {
             startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share)));
         }catch(ActivityNotFoundException e){
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
     }
 
@@ -234,7 +234,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         try {
             startActivity(data);
         }catch(ActivityNotFoundException e){
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
     }
 
@@ -298,7 +298,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                     e.getStackTrace();
                 }
             }else{
-                ShadowsocksApplication.debug("ss-vpn","bgServiceIsNull");
+                ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
         }
     }
@@ -318,7 +318,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             }
 
         }catch (RemoteException e){
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
 
     }
@@ -335,7 +335,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             try {
                 mShadowsocksService.registerCallback(mShadowsocksServiceCallbackBinder);
             } catch (RemoteException e) {
-                e.printStackTrace();
+                ShadowsocksApplication.handleException(e);
             }
         }
     }
@@ -351,7 +351,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             try {
                 mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
             } catch (RemoteException e) {
-                e.printStackTrace();
+                ShadowsocksApplication.handleException(e);
             }
         }
     }

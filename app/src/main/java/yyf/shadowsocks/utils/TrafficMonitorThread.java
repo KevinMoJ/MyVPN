@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.LocalServerSocket;
 import android.support.annotation.NonNull;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+
 import java.io.IOException;
 
 import yyf.shadowsocks.service.BaseService;
@@ -32,7 +34,7 @@ public class TrafficMonitorThread extends Thread {
             try {
                 serverSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                ShadowsocksApplication.handleException(e);
             }
             serverSocket = null;
         }
