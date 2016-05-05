@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 public class BaseShadowsocksActivity extends AppCompatActivity {
     protected BroadcastReceiver mBackgroundReceiver;
     protected IntentFilter mBackgroundReceiverIntentFilter;
+    protected BroadcastReceiver mForgroundReceiver;
+    protected IntentFilter mForgroundReceiverIntentFilter;
 
 
     protected void registerBackgroundReceiver(){
@@ -27,15 +29,29 @@ public class BaseShadowsocksActivity extends AppCompatActivity {
         }
     }
 
+    protected void registerForgroundReceiver(){
+        if(mForgroundReceiver != null && mForgroundReceiverIntentFilter != null){
+            LocalBroadcastManager.getInstance(this).registerReceiver(mForgroundReceiver, mForgroundReceiverIntentFilter);
+        }
+    }
+
+    protected void unregisterForgroundReceiver(){
+        if(mForgroundReceiver != null){
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mForgroundReceiver);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        registerForgroundReceiver();
         unregisterBackgroundReceiver();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterForgroundReceiver();
         registerBackgroundReceiver();
     }
 
@@ -43,5 +59,6 @@ public class BaseShadowsocksActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterBackgroundReceiver();
+        unregisterForgroundReceiver();
     }
 }

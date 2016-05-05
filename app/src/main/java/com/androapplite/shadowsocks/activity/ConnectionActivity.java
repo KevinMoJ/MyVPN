@@ -3,13 +3,18 @@ package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.IBinder;
@@ -20,7 +25,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -32,14 +36,12 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.google.android.gms.analytics.HitBuilders;
 
 import java.lang.System;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
-import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.utils.Constants;
 
 public class ConnectionActivity extends BaseShadowsocksActivity implements
@@ -51,6 +53,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private ConnectionFragment mConnectionFragment;
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private long mConnectOrDisconnectStartTime;
+    private BroadcastReceiver mConnectivityBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
 
+        initConnectivityReceiver();
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -361,6 +365,56 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         super.onDestroy();
         if(mShadowsocksServiceConnection != null){
             unbindService(mShadowsocksServiceConnection);
+        }
+
+        if(mConnectivityBroadcastReceiver != null){
+            unregisterReceiver(mConnectivityBroadcastReceiver);
+        }
+    }
+
+    private void initForgroundReceiver(){
+
+    }
+
+    private void initForgroundReceiverIntentFilter(){
+
+    }
+
+    private void initConnectivityReceiver(){
+        mConnectivityBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(intent != null
+                        && ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())
+                        && intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1) == ConnectivityManager.TYPE_VPN) {
+                    checkConnectivity();
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        registerReceiver(mConnectivityBroadcastReceiver, intentFilter);
+    }
+
+    private void checkConnectivity(){
+        if(mConnectionFragment != null){
+            ConnectivityManager cm =
+                    (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_VPN);
+            if(activeNetwork != null ){
+                if(activeNetwork.isConnectedOrConnecting()){
+                    if(activeNetwork.isConnected()){
+                        mConnectionFragment.connected();
+                    }else{
+                        mConnectionFragment.connecting();
+                    }
+                }else{
+                    mConnectionFragment.stop();
+                }
+            }
         }
     }
 }
