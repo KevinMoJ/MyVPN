@@ -49,13 +49,14 @@ import yyf.shadowsocks.utils.TrafficMonitorThread;
  */
 public class ShadowsocksVpnService extends BaseService {
 
-    String TAG = "ShadowsocksVpnService";
-    int VPN_MTU = 1500;
-    String PRIVATE_VLAN = "25.25.25.%s";
+    private static final String TAG = "ShadowsocksVpnService";
+    private static final int VPN_MTU = 1500;
+    private static final String PRIVATE_VLAN = "25.25.25.%s";
 
-    ParcelFileDescriptor conn = null;
-    NotificationManager notificationManager = null;
-    BroadcastReceiver receiver = null;
+    private ParcelFileDescriptor conn = null;
+    private NotificationManager notificationManager = null;
+    private BroadcastReceiver receiver = null;
+    private ShadowsocksVpnThread mShadowsocksVpnThread;
 
 
     //Array<ProxiedApp> apps = null; 功能去掉...
@@ -148,7 +149,7 @@ public class ShadowsocksVpnService extends BaseService {
         //Log.d(TAG, cmd.mkString(" "))
         Console.runCommand(Console.mkCMD(cmd));
         Log.v("ss-vpn", "start DnsTun");
-        Log.v("ss-vpn",Console.mkCMD(cmd));
+        Log.v("ss-vpn", Console.mkCMD(cmd));
     }
 
     public void startDnsDaemon() {
@@ -167,8 +168,8 @@ public class ShadowsocksVpnService extends BaseService {
         if (BuildConfig.DEBUG)
             Log.d(TAG, cmd);
         Console.runCommand(cmd);
-        Log.v("ss-vpn","start DnsDaemon");
-        Log.v("ss-vpn",cmd);
+        Log.v("ss-vpn", "start DnsDaemon");
+        Log.v("ss-vpn", cmd);
 
     }
 
@@ -300,7 +301,7 @@ public class ShadowsocksVpnService extends BaseService {
         if (VpnService.SERVICE_INTERFACE == action) {
             return super.onBind(intent);
         } else if (Constants.Action.SERVICE == action) {
-            Log.v("ss-vpn","getBinder");
+            Log.v("ss-vpn", "getBinder");
             return binder;
         }
         return null;
@@ -343,8 +344,10 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void startRunner(Config c) {
-        Log.v("ss-vpn","startRunner");
+        Log.v("ss-vpn", "startRunner");
         super.startRunner(c);
+        mShadowsocksVpnThread = new ShadowsocksVpnThread(this);
+        mShadowsocksVpnThread.start();
 
         changeState(Constants.State.CONNECTING);
         if (config != null) {
@@ -377,7 +380,7 @@ public class ShadowsocksVpnService extends BaseService {
     }
 
     public boolean handleConnection() {
-        Log.v("ss-vpn","handleConnection");
+        Log.v("ss-vpn", "handleConnection");
         startShadowsocksDaemon();
         startDnsDaemon();
         startDnsTunnel();
@@ -391,7 +394,10 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void stopRunner() {
-
+        if(mShadowsocksVpnThread != null){
+            mShadowsocksVpnThread.stopThread();
+            mShadowsocksVpnThread = null;
+        }
         // channge the state
         changeState(Constants.State.STOPPING);
         // send event
