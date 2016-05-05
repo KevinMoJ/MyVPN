@@ -288,7 +288,7 @@ public class ShadowsocksVpnService extends BaseService {
                 try {
                     Thread.sleep(1000 * tries);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    ShadowsocksApplication.handleException(e)
                 }
                 if (System.sendfd(fd, Constants.Path.BASE + "sock_path") != -1) {
                     return true;

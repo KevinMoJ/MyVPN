@@ -2,6 +2,8 @@ package yyf.shadowsocks.utils;
 
 import android.os.Build;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -132,7 +134,7 @@ public class ConfigUtils {
             p = new PrintWriter(f);
             return p;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
             return null;
         }
     }
