@@ -2,6 +2,7 @@ package com.androapplite.shadowsocks;
 
 import android.app.Application;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -38,5 +39,19 @@ public class ShadowsocksApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
+    }
+
+    public static final void debug(@NonNull String tag, @NonNull String msg){
+        if(BuildConfig.DEBUG){
+            Log.d(tag, msg);
+        }
+    }
+
+    public static final void handleException(@NonNull Throwable throwable){
+        if(BuildConfig.DEBUG){
+            throwable.printStackTrace();
+        }else{
+            Crashlytics.logException(throwable);
+        }
     }
 }

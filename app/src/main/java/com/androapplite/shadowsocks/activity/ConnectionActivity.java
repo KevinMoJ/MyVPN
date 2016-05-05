@@ -252,7 +252,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                     .setMessage(appName + " (" + version + ")")
                     .show();
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
     }
 
@@ -277,10 +277,10 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         Intent intent = VpnService.prepare(this);
         if (intent != null) {
             startActivityForResult(intent, REQUEST_CONNECT);
-            Log.v("ss-vpn", "startActivityForResult");
+            ShadowsocksApplication.debug("ss-vpn", "startActivityForResult");
         } else {
             onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
-            Log.v("ss-vpn", "onActivityResult");
+            ShadowsocksApplication.debug("ss-vpn", "onActivityResult");
         }
     }
 
@@ -293,12 +293,12 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 try {
                     Config config = new Config();
                     mShadowsocksService.start(config);
-                    Log.v("ss-vpn", "bgService.StartVpn");
+                    ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
                 }catch(RemoteException e){
                     e.getStackTrace();
                 }
             }else{
-                Log.v("ss-vpn","bgServiceIsNull");
+                ShadowsocksApplication.debug("ss-vpn","bgServiceIsNull");
             }
         }
     }
