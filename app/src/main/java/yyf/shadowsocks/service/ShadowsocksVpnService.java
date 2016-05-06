@@ -27,6 +27,7 @@ import org.xbill.DNS.Type;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -167,7 +168,7 @@ public class ShadowsocksVpnService extends BaseService {
 
         String conf = String.format(Locale.ENGLISH, ConfigUtils.PDNSD_DIRECT, "0.0.0.0", 8153,
                 Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
-        ShadowsocksApplication.debug("ss-vpn","DnsDaemon:config write to file");
+        ShadowsocksApplication.debug("ss-vpn", "DnsDaemon:config write to file");
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "pdnsd-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
@@ -177,8 +178,8 @@ public class ShadowsocksVpnService extends BaseService {
         if (BuildConfig.DEBUG)
             Log.d(TAG, cmd);
         Console.runCommand(cmd);
-        ShadowsocksApplication.debug("ss-vpn","start DnsDaemon");
-        ShadowsocksApplication.debug("ss-vpn",cmd);
+        ShadowsocksApplication.debug("ss-vpn", "start DnsDaemon");
+        ShadowsocksApplication.debug("ss-vpn", cmd);
     }
 
 
@@ -331,18 +332,20 @@ public class ShadowsocksVpnService extends BaseService {
     }
 
     public void killProcesses() {
-        try {
-            String[] tasks = {"ss-local", "ss-tunnel", "pdnsd", "tun2socks"};
-            for (String task : tasks) {
-                File f = new File(Constants.Path.BASE + task + "-vpn.pid");
-                BufferedReader br = new BufferedReader(new FileReader(f));
+        String[] tasks = {"ss-local", "ss-tunnel", "pdnsd", "tun2socks"};
+        for (String task : tasks) {
+            File f = new File(Constants.Path.BASE + task + "-vpn.pid");
+            FileReader fr = null;
+            try {
+                fr = new FileReader(f);
+                BufferedReader br = new BufferedReader(fr);
                 Integer pid = Integer.valueOf(br.readLine());
                 br.close();
                 if(pid!=null)
                     android.os.Process.killProcess(pid);
-
+            } catch (Exception e) {
+                ShadowsocksApplication.handleException(e);
             }
-        }catch(IOException e){
         }
     }
 
@@ -354,7 +357,7 @@ public class ShadowsocksVpnService extends BaseService {
 
     @Override
     public void startRunner(Config c) {
-        ShadowsocksApplication.debug("ss-vpn","startRunner");
+        ShadowsocksApplication.debug("ss-vpn", "startRunner");
         super.startRunner(c);
         mShadowsocksVpnThread = new ShadowsocksVpnThread(this);
         mShadowsocksVpnThread.start();
