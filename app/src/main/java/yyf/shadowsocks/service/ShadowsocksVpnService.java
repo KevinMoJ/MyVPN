@@ -335,16 +335,40 @@ public class ShadowsocksVpnService extends BaseService {
         String[] tasks = {"ss-local", "ss-tunnel", "pdnsd", "tun2socks"};
         for (String task : tasks) {
             File f = new File(Constants.Path.BASE + task + "-vpn.pid");
-            FileReader fr = null;
-            try {
-                fr = new FileReader(f);
-                BufferedReader br = new BufferedReader(fr);
-                Integer pid = Integer.valueOf(br.readLine());
-                br.close();
-                if(pid!=null)
-                    android.os.Process.killProcess(pid);
-            } catch (Exception e) {
-                ShadowsocksApplication.handleException(e);
+            if(f.exists()){
+                FileReader fr = null;
+                BufferedReader br = null;
+                try {
+                    fr = new FileReader(f);
+                    br = new BufferedReader(fr);
+                    String line = br.readLine();
+                    if(line != null && !line.isEmpty()) {
+                        Integer pid = Integer.valueOf(line);
+                        if(pid != null)
+                            android.os.Process.killProcess(pid);
+                    }
+                    br.close();
+                    br = null;
+                    fr.close();
+                    fr = null;
+
+                } catch (Exception e) {
+                    ShadowsocksApplication.handleException(e);
+                    if(br != null){
+                        try {
+                            br.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                    if(fr != null){
+                        try {
+                            fr.close();
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
             }
         }
     }
@@ -400,7 +424,7 @@ public class ShadowsocksVpnService extends BaseService {
         try {
             startVpn();
         }catch(PackageManager.NameNotFoundException e){
-            e.getStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
         return true;
     }
@@ -477,9 +501,9 @@ public class ShadowsocksVpnService extends BaseService {
                 }
             }
         } catch(java.net.UnknownHostException e){
-            e.getStackTrace();
+            ShadowsocksApplication.handleException(e);
         } catch (org.xbill.DNS.TextParseException e){
-            e.getStackTrace();
+            ShadowsocksApplication.handleException(e);
         }
         return null;
     }

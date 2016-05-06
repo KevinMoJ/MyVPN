@@ -300,7 +300,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                     mShadowsocksService.start(config);
                     ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
                 }catch(RemoteException e){
-                    e.getStackTrace();
+                    ShadowsocksApplication.handleException(e);
                 }
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
