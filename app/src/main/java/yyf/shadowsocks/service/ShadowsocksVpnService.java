@@ -240,9 +240,9 @@ public class ShadowsocksVpnService extends BaseService {
         try {
             conn = builder.establish();
         } catch (IllegalStateException e){
-                changeState(Constants.State.STOPPED, e.getMessage());
-                conn = null;
-
+            ShadowsocksApplication.handleException(e);
+            changeState(Constants.State.STOPPED, e.getMessage());
+            conn = null;
         }
 
         if (conn == null) {
