@@ -66,7 +66,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
 
-        initConnectivityReceiver();
+        mConnectivityBroadcastReceiver = createConnectivityReceiver();
+        registerConnectivityReceiver();
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -332,6 +333,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     protected void onStart() {
         super.onStart();
         registerShadowsocksCallback();
+        checkConnectivity();
     }
 
     private void registerShadowsocksCallback() {
@@ -372,16 +374,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         }
     }
 
-    private void initForgroundReceiver(){
-
-    }
-
-    private void initForgroundReceiverIntentFilter(){
-
-    }
-
-    private void initConnectivityReceiver(){
-        mConnectivityBroadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver createConnectivityReceiver(){
+        return new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if(intent != null
@@ -391,10 +385,11 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 }
             }
         };
+    }
 
+    private void registerConnectivityReceiver(){
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
         registerReceiver(mConnectivityBroadcastReceiver, intentFilter);
     }
 
