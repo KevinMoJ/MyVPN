@@ -194,4 +194,8 @@ public abstract class BaseService extends VpnService {
     private void updateTrafficTotal(){
 
     }
+
+    public TrafficMonitor getTrafficMonitor(){
+        return mTrafficMonitor;
+    }
 }

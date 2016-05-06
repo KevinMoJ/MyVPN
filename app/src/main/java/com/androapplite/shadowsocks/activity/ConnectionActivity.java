@@ -84,7 +84,10 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
             @Override
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
-
+                ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
+                ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
+                ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
+                ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
             }
         };
     }

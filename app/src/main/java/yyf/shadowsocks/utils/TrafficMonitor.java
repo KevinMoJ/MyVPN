@@ -13,7 +13,7 @@ import java.util.Formatter;
  */
 public final class TrafficMonitor {
     private volatile boolean dirty;
-    private final DecimalFormat numberFormat;
+    private static final DecimalFormat numberFormat = new DecimalFormat("@@@");
     // Bytes per second
     public long txRate;
     public long rxRate;
@@ -24,15 +24,15 @@ public final class TrafficMonitor {
     private long txLast;
     private long rxLast;
     private long timestampLast;
-    private final String[] units;
+    private static final String[] units = { "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
 
-    public TrafficMonitor(){
+/*    public TrafficMonitor(){
         units = new String[] { "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         numberFormat = new DecimalFormat("@@@");
-    }
+    }*/
 
     @NonNull
-    public String formatTraffic(@NonNull Context context, long size){
+    public static final String formatTraffic(@NonNull Context context, long size){
         double n = size;
         int i = -1;
         while (n >= 1000) {
@@ -40,7 +40,7 @@ public final class TrafficMonitor {
             i = i + 1;
         }
         StringBuilder formatString = new StringBuilder();
-        if(i<0){
+        if(i < 0){
             formatString.append(size).append(" ").append(context.getResources().getQuantityString(R.plurals.bytes, (int) size));
         }else{
             formatString.append(numberFormat.format(n)).append(" ").append(units[i]);
