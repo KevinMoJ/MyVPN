@@ -11,7 +11,7 @@ public class Config implements Parcelable {
     public boolean isTrafficStat = false;
     public boolean isUdpDns = false;
 
-    public String profileName = "Test";
+    public String profileName = "US Server";
     public String proxy = "52.10.0.180";
     public String sitekey = "abc!@#123d";
     //public String route = "all";
