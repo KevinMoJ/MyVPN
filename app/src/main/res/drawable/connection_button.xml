@@ -15,14 +15,14 @@
             <item android:drawable="@drawable/connection_button_windmill" />
         </layer-list>
     </item>
-    <!--<item android:minLevel="2" android:maxLevel="3">-->
-        <!--<shape android:shape="oval">-->
-            <!--<solid android:color="@color/connect_button_connected" />-->
-        <!--</shape>-->
-    <!--</item>-->
-    <!--<item android:minLevel="3" android:maxLevel="4">-->
-        <!--<shape android:shape="oval">-->
-            <!--<solid android:color="@color/connect_button_error" />-->
-        <!--</shape>-->
-    <!--</item>-->
+    <item android:minLevel="2" android:maxLevel="3">
+        <shape android:shape="oval">
+            <solid android:color="@color/connect_button_connected" />
+        </shape>
+    </item>
+    <item android:minLevel="3" android:maxLevel="4">
+        <shape android:shape="oval">
+            <solid android:color="@color/connect_button_error" />
+        </shape>
+    </item>
 </level-list>
