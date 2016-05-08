@@ -391,6 +391,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     }
 
     private void registerConnectivityReceiver(){
+        //android4的vpn变化没有发送广播
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(mConnectivityBroadcastReceiver, intentFilter);
@@ -400,7 +401,6 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         if(mConnectionFragment != null){
             ConnectivityManager cm =
                     (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-
             NetworkInfo activeNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_VPN);
             if(activeNetwork != null ){
                 if(activeNetwork.isConnectedOrConnecting()){
