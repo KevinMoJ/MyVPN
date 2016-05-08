@@ -9,30 +9,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/wizard_pager">
-
     </android.support.v4.view.ViewPager>
-    <fragment
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:name="com.androapplite.shadowsocks.fragment.PagerIndicatorFragment"
-        android:id="@+id/pager_indicator"
-        tools:layout="@layout/fragment_pager_indicator"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="140dp"/>
-    <Button
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_centerHorizontal="true"
+        android:layout_height="@dimen/user_guide_top_bottom_margin"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="40dp"
-        android:text="@android:string/ok"
-        android:textColor="@color/primary_white_text"
-        android:textSize="@dimen/large_text"
-        android:background="@drawable/new_user_guide_finish_button"
-        android:visibility="gone"
-        android:id="@+id/new_user_guide_finish_button"
-        />
+        >
+        <fragment
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:name="com.androapplite.shadowsocks.fragment.PagerIndicatorFragment"
+            android:id="@+id/pager_indicator"
+            android:layout_centerHorizontal="true"
+            tools:layout="@layout/fragment_pager_indicator"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:text="@android:string/ok"
+            android:textColor="@color/primary_white_text"
+            android:textSize="@dimen/large_text"
+            android:background="@drawable/new_user_guide_finish_button"
+            android:visibility="gone"
+            android:id="@+id/new_user_guide_finish_button"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
 </RelativeLayout>
