@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:background="@color/activity_background"
     tools:context="com.androapplite.shadowsocks.activity.ConnectionActivity">
 
     <android.support.design.widget.AppBarLayout

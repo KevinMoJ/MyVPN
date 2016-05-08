@@ -115,10 +115,9 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     }
 
     private void showRateUsFragmentWhenFirstOpen() {
-        if(!DefaultSharedPrefeencesUtil.isRateUsFragmentShown(this)) {
+        if(!DefaultSharedPrefeencesUtil.doesNeedRateUsFragmentShow(this)) {
             mRateUsFragment = RateUsFragment.newInstance();
             initRateUsFragment();
-            DefaultSharedPrefeencesUtil.markRateUsFragmentAsShowed(this);
         }
     }
 
@@ -270,7 +269,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().remove(mRateUsFragment).commit();
             mRateUsFragment = null;
-
+            DefaultSharedPrefeencesUtil.markRateUsFragmentNotNeedToShow(this);
             GAHelper.sendEvent(this, "给我们打分", "关闭");
         }
     }
@@ -278,6 +277,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     @Override
     public void onRateUs() {
         rateUs();
+        DefaultSharedPrefeencesUtil.markRateUsFragmentNotNeedToShow(this);
         GAHelper.sendEvent(this, "给我们打分", "打开");
     }
 

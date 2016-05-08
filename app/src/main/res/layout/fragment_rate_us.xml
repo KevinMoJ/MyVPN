@@ -28,47 +28,57 @@
             android:background="@null"
             android:id="@+id/rate_us_close_btn"/>
     </RelativeLayout>
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@drawable/rate_us_content"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin"
+        android:padding="@dimen/standard_margin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         >
-        <LinearLayout
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            >
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/star"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/half_standard_margin"
-                android:src="@drawable/star"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/half_standard_margin"
-                android:src="@drawable/star"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/half_standard_margin"
-                android:src="@drawable/star"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/half_standard_margin"
-                android:src="@drawable/star"/>
-        </LinearLayout>
-
-        <Button
+            android:src="@drawable/star"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <ImageView
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/star"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/star"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/star"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/star"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <Button
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -78,7 +88,5 @@
             android:textSize="@dimen/large_text"
             android:background="@drawable/rating_button"
             android:id="@+id/rate_us_btn"/>
-    </RelativeLayout>
-
-
+    </LinearLayout>
 </LinearLayout>

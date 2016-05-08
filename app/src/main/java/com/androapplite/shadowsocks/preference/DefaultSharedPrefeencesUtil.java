@@ -26,12 +26,12 @@ public class DefaultSharedPrefeencesUtil {
         editor.putBoolean(SharedPreferenceKey.IS_NEW_USER, false).apply();
     }
 
-    public static final boolean isRateUsFragmentShown(Context context){
+    public static final boolean doesNeedRateUsFragmentShow(Context context){
         SharedPreferences sharedPreferences = getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false);
     }
 
-    public static final void markRateUsFragmentAsShowed(Context context){
+    public static final void markRateUsFragmentNotNeedToShow(Context context){
         final SharedPreferences.Editor editor = getDefaultSharedPreferencesEditor(context);
         editor.putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
 
