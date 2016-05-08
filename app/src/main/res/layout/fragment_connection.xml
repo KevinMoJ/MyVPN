@@ -7,28 +7,28 @@
     <FrameLayout
         android:layout_width="@dimen/connection_button_outer"
         android:layout_height="@dimen/connection_button_outer"
-        android:background="@drawable/connection_button_normal"
         android:layout_centerHorizontal="true"
-        android:id="@+id/connection_button_bg"
-        >
-        <ImageView
-            android:layout_width="@dimen/connection_button_inner"
-            android:layout_height="@dimen/connection_button_inner"
-            android:background="@drawable/connection_button_windmill"
+        android:id="@+id/connection_button_bg">
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/connection_button"
+            android:scaleType="fitXY"
             android:layout_gravity="center"
-            android:id="@+id/connection_button_windmill"
-            android:visibility="gone"
+            android:id="@+id/connection_button"
+            android:background="@drawable/shadow"
+            android:padding="9dp"
             />
-        <Button
+        <TextView
             android:layout_width="130dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/tap_to_connect"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
             android:textAllCaps="false"
-            android:id="@+id/connection_button"
+            android:id="@+id/connection_button_text"
             android:background="@null"/>
     </FrameLayout>
 
