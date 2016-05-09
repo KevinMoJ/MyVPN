@@ -230,10 +230,10 @@ public class ShadowsocksVpnService extends BaseService {
         builder.addRoute("8.8.0.0", 16);
         builder.addRoute("0.0.0.0", 0);
 
-        for(int i = 0;i < list.length;i++) {
-            String [] addr = list[i].split("/");
-            builder.addRoute(addr[0],Integer.valueOf(addr[1]));
-        }
+//        for(int i = 0;i < list.length;i++) {
+//            String [] addr = list[i].split("/");
+//            builder.addRoute(addr[0],Integer.valueOf(addr[1]));
+//        }
 
         //TODO 5.0以上
 
