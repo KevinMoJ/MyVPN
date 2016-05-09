@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.net.VpnService;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -27,6 +28,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
@@ -166,12 +168,34 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_connection_activity, menu);
-        MenuItem item = menu.findItem(R.id.share_icon);
+/*        MenuItem item = menu.findItem(R.id.share_icon);
         Drawable drawable = item.getIcon();
         drawable.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
-        item.setIcon(drawable);
+        item.setIcon(drawable);*/
+        final int whiteColor = getResources().getColor(android.R.color.white);
+        final int primaryColor = getResources().getColor(R.color.colorPrimary);
+        for(int i=0; i<menu.size(); i++){
+            MenuItem menuItem = menu.getItem(i);
+            paintColorOnMenuItem(menuItem, whiteColor);
+            SubMenu subMenu = menuItem.getSubMenu();
+            if(subMenu != null){
+                for(int j=0; j<subMenu.size(); j++){
+
+                    paintColorOnMenuItem(subMenu.getItem(j), primaryColor);
+                }
+            }
+        }
         return true;
     }
+
+    private static void paintColorOnMenuItem(@NonNull MenuItem menuItem, @ColorInt int color) {
+        Drawable drawable = menuItem.getIcon();
+        if(drawable != null) {
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            menuItem.setIcon(drawable);
+        }
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

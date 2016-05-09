@@ -5,16 +5,26 @@
         android:icon="@drawable/ic_share_24dp"
         android:title="@string/share"
         app:showAsAction="always" />
-    <item android:id="@+id/share"
-        android:title="@string/share"
-        app:showAsAction="never" />
-    <item android:id="@+id/rate_us"
-        android:title="@string/rate_us"
-        app:showAsAction="never" />
-    <item android:id="@+id/contact_us"
-        android:title="@string/contact_us"
-        app:showAsAction="never" />
-    <item android:id="@+id/about"
-        android:title="@string/about"
-        app:showAsAction="never" />
+    <item android:id="@+id/overflow"
+        android:title="@string/more"
+        android:icon="@drawable/ic_more_vert_24dp"
+        app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/share"
+                android:title="@string/share"
+                android:icon="@drawable/ic_share_24dp"
+                 />
+            <item android:id="@+id/rate_us"
+                android:title="@string/rate_us"
+                android:icon="@drawable/ic_grade_24dp"
+                 />
+            <item android:id="@+id/contact_us"
+                android:title="@string/contact_us"
+                android:icon="@drawable/ic_email_24dp"
+                 />
+            <item android:id="@+id/about"
+                android:title="@string/about"
+                 />
+        </menu>
+    </item>
 </menu>
