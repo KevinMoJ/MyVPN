@@ -15,7 +15,7 @@
     <dimen name="large_text">20sp</dimen>
     <dimen name="medium_text">16sp</dimen>
 
-    <dimen name="connection_button_outer">162dp</dimen>
+    <dimen name="connection_button_outer">156dp</dimen>
     <dimen name="connection_button_inner">144dp</dimen>
 
     <dimen name="pager_indicator_spot">10dp</dimen>

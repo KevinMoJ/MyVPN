@@ -17,7 +17,7 @@
             android:layout_gravity="center"
             android:id="@+id/connection_button"
             android:background="@drawable/shadow"
-            android:padding="9dp"
+            android:padding="6dp"
             />
         <TextView
             android:layout_width="130dp"
