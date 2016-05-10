@@ -6,6 +6,4 @@ package com.androapplite.shadowsocks.preference;
 public final class SharedPreferenceKey {
     public static final String IS_NEW_USER = "IS_NEW_USER";
     public static final String IS_RATE_US_FRAGMENT_SHOWN = "IS_RATE_US_FRAGMENT_SHOWN";
-    public static final String TX_TOTAL = "TX_TOTAL";
-    public static final String RX_TOTAL = "RX_TOTAL";
 }

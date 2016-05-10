@@ -2,19 +2,23 @@ package yyf.shadowsocks.service;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.IShadowsocksService;
+import yyf.shadowsocks.broadcast.Action;
+import yyf.shadowsocks.preferences.DefaultSharedPrefeencesUtil;
+import yyf.shadowsocks.preferences.SharedPreferenceKey;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
@@ -217,12 +221,32 @@ public abstract class BaseService extends VpnService {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-
+                checkLastResetMonth();
             }
         };
         Timer timer = new Timer(true);
         timer.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.HOURS.toMillis(1));
         return timer;
+    }
+
+    private void checkLastResetMonth() {
+        long txTotal = DefaultSharedPrefeencesUtil.getTxTotal(this);
+        long rxTotal = DefaultSharedPrefeencesUtil.getRxTotal(this);
+        Calendar lastResetMonth = DefaultSharedPrefeencesUtil.getLastResetMonth(this);
+        Calendar currentMonth = Calendar.getInstance();
+        if(lastResetMonth.get(Calendar.MONTH) != currentMonth.get(Calendar.MONTH) ){
+            DefaultSharedPrefeencesUtil.resetTxTotalAndRxTotal(this);
+            DefaultSharedPrefeencesUtil.setLastResetMonth(this, currentMonth);
+            mTrafficMonitor.reset();
+
+            //send broadcast
+            Intent intent = new Intent(Action.RESET_TOTAL);
+            intent.putExtra(SharedPreferenceKey.TX_TOTAL, txTotal);
+            intent.putExtra(SharedPreferenceKey.RX_TOTAL, rxTotal);
+            intent.putExtra(SharedPreferenceKey.LAST_RESET_MONTH, lastResetMonth.getTimeInMillis());
+            sendBroadcast(intent);
+
+        }
     }
 
     @Override

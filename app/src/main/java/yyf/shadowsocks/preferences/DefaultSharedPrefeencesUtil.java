@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import java.util.Calendar;
+import java.util.Date;
+
 
 /**
  * Created by jim on 16/4/27.
@@ -38,6 +41,28 @@ public class DefaultSharedPrefeencesUtil {
 
     public static final long getTxTotal(@NonNull Context context){
         return getDefaultSharedPreferences(context).getLong(SharedPreferenceKey.TX_TOTAL, 0);
+    }
+
+/*    public static final long getLastResetMonth(@NonNull Context context){
+        return getDefaultSharedPreferences(context).getInt(SharedPreferenceKey.LAST_RESET_MONTH, 0);
+    }
+
+    public static final void setLastResetMonth(@NonNull Context context, long date){
+        getDefaultSharedPreferencesEditor(context).putLong(SharedPreferenceKey.LAST_RESET_MONTH, date).apply();
+//        getDefaultSharedPreferencesEditor(context).putInt(SharedPreferenceKey.LAST_RESET_MONTH, month).apply();
+    }*/
+
+    public static final Calendar getLastResetMonth(@NonNull Context context){
+        long date = getDefaultSharedPreferences(context).getLong(SharedPreferenceKey.LAST_RESET_MONTH, 0);
+        Calendar calendar = Calendar.getInstance();
+        if(date != 0) {
+            calendar.setTimeInMillis(date);
+        }
+        return calendar;
+    }
+
+    public static final void setLastResetMonth(@NonNull Context context, @NonNull Calendar calendar){
+        getDefaultSharedPreferencesEditor(context).putLong(SharedPreferenceKey.LAST_RESET_MONTH, calendar.getTimeInMillis()).apply();
     }
 
 }
