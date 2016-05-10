@@ -46,6 +46,7 @@ import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
+import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectionActivity extends BaseShadowsocksActivity implements
         RateUsFragment.OnFragmentInteractionListener, ConnectionFragment.OnFragmentInteractionListener{
@@ -91,8 +92,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
                 ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
                 ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
-                ShadowsocksApplication.debug("traffic", "txTotal old : " + DefaultSharedPrefeencesUtil.getTxTotal(ConnectionActivity.this));
-                ShadowsocksApplication.debug("traffic", "rxTotal old : " + DefaultSharedPrefeencesUtil.getRxTotal(ConnectionActivity.this));
+                ShadowsocksApplication.debug("traffic", "txTotal old : " + TrafficMonitor.formatTraffic(ConnectionActivity.this, mShadowsocksService.getTxTotalMonthly()));
+                ShadowsocksApplication.debug("traffic", "rxTotal old : " + TrafficMonitor.formatTraffic(ConnectionActivity.this, mShadowsocksService.getRxTotalMonthly()));
             }
         };
     }
