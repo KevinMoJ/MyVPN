@@ -41,6 +41,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
 import java.lang.System;
 
+import eu.chainfire.libsuperuser.Shell;
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
@@ -90,6 +91,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
                 ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
                 ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
+                ShadowsocksApplication.debug("traffic", "txTotal old : " + DefaultSharedPrefeencesUtil.getTxTotal(ConnectionActivity.this));
+                ShadowsocksApplication.debug("traffic", "rxTotal old : " + DefaultSharedPrefeencesUtil.getRxTotal(ConnectionActivity.this));
             }
         };
     }

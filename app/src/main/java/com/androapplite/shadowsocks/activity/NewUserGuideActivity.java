@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -93,10 +94,15 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
             @Override
             public void onClick(View v) {
                 Activity activity = NewUserGuideActivity.this;
-                DefaultSharedPrefeencesUtil.markAsOldUser(activity);
+                initSharedPreferenceValue(activity);
                 startActivity(new Intent(activity, ConnectionActivity.class));
             }
         });
+    }
+
+    private void initSharedPreferenceValue(@NonNull Context context){
+        DefaultSharedPrefeencesUtil.markAsOldUser(context);
+        DefaultSharedPrefeencesUtil.resetTxTotalAndRxTotal(context);
     }
 
     private static class NewUserGuidePagerAdapter extends FragmentPagerAdapter{

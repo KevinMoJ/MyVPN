@@ -8,6 +8,7 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -90,8 +91,9 @@ public abstract class BaseService extends VpnService {
     }
 
     private void updateTrafficTotal(long tx, long rx){
-
+        DefaultSharedPrefeencesUtil.accumulateTxTotalAndRxToal(this, tx, rx);
     }
+
     public abstract Constants.Mode getServiceMode();
     public abstract String getTag();
     public abstract Context getContext();
