@@ -328,7 +328,7 @@ public class ShadowsocksVpnService extends BaseService {
     @Override
     public void onRevoke() {
         stopRunner();
-        ShadowsocksApplication.debug("ss-vpn", "oncreate");
+        ShadowsocksApplication.debug("ss-vpn", "onRevoke");
     }
 
     public void killProcesses() {

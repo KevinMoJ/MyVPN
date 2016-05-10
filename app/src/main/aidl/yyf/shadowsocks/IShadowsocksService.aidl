@@ -11,4 +11,7 @@ interface IShadowsocksService {
 
   oneway void start(in Config config);
   oneway void stop();
+
+    long getTxTotalMonthly();
+    long getRxTotalMonthly();
 }

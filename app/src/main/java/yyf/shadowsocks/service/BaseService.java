@@ -12,6 +12,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
@@ -31,6 +32,7 @@ public abstract class BaseService extends VpnService {
     private Timer timer;
     private Handler handler;
     protected Config config = null;
+    private Timer mHoulyUpdater;
 
 
 
@@ -65,6 +67,15 @@ public abstract class BaseService extends VpnService {
                 startRunner(config);
             }
         }
+
+        public long getTxTotalMonthly(){
+            return DefaultSharedPrefeencesUtil.getTxTotal(BaseService.this);
+        }
+
+        public long getRxTotalMonthly(){
+            return DefaultSharedPrefeencesUtil.getRxTotal(BaseService.this);
+        }
+
     };
 
     @Override
@@ -72,6 +83,7 @@ public abstract class BaseService extends VpnService {
         super.onCreate();
         mTrafficMonitor = new TrafficMonitor();
         handler = new Handler(getMainLooper());
+        mHoulyUpdater = createHourlyUpdater();
     }
 
     public abstract void stopBackgroundService();
@@ -199,5 +211,26 @@ public abstract class BaseService extends VpnService {
 
     public TrafficMonitor getTrafficMonitor(){
         return mTrafficMonitor;
+    }
+
+    private Timer createHourlyUpdater(){
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+
+            }
+        };
+        Timer timer = new Timer(true);
+        timer.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.HOURS.toMillis(1));
+        return timer;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mHoulyUpdater != null){
+            mHoulyUpdater.cancel();
+            mHoulyUpdater = null;
+        }
     }
 }

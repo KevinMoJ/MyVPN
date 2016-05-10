@@ -102,7 +102,6 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
 
     private void initSharedPreferenceValue(@NonNull Context context){
         DefaultSharedPrefeencesUtil.markAsOldUser(context);
-        DefaultSharedPrefeencesUtil.resetTxTotalAndRxTotal(context);
     }
 
     private static class NewUserGuidePagerAdapter extends FragmentPagerAdapter{
