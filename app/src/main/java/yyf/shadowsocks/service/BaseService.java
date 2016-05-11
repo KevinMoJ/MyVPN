@@ -87,7 +87,9 @@ public abstract class BaseService extends VpnService {
         super.onCreate();
         mTrafficMonitor = new TrafficMonitor();
         handler = new Handler(getMainLooper());
-        mHoulyUpdater = createHourlyUpdater();
+        mHoulyUpdater = new Timer(true);
+        initHourlyUpdater();
+        initLastResetMonth();
     }
 
     public abstract void stopBackgroundService();
@@ -221,16 +223,16 @@ public abstract class BaseService extends VpnService {
         return mTrafficMonitor;
     }
 
-    private Timer createHourlyUpdater(){
+    private void initHourlyUpdater(){
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 checkLastResetMonth();
             }
         };
-        Timer timer = new Timer(true);
-        timer.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.HOURS.toMillis(1));
-        return timer;
+//        mHoulyUpdater.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
+        mHoulyUpdater.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.HOURS.toMillis(1));
+
     }
 
     private void checkLastResetMonth() {
@@ -238,6 +240,7 @@ public abstract class BaseService extends VpnService {
         long rxTotal = DefaultSharedPrefeencesUtil.getRxTotal(this);
         Calendar lastResetMonth = DefaultSharedPrefeencesUtil.getLastResetMonth(this);
         Calendar currentMonth = Calendar.getInstance();
+//        if(currentMonth.getTimeInMillis() - lastResetMonth.getTimeInMillis() > 10000){
         if(lastResetMonth.get(Calendar.MONTH) != currentMonth.get(Calendar.MONTH) ){
             DefaultSharedPrefeencesUtil.resetTxTotalAndRxTotal(this);
             DefaultSharedPrefeencesUtil.setLastResetMonth(this, currentMonth);
@@ -260,6 +263,15 @@ public abstract class BaseService extends VpnService {
             mHoulyUpdater.cancel();
             mHoulyUpdater = null;
         }
+    }
+
+    private void initLastResetMonth(){
+        Calendar currentMonth = Calendar.getInstance();
+        Calendar lastResetMonth = DefaultSharedPrefeencesUtil.getLastResetMonth(this);
+        if(currentMonth.before(lastResetMonth)){
+            DefaultSharedPrefeencesUtil.setLastResetMonth(this, currentMonth);
+        }
+
     }
 
 
