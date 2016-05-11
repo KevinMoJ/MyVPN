@@ -104,6 +104,10 @@ public abstract class BaseService extends VpnService {
             trafficMonitorThread.stopThread();
             trafficMonitorThread = null;
         }
+        // stop the service if no callback registered
+        if (callbacksCount == 0) {
+            stopSelf();
+        }
     }
 
     private void updateTrafficTotal(long tx, long rx){

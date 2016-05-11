@@ -57,7 +57,7 @@ public class Constants {
 
     public enum Mode {NAT,VPN };
 
-    public enum State {INIT,CONNECTING,CONNECTED,STOPPING,STOPPED,}
+    public enum State {INIT,CONNECTING,CONNECTED,STOPPING,STOPPED, ERROR}
 
     public static class Action {
         public static String SERVICE = "yyf.shadowsocks.SERVICE";

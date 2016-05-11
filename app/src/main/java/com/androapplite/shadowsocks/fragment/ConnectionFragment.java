@@ -81,8 +81,8 @@ public class ConnectionFragment extends Fragment {
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_CONNECTED);
     }
 
-    protected void error(){
-        mConnectionButtonTextView.setText("");
+    public void error(){
+        mConnectionButtonTextView.setText(R.string.connection_failed);
         mConnectionMessageTextView.setText("");
         mConnectionButton.clearAnimation();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_ERROR);

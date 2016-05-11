@@ -59,7 +59,7 @@
         <receiver
             android:name=".broadcast.ShadowsocksVPNServiceReceiver">
             <intent-filter>
-                <action android:name="${BuildConfig.APPLICATION_ID}.RESET_TOTAL" />
+                <action android:name="${applicationId}.RESET_TOTAL" />
             </intent-filter>
         </receiver>
     </application>

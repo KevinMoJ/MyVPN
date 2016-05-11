@@ -25,6 +25,8 @@
         <item quantity="other">Bytes</item>
     </plurals>
     <string name="more">more</string>
+    <string name="connection_failed">Connection failed</string>
+    <string name="connection_failed_explain"></string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

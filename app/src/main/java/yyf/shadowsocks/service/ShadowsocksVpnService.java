@@ -217,19 +217,15 @@ public class ShadowsocksVpnService extends BaseService {
         }  TODO 添加 ipv6 支持 */
 
 
-
-
-
-        String  list[];
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-            list = getResources().getStringArray(R.array.simple_route);
-        } else {
-            list = getResources().getStringArray(R.array.gfw_route);
-        }
-
         builder.addRoute("8.8.0.0", 16);
         builder.addRoute("0.0.0.0", 0);
 
+//        String  list[];
+//        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+//            list = getResources().getStringArray(R.array.simple_route);
+//        } else {
+//            list = getResources().getStringArray(R.array.gfw_route);
+//        }
 //        for(int i = 0;i < list.length;i++) {
 //            String [] addr = list[i].split("/");
 //            builder.addRoute(addr[0],Integer.valueOf(addr[1]));
@@ -241,12 +237,10 @@ public class ShadowsocksVpnService extends BaseService {
             conn = builder.establish();
         } catch (IllegalStateException e){
             ShadowsocksApplication.handleException(e);
-            changeState(Constants.State.STOPPED, e.getMessage());
             conn = null;
         }
 
         if (conn == null) {
-            stopRunner();
             return;
         }
 
@@ -410,8 +404,7 @@ public class ShadowsocksVpnService extends BaseService {
             if (resolved && handleConnection()) {
                 changeState(Constants.State.CONNECTED);
             } else {
-                changeState(Constants.State.STOPPED);
-                stopRunner();
+                stopRunnerForError();
             }
         }
     }
@@ -426,7 +419,33 @@ public class ShadowsocksVpnService extends BaseService {
         }catch(PackageManager.NameNotFoundException e){
             ShadowsocksApplication.handleException(e);
         }
-        return true;
+
+        return conn != null;
+    }
+
+    private void stopRunnerForError(){
+        changeState(Constants.State.ERROR);
+        killProcesses();
+        if(mShadowsocksVpnThread != null){
+            mShadowsocksVpnThread.stopThread();
+            mShadowsocksVpnThread = null;
+        }
+        // close connections
+        if (conn != null) {
+            try {
+                conn.close();
+                conn = null;
+            }catch(IOException e){
+                ShadowsocksApplication.handleException(e);
+            }
+        }
+
+        // clean up the context
+        if (receiver != null) {
+            unregisterReceiver(receiver);
+            receiver = null;
+        }
+        super.stopRunner();
     }
 
     @Override
@@ -454,17 +473,13 @@ public class ShadowsocksVpnService extends BaseService {
                 ShadowsocksApplication.handleException(e);
             }
         }
-        // stop the service if no callback registered
-        if (getCallbacksCount() == 0) {
-            stopSelf();
-        }
+        // channge the state
+        changeState(Constants.State.STOPPED);
         // clean up the context
         if (receiver != null) {
             unregisterReceiver(receiver);
             receiver = null;
         }
-        // channge the state
-        changeState(Constants.State.STOPPED);
         super.stopRunner();
     }
 

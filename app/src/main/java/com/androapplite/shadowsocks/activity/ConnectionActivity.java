@@ -116,6 +116,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 }
             }else if(state == Constants.State.CONNECTING.ordinal()){
                 mConnectionFragment.connecting();
+            }else if(state == Constants.State.ERROR.ordinal()){
+                mConnectionFragment.error();
             }
         }
     }
