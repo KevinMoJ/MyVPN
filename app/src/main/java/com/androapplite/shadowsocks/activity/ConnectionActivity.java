@@ -72,6 +72,9 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
         mConnectivityBroadcastReceiver = createConnectivityReceiver();
         registerConnectivityReceiver();
+
+        initForgroundReceiver();
+        initForgroundReceiverIntentFilter();
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -424,6 +427,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         //android4的vpn变化没有发送广播
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction("vpn.connectivity");
         registerReceiver(mConnectivityBroadcastReceiver, intentFilter);
     }
 
@@ -444,5 +448,23 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 }
             }
         }
+    }
+
+
+    private void initForgroundReceiver(){
+        mForgroundReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+                if(action.equals(yyf.shadowsocks.broadcast.Action.RESET_TOTAL)){
+                    //TODO: 刷新数据用量
+                }
+            }
+        };
+    }
+
+    private void initForgroundReceiverIntentFilter(){
+        mForgroundReceiverIntentFilter = new IntentFilter();
+        mForgroundReceiverIntentFilter.addAction(yyf.shadowsocks.broadcast.Action.RESET_TOTAL);
     }
 }
