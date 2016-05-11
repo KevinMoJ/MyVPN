@@ -16,6 +16,7 @@ import io.fabric.sdk.android.Fabric;
  */
 public class ShadowsocksApplication extends Application {
     private Tracker mTracker;
+    private AdHelper mAdHelper;
 
     @NonNull
     public Tracker getTracker(){
@@ -51,6 +52,7 @@ public class ShadowsocksApplication extends Application {
                     .penaltyDeath()
                     .build());
         }
+        mAdHelper = new AdHelper(this);
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -66,4 +68,5 @@ public class ShadowsocksApplication extends Application {
             Crashlytics.logException(throwable);
         }
     }
+
 }
