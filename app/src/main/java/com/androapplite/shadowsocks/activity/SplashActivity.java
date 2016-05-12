@@ -5,10 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+import android.os.Handler;
 
 import com.androapplite.shadowsocks.AdHelper;
 import com.androapplite.shadowsocks.R;
@@ -16,13 +14,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
-
-import yyf.shadowsocks.utils.Constants;
 
 public class SplashActivity extends BaseShadowsocksActivity {
 
@@ -37,7 +29,8 @@ public class SplashActivity extends BaseShadowsocksActivity {
         startNewUserGuideActivityOrConnectionActivity();
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
-        initAd();
+
+        loadAd();
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
@@ -79,8 +72,9 @@ public class SplashActivity extends BaseShadowsocksActivity {
         mBackgroundReceiverIntentFilter.addAction(Action.NEW_USER_GUIDE_ACTIVITY_SHOW);
     }
 
-    private void initAd(){
-        AdHelper.getInstance(this).setFacebookAdListener(new AdHelper.OnAdLoadListener() {
+    private void loadAd(){
+        final AdHelper adHelper = AdHelper.getInstance(this);
+        adHelper.setFacebookAdListener(new AdHelper.OnAdLoadListener() {
             @Override
             public void onAdLoaded(Object ad) {
             }
@@ -92,9 +86,11 @@ public class SplashActivity extends BaseShadowsocksActivity {
 
             @Override
             public void onError(Object ad) {
-                AdHelper.getInstance(SplashActivity.this).loadAdmobAd();
+                adHelper.loadAdmobAd();
             }
         });
+        adHelper.loadFacebookAd();
+//        adHelper.loadAdmobAd();
     }
 
 }

@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
+import com.facebook.ads.AdSettings;
 import com.facebook.ads.NativeAd;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -124,6 +125,9 @@ public final class AdHelper {
 
     private static AdRequest createAdmobRequest(){
         AdRequest.Builder builder = new AdRequest.Builder();
+        if(BuildConfig.DEBUG) {
+            builder.addTestDevice("7CE6E7BA2138D164DA9BE6641B0F5BDD");
+        }
         return  builder.build();
     }
 
@@ -132,14 +136,22 @@ public final class AdHelper {
     }
 
     public void loadAdmobAd(){
-        mAdmobAd.loadAd(createAdmobRequest());
-        mAdmobAdState = AD_LOADING;
+        if(mAdmobAdState != AD_LOADING) {
+            mAdmobAd.loadAd(createAdmobRequest());
+            mAdmobAdState = AD_LOADING;
+        }
     }
 
     public void initFacebookAd(){
+        if(BuildConfig.DEBUG){
+            AdSettings.addTestDevice("14ef9e409d575d15f92eb11f5b06f01b");
+        }
         mFacebookAd.setAdListener(new com.facebook.ads.AdListener() {
             @Override
             public void onError(Ad ad, AdError adError) {
+                if(ad != mFacebookAd){
+                    return;
+                }
                 mFacebookAdState = AD_ERROR;
                 if(mFaceBookAdListener != null){
                     mFaceBookAdListener.onError(ad);
@@ -150,6 +162,9 @@ public final class AdHelper {
 
             @Override
             public void onAdLoaded(Ad ad) {
+                if(ad != mFacebookAd){
+                    return;
+                }
                 mFacebookAdState = AD_LOADED;
                 if(mFaceBookAdListener != null){
                     mFaceBookAdListener.onAdLoaded(ad);
@@ -160,6 +175,9 @@ public final class AdHelper {
 
             @Override
             public void onAdClicked(Ad ad) {
+                if(ad != mFacebookAd){
+                    return;
+                }
                 mFacebookAdState = AD_CLICKED;
                 if(mFaceBookAdListener != null){
                     mFaceBookAdListener.onAdClicked(ad);
@@ -175,7 +193,6 @@ public final class AdHelper {
                 intent.putExtra(AD_STATE, adState);
                 return intent;
             }
-
         });
     }
 
@@ -184,8 +201,10 @@ public final class AdHelper {
     }
 
     public void loadFacebookAd(){
-        mFacebookAd.loadAd();
-        mFacebookAdState = AD_LOADING;
+        if(mFacebookAdState != AD_LOADING) {
+            mFacebookAd.loadAd();
+            mFacebookAdState = AD_LOADING;
+        }
     }
 
     public interface OnAdLoadListener{

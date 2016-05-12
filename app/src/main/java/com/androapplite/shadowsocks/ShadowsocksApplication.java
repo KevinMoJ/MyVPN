@@ -1,6 +1,7 @@
 package com.androapplite.shadowsocks;
 
 import android.app.Application;
+import android.os.Build;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
