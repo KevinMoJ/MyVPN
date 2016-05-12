@@ -30,6 +30,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 
+import com.androapplite.shadowsocks.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -455,9 +456,21 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         mForgroundReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final String action = intent.getAction();
-                if(action.equals(yyf.shadowsocks.broadcast.Action.RESET_TOTAL)){
-                    //TODO: 刷新数据用量
+                if(intent != null) {
+                    final String action = intent.getAction();
+                    if (action.equals(yyf.shadowsocks.broadcast.Action.RESET_TOTAL)) {
+                        //TODO: 刷新数据用量
+                    } else if (action.equals(Action.AD_LOADED)) {
+                        @AdHelper.AdState int adState = intent.getIntExtra(AdHelper.AD_STATE, AdHelper.AD_INIT);
+                        if(adState == AdHelper.AD_LOADED){
+                            @AdHelper.AdType int adType = intent.getIntExtra(AdHelper.AD_TYPE, AdHelper.AD_FACEBOOK);
+                            if(adType == AdHelper.AD_FACEBOOK){
+                                showFacebookAd();
+                            }else{
+                                showAdmobAd();
+                            }
+                        }
+                    }
                 }
             }
         };
@@ -466,5 +479,14 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private void initForgroundReceiverIntentFilter(){
         mForgroundReceiverIntentFilter = new IntentFilter();
         mForgroundReceiverIntentFilter.addAction(yyf.shadowsocks.broadcast.Action.RESET_TOTAL);
+        mForgroundReceiverIntentFilter.addAction(Action.AD_LOADED);
+    }
+
+    private void showFacebookAd(){
+
+    }
+
+    private void showAdmobAd(){
+
     }
 }
