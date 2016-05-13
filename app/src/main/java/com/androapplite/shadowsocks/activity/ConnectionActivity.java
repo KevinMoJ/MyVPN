@@ -41,6 +41,7 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
+import com.androapplite.shadowsocks.fragment.TrafficFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
 import java.lang.System;
@@ -62,12 +63,14 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private long mConnectOrDisconnectStartTime;
     private BroadcastReceiver mConnectivityBroadcastReceiver;
+    private TrafficFragment mTrafficFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
         mConnectionFragment = findConectionFragment();
+        mTrafficFragment = findTrafficFragment();
         initToobar();
         initActionBar();
         showRateUsFragmentWhenFirstOpen();
@@ -508,5 +511,10 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
     private void showAdmobAd(){
 
+    }
+
+    private TrafficFragment findTrafficFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        return (TrafficFragment) fragmentManager.findFragmentById(R.id.traffic_fragment);
     }
 }

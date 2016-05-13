@@ -12,6 +12,8 @@
     <color name="dhi_black_text">#61000000</color>
     <color name="grey_e3">#E3E3E3</color>
     <color name="button_green">#54CB6C</color>
-    <color name="activity_background">#f4f4f4</color>
+    <color name="activity_background">#e0e0e0</color>
     <color name="connect_button_error">#f58559</color>
+    <color name="usage">#F82531</color>
+    <color name="available">#5A8941</color>
 </resources>

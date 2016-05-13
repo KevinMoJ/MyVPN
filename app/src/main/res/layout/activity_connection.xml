@@ -24,7 +24,8 @@
     </android.support.design.widget.AppBarLayout>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/half_standard_margin">
         <fragment
             android:layout_width="match_parent"
             android:layout_height="270dp"
@@ -33,6 +34,16 @@
             tools:layout="@layout/fragment_connection"
             android:layout_centerHorizontal="true"/>
     </FrameLayout>
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="@dimen/half_standard_margin"
+        android:id="@+id/traffic_fragment"
+        android:name="com.androapplite.shadowsocks.fragment.TrafficFragment"
+        tools:layout="@layout/fragment_traffic"
+        >
+
+    </fragment>
 
     <View
         android:layout_width="match_parent"
