@@ -32,11 +32,6 @@
             android:id="@+id/connection_fragment"
             tools:layout="@layout/fragment_connection"
             android:layout_centerHorizontal="true"/>
-        <ImageView
-            android:layout_width="49dp"
-            android:layout_height="32dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/flag_us"/>
     </FrameLayout>
 
     <FrameLayout

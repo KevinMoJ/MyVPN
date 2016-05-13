@@ -29,6 +29,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.view.Window;
 
 import com.androapplite.shadowsocks.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
@@ -167,6 +169,14 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private void initToobar(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        toolbar.setLogo(R.drawable.ic_flag_us);
+        toolbar.getChildAt(0).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ShadowsocksApplication.debug("Toobar", "click");
+            }
+        });
     }
 
     @Override

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/share_icon"
-        android:icon="@drawable/ic_share_24dp"
+        android:icon="@drawable/ic_share_icon"
         android:title="@string/share"
         app:showAsAction="always" />
     <item android:id="@+id/overflow"
