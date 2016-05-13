@@ -316,20 +316,23 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
     @Override
     public void onCloseRateUs() {
-        if(mRateUsFragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().remove(mRateUsFragment).commit();
-            mRateUsFragment = null;
-            DefaultSharedPrefeencesUtil.markRateUsFragmentNotNeedToShow(this);
-            GAHelper.sendEvent(this, "给我们打分", "关闭");
-        }
+
     }
 
     @Override
     public void onRateUs() {
         rateUs();
-        DefaultSharedPrefeencesUtil.markRateUsFragmentNotNeedToShow(this);
+        hideRateUsFragment();
         GAHelper.sendEvent(this, "给我们打分", "打开");
+    }
+
+    private void hideRateUsFragment() {
+        if(mRateUsFragment != null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().remove(mRateUsFragment).commit();
+            mRateUsFragment = null;
+            DefaultSharedPrefeencesUtil.markRateUsFragmentNotNeedToShow(this);
+        }
     }
 
     private void prepareStartService(){

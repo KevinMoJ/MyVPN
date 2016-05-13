@@ -3,8 +3,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="connect_success">You are connected!</string>
-    <string name="rate_your_experience">Rate your experience</string>
-    <string name="rating">rating</string>
     <string name="share">Share</string>
     <string name="rate_us">Rate us</string>
     <string name="contact_us">Contact us</string>
@@ -19,7 +17,6 @@
     <string name="connect">Connect</string>
     <string name="connecting">Connecting</string>
     <string name="connected">Conncted</string>
-    <string name="tap_to_disconnect">Tap to Disconnect</string>
     <string name="tap_to_connect_explain">Press the blue button to connect!</string>
     <string name="please_wait">Please wait...</string>
     <plurals name="bytes">

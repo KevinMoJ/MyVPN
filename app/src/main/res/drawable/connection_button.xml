@@ -18,7 +18,7 @@
     </item>
     <item android:maxLevel="2">
         <shape android:shape="oval">
-            <stroke android:color="@color/connect_button_connected" android:width="@dimen/connection_button_stroke_width"/>
+            <stroke android:color="@color/button_green" android:width="@dimen/connection_button_stroke_width"/>
         </shape>
     </item>
     <item android:maxLevel="3">

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -78,7 +76,7 @@ public class ConnectionFragment extends Fragment {
 
     public void connected(){
         mConnectionButtonTextView.setText(R.string.connected);
-        mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.connect_button_connected));
+        mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.button_green));
         Snackbar.make(mConnectionButtonTextView, R.string.connect_success,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.clearAnimation();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_CONNECTED);

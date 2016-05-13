@@ -1,92 +1,29 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_margin="@dimen/standard_margin"
+    android:background="@drawable/rate_us_bg"
+    android:paddingLeft="@dimen/standard_margin"
+    android:paddingRight="@dimen/standard_margin"
     tools:context="com.androapplite.shadowsocks.fragment.RateUsFragment">
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/rate_us_star"
+        android:layout_centerVertical="true"
+        />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="53dp"
-        android:background="@drawable/rate_us_title"
-        android:paddingLeft="@dimen/standard_margin"
-        android:paddingRight="@dimen/standard_margin">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/primary_white_text"
-            android:textSize="@dimen/large_text"
-            android:layout_centerVertical="true"
-            android:text="@string/rate_your_experience" />
-        <ImageButton
-            android:layout_width="@dimen/large_text"
-            android:layout_height="@dimen/large_text"
-            android:layout_centerInParent="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/ic_close_24dp"
-            android:tint="@android:color/white"
-            android:background="@null"
-            android:id="@+id/rate_us_close_btn"/>
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/rate_us_content"
-        android:padding="@dimen/standard_margin"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        >
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/star"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/star"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/star"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/star"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/star"/>
-        <View
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-        <Button
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:text="@string/rating"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/large_text"
-            android:background="@drawable/rating_button"
-            android:id="@+id/rate_us_btn"/>
-    </LinearLayout>
-</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:text="@string/rate_us"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_white_text"
+        android:textSize="@dimen/large_text"
+        android:background="@drawable/common_positive_button_bg"
+        android:id="@+id/rate_us_btn"/>
+
+</RelativeLayout>

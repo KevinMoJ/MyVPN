@@ -19,7 +19,6 @@ import com.androapplite.shadowsocks.R;
  * create an instance of this fragment.
  */
 public class RateUsFragment extends Fragment {
-    private ImageButton mRateUsCloseButton;
     private Button mRateUsButton;
     private OnFragmentInteractionListener mListener;
 
@@ -37,22 +36,10 @@ public class RateUsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_rate_us, container, false);
         mRateUsButton = (Button)rootView.findViewById(R.id.rate_us_btn);
-        mRateUsCloseButton = (ImageButton)rootView.findViewById(R.id.rate_us_close_btn);
         initRateUsButton();
-        initRateUsCloseButton();
         return rootView;
     }
 
-    private void initRateUsCloseButton(){
-        mRateUsCloseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mListener != null){
-                    mListener.onCloseRateUs();
-                }
-            }
-        });
-    }
 
     private void initRateUsButton(){
         mRateUsButton.setOnClickListener(new View.OnClickListener() {
