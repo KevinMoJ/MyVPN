@@ -36,22 +36,5 @@
 
         </shape>
     </item>
-<!--    <item android:right="6dp" android:top="6dp" android:left="6dp" android:bottom="6dp">
-        <shape android:shape="oval">
-            <solid android:color="#09000000"></solid>
 
-        </shape>
-    </item>
-    <item android:right="7dp" android:top="7dp" android:left="7dp" android:bottom="7dp">
-        <shape android:shape="oval">
-            <solid android:color="#0a000000"></solid>
-
-        </shape>
-    </item>
-
-    <item android:left="8dp" android:bottom="8dp" android:top="8dp" android:right="8dp">
-        <shape android:shape="oval">
-            <solid android:color="#0b000000"/>
-        </shape>
-    </item>-->
 </layer-list>

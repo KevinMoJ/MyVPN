@@ -22,44 +22,37 @@
             />
 
     </android.support.design.widget.AppBarLayout>
-
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        >
+        android:layout_height="wrap_content">
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="270dp"
+            android:name="com.androapplite.shadowsocks.fragment.ConnectionFragment"
+            android:id="@+id/connection_fragment"
+            tools:layout="@layout/fragment_connection"
+            android:layout_centerHorizontal="true"/>
         <ImageView
             android:layout_width="49dp"
             android:layout_height="32dp"
             android:scaleType="fitCenter"
             android:src="@drawable/flag_us"/>
-        <fragment
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:name="com.androapplite.shadowsocks.fragment.ConnectionFragment"
-            android:id="@+id/connection_fragment"
-            tools:layout="@layout/fragment_connection"
-            android:layout_centerHorizontal="true"/>
+    </FrameLayout>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:id="@+id/rate_us_fragment_container"
-            android:layout_alignParentBottom="true"
-            ></FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:id="@+id/rate_us_fragment_container"
+        android:layout_alignParentBottom="true"
+        ></FrameLayout>
 
-<!--        <fragment
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
-            android:id="@+id/rate_us_fragment"
-            android:layout_alignParentBottom="true"
-            tools:layout="@layout/fragment_rate_us"
-            />-->
-    </RelativeLayout>
+    <!--        <fragment
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
+                android:id="@+id/rate_us_fragment"
+                android:layout_alignParentBottom="true"
+                tools:layout="@layout/fragment_rate_us"
+                />-->
 
 </LinearLayout>
