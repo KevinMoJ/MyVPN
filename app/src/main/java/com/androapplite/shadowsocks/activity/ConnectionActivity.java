@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.ColorInt;
