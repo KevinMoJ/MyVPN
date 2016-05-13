@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="@dimen/standard_margin"
     android:background="@drawable/rate_us_bg"
     android:paddingLeft="@dimen/standard_margin"
     android:paddingRight="@dimen/standard_margin"
@@ -15,14 +14,14 @@
         />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="35dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:text="@string/rate_us"
         android:textAllCaps="false"
         android:textColor="@color/primary_white_text"
-        android:textSize="@dimen/large_text"
+        android:textSize="@dimen/small_text"
         android:background="@drawable/common_positive_button_bg"
         android:id="@+id/rate_us_btn"/>
 

@@ -36,9 +36,11 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="60dp"
         android:id="@+id/rate_us_fragment_container"
         android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/standard_margin"
+
         ></FrameLayout>
 
     <!--        <fragment
