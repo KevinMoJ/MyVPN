@@ -26,7 +26,7 @@
             android:gravity="center"
             android:text="@string/tap_to_connect"
             android:textSize="@dimen/large_text"
-            android:textColor="@color/primary_black_text"
+            android:textColor="@color/colorPrimary"
             android:textAllCaps="false"
             android:id="@+id/connection_button_text"
             android:background="@null"/>
@@ -38,21 +38,6 @@
             android:layout_gravity="center"
             android:id="@+id/connection_button"
             android:background="@null"
-
             />
-
     </FrameLayout>
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tap_to_connect_explain"
-        android:id="@+id/connection_message"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/twice_margin"
-        android:layout_below="@id/connection_button_bg"
-        android:textSize="@dimen/large_text"
-        android:textColor="@color/secondary_black_text"/>
-
 </RelativeLayout>

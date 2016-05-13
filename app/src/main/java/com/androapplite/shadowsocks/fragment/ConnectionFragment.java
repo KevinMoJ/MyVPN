@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +23,6 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 public class ConnectionFragment extends Fragment {
     private TextView mConnectionButtonTextView;
     private ImageButton mConnectionButton;
-    private TextView mConnectionMessageTextView;
     private OnFragmentInteractionListener mListener;
     private int count = 0;
 
@@ -42,7 +42,7 @@ public class ConnectionFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_connection, container, false);
         mConnectionButton = (ImageButton)rootView.findViewById(R.id.connection_button);
         mConnectionButtonTextView = (TextView)rootView.findViewById(R.id.connection_button_text);
-        mConnectionMessageTextView = (TextView)rootView.findViewById(R.id.connection_message);
+//        mConnectionMessageTextView = (TextView)rootView.findViewById(R.id.connection_message);
         initConnectionButton();
         return rootView;
     }
@@ -60,7 +60,8 @@ public class ConnectionFragment extends Fragment {
 
     public void connecting(){
         mConnectionButtonTextView.setText(R.string.connecting);
-        mConnectionMessageTextView.setText(R.string.please_wait);
+        mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+        Snackbar.make(mConnectionButtonTextView, R.string.please_wait,Snackbar.LENGTH_SHORT);
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_CONNECTING);
         mConnectionButton.clearAnimation();
         Animation rotate = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate);
@@ -69,21 +70,24 @@ public class ConnectionFragment extends Fragment {
 
     public void stop(){
         mConnectionButtonTextView.setText(R.string.tap_to_connect);
-        mConnectionMessageTextView.setText(R.string.tap_to_connect_explain);
+        mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
+        Snackbar.make(mConnectionButtonTextView, R.string.tap_to_connect_explain,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_STOP);
         mConnectionButton.clearAnimation();
     }
 
     public void connected(){
-        mConnectionButtonTextView.setText(R.string.tap_to_disconnect);
-        mConnectionMessageTextView.setText(R.string.connect_success);
+        mConnectionButtonTextView.setText(R.string.connected);
+        mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.connect_button_connected));
+        Snackbar.make(mConnectionButtonTextView, R.string.connect_success,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.clearAnimation();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_CONNECTED);
     }
 
     public void error(){
         mConnectionButtonTextView.setText(R.string.connection_failed);
-        mConnectionMessageTextView.setText("");
+        mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.connect_button_error));
+        Snackbar.make(mConnectionButtonTextView, R.string.connection_failed_explain,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.clearAnimation();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_ERROR);
     }
