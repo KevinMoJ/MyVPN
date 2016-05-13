@@ -23,6 +23,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -68,6 +69,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         setContentView(R.layout.activity_connection);
         mConnectionFragment = findConectionFragment();
         initToobar();
+        initActionBar();
         showRateUsFragmentWhenFirstOpen();
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
@@ -177,6 +179,11 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 ShadowsocksApplication.debug("Toobar", "click");
             }
         });
+    }
+
+    private void initActionBar(){
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
     }
 
     @Override
