@@ -72,6 +72,7 @@ public class ConnectionFragment extends Fragment {
         Snackbar.make(mConnectionButtonTextView, R.string.tap_to_connect_explain,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_STOP);
         mConnectionButton.clearAnimation();
+        getView().invalidate();
     }
 
     public void connected(){
@@ -80,6 +81,7 @@ public class ConnectionFragment extends Fragment {
         Snackbar.make(mConnectionButtonTextView, R.string.connect_success,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.clearAnimation();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_CONNECTED);
+        getView().invalidate();
     }
 
     public void error(){
@@ -88,6 +90,7 @@ public class ConnectionFragment extends Fragment {
         Snackbar.make(mConnectionButtonTextView, R.string.connection_failed_explain,Snackbar.LENGTH_SHORT).show();
         mConnectionButton.clearAnimation();
         mConnectionButton.setImageLevel(CONNECTION_BUTTON_STATE_ERROR);
+        getView().invalidate();
     }
 
     public interface OnFragmentInteractionListener {
