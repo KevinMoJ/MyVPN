@@ -52,3 +52,5 @@
   public *;
 }
 -dontwarn okio.**
+-dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
+-dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
