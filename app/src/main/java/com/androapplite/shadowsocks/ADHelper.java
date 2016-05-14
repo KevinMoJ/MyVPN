@@ -126,7 +126,10 @@ public final class AdHelper {
     private static AdRequest createAdmobRequest(){
         AdRequest.Builder builder = new AdRequest.Builder();
         if(BuildConfig.DEBUG) {
+            //nexus 4 android 4.4
             builder.addTestDevice("7CE6E7BA2138D164DA9BE6641B0F5BDD");
+            //我的手机 nexus 5 android 6
+            builder.addTestDevice("c35b50cfe853bf4d75a49754dc0e4c48");
         }
         return  builder.build();
     }
@@ -144,7 +147,10 @@ public final class AdHelper {
 
     public void initFacebookAd(){
         if(BuildConfig.DEBUG){
+            //nexus 4 android 4.4
             AdSettings.addTestDevice("14ef9e409d575d15f92eb11f5b06f01b");
+            //我的手机 nexus 5 andorid 6
+            AdSettings.addTestDevice("c35b50cfe853bf4d75a49754dc0e4c48");
         }
         mFacebookAd.setAdListener(new com.facebook.ads.AdListener() {
             @Override

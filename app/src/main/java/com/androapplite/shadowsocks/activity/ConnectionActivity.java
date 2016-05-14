@@ -42,6 +42,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.androapplite.shadowsocks.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
@@ -53,6 +54,7 @@ import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.fragment.TrafficFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.facebook.ads.MediaView;
 import com.facebook.ads.NativeAd;
 import com.google.android.gms.ads.AdView;
 
@@ -583,16 +585,32 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private void showFacebookAd(){
         NativeAd nativeAd = AdHelper.getInstance(this).getFaceBookAd();
         LayoutInflater inflater = getLayoutInflater();
-        RelativeLayout adView = (RelativeLayout) inflater.inflate(R.layout.layout_ad_unit, null);
+        RelativeLayout adView = (RelativeLayout) inflater.inflate(R.layout.layout_ad_unit, mLowerScreenView);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        
+        mLowerScreenView.removeAllViews();
+        mLowerScreenView.addView(adView);
+
+        TextView title = (TextView) adView.findViewById(R.id.ad_title);
+        title.setText(nativeAd.getAdTitle());
+
+        TextView body = (TextView) adView.findViewById(R.id.ad_body);
+        body.setText(nativeAd.getAdBody());
+
+        // Download and setting the cover image.
+        MediaView nativeAdMedia = (MediaView) adView.findViewById(R.id.native_ad_media);
+        NativeAd.Image adCoverImage = nativeAd.getAdCoverImage();
+        nativeAdMedia.setNativeAd(nativeAd);
+
+        // Register the native ad view with the native ad instance
+        nativeAd.registerViewForInteraction(mLowerScreenView);
 
     }
 
     private void showAdmobAd(){
         AdView adView = AdHelper.getInstance(this).getAdmobAd();
         if(adView != null){
+            mLowerScreenView.removeAllViews();
             mLowerScreenView.addView(adView, 0);
         }
 

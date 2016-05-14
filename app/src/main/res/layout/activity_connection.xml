@@ -1,63 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
     tools:context="com.androapplite.shadowsocks.activity.ConnectionActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:elevation="0dp"
-        android:theme="@style/AppTheme.NoBackground.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.NoBackground.PopupOverlay"
-            />
-
-    </android.support.design.widget.AppBarLayout>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/half_standard_margin">
-        <fragment
-            android:layout_width="match_parent"
-            android:layout_height="270dp"
-            android:name="com.androapplite.shadowsocks.fragment.ConnectionFragment"
-            android:id="@+id/connection_fragment"
-            tools:layout="@layout/fragment_connection"
-            android:layout_centerHorizontal="true"/>
-    </FrameLayout>
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginBottom="@dimen/half_standard_margin"
-        android:id="@+id/traffic_fragment"
-        android:name="com.androapplite.shadowsocks.fragment.TrafficFragment"
-        tools:layout="@layout/fragment_traffic"
+        android:orientation="vertical"
         >
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:elevation="0dp"
+            android:theme="@style/AppTheme.NoBackground.AppBarOverlay">
 
-    </fragment>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/lower_screen">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.NoBackground.PopupOverlay"
+                />
+
+        </android.support.design.widget.AppBarLayout>
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:id="@+id/rate_us_fragment_container"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="@dimen/standard_margin"
-            tools:layout="@layout/fragment_rate_us"
-            ></FrameLayout>
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/half_standard_margin">
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="270dp"
+                android:name="com.androapplite.shadowsocks.fragment.ConnectionFragment"
+                android:id="@+id/connection_fragment"
+                tools:layout="@layout/fragment_connection"
+                android:layout_centerHorizontal="true"/>
+        </FrameLayout>
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="@dimen/half_standard_margin"
+            android:id="@+id/traffic_fragment"
+            android:name="com.androapplite.shadowsocks.fragment.TrafficFragment"
+            tools:layout="@layout/fragment_traffic"
+            >
+        </fragment>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lower_screen">
+        </RelativeLayout>
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/rate_us_fragment_container"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/standard_margin"
+        tools:layout="@layout/fragment_rate_us"
+        ></FrameLayout>
 
-</LinearLayout>
+</RelativeLayout>
