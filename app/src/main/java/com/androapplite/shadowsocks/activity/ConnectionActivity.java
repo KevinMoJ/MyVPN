@@ -287,6 +287,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         int id = item.getItemId();
         switch (id){
             case R.id.share_icon:
+//                final AdHelper adHelper = AdHelper.getInstance(this);
+//                adHelper.loadFacebookAd();
                 share();
                 GAHelper.sendEvent(this, "菜单", "分享", "图标");
                 break;
@@ -589,7 +591,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         mLowerScreenView.removeAllViews();
-        mLowerScreenView.addView(adView);
+        mLowerScreenView.addView(adView, layoutParams);
 
         TextView title = (TextView) adView.findViewById(R.id.ad_title);
         title.setText(nativeAd.getAdTitle());
