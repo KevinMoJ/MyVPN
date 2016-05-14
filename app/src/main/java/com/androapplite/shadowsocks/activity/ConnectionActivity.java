@@ -106,6 +106,10 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
                 ShadowsocksApplication.debug("traffic", "txTotal old : " + TrafficMonitor.formatTraffic(ConnectionActivity.this, mShadowsocksService.getTxTotalMonthly()));
                 ShadowsocksApplication.debug("traffic", "rxTotal old : " + TrafficMonitor.formatTraffic(ConnectionActivity.this, mShadowsocksService.getRxTotalMonthly()));
+                if(mTrafficFragment != null){
+                    mTrafficFragment.updateTrafficUse(txTotal, rxTotal,
+                            mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
+                }
             }
         };
     }
@@ -154,6 +158,10 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 registerShadowsocksCallback();
                 try {
                     updateConnectionState(mShadowsocksService.getState());
+                    if(mTrafficFragment != null){
+                        mTrafficFragment.updateTrafficUse(0, 0,
+                                mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
+                    }
                 } catch (RemoteException e) {
                     ShadowsocksApplication.handleException(e);
                 }

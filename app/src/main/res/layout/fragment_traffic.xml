@@ -16,15 +16,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Used: "
+            android:text="@string/traffic_used"
             android:textSize="@dimen/medium_text"
             android:textColor="@color/primary_black_text"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="500MB"
+            android:text="0B"
             android:textSize="@dimen/large_text"
             android:textColor="@color/usage"
+            android:id="@+id/traffic_use"
             />
     </LinearLayout>
     <LinearLayout
@@ -38,13 +39,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Available: "
+            android:text="@string/traffic_available"
             android:textSize="@dimen/medium_text"
             android:textColor="@color/primary_black_text"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="500MB"
+            android:text="1GB"
             android:textSize="@dimen/large_text"
             android:textColor="@color/available"/>
     </LinearLayout>

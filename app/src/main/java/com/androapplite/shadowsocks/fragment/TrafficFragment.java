@@ -6,8 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
+
+import yyf.shadowsocks.utils.TrafficMonitor;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +26,8 @@ public class TrafficFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private TextView mTrafficUseTextView;
 
 
     public TrafficFragment() {
@@ -60,7 +65,18 @@ public class TrafficFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_traffic, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_traffic, container, false);
+        mTrafficUseTextView = (TextView)rootView.findViewById(R.id.traffic_use);
+        return rootView;
+    }
+
+    public void updateTrafficUse(long dailyTxUsed, long dailyRxUsed, long monthlyTxUsed, long monthlyRxUsed){
+        if(mTrafficUseTextView != null) {
+            long total = dailyTxUsed + dailyRxUsed + monthlyTxUsed + monthlyRxUsed;
+            String formatTotal = TrafficMonitor.formatTraffic(getActivity(), total);
+            mTrafficUseTextView.setText(formatTotal);
+        }
+
     }
 
 }
