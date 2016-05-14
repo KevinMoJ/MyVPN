@@ -31,6 +31,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -40,6 +41,7 @@ import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.widget.RelativeLayout;
 
 import com.androapplite.shadowsocks.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
@@ -51,6 +53,7 @@ import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.fragment.TrafficFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.facebook.ads.NativeAd;
 import com.google.android.gms.ads.AdView;
 
 import java.lang.System;
@@ -578,7 +581,12 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     }
 
     private void showFacebookAd(){
-
+        NativeAd nativeAd = AdHelper.getInstance(this).getFaceBookAd();
+        LayoutInflater inflater = getLayoutInflater();
+        RelativeLayout adView = (RelativeLayout) inflater.inflate(R.layout.layout_ad_unit, null);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        
 
     }
 
