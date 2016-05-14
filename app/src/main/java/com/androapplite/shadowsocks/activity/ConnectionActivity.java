@@ -169,7 +169,8 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     }
 
     private void checkToShowRateUsFragment() {
-        if(!DefaultSharedPrefeencesUtil.doesNeedRateUsFragmentShow(this)) {
+        //动画只显示一次
+        if(!DefaultSharedPrefeencesUtil.doesNeedRateUsFragmentShow(this) && mRateUsFragment == null) {
             mRateUsFragment = RateUsFragment.newInstance();
             initRateUsFragment();
         }
@@ -209,6 +210,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             @Override
             public void run() {
                 FragmentManager fragmentManager = getSupportFragmentManager();
+
                 fragmentManager.beginTransaction()
                         .replace(R.id.rate_us_fragment_container, mRateUsFragment)
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
