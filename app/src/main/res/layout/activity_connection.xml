@@ -45,27 +45,19 @@
         >
 
     </fragment>
-
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:id="@+id/rate_us_fragment_container"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/standard_margin"
-        tools:layout="@layout/fragment_rate_us"
-        ></FrameLayout>
-
-    <!--        <fragment
-                android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
-                android:id="@+id/rate_us_fragment"
-                android:layout_alignParentBottom="true"
-                tools:layout="@layout/fragment_rate_us"
-                />-->
+        android:layout_weight="1"
+        android:id="@+id/lower_screen">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:id="@+id/rate_us_fragment_container"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/standard_margin"
+            tools:layout="@layout/fragment_rate_us"
+            ></FrameLayout>
+    </RelativeLayout>
 
 </LinearLayout>

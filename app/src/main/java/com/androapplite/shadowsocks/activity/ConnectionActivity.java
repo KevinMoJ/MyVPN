@@ -18,11 +18,14 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -32,7 +35,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 
 import com.androapplite.shadowsocks.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
@@ -44,8 +51,10 @@ import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.fragment.TrafficFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.google.android.gms.ads.AdView;
 
 import java.lang.System;
+import java.util.concurrent.TimeUnit;
 
 import eu.chainfire.libsuperuser.Shell;
 import yyf.shadowsocks.Config;
@@ -65,6 +74,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     private long mConnectOrDisconnectStartTime;
     private BroadcastReceiver mConnectivityBroadcastReceiver;
     private TrafficFragment mTrafficFragment;
+    private ViewGroup mLowerScreenView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +82,9 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         setContentView(R.layout.activity_connection);
         mConnectionFragment = findConectionFragment();
         mTrafficFragment = findTrafficFragment();
+        mLowerScreenView = (ViewGroup)findViewById(R.id.lower_screen);
         initToobar();
         initActionBar();
-        showRateUsFragmentWhenFirstOpen();
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
@@ -99,7 +109,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             }
 
             @Override
-            public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
+            public void trafficUpdated(long txRate, long rxRate, final long txTotal, final long rxTotal) throws RemoteException {
                 ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
                 ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
                 ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
@@ -107,28 +117,48 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
                 ShadowsocksApplication.debug("traffic", "txTotal old : " + TrafficMonitor.formatTraffic(ConnectionActivity.this, mShadowsocksService.getTxTotalMonthly()));
                 ShadowsocksApplication.debug("traffic", "rxTotal old : " + TrafficMonitor.formatTraffic(ConnectionActivity.this, mShadowsocksService.getRxTotalMonthly()));
                 if(mTrafficFragment != null){
-                    mTrafficFragment.updateTrafficUse(txTotal, rxTotal,
-                            mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                mTrafficFragment.updateTrafficUse(txTotal, rxTotal,
+                                        mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
+                            } catch (RemoteException e) {
+                                ShadowsocksApplication.handleException(e);
+                            }
+                        }
+                    });
                 }
             }
         };
     }
 
     private void updateConnectionState(int state) {
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_VPN);
+
         if(mConnectionFragment != null) {
             if (state == Constants.State.CONNECTED.ordinal()) {
-                mConnectionFragment.connected();
-                if(mConnectOrDisconnectStartTime > 0) {
-                    long t = System.currentTimeMillis();
-                    GAHelper.sendTimingEvent(ConnectionActivity.this, "VPN计时", "连接", t-mConnectOrDisconnectStartTime);
-                    mConnectOrDisconnectStartTime = 0;
+                //消息只发一次
+                if(activeNetwork == null || !activeNetwork.isConnected()) {
+                    mConnectionFragment.connected();
+                    if (mConnectOrDisconnectStartTime > 0) {
+                        long t = System.currentTimeMillis();
+                        GAHelper.sendTimingEvent(ConnectionActivity.this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
+                        mConnectOrDisconnectStartTime = 0;
+                    }
+                    checkToShowRateUsFragment();
                 }
             }else if(state == Constants.State.STOPPED.ordinal()) {
-                mConnectionFragment.stop();
-                if(mConnectOrDisconnectStartTime > 0){
-                    long t = System.currentTimeMillis();
-                    GAHelper.sendTimingEvent(ConnectionActivity.this, "VPN计时", "断开", t-mConnectOrDisconnectStartTime);
-                    mConnectOrDisconnectStartTime = 0;
+                //消息只发一次
+                if(activeNetwork == null || activeNetwork.isConnectedOrConnecting()) {
+                    mConnectionFragment.stop();
+                    if (mConnectOrDisconnectStartTime > 0) {
+                        long t = System.currentTimeMillis();
+                        GAHelper.sendTimingEvent(ConnectionActivity.this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
+                        mConnectOrDisconnectStartTime = 0;
+                    }
                 }
             }else if(state == Constants.State.CONNECTING.ordinal()){
                 mConnectionFragment.connecting();
@@ -138,7 +168,7 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         }
     }
 
-    private void showRateUsFragmentWhenFirstOpen() {
+    private void checkToShowRateUsFragment() {
         if(!DefaultSharedPrefeencesUtil.doesNeedRateUsFragmentShow(this)) {
             mRateUsFragment = RateUsFragment.newInstance();
             initRateUsFragment();
@@ -175,8 +205,17 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     }
 
     private void initRateUsFragment(){
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.rate_us_fragment_container, mRateUsFragment).commit();
+        new Handler(getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.rate_us_fragment_container, mRateUsFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .commit();
+            }
+        }, TimeUnit.SECONDS.toMillis(2));
+
 
     }
 
@@ -472,12 +511,34 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
             if(activeNetwork != null ){
                 if(activeNetwork.isConnectedOrConnecting()){
                     if(activeNetwork.isConnected()){
-                        mConnectionFragment.connected();
+                        //消息不发两次
+                        try {
+                            if(mShadowsocksService != null && mShadowsocksService.getMode() != Constants.State.CONNECTED.ordinal()){
+                                mConnectionFragment.connected();
+                                checkToShowRateUsFragment();
+                            }
+                        } catch (RemoteException e) {
+                            ShadowsocksApplication.handleException(e);
+                        }
                     }else{
-                        mConnectionFragment.connecting();
+                        //消息不发两次
+                        try {
+                            if(mShadowsocksService != null && mShadowsocksService.getMode() != Constants.State.CONNECTING.ordinal()){
+                                mConnectionFragment.connecting();
+                            }
+                        } catch (RemoteException e) {
+                            ShadowsocksApplication.handleException(e);
+                        }
                     }
                 }else{
-                    mConnectionFragment.stop();
+                    //消息不发两次
+                    try {
+                        if(mShadowsocksService != null && mShadowsocksService.getMode() != Constants.State.CONNECTING.ordinal()){
+                            mConnectionFragment.stop();
+                        }
+                    } catch (RemoteException e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
                 }
             }
         }
@@ -516,9 +577,14 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
 
     private void showFacebookAd(){
 
+
     }
 
     private void showAdmobAd(){
+        AdView adView = AdHelper.getInstance(this).getAdmobAd();
+        if(adView != null){
+            mLowerScreenView.addView(adView, 0);
+        }
 
     }
 
