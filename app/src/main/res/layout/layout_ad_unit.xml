@@ -10,7 +10,7 @@
         <com.facebook.ads.MediaView
             android:id="@+id/native_ad_media"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="300dp"
             />
         <TextView
             android:layout_width="match_parent"
