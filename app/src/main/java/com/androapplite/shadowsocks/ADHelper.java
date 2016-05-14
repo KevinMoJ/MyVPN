@@ -208,6 +208,8 @@ public final class AdHelper {
 
     public void loadFacebookAd(){
         if(mFacebookAdState != AD_LOADING) {
+            mFacebookAd = new NativeAd(mContext, FACEBOOK_ID);
+            initFacebookAd();
             mFacebookAd.loadAd();
             mFacebookAdState = AD_LOADING;
         }
