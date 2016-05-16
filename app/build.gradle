@@ -63,5 +63,6 @@ dependencies {
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.android.support:design:22.2.1'
     compile 'com.google.android.gms:play-services-analytics:7.8.+'
+    compile 'com.google.android.gms:play-services-appinvite:7.8.+'
     compile 'com.facebook.android:audience-network-sdk:4.8.2'
 }
