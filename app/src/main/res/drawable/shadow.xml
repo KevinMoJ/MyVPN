@@ -32,7 +32,7 @@
     </item>
     <item android:right="5dp" android:top="5dp" android:left="5dp" android:bottom="5dp">
         <shape android:shape="oval">
-            <solid android:color="#20000000"></solid>
+            <solid android:color="@android:color/white"></solid>
 
         </shape>
     </item>

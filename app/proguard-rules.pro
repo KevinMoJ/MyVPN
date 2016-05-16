@@ -54,3 +54,9 @@
 -dontwarn okio.**
 -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
+
+
+-keep public class yyf.shadowsocks.**{*;}
+-keep public class yyf.shadowsocks.service.**{*;}
+-keep public class yyf.shadowsocks.jni.**{*;}
+
