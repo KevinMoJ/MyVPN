@@ -50,6 +50,7 @@ public class ConnectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(mListener != null){
+                    mConnectionButton.setClickable(false);
                     mListener.onClickConnectionButton();
                 }
             }
@@ -67,6 +68,7 @@ public class ConnectionFragment extends Fragment {
     }
 
     public void stop(){
+        mConnectionButton.setClickable(true);
         mConnectionButtonTextView.setText(R.string.tap_to_connect);
         mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.colorPrimary));
         Snackbar.make(mConnectionButtonTextView, R.string.tap_to_connect_explain,Snackbar.LENGTH_SHORT).show();
@@ -76,6 +78,7 @@ public class ConnectionFragment extends Fragment {
     }
 
     public void connected(){
+        mConnectionButton.setClickable(true);
         mConnectionButtonTextView.setText(R.string.connected);
         mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.button_green));
         Snackbar.make(mConnectionButtonTextView, R.string.connect_success,Snackbar.LENGTH_SHORT).show();
@@ -85,6 +88,7 @@ public class ConnectionFragment extends Fragment {
     }
 
     public void error(){
+        mConnectionButton.setClickable(true);
         mConnectionButtonTextView.setText(R.string.connection_failed);
         mConnectionButtonTextView.setTextColor(getResources().getColor(R.color.connect_button_error));
         Snackbar.make(mConnectionButtonTextView, R.string.connection_failed_explain,Snackbar.LENGTH_SHORT).show();
