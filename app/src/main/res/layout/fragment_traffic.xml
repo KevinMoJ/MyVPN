@@ -18,12 +18,13 @@
             android:layout_height="wrap_content"
             android:text="@string/traffic_used"
             android:textSize="@dimen/medium_text"
+            android:layout_marginRight="@dimen/margin_4dp"
             android:textColor="@color/secondary_black_text"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0B"
-            android:textSize="@dimen/large_text"
+            android:textSize="@dimen/medium_text"
             android:textColor="@color/usage"
             android:id="@+id/traffic_use"
             />
@@ -39,6 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_4dp"
             android:text="@string/traffic_available"
             android:textSize="@dimen/medium_text"
             android:textColor="@color/secondary_black_text"/>
@@ -46,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1GB/Month"
-            android:textSize="@dimen/large_text"
+            android:textSize="@dimen/medium_text"
             android:textColor="@color/available"/>
     </LinearLayout>
 </LinearLayout>
