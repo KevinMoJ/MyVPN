@@ -67,7 +67,7 @@
         android:id="@+id/rate_us_fragment_container"
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/standard_margin"
-
+        android:layout_gravity="bottom|end"
         tools:layout="@layout/fragment_rate_us"
         ></FrameLayout>
 
