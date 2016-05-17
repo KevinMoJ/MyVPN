@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/share_icon"
+<!--    <item android:id="@+id/share_icon"
         android:icon="@drawable/ic_share_icon"
         android:title="@string/share"
-        app:showAsAction="always" />
+        app:showAsAction="always" />-->
     <item android:id="@+id/overflow"
         android:title="@string/more"
         android:icon="@drawable/ic_more_vert_24dp"

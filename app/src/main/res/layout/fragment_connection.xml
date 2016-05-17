@@ -5,11 +5,12 @@
     tools:context="com.androapplite.shadowsocks.fragment.ConnectionFragment"
     android:background="@color/colorPrimary"
     >
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/world_map"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         />
 
     <FrameLayout

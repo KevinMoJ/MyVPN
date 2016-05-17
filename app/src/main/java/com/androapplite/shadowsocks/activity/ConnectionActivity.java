@@ -286,12 +286,12 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
-            case R.id.share_icon:
-//                final AdHelper adHelper = AdHelper.getInstance(this);
-//                adHelper.loadFacebookAd();
-                share();
-                GAHelper.sendEvent(this, "菜单", "分享", "图标");
-                break;
+//            case R.id.share_icon:
+////                final AdHelper adHelper = AdHelper.getInstance(this);
+////                adHelper.loadFacebookAd();
+//                share();
+//                GAHelper.sendEvent(this, "菜单", "分享", "图标");
+//                break;
             case R.id.share:
                 share();
                 GAHelper.sendEvent(this, "菜单", "分享", "文字");
