@@ -31,6 +31,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,6 +60,7 @@ import com.facebook.ads.NativeAd;
 import com.google.android.gms.ads.AdView;
 
 import java.lang.System;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import eu.chainfire.libsuperuser.Shell;
@@ -231,13 +233,34 @@ public class ConnectionActivity extends BaseShadowsocksActivity implements
         setSupportActionBar(toolbar);
 
         toolbar.setLogo(R.drawable.ic_flag_us);
-        toolbar.getChildAt(0).setOnClickListener(new View.OnClickListener() {
+        View logoView = getToolbarLogoIcon(toolbar);
+        logoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ShadowsocksApplication.debug("Toobar", "click");
             }
         });
     }
+
+    private static View getToolbarLogoIcon(Toolbar toolbar){
+        //check if contentDescription previously was set
+        boolean hadContentDescription = TextUtils.isEmpty(toolbar.getLogoDescription());
+        String contentDescription = String.valueOf(!hadContentDescription ? toolbar.getLogoDescription() : "logoContentDescription");
+        toolbar.setLogoDescription(contentDescription);
+        ArrayList<View> potentialViews = new ArrayList<View>();
+        //find the view based on it's content description, set programatically or with android:contentDescription
+        toolbar.findViewsWithText(potentialViews,contentDescription, View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
+        //Nav icon is always instantiated at this point because calling setLogoDescription ensures its existence
+        View logoIcon = null;
+        if(potentialViews.size() > 0){
+            logoIcon = potentialViews.get(0);
+        }
+        //Clear content description if not previously present
+        if(hadContentDescription)
+            toolbar.setLogoDescription(null);
+        return logoIcon;
+    }
+
 
     private void initActionBar(){
         ActionBar actionBar = getSupportActionBar();
