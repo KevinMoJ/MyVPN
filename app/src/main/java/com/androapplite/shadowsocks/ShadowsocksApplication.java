@@ -6,6 +6,8 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
+import com.androapplite.shadowsocks.util.IabHelper;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
@@ -17,6 +19,9 @@ import io.fabric.sdk.android.Fabric;
  */
 public class ShadowsocksApplication extends Application {
     private Tracker mTracker;
+    IabHelper mHelper;
+    IabBroadcastReceiver mBroadcastReceiver;
+
 
     @NonNull
     public Tracker getTracker(){
@@ -52,6 +57,10 @@ public class ShadowsocksApplication extends Application {
                     .penaltyDeath()
                     .build());
         }
+//        mHelper = new IabHelper(this, base64EncodedPublicKey);
+//        mHelper.enableDebugLogging(BuildConfig.DEBUG);
+
+
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
