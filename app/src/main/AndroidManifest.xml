@@ -18,11 +18,11 @@
             android:name=".activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.FullScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".activity.ConnectionActivity"
@@ -57,12 +57,23 @@
             android:name="io.fabric.ApiKey"
             android:value="52a14ce59287e0edc5512692515ab0270feaef99" />
 
-        <receiver
-            android:name=".broadcast.ShadowsocksVPNServiceReceiver">
+        <receiver android:name=".broadcast.ShadowsocksVPNServiceReceiver">
             <intent-filter>
                 <action android:name="${applicationId}.RESET_TOTAL" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".activity.ConnectivityActivity"
+            android:label="@string/title_activity_connectivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

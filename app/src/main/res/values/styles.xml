@@ -29,7 +29,9 @@
     </style>
 
     <style name="AppTheme.NoBackground.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.NoBackground.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
     <style name="OverFlow" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_more_vert_24dp</item>
         <item name="android:tint">@android:color/white</item>
@@ -44,5 +46,9 @@
         <item name="background">@android:color/transparent</item>
         <item name="windowActionBarOverlay">true</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
