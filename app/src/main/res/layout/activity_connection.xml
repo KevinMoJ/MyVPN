@@ -61,6 +61,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/standard_margin"
         tools:layout="@layout/fragment_rate_us"
+        android:visibility="gone"
         ></FrameLayout>
 
 </RelativeLayout>
