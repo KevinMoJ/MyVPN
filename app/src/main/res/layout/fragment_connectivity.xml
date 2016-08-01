@@ -20,11 +20,13 @@
             android:textColor="@color/primary_white_text"
             android:padding="10dp"
             android:textSize="@dimen/large_text"
+            android:textStyle="bold"
             />
 
         <ImageView
             android:layout_width="40dp"
-            android:layout_height="40dp" />
+            android:layout_height="40dp"
+            android:src="@drawable/triangle"/>
     </LinearLayout>
     <Button
         android:layout_width="200dp"
