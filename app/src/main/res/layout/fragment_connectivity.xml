@@ -28,8 +28,10 @@
             android:layout_height="40dp"
             android:src="@drawable/triangle"/>
     </LinearLayout>
-    <Button
+    <ImageButton
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:src="@drawable/connectivy_loading"
+        android:id="@+id/connectivity_button"
         />
 </LinearLayout>
