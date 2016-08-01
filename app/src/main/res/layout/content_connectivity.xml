@@ -44,8 +44,8 @@
             android:layout_height="40dp"
             android:layout_marginBottom="@dimen/half_standard_margin"
             android:id="@+id/traffic_fragment"
-            android:name="com.androapplite.shadowsocks.fragment.TrafficFragment"
-            tools:layout="@layout/fragment_traffic"
+            android:name="com.androapplite.shadowsocks.fragment.TrafficRateFragment"
+            tools:layout="@layout/fragment_traffic_rate"
             >
         </fragment>
         <RelativeLayout
