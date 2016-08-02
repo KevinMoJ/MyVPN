@@ -3,16 +3,18 @@
     android:fromDegrees="270"
     android:toDegrees="270">
     <shape
-        android:innerRadius="74dp"
+        android:innerRadius="72dp"
         android:shape="ring"
-        android:thickness="16dp"
+        android:thickness="18dp"
         android:useLevel="true"><!-- this line fixes the issue for lollipop api 21 -->
 
         <gradient
-            android:angle="0"
-            android:endColor="#007DD6"
-            android:startColor="#00ff00"
-            android:type="linear"
-            android:useLevel="false" />
+            android:angle="90"
+            android:startColor="#27CE81"
+            android:endColor="#FEE76A"
+            android:type="sweep"
+            android:useLevel="false"
+
+            />
     </shape>
 </rotate>

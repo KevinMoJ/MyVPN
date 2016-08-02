@@ -46,8 +46,10 @@ public class ConnectivityFragment extends Fragment {
             public void onAnimationRepeat(Animator animation) {
                 if(mCount == 0){
                     progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_2));
+                    progressBar.setBackgroundResource(R.drawable.connecting_phase_1_end);
                 }else if(mCount == 1){
                     progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_3));
+                    progressBar.setBackgroundResource(R.drawable.connecting_phase_2_end);
                 }
                 mCount++;
             }

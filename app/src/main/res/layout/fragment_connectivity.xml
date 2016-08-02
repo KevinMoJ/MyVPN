@@ -24,9 +24,10 @@
             />
 
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/triangle"/>
+            android:layout_width="10dp"
+            android:layout_height="18dp"
+            android:src="@drawable/triangle"
+            android:tint="@color/colorPrimary"/>
     </LinearLayout>
     <FrameLayout
         android:layout_width="188dp"
@@ -40,7 +41,7 @@
             android:progressDrawable="@drawable/connecting_phase_1"
             style="?android:attr/progressBarStyleHorizontal"
             android:max="360"
-            android:progress="50"
+            android:progress="350"
             />
         <ImageButton
             android:layout_width="match_parent"

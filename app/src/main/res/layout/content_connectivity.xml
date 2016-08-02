@@ -13,13 +13,15 @@
         android:orientation="vertical"
         >
         <fragment
+            android:layout_marginTop="@dimen/standard_margin"
             android:layout_width="match_parent"
-            android:layout_height="270dp"
+            android:layout_height="wrap_content"
             android:name="com.androapplite.shadowsocks.fragment.ConnectivityFragment"
             android:id="@+id/connection_fragment"
             tools:layout="@layout/fragment_connectivity"
             android:layout_centerHorizontal="true"/>
         <fragment
+            android:layout_marginTop="@dimen/standard_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/half_standard_margin"
