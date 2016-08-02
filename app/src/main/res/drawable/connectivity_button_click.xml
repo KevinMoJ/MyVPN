@@ -5,10 +5,6 @@
             android:gravity="center" />
     </item>
     <item>
-        <bitmap android:src="@drawable/connectivity_button_inner_circle_unclick"
-            android:gravity="center" />
-    </item>
-    <item>
         <bitmap android:src="@drawable/connectivity_button_inner_circle_click"
             android:gravity="center" />
     </item>
