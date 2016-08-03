@@ -47,15 +47,16 @@ public class ShadowsocksApplication extends Application {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
         if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .penaltyDeath()
-                    .build());
+            //谷歌插页广告导致资源泄露
+//            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .build());
+//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .penaltyDeath()
+//                    .build());
         }
 //        mHelper = new IabHelper(this, base64EncodedPublicKey);
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);

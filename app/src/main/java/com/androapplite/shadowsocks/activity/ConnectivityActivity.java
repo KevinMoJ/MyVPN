@@ -36,6 +36,7 @@ import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
@@ -85,7 +86,34 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .build();
             mAdView.loadAd(adRequest);
+            initInterstitialAd();
         }
+    }
+
+    private void initInterstitialAd() {
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.admob_interstitial_id));
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                ShadowsocksApplication.debug("插页广告", "关闭");
+            }
+
+            @Override
+            public void onAdLoaded() {
+                ShadowsocksApplication.debug("插页广告", "加载完成");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                ShadowsocksApplication.debug("插页广告", "加载错误" + errorCode);
+            }
+
+
+        });
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+        mInterstitialAd.loadAd(adRequest);
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -346,7 +374,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 prepareStartService();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
                 GAHelper.sendEvent(this, "连接VPN", "打开");
-
+                if(mInterstitialAd != null && mInterstitialAd.isLoaded()){
+                    mInterstitialAd.show();
+                }
             }else{
                 mShadowsocksService.stop();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
