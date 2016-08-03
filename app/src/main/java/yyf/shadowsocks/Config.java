@@ -3,7 +3,11 @@ package yyf.shadowsocks;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.UnknownHostException;
+
 public class Config implements Parcelable {
+    public static final String VPN_IP = "54.211.188.225";
+    public static final String VPN_DOMAIN = "1.vpnnest.com";
 
     public boolean isGlobalProxy = true;
     public boolean isGFWList = true;
@@ -12,7 +16,8 @@ public class Config implements Parcelable {
     public boolean isUdpDns = false;
 
     public String profileName = "US Server";
-    public String proxy = "1.vpnnest.com";
+//    public String proxy = "54.211.188.225";
+    public String proxy = VPN_IP;
     public String sitekey = "vpnnest!@#123d";
     //public String route = "all";
 
@@ -33,6 +38,12 @@ public class Config implements Parcelable {
     };
 
     public Config() {
+//        try {
+//            java.net.InetAddress[] x= java.net.InetAddress.getAllByName(VPN_DOMAIN) ;
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//            proxy = VPN_IP;
+//        }
 
     }
 

@@ -39,7 +39,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
             public void run() {
                 Activity activity = SplashActivity.this;
                 startActivity(new Intent(activity,
-                        DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectionActivity.class
+                        DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectivityActivity.class
                 ));
             }
         }, TimeUnit.SECONDS.toMillis(2));
