@@ -2,6 +2,7 @@ package com.androapplite.shadowsocks;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,6 +19,7 @@ import com.google.android.gms.ads.AdView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 
 /**
  * Created by jim on 16/5/11.
@@ -58,6 +60,17 @@ public final class AdHelper {
     private OnAdLoadListener mAdmobAdListener;
 
     private static AdHelper mInstance;
+
+    private static final ArrayList<String> ESCAPE_PHONES = new ArrayList<String>();
+    static{
+        ESCAPE_PHONES.add("Xiaomi/cm_pisces/pisces:5.1.1/LMY48W/534f9b320e:userdebug/test-keys");
+        ESCAPE_PHONES.add("google/occam/mako:5.1.1/LMY48M/2167285:user/release-keys");
+    }
+
+    public static boolean isAdNeedToShow(){
+        String buildDisplay = Build.FINGERPRINT;
+        return !ESCAPE_PHONES.contains(buildDisplay);
+    }
 
     private AdHelper(@NonNull Context context){
         mContext = context;
