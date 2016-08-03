@@ -69,9 +69,7 @@ public class ConnectivityFragment extends Fragment {
             @Override
             public void onAnimationStart(Animator animation) {
                 mCount = 0;
-                mProgressBar.setProgress(0);
-                mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_1));
-                mProgressBar.setBackground(null);
+                initProgressBarStartState();
             }
 
             @Override
@@ -95,6 +93,12 @@ public class ConnectivityFragment extends Fragment {
         });
         mAnimatorSet.setTarget(mProgressBar);
         mProgressBar.clearAnimation();
+    }
+
+    private void initProgressBarStartState() {
+        mProgressBar.setProgress(0);
+        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_1));
+        mProgressBar.setBackground(null);
     }
 
     public void connecting(){
@@ -185,7 +189,7 @@ public class ConnectivityFragment extends Fragment {
         }else if(state == Constants.State.INIT.ordinal()){
         }else if(state == Constants.State.STOPPING.ordinal()){
         }else if(state == Constants.State.STOPPED.ordinal()){
-
+            initProgressBarStartState();
         }
     }
 }
