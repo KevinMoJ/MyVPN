@@ -30,10 +30,10 @@ android {
         applicationId "com.androapplite.shadowsocks"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0.1"
+        versionCode 2
+        versionName "1.2.0"
     }
-    project.archivesBaseName = 'Free_VPN-' + defaultConfig.versionName;
+    project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'

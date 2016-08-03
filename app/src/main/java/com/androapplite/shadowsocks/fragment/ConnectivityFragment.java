@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.media.Image;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -62,7 +64,6 @@ public class ConnectivityFragment extends Fragment {
         return rootView;
     }
 
-    @NonNull
     private void initProgressBar() {
         mAnimatorSet = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(), R.animator.connecting);
         mAnimatorSet.getChildAnimations().get(0).addListener(new AnimatorListenerAdapter() {
@@ -76,7 +77,7 @@ public class ConnectivityFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                error();
+//                error();
             }
 
             @Override
@@ -97,6 +98,8 @@ public class ConnectivityFragment extends Fragment {
         mProgressBar.clearAnimation();
     }
 
+
+
     private void initProgressBarStartState() {
         mProgressBar.setProgress(0);
         mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_1));
@@ -104,7 +107,14 @@ public class ConnectivityFragment extends Fragment {
     }
 
     public void connecting(){
+        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(2);
         mAnimatorSet.start();
+    }
+
+    public void stopping(){
+        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(0);
+        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).reverse();
+        initProgressBarStartState();
     }
 
     public void connected(){
@@ -128,6 +138,11 @@ public class ConnectivityFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void stopped() {
+        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).cancel();
+        initProgressBarStartState();
     }
 
     private void showConnectingMessage(){
@@ -323,10 +338,12 @@ public class ConnectivityFragment extends Fragment {
             showErrorMessage();
         }else if(state == Constants.State.INIT.ordinal()){
         }else if(state == Constants.State.STOPPING.ordinal()){
+            stopping();
             showStoppingMessage();
         }else if(state == Constants.State.STOPPED.ordinal()){
             showStoppedMessage();
-            initProgressBarStartState();
+            stopped();
         }
     }
+
 }

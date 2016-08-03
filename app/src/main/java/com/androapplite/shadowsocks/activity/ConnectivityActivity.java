@@ -33,10 +33,15 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+
+import java.lang.System;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
+import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.TrafficMonitor;
 
@@ -65,6 +70,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
         mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
+        GAHelper.sendScreenView(this, "ConnectivityActivity");
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -124,15 +130,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
                 registerShadowsocksCallback();
                 checkConnectivity();
-//                try {
-//                    updateConnectionState(mShadowsocksService.getState());
-//                    if(mTrafficFragment != null){
-//                        mTrafficFragment.updateTrafficUse(0, 0,
-//                                mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
-//                    }
-//                } catch (RemoteException e) {
-//                    ShadowsocksApplication.handleException(e);
-//                }
+
             }
 
             @Override
@@ -147,6 +145,27 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         try {
             if(mShadowsocksService != null) {
                 updateConnectionState(mShadowsocksService.getState());
+            }
+            if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()) {
+                if (mConnectOrDisconnectStartTime > 0) {
+                    long t = System.currentTimeMillis();
+                    GAHelper.sendTimingEvent(this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
+                    mConnectOrDisconnectStartTime = 0;
+                    DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this).putLong(SharedPreferenceKey.CONNECTION_TIME, t);
+                }
+            }else if(mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()){
+                if (mConnectOrDisconnectStartTime > 0) {
+                    long t = System.currentTimeMillis();
+                    GAHelper.sendTimingEvent(this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
+                    mConnectOrDisconnectStartTime = 0;
+                }
+                long connectStartTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getLong(SharedPreferenceKey.CONNECTION_TIME, 0);
+                if(connectStartTime != 0){
+                    long t = System.currentTimeMillis();
+                    long d = t - connectStartTime;
+                    GAHelper.sendTimingEvent(this, "VPN计时","使用", d);
+                    DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this).putLong(SharedPreferenceKey.CONNECTION_TIME, 0);
+                }
             }
         } catch (RemoteException e) {
             e.printStackTrace();

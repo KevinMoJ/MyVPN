@@ -45,4 +45,10 @@ public final class GAHelper {
                                              long value){
         getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value).build());
     }
+
+    public static final void sendScreenView(@NonNull Context context, @NonNull String screenView){
+        Tracker t = getTracker(context);
+        t.setScreenName(screenView);
+        t.send(new HitBuilders.ScreenViewBuilder().build());
+    }
 }
