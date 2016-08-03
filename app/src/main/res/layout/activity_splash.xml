@@ -20,6 +20,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="@dimen/twice_margin"
         android:textSize="@dimen/large_text_30"
-        android:textColor="@color/primary_white_text"/>
+        android:textColor="@color/primary_white_text"
+        android:visibility="gone"/>
 
 </RelativeLayout>

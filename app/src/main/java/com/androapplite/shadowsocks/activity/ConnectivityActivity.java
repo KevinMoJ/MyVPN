@@ -1,20 +1,26 @@
 package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.net.VpnService;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -202,24 +208,87 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
+        if (id == R.id.nav_rate_us) {
+            rateUs();
+            GAHelper.sendEvent(this, "菜单", "给我们打分");
+        } else if (id == R.id.nav_share) {
+            share();
+            GAHelper.sendEvent(this, "抽屉", "分享");
+        } else if (id == R.id.nav_contact_us) {
+            contactUs();
+            GAHelper.sendEvent(this, "菜单", "联系我们");
+        } else if (id == R.id.nav_about) {
+            about();
+            GAHelper.sendEvent(this, "菜单", "关于");
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void share(){
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getPlayStoreUrlString());
+        shareIntent.setType("text/plain");
+        try {
+            startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share)));
+        }catch(ActivityNotFoundException e){
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    @NonNull
+    private String getPlayStoreUrlString() {
+        return " https://play.google.com/store/apps/details?id=" + getPackageName();
+    }
+
+    private void rateUs(){
+        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+            startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(getPlayStoreUrlString())));
+        }
+    }
+
+    private void contactUs(){
+        Intent data=new Intent(Intent.ACTION_SENDTO);
+        data.setData(Uri.parse("mailto:watchfacedev@gmail.com"));
+        data.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.app_name));
+        data.putExtra(Intent.EXTRA_TEXT, "");
+        try {
+            startActivity(data);
+        }catch(ActivityNotFoundException e){
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    private void about(){
+        PackageManager packageManager = getPackageManager();
+        String packageName = getPackageName();
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
+            String version = packageInfo.versionName;
+
+            String appName = getResources().getString(R.string.app_name);
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.about)
+                    .setMessage(appName + " (" + version + ")")
+                    .show();
+        } catch (PackageManager.NameNotFoundException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
 
 
     private void prepareStartService(){
