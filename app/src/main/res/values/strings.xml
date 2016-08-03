@@ -37,4 +37,6 @@
     <string name="action_settings">Settings</string>
     <string name="action_choose_server">Choose server</string>
     <string name="retry">Retry</string>
+    <string name="stopping">Stopping</string>
+    <string name="stoped">Stoped</string>
 </resources>

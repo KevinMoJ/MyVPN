@@ -195,6 +195,71 @@ public class ConnectivityFragment extends Fragment {
         mMessageView.startAnimation(animation);
     }
 
+    private void showStoppingMessage(){
+        mMessageView.setVisibility(View.VISIBLE);
+        mMessageTextView.setText(R.string.stopping);
+        mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
+        mMessageArrowView.setColorFilter(getResources().getColor(R.color.stop_yellow));
+
+        mMessageView.clearAnimation();
+
+        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mMessageView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageView.setVisibility(View.INVISIBLE);
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mMessageView.startAnimation(animation);
+    }
+
+    private void showStoppedMessage(){
+        mMessageView.setVisibility(View.VISIBLE);
+        mMessageTextView.setText(R.string.stoped);
+        mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
+        mMessageArrowView.setColorFilter(getResources().getColor(R.color.stop_yellow));
+
+        mMessageView.clearAnimation();
+        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mMessageView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageView.setVisibility(View.INVISIBLE);
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mMessageView.startAnimation(animation);
+    }
+
     private void showErrorMessage(){
         mMessageView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.retry);
@@ -258,7 +323,9 @@ public class ConnectivityFragment extends Fragment {
             showErrorMessage();
         }else if(state == Constants.State.INIT.ordinal()){
         }else if(state == Constants.State.STOPPING.ordinal()){
+            showStoppingMessage();
         }else if(state == Constants.State.STOPPED.ordinal()){
+            showStoppedMessage();
             initProgressBarStartState();
         }
     }
