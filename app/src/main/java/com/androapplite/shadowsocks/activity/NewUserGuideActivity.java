@@ -153,7 +153,7 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
             public void onClick(View v) {
                 Activity activity = NewUserGuideActivity.this;
                 initSharedPreferenceValue(activity);
-                startActivity(new Intent(activity, ConnectionActivity.class));
+                startActivity(new Intent(activity, ConnectivityActivity.class));
             }
         });
     }
