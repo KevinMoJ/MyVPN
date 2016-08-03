@@ -23,6 +23,7 @@ import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.fragment.ConnectionFragment;
+import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
@@ -30,12 +31,13 @@ import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ConnectionFragment.OnFragmentInteractionListener{
+        ConnectivityFragment.OnFragmentInteractionListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
     private ConnectionFragment mConnectionFragment;
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
+    private ConnectivityFragment connectivityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +46,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         initNavigationView();
-//        mShadowsocksServiceConnection = createShadowsocksServiceConnection();
-//        ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
-//        mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
-
-
+        mShadowsocksServiceConnection = createShadowsocksServiceConnection();
+        ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
+        mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
+        
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -58,7 +59,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 getWindow().getDecorView().post(new Runnable() {
                     @Override
                     public void run() {
-//                        updateConnectionState(state);
+                        updateConnectionState(state);
                     }
                 });
             }
@@ -86,6 +87,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //                }
             }
         };
+    }
+
+    private void updateConnectionState(int State){
+
     }
 
     private ServiceConnection createShadowsocksServiceConnection(){
@@ -195,6 +200,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onClickConnectionButton() {
 
+
     }
 
     @Override
@@ -237,4 +243,5 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             unbindService(mShadowsocksServiceConnection);
         }
     }
+
 }

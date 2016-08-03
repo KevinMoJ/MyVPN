@@ -17,5 +17,7 @@
     <color name="connect_button_error">#f58559</color>
     <color name="usage">#fa6567</color>
     <color name="available">#568735</color>
-
+    <color name="message_green_color">#5ED2AD</color>
+    <color name="message_red_color">#EA624D</color>
+    <color name="connect_error_red">#E93E26</color>
 </resources>
