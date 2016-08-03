@@ -25,6 +25,7 @@ public final class TrafficMonitor {
     private long rxLast;
     private long timestampLast;
     private static final String[] units = { "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
+    
 
 /*    public TrafficMonitor(){
         units = new String[] { "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
@@ -58,6 +59,7 @@ public final class TrafficMonitor {
                 rxRate = (rxTotal - rxLast) * 1000 / delta;
                 txLast = txTotal;
                 rxLast = rxTotal;
+                timestampLast = now;
                 dirty = false;
                 updated = true;
             }else{
