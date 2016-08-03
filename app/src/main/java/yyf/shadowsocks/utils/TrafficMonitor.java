@@ -25,12 +25,30 @@ public final class TrafficMonitor {
     private long rxLast;
     private long timestampLast;
     private static final String[] units = { "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
-    
+    private static final String[] RATE_UNITS = {"KB/s", "MB/s", "GB/s", "TB/s", "PB/s"};
 
 /*    public TrafficMonitor(){
         units = new String[] { "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         numberFormat = new DecimalFormat("@@@");
     }*/
+
+    @NonNull
+    public static final String formatTrafficRate(@NonNull Context context, long size){
+        double n = size;
+        int i = -1;
+        while (n >= 1000) {
+            n /= 1024;
+            i = i + 1;
+        }
+        StringBuilder formatString = new StringBuilder();
+        if(i < 0){
+            formatString.append(size).append(" B/s");
+        }else{
+            formatString.append(numberFormat.format(n)).append(" ").append(RATE_UNITS[i]);
+        }
+
+        return formatString.toString();
+    }
 
     @NonNull
     public static final String formatTraffic(@NonNull Context context, long size){

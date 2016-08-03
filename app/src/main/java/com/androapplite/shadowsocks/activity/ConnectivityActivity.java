@@ -72,23 +72,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
 
             @Override
-            public void trafficUpdated(long txRate, long rxRate, final long txTotal, final long rxTotal) throws RemoteException {
+            public void trafficUpdated(final long txRate, final long rxRate, final long txTotal, final long rxTotal) throws RemoteException {
                 ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
                 ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
                 ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
                 ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
-                ShadowsocksApplication.debug("traffic", "txTotal old : " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
-                ShadowsocksApplication.debug("traffic", "rxTotal old : " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
+                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
+                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
+                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
+                ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
                 if(mTrafficRateFragment != null){
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-//                            try {
-//                                mTrafficFragment.updateTrafficUse(txTotal, rxTotal,
-//                                        mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
-//                            } catch (RemoteException e) {
-//                                ShadowsocksApplication.handleException(e);
-//                            }
+                            mTrafficRateFragment.updateRate(TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate),
+                                    TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
                         }
                     });
                 }
