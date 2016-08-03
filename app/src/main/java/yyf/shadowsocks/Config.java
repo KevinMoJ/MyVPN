@@ -12,14 +12,14 @@ public class Config implements Parcelable {
     public boolean isUdpDns = false;
 
     public String profileName = "US Server";
-    public String proxy = "52.10.0.180";
-    public String sitekey = "abc!@#123d";
+    public String proxy = "1.vpnnest.com";
+    public String sitekey = "vpnnest!@#123d";
     //public String route = "all";
 
     public String encMethod = "aes-256-cfb";
     public String proxiedAppString = "";
 
-    public int remotePort = 28388;
+    public int remotePort = 40010;
     public int localPort = 1080;
 
     public static final Creator<Config> CREATOR = new Creator<Config>() {

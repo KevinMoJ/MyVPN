@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.VpnService;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
@@ -22,6 +24,7 @@ import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
+import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
@@ -39,6 +42,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ConnectivityFragment mConnectivityFragment;
     private static int REQUEST_CONNECT = 1;
     private long mConnectOrDisconnectStartTime;
+    private TrafficRateFragment mTrafficRateFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         FragmentManager fragmentManager = getSupportFragmentManager();
         mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
+        mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -74,19 +79,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
                 ShadowsocksApplication.debug("traffic", "txTotal old : " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
                 ShadowsocksApplication.debug("traffic", "rxTotal old : " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
-//                if(mTrafficFragment != null){
-//                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                        @Override
-//                        public void run() {
+                if(mTrafficRateFragment != null){
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
 //                            try {
 //                                mTrafficFragment.updateTrafficUse(txTotal, rxTotal,
 //                                        mShadowsocksService.getTxTotalMonthly(), mShadowsocksService.getRxTotalMonthly());
 //                            } catch (RemoteException e) {
 //                                ShadowsocksApplication.handleException(e);
 //                            }
-//                        }
-//                    });
-//                }
+                        }
+                    });
+                }
             }
         };
     }
