@@ -83,7 +83,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mAdView = (AdView)findViewById(R.id.ad_view);
         if(AdHelper.isAdNeedToShow()) {
             AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
                     .build();
             mAdView.loadAd(adRequest);
             initInterstitialAd();
@@ -112,7 +112,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         });
         AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
                 .build();
+
         mInterstitialAd.loadAd(adRequest);
     }
 
