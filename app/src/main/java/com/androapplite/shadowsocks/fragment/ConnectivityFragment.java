@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -121,26 +123,76 @@ public class ConnectivityFragment extends Fragment {
         mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mListener != null){
+                if (mListener != null) {
                     mListener.onClickConnectionButton();
                 }
             }
         });
     }
 
+    private void showConnectingMessage(){
+        mMessageView.setVisibility(View.VISIBLE);
+        mMessageTextView.setText(R.string.connecting);
+        mMessageTextView.setBackgroundResource(R.drawable.message_frame);
+        mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
+        mMessageView.clearAnimation();
+        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mMessageView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageView.setVisibility(View.INVISIBLE);
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mMessageView.startAnimation(animation);
+    }
+
     private void showConnectMessage(){
         mMessageView.setVisibility(View.VISIBLE);
-        mMessageTextView.setText(R.string.connect_success);
+        mMessageTextView.setText(R.string.connected);
         mMessageTextView.setBackgroundResource(R.drawable.message_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
         mConnectedImageView.setVisibility(View.VISIBLE);
-        mMessageView.postDelayed(new Runnable() {
+
+        mMessageView.clearAnimation();
+        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
+        animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void run() {
-                mMessageView.setVisibility(View.INVISIBLE);
-                mConnectedImageView.setVisibility(View.GONE);
+            public void onAnimationStart(Animation animation) {
             }
-        }, 1000);
+
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mMessageView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageView.setVisibility(View.INVISIBLE);
+                        mConnectedImageView.setVisibility(View.INVISIBLE);
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mMessageView.startAnimation(animation);
     }
 
     private void showErrorMessage(){
@@ -148,12 +200,29 @@ public class ConnectivityFragment extends Fragment {
         mMessageTextView.setText(R.string.retry);
         mMessageTextView.setBackgroundResource(R.drawable.message_error_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_red_color));
-        mMessageView.postDelayed(new Runnable() {
+        mMessageView.clearAnimation();
+        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
+        animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void run() {
-                mMessageView.setVisibility(View.INVISIBLE);
+            public void onAnimationStart(Animation animation) {
             }
-        }, 1000);
+
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mMessageView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageView.setVisibility(View.INVISIBLE);
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
     }
 
     public interface OnFragmentInteractionListener {
@@ -180,6 +249,7 @@ public class ConnectivityFragment extends Fragment {
     public void updateConnectionState(int state){
         if(state == Constants.State.CONNECTING.ordinal()){
             connecting();
+            showConnectingMessage();
         }else if(state == Constants.State.CONNECTED.ordinal()){
             connected();
             showConnectMessage();

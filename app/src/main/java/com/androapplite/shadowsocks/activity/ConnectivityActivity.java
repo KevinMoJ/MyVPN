@@ -17,6 +17,7 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -29,6 +30,7 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 
@@ -362,6 +364,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
     }
 
     @Override
