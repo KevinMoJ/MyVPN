@@ -45,7 +45,7 @@
             android:progressDrawable="@drawable/connecting_phase_1"
             style="?android:attr/progressBarStyleHorizontal"
             android:max="360"
-            android:progress="350"
+            android:progress="0"
             />
         <ImageButton
             android:layout_width="match_parent"

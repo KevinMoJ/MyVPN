@@ -1,32 +1,32 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.VpnService;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
+import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.fragment.ConnectionFragment;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 
+import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
+import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
@@ -35,9 +35,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
-    private ConnectionFragment mConnectionFragment;
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
-    private ConnectivityFragment connectivityFragment;
+    private ConnectivityFragment mConnectivityFragment;
+    private static int REQUEST_CONNECT = 1;
+    private long mConnectOrDisconnectStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
-        
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -89,8 +91,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         };
     }
 
-    private void updateConnectionState(int State){
-
+    private void updateConnectionState(int state){
+        if(mConnectivityFragment != null){
+//            if(state == Constants.State.CONNECTING.ordinal()){
+//
+//            }else if(state == Constants.State.CONNECTED.ordinal()){
+//            }else if(state == Constants.State.ERROR.ordinal()){
+//            }else if(state == Constants.State.INIT.ordinal()){
+//            }else if(state == Constants.State.STOPPING.ordinal()){
+//            }else if(state == Constants.State.STOPPED.ordinal()){
+//
+//            }
+            mConnectivityFragment.updateConnectionState(state);
+        }
     }
 
     private ServiceConnection createShadowsocksServiceConnection(){
@@ -99,6 +112,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
                 registerShadowsocksCallback();
+                checkConnectivity();
 //                try {
 //                    updateConnectionState(mShadowsocksService.getState());
 //                    if(mTrafficFragment != null){
@@ -116,6 +130,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShadowsocksService = null;
             }
         };
+    }
+
+    private void checkConnectivity() {
+        try {
+            if(mShadowsocksService != null) {
+                updateConnectionState(mShadowsocksService.getState());
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initNavigationView(){
@@ -195,19 +219,43 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
 
-
+    private void prepareStartService(){
+        Intent intent = VpnService.prepare(this);
+        if (intent != null) {
+            startActivityForResult(intent, REQUEST_CONNECT);
+            ShadowsocksApplication.debug("ss-vpn", "startActivityForResult");
+        } else {
+            onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
+            ShadowsocksApplication.debug("ss-vpn", "onActivityResult");
+        }
+    }
 
     @Override
     public void onClickConnectionButton() {
+        try {
+            if (mShadowsocksService == null || mShadowsocksService.getState() == Constants.State.INIT.ordinal()
+                    || mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()) {
+                prepareStartService();
+                mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                GAHelper.sendEvent(this, "连接VPN", "打开");
+            }else{
+                mShadowsocksService.stop();
+                mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                GAHelper.sendEvent(this, "连接VPN", "关闭");
+            }
 
+        }catch (RemoteException e){
+            ShadowsocksApplication.handleException(e);
+        }
 
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
         registerShadowsocksCallback();
-//        checkConnectivity();
+        checkConnectivity();
     }
 
     private void registerShadowsocksCallback() {
@@ -241,6 +289,25 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onDestroy();
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            //Intent intent = new Intent(this, ShadowsocksVpnService.class);
+            //bindService(intent,connection,BIND_AUTO_CREATE);
+            if(mShadowsocksService != null){
+                try {
+                    Config config = new Config();
+                    mShadowsocksService.start(config);
+                    ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
+                }catch(RemoteException e){
+                    ShadowsocksApplication.handleException(e);
+                }
+            }else{
+                ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
+            }
         }
     }
 

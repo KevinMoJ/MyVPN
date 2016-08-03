@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
 
+import yyf.shadowsocks.utils.Constants;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -62,7 +64,15 @@ public class ConnectivityFragment extends Fragment {
     private void initProgressBar() {
         mAnimatorSet = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(), R.animator.connecting);
         mAnimatorSet.getChildAnimations().get(0).addListener(new AnimatorListenerAdapter() {
-            private int mCount = 0;
+            private int mCount;
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                mCount = 0;
+                mProgressBar.setProgress(0);
+                mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_1));
+                mProgressBar.setBackground(null);
+            }
 
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -80,6 +90,8 @@ public class ConnectivityFragment extends Fragment {
                 }
                 mCount++;
             }
+
+
         });
         mAnimatorSet.setTarget(mProgressBar);
         mProgressBar.clearAnimation();
@@ -159,5 +171,21 @@ public class ConnectivityFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void updateConnectionState(int state){
+        if(state == Constants.State.CONNECTING.ordinal()){
+            connecting();
+        }else if(state == Constants.State.CONNECTED.ordinal()){
+            connected();
+            showConnectMessage();
+        }else if(state == Constants.State.ERROR.ordinal()){
+            error();
+            showErrorMessage();
+        }else if(state == Constants.State.INIT.ordinal()){
+        }else if(state == Constants.State.STOPPING.ordinal()){
+        }else if(state == Constants.State.STOPPED.ordinal()){
+
+        }
     }
 }
