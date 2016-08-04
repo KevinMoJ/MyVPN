@@ -8,6 +8,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
 
 import yyf.shadowsocks.utils.Constants;
@@ -107,14 +109,18 @@ public class ConnectivityFragment extends Fragment {
     }
 
     public void connecting(){
-        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(2);
-        mAnimatorSet.start();
+        if(!mAnimatorSet.isRunning()) {
+            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(2);
+            mAnimatorSet.start();
+        }
     }
 
     public void stopping(){
-        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(0);
-        ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).reverse();
-        initProgressBarStartState();
+        if(!mAnimatorSet.isRunning()) {
+            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(0);
+            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).reverse();
+            initProgressBarStartState();
+        }
     }
 
     public void connected(){
@@ -346,4 +352,23 @@ public class ConnectivityFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            if(mAnimatorSet.isPaused()){
+                mAnimatorSet.resume();
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            if(mAnimatorSet.isRunning()){
+                mAnimatorSet.pause();
+            }
+        }
+    }
 }

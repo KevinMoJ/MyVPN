@@ -64,9 +64,10 @@ public class ShadowsocksApplication extends Application {
         }
 //        mHelper = new IabHelper(this, base64EncodedPublicKey);
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
-
-        initInterstitialAd();
-        loadInterstitialAd();
+        if(AdHelper.isAdNeedToShow()) {
+            initInterstitialAd();
+            loadInterstitialAd();
+        }
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -107,10 +108,13 @@ public class ShadowsocksApplication extends Application {
     }
 
     public void loadInterstitialAd(){
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
-                .build();
+        final AdRequest.Builder builder = new AdRequest.Builder();
+        if(BuildConfig.DEBUG){
+                builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
+                .addTestDevice("D02D93D7BE318DCDE226778EC2619A8D");
+        }
 
+        AdRequest adRequest = builder.build();
         mInterstitialAd.loadAd(adRequest);
     }
 

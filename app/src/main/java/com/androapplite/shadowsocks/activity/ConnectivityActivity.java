@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.androapplite.shadowsocks.AdHelper;
+import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -81,9 +82,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         mAdView = (AdView)findViewById(R.id.ad_view);
         if(AdHelper.isAdNeedToShow()) {
-            AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
-                    .build();
+            final AdRequest.Builder builder = new AdRequest.Builder();
+            if(BuildConfig.DEBUG){
+                builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
+                        .addTestDevice("D02D93D7BE318DCDE226778EC2619A8D");
+            }
+            AdRequest adRequest = builder.build();
             mAdView.loadAd(adRequest);
         }
     }
@@ -346,14 +350,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 prepareStartService();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
                 GAHelper.sendEvent(this, "连接VPN", "打开");
-                final ShadowsocksApplication application = (ShadowsocksApplication) getApplication();
-                InterstitialAd interstitialAd = application.getInterstitialAd();
-                if(interstitialAd != null){
-                    if(interstitialAd.isLoaded()){
-                        interstitialAd.show();
-                    }
-                    if(!interstitialAd.isLoading()){
-                        application.loadInterstitialAd();
+                if(AdHelper.isAdNeedToShow()) {
+                    final ShadowsocksApplication application = (ShadowsocksApplication) getApplication();
+                    InterstitialAd interstitialAd = application.getInterstitialAd();
+                    if (interstitialAd != null) {
+                        if (interstitialAd.isLoaded()) {
+                            interstitialAd.show();
+                        }
+                        if (!interstitialAd.isLoading()) {
+                            application.loadInterstitialAd();
+                        }
                     }
                 }
             }else{
