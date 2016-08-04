@@ -169,20 +169,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         long t = System.currentTimeMillis();
                         GAHelper.sendTimingEvent(this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
                         mConnectOrDisconnectStartTime = 0;
-                        DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this).putLong(SharedPreferenceKey.CONNECTION_TIME, t);
                     }
                 }else if(mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()){
                     if (mConnectOrDisconnectStartTime > 0) {
                         long t = System.currentTimeMillis();
                         GAHelper.sendTimingEvent(this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
                         mConnectOrDisconnectStartTime = 0;
-                    }
-                    long connectStartTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getLong(SharedPreferenceKey.CONNECTION_TIME, 0);
-                    if(connectStartTime != 0){
-                        long t = System.currentTimeMillis();
-                        long d = t - connectStartTime;
-                        GAHelper.sendTimingEvent(this, "VPN计时","使用", d);
-                        DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this).putLong(SharedPreferenceKey.CONNECTION_TIME, 0);
                     }
                 }
             }

@@ -481,6 +481,7 @@ public class ShadowsocksVpnService extends BaseService {
             receiver = null;
         }
         super.stopRunner();
+
     }
 
 

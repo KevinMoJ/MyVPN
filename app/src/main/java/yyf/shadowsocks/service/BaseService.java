@@ -125,6 +125,20 @@ public abstract class BaseService extends VpnService {
     }
     public void changeState(Constants.State s) {
         changeState(s, null);
+
+        if(s == Constants.State.CONNECTED){
+            //send broadcast
+            Intent intent = new Intent(Action.CONNECTED);
+            sendBroadcast(intent);
+        }else if(s == Constants.State.STOPPED){
+            //send broadcast
+            Intent intent = new Intent(Action.STOPPED);
+            sendBroadcast(intent);
+        }else if(s == Constants.State.ERROR){
+            //send broadcast
+            Intent intent = new Intent(Action.ERROR);
+            sendBroadcast(intent);
+        }
     }
 
     protected void changeState(final Constants.State s,final String msg) {
