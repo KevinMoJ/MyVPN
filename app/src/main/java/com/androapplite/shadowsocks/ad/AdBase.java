@@ -3,11 +3,13 @@ package com.androapplite.shadowsocks.ad;
 import android.support.annotation.IntDef;
 
 import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.logging.Handler;
 
 /**
  * Created by jim on 16/8/4.
@@ -19,7 +21,8 @@ public abstract class AdBase {
     public static final int AD_OPENED = 3;
     public static final int AD_CLOSED = 4;
     public static final int AD_ERROR = 5;
-    @IntDef({AD_INIT, AD_LOADING, AD_LOADED, AD_OPENED, AD_CLOSED, AD_ERROR})
+    public static final int AD_SHOWING = 6;
+    @IntDef({AD_INIT, AD_LOADING, AD_LOADED, AD_OPENED, AD_CLOSED, AD_ERROR, AD_SHOWING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdStatus{}
 
@@ -36,11 +39,12 @@ public abstract class AdBase {
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdPlatform{}
 
-    private @AdStatus int mAdStatus;
+    private volatile @AdStatus int mAdStatus;
     private @AdType int mAdType;
     private @AdPlatform int mAdplatform;
     private OnAdLoadListener mListener;
     private String mTag;
+    private Handler mTimeoutHandler;
 
     protected AdBase(@AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
@@ -68,11 +72,13 @@ public abstract class AdBase {
             //我的手机 nexus 5 android 6
             builder.addTestDevice("c35b50cfe853bf4d75a49754dc0e4c48");
         }
+
         return  builder.build();
     }
 
     protected void setAdStatus(@AdStatus int status){
         mAdStatus = status;
+        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
 
     public @AdStatus int getAdStatus(){
@@ -101,23 +107,32 @@ public abstract class AdBase {
             public void onAdClosed() {
                 mAdStatus = AD_CLOSED;
                 AdBase.this.onAdClosed();
+                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 mAdStatus = AD_ERROR;
                 AdBase.this.onAdError(errorCode);
+                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+
             }
 
             @Override
             public void onAdOpened() {
                 mAdStatus = AD_OPENED;
                 AdBase.this.onAdOpened();
+                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+
             }
 
             @Override
             public void onAdLoaded() {
                 mAdStatus = AD_LOADED;
+                AdBase.this.onAdLoaded();
+                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+
             }
         };
     }

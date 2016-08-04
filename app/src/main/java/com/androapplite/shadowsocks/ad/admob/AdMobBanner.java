@@ -29,5 +29,13 @@ public class AdMobBanner extends Banner{
         }
     }
 
+    public void resume(){
+        mAdview.resume();
+    }
+
+    public void pause(){
+        mAdview.pause();
+    }
+
 
 }

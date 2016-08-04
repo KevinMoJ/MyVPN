@@ -2,6 +2,7 @@ package com.androapplite.shadowsocks.ad.admob;
 
 import android.content.Context;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.AdBase;
 import com.androapplite.shadowsocks.ad.Interstitial;
 import com.google.android.gms.ads.AdListener;
@@ -11,7 +12,7 @@ import com.google.android.gms.ads.InterstitialAd;
  * Created by jim on 16/8/4.
  */
 public class AdMobInterstitial extends Interstitial{
-    private InterstitialAd mInterstitial;
+    private volatile InterstitialAd mInterstitial;
 
     public AdMobInterstitial(Context context, String adUnitId){
         super(AD_ADMOB);
@@ -27,7 +28,9 @@ public class AdMobInterstitial extends Interstitial{
 
     @Override
     public void load(){
+
         if(!mInterstitial.isLoading() && getAdStatus() != AD_LOADED){
+            ShadowsocksApplication.debug("广告load", mInterstitial.isLoading() + " " + getAdStatus());
             mInterstitial.loadAd(createAdmobRequest());
             setAdStatus(AD_LOADING);
         }
@@ -35,10 +38,19 @@ public class AdMobInterstitial extends Interstitial{
 
     @Override
     public void show(){
-        mInterstitial.show();
+        if(mInterstitial.isLoaded()) {
+            mInterstitial.show();
+            setAdStatus(AD_SHOWING);
+        }
     }
 
-/*
+    @Override
+    protected void onAdClosed() {
+        super.onAdClosed();
+        load();
+    }
+
+    /*
 new AdListener() {
             @Override
             public void onAdClosed() {
