@@ -89,7 +89,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
                 adHelper.loadAdmobAd();
             }
         });
-        adHelper.loadFacebookAd();
+//        adHelper.loadFacebookAd();
 //        adHelper.loadAdmobAd();
     }
 

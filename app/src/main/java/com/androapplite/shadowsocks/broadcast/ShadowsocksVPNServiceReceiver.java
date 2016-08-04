@@ -34,20 +34,18 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                 GAHelper.sendEvent(context, "流量", "接收", monthString, rxTotal);
                 GAHelper.sendEvent(context, "流量", "总共", monthString, txTotal + rxTotal);
             }else if(action.equals(Action.CONNECTED)){
-                long t = System.currentTimeMillis();
-                DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(context).putLong(
-                        com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECTION_TIME, t);
             }else if(action.equals(Action.STOPPED)){
-                long connectStartTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getLong(
-                        com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECTION_TIME, 0);
-                if(connectStartTime != 0){
-                    long t = System.currentTimeMillis();
-                    long d = t - connectStartTime;
-                    GAHelper.sendTimingEvent(context, "VPN计时","使用", d);
-                    DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(context).putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECTION_TIME, 0);
+                long duration = intent.getLongExtra(SharedPreferenceKey.DURATION, 0);
+                if(duration != 0){
+                    GAHelper.sendTimingEvent(context, "VPN计时", "使用", duration);
                 }
             }else if(action.equals(Action.ERROR)){
-                GAHelper.sendEvent(context, "VPN", "错误");
+                long duration = intent.getLongExtra(SharedPreferenceKey.DURATION, 0);
+                if(duration != 0){
+                    GAHelper.sendTimingEvent(context, "VPN计时","错误", duration);
+                }else{
+                    GAHelper.sendEvent(context, "VPN状态", "错误");
+                }
             }
         }
     }

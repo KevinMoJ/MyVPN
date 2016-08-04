@@ -10,6 +10,7 @@ import android.os.RemoteException;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 
+import java.lang.System;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.broadcast.Action;
+import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.preferences.DefaultSharedPrefeencesUtil;
 import yyf.shadowsocks.preferences.SharedPreferenceKey;
 import yyf.shadowsocks.utils.Constants;
@@ -37,6 +39,7 @@ public abstract class BaseService extends VpnService {
     private Handler handler;
     protected Config config = null;
     private Timer mHoulyUpdater;
+    private long mStartTime;
 
 
 
@@ -127,16 +130,24 @@ public abstract class BaseService extends VpnService {
         changeState(s, null);
 
         if(s == Constants.State.CONNECTED){
-            //send broadcast
-            Intent intent = new Intent(Action.CONNECTED);
-            sendBroadcast(intent);
+            mStartTime = System.currentTimeMillis();
         }else if(s == Constants.State.STOPPED){
             //send broadcast
             Intent intent = new Intent(Action.STOPPED);
+            if(mStartTime != 0) {
+                long c = System.currentTimeMillis();
+                intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                mStartTime = 0;
+            }
             sendBroadcast(intent);
         }else if(s == Constants.State.ERROR){
             //send broadcast
             Intent intent = new Intent(Action.ERROR);
+            if(mStartTime != 0) {
+                long c = System.currentTimeMillis();
+                intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                mStartTime = 0;
+            }
             sendBroadcast(intent);
         }
     }

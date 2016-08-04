@@ -88,6 +88,9 @@
         <receiver android:name=".broadcast.ShadowsocksVPNServiceReceiver">
             <intent-filter>
                 <action android:name="${applicationId}.RESET_TOTAL" />
+                <action android:name="${applicationId}.CONNECTED" />
+                <action android:name="${applicationId}.STOPPED" />
+                <action android:name="${applicationId}.ERROR" />
             </intent-filter>
         </receiver>
 
