@@ -75,6 +75,10 @@ public abstract class AdBase {
         mAdStatus = status;
     }
 
+    public @AdStatus int getAdStatus(){
+        return  mAdStatus;
+    }
+
     public void setAdLoadListener(OnAdLoadListener listener){
         mListener = listener;
     }

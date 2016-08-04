@@ -2,6 +2,7 @@ package com.androapplite.shadowsocks.ad;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.Nullable;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ad.admob.AdMobInterstitial;
@@ -24,11 +25,12 @@ public class AdHelper {
 
     private AdHelper(Context context){
         MobileAds.initialize(context, context.getString(R.string.admob_application_id));
+        mAds = new ArrayList<>();
         initAds(context);
     }
 
 
-    public AdHelper getmInstance(Context context){
+    public static AdHelper getInstance(Context context){
         if(mInstance == null){
             synchronized (AdHelper.class){
                 if(mInstance == null) {
@@ -65,21 +67,51 @@ public class AdHelper {
         return mAds;
     }
 
+    private ArrayList<AdBase> filterByTag(String tag){
+        ArrayList<AdBase> ads = new ArrayList<>();
+        for(AdBase adBase:mAds){
+            if(tag.equals(adBase.getTag())){
+                ads.add(adBase);
+            }
+        }
+        return ads;
+    }
+
 //    public void addAd(AdBase adBase){
 //        mAds.add(adBase);
 //    }
 //
 //
-//    public void loadByTag(String tag){
-//        if(isNoAdPhone()) return;
-//
-//    }
-//
-//    public void showByTag(String tag){
-//        if(isNoAdPhone()) return;
-//    }
+    public void loadByTag(String tag){
+        if(isNoAdPhone()) return;
+        for(AdBase adBase:filterByTag(tag)){
+            adBase.load();
+        }
 
+    }
 
+    public void showByTag(String tag){
+        if(isNoAdPhone()) return;
+        Interstitial interstitial = filterBestInterstitial(tag);
+        if(interstitial != null) {
+            interstitial.show();
+            interstitial.load();
+        }
+    }
+
+    @Nullable
+    private Interstitial filterBestInterstitial(String tag) {
+        int minDisplayCount = Integer.MAX_VALUE;
+        Interstitial interstitial = null;
+        for(AdBase adBase:filterByTag(tag)){
+            if(adBase instanceof Interstitial){
+                if(((Interstitial)adBase).getDisplayCount() < minDisplayCount){
+                    interstitial = (Interstitial)adBase;
+                }
+            }
+        }
+        return interstitial;
+    }
 
 
 }

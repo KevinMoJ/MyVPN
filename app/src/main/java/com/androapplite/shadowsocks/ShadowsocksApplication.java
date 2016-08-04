@@ -6,6 +6,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.ad.*;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.crashlytics.android.Crashlytics;
@@ -24,8 +25,6 @@ public class ShadowsocksApplication extends Application {
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
-    private InterstitialAd mInterstitialAd;
-
 
     @NonNull
     public Tracker getTracker(){
@@ -64,10 +63,7 @@ public class ShadowsocksApplication extends Application {
         }
 //        mHelper = new IabHelper(this, base64EncodedPublicKey);
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
-        if(AdHelper.isAdNeedToShow()) {
-            initInterstitialAd();
-            loadInterstitialAd();
-        }
+
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -84,41 +80,4 @@ public class ShadowsocksApplication extends Application {
         }
     }
 
-    private void initInterstitialAd() {
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(getString(R.string.admob_interstitial_id));
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                ShadowsocksApplication.debug("插页广告", "关闭");
-            }
-
-            @Override
-            public void onAdLoaded() {
-                ShadowsocksApplication.debug("插页广告", "加载完成");
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                ShadowsocksApplication.debug("插页广告", "加载错误" + errorCode);
-            }
-
-
-        });
-    }
-
-    public void loadInterstitialAd(){
-        final AdRequest.Builder builder = new AdRequest.Builder();
-        if(BuildConfig.DEBUG){
-                builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
-                .addTestDevice("D02D93D7BE318DCDE226778EC2619A8D");
-        }
-
-        AdRequest adRequest = builder.build();
-        mInterstitialAd.loadAd(adRequest);
-    }
-
-    public InterstitialAd getInterstitialAd(){
-        return mInterstitialAd;
-    }
 }

@@ -26,12 +26,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.androapplite.shadowsocks.AdHelper;
+import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ad.Interstitial;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
@@ -426,18 +427,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
-            if(AdHelper.isAdNeedToShow()) {
-                final ShadowsocksApplication application = (ShadowsocksApplication) getApplication();
-                InterstitialAd interstitialAd = application.getInterstitialAd();
-                if (interstitialAd != null) {
-                    if (interstitialAd.isLoaded()) {
-                        interstitialAd.show();
-                    }
-                    if (!interstitialAd.isLoading()) {
-                        application.loadInterstitialAd();
-                    }
-                }
-            }
+            AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+
         }
     }
 

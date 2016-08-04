@@ -23,7 +23,10 @@ public class AdMobBanner extends Banner{
 
     @Override
     public void load(){
-        mAdview.loadAd(createAdmobRequest());
+        if(!mAdview.isLoading() && getAdStatus() != AD_LOADED) {
+            mAdview.loadAd(createAdmobRequest());
+            setAdStatus(AD_LOADING);
+        }
     }
 
 

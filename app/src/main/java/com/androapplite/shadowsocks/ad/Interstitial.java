@@ -26,4 +26,8 @@ public abstract class Interstitial extends AdBase{
         super.onAdOpened();
         mDisplayCount++;
     }
+
+    public int getDisplayCount(){
+        return mDisplayCount;
+    }
 }

@@ -27,8 +27,10 @@ public class AdMobInterstitial extends Interstitial{
 
     @Override
     public void load(){
-        mInterstitial.loadAd(createAdmobRequest());
-        setAdStatus(AD_LOADING);
+        if(!mInterstitial.isLoading() && getAdStatus() != AD_LOADED){
+            mInterstitial.loadAd(createAdmobRequest());
+            setAdStatus(AD_LOADING);
+        }
     }
 
     @Override
