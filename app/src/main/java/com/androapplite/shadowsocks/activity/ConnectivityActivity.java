@@ -62,7 +62,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private long mConnectOrDisconnectStartTime;
     private TrafficRateFragment mTrafficRateFragment;
     private AdView mAdView;
-    private InterstitialAd mInterstitialAd;
 
 
     @Override
@@ -86,36 +85,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     .addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
                     .build();
             mAdView.loadAd(adRequest);
-            initInterstitialAd();
         }
-    }
-
-    private void initInterstitialAd() {
-        mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId(getString(R.string.admob_interstitial_id));
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                ShadowsocksApplication.debug("插页广告", "关闭");
-            }
-
-            @Override
-            public void onAdLoaded() {
-                ShadowsocksApplication.debug("插页广告", "加载完成");
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                ShadowsocksApplication.debug("插页广告", "加载错误" + errorCode);
-            }
-
-
-        });
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
-                .build();
-
-        mInterstitialAd.loadAd(adRequest);
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -376,8 +346,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 prepareStartService();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
                 GAHelper.sendEvent(this, "连接VPN", "打开");
-                if(mInterstitialAd != null && mInterstitialAd.isLoaded()){
-                    mInterstitialAd.show();
+                final ShadowsocksApplication application = (ShadowsocksApplication) getApplication();
+                InterstitialAd interstitialAd = application.getInterstitialAd();
+                if(interstitialAd != null){
+                    if(interstitialAd.isLoaded()){
+                        interstitialAd.show();
+                    }
+                    if(!interstitialAd.isLoading()){
+                        application.loadInterstitialAd();
+                    }
                 }
             }else{
                 mShadowsocksService.stop();
