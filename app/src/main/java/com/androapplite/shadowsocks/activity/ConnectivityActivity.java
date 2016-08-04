@@ -342,18 +342,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 prepareStartService();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
                 GAHelper.sendEvent(this, "连接VPN", "打开");
-                if(AdHelper.isAdNeedToShow()) {
-                    final ShadowsocksApplication application = (ShadowsocksApplication) getApplication();
-                    InterstitialAd interstitialAd = application.getInterstitialAd();
-                    if (interstitialAd != null) {
-                        if (interstitialAd.isLoaded()) {
-                            interstitialAd.show();
-                        }
-                        if (!interstitialAd.isLoading()) {
-                            application.loadInterstitialAd();
-                        }
-                    }
-                }
             }else{
                 mShadowsocksService.stop();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
@@ -437,6 +425,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
+            }
+            if(AdHelper.isAdNeedToShow()) {
+                final ShadowsocksApplication application = (ShadowsocksApplication) getApplication();
+                InterstitialAd interstitialAd = application.getInterstitialAd();
+                if (interstitialAd != null) {
+                    if (interstitialAd.isLoaded()) {
+                        interstitialAd.show();
+                    }
+                    if (!interstitialAd.isLoading()) {
+                        application.loadInterstitialAd();
+                    }
+                }
             }
         }
     }
