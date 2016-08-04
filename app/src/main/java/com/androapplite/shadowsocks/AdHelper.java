@@ -16,6 +16,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,7 +25,8 @@ import java.util.ArrayList;
 /**
  * Created by jim on 16/5/11.
  */
-public final class AdHelper {
+public final class AdHelper{
+    //	ca-app-pub-5330675173640052~2450767323
     private Context mContext;
     private NativeAd mFacebookAd;
     private AdView mAdmobAd;
