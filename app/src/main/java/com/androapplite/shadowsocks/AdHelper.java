@@ -16,6 +16,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.lang.annotation.Retention;
@@ -32,6 +33,7 @@ public final class AdHelper{
     private AdView mAdmobAd;
     private static final String ADMOB_ID = "ca-app-pub-5330675173640052/3927500528";
     private static final String FACEBOOK_ID = "504824046367667_504825153034223";
+
     public static final int AD_INIT = 0;
     public static final int AD_LOADING = 1;
     public static final int AD_LOADED = 2;
@@ -78,6 +80,7 @@ public final class AdHelper{
         mContext = context;
         mAdmobAd = new AdView(context);
         mFacebookAd = new NativeAd(context, FACEBOOK_ID);
+
         mFacebookAdState = AD_INIT;
         mAdmobAdState = AD_INIT;
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(mContext);
