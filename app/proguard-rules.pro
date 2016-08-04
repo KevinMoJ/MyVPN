@@ -60,3 +60,6 @@
 -keep public class yyf.shadowsocks.service.**{*;}
 -keep public class yyf.shadowsocks.jni.**{*;}
 
+#For design support library
+-keep class android.support.design.widget.** { *; }
+-keep interface android.support.design.widget.** { *; }
