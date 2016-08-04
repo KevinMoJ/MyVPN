@@ -28,11 +28,11 @@ public class AdMobInterstitial extends Interstitial{
 
     @Override
     public void load(){
-
         if(!mInterstitial.isLoading() && getAdStatus() != AD_LOADED){
             ShadowsocksApplication.debug("广告load", mInterstitial.isLoading() + " " + getAdStatus());
             mInterstitial.loadAd(createAdmobRequest());
             setAdStatus(AD_LOADING);
+            super.load();
         }
     }
 
@@ -42,12 +42,6 @@ public class AdMobInterstitial extends Interstitial{
             mInterstitial.show();
             setAdStatus(AD_SHOWING);
         }
-    }
-
-    @Override
-    protected void onAdClosed() {
-        super.onAdClosed();
-        load();
     }
 
     /*
