@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.Banner;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdSize;
@@ -26,8 +27,14 @@ public class AdMobBanner extends Banner{
     @Override
     public void load(){
         if(!mAdview.isLoading() && getAdStatus() != AD_LOADED) {
-            mAdview.loadAd(createAdmobRequest());
-            setAdStatus(AD_LOADING);
+            try {
+                mAdview.loadAd(createAdmobRequest());
+                setAdStatus(AD_LOADING);
+                super.load();
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
+                setAdStatus(AD_ERROR);
+            }
         }
     }
 
@@ -41,6 +48,7 @@ public class AdMobBanner extends Banner{
 
     @Override
     public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams) {
+        super.addToViewGroup(container, layoutParams);
         container.addView(mAdview, layoutParams);
     }
 }

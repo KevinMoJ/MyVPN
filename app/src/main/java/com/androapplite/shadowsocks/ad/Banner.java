@@ -13,13 +13,9 @@ public abstract class Banner extends AdBase {
         loadDisplayCount();
     }
 
-    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
+    protected void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
         increaseDisplayCount();
         saveDisplayCount();
     }
-//    protected Banner(@AdPlatform int platform, String tag){
-//        super(platform, AD_BANNER, tag);
-//    }
-
 
 }

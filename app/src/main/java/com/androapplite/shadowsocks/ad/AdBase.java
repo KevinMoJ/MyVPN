@@ -58,6 +58,8 @@ public abstract class AdBase {
     private String mTag;
     private int mDisplayCount;
     private SharedPreferences mSharedPreference;
+    private Handler mTimeoutHandler;
+    private Runnable mTimeoutCallback;
 
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
@@ -65,6 +67,13 @@ public abstract class AdBase {
         mAdStatus = AD_INIT;
         mDisplayCount = 0;
         mSharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
+        mTimeoutCallback = new Runnable() {
+            @Override
+            public void run() {
+                setAdStatus(AD_TIMEOUT);
+            }
+        };
+
     }
 
 //    protected AdBase(@AdPlatform int platform, @AdType int type, String tag){
@@ -162,6 +171,14 @@ public abstract class AdBase {
         if(mListener != null){
             mListener.onAdError(this, errorCode);
         }
+        clearTimeout();
+    }
+
+    private void clearTimeout(){
+        if(mTimeoutHandler != null){
+            mTimeoutHandler.removeCallbacks(mTimeoutCallback);
+            mTimeoutHandler = null;
+        }
     }
 
     protected void onAdOpened(){
@@ -174,9 +191,20 @@ public abstract class AdBase {
         if(mListener != null){
             mListener.onAdLoaded(this);
         }
+        clearTimeout();
     }
 
-    abstract public void load();
+    public void load(){
+        setTiemeout();
+    }
+
+    private void setTiemeout(){
+        if(mTimeoutHandler != null){
+            mTimeoutHandler.removeCallbacks(mTimeoutCallback);
+        }
+        mTimeoutHandler = new Handler();
+        mTimeoutHandler.postDelayed(mTimeoutCallback, TimeUnit.MINUTES.toMillis(3));
+    }
 
     public int getDisplayCount(){
         return mDisplayCount;

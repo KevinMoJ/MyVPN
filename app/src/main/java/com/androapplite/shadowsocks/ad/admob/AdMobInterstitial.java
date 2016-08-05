@@ -30,9 +30,14 @@ public class AdMobInterstitial extends Interstitial{
     public void load(){
         if(!mInterstitial.isLoading() && getAdStatus() != AD_LOADED){
             ShadowsocksApplication.debug("广告load", mInterstitial.isLoading() + " " + getAdStatus());
-            mInterstitial.loadAd(createAdmobRequest());
-            setAdStatus(AD_LOADING);
-            super.load();
+            try{
+                mInterstitial.loadAd(createAdmobRequest());
+                setAdStatus(AD_LOADING);
+                super.load();
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
+                setAdStatus(AD_ERROR);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.admob.AdMobInterstitial;
 import com.google.android.gms.ads.MobileAds;
 
@@ -93,7 +94,7 @@ public class AdHelper {
 
     public void showByTag(String tag){
         if(isNoAdPhone()) return;
-        Interstitial interstitial = filterBestInterstitial(tag);
+        Interstitial interstitial = filterBestAd(filterByTag(tag));
         if(interstitial != null) {
             interstitial.show();
             interstitial.load();
@@ -101,24 +102,64 @@ public class AdHelper {
     }
 
 
+//    @Nullable
+//    private Interstitial filterBestInterstitial(String tag) {
+//        int minDisplayCount = Integer.MAX_VALUE;
+//        Interstitial interstitial = null;
+//        for(AdBase adBase:filterByTag(tag)){
+//            if(adBase instanceof Interstitial){
+//                final int displayCount = ((Interstitial) adBase).getDisplayCount();
+//                if(displayCount < minDisplayCount){
+//                    interstitial = (Interstitial)adBase;
+//                    minDisplayCount = displayCount;
+//                }
+//            }
+//        }
+//        return interstitial;
+//    }
+//
+//    @Nullable
+//    private <T extends AdBase> T filterBestAd(String tag){
+//        int minDisplayCount = Integer.MAX_VALUE;
+//        T ad = null;
+//        for(AdBase adBase: filterByTag(tag)){
+//            int displayCount = adBase.getDisplayCount();
+//            if(displayCount < minDisplayCount){
+//                try{
+//                    ad = (T)adBase;
+//                    minDisplayCount = displayCount;
+//                }catch (ClassCastException e){
+//                    ShadowsocksApplication.handleException(e);
+//                }
+//
+//            }
+//        }
+//        return ad;
+//    }
+
     @Nullable
-    private Interstitial filterBestInterstitial(String tag) {
+    private <T extends AdBase> T filterBestAd(ArrayList<AdBase> ads){
         int minDisplayCount = Integer.MAX_VALUE;
-        Interstitial interstitial = null;
-        for(AdBase adBase:filterByTag(tag)){
-            if(adBase instanceof Interstitial){
-                final int displayCount = ((Interstitial) adBase).getDisplayCount();
-                if(displayCount < minDisplayCount){
-                    interstitial = (Interstitial)adBase;
+        T ad = null;
+        for(AdBase adBase: ads){
+            int displayCount = adBase.getDisplayCount();
+            if(displayCount < minDisplayCount){
+                try{
+                    ad = (T)adBase;
                     minDisplayCount = displayCount;
+                }catch (ClassCastException e){
+                    ShadowsocksApplication.handleException(e);
                 }
+
             }
         }
-        return interstitial;
+        return ad;
     }
 
-    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
-
+    public void addToViewGroup(String tag, ViewGroup container, ViewGroup.LayoutParams layoutParams){
+        if(isNoAdPhone()) return;
+        Banner banner = filterBestAd(filterByTag(tag));
+        banner.addToViewGroup(container, layoutParams);
     }
 
 
