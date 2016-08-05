@@ -15,7 +15,7 @@ public class AdMobInterstitial extends Interstitial{
     private volatile InterstitialAd mInterstitial;
 
     public AdMobInterstitial(Context context, String adUnitId){
-        super(AD_ADMOB);
+        super(context, AD_ADMOB);
         mInterstitial = new InterstitialAd(context);
         mInterstitial.setAdUnitId(adUnitId);
         mInterstitial.setAdListener(createAdmobAdListener());

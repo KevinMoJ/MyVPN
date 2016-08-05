@@ -1,6 +1,8 @@
 package com.androapplite.shadowsocks.ad.admob;
 
 import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.ad.Banner;
 import com.google.android.gms.ads.AdListener;
@@ -14,7 +16,7 @@ public class AdMobBanner extends Banner{
     private AdView mAdview;
 
     public AdMobBanner(Context context, String adUnitId, AdSize size){
-        super(AD_ADMOB);
+        super(context, AD_ADMOB);
         mAdview = new AdView(context);
         mAdview.setAdSize(size);
         mAdview.setAdUnitId(adUnitId);
@@ -37,5 +39,8 @@ public class AdMobBanner extends Banner{
         mAdview.pause();
     }
 
-
+    @Override
+    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams) {
+        container.addView(mAdview, layoutParams);
+    }
 }

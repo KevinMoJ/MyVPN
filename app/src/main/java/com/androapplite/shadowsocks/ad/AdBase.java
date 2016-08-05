@@ -1,7 +1,10 @@
 package com.androapplite.shadowsocks.ad;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.util.TimeUtils;
 
@@ -28,6 +31,7 @@ public abstract class AdBase {
     public static final int AD_SHOWING = 6;
     public static final int AD_TIMEOUT = 7;
 
+
     @IntDef({AD_INIT, AD_LOADING, AD_LOADED, AD_OPENED, AD_CLOSED, AD_ERROR, AD_SHOWING, AD_TIMEOUT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdStatus{}
@@ -38,24 +42,29 @@ public abstract class AdBase {
     @IntDef({AD_BANNER, AD_INTERSTItiAL, AD_NATIVE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdType{}
+    private static final String[] AD_TYPE_TEXT = {"AD_BANNER", "AD_INTERSTItiAL", "AD_NATIVE"};
 
     public static final int AD_ADMOB = 0;
     public static final int AD_FACEBOOK = 1;
     @IntDef({AD_ADMOB, AD_FACEBOOK})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdPlatform{}
+    private static final String[] AD_PLATFORM_TEXT = {"AD_ADMOB", "AD_FACEBOOK"};
 
     private volatile @AdStatus int mAdStatus;
     private @AdType int mAdType;
     private @AdPlatform int mAdplatform;
     private OnAdLoadListener mListener;
     private String mTag;
+    private int mDisplayCount;
+    private SharedPreferences mSharedPreference;
 
-
-    protected AdBase(@AdPlatform int platform, @AdType int type){
+    protected AdBase(Context context, @AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
         mAdType = type;
         mAdStatus = AD_INIT;
+        mDisplayCount = 0;
+        mSharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
 //    protected AdBase(@AdPlatform int platform, @AdType int type, String tag){
@@ -168,6 +177,35 @@ public abstract class AdBase {
     }
 
     abstract public void load();
+
+    public int getDisplayCount(){
+        return mDisplayCount;
+    }
+
+    protected void increaseDisplayCount(){
+        if(mDisplayCount < Integer.MAX_VALUE) {
+            mDisplayCount++;
+        }
+    }
+
+    protected void saveDisplayCount(){
+        String uniqueTag = getAdPlatformText() + getAdTypeText() + getTag();
+        mSharedPreference.edit().putInt(uniqueTag, mDisplayCount).apply();
+    }
+
+    protected void loadDisplayCount(){
+        String uniqueTag = getAdPlatformText() + getAdTypeText() + getTag();
+        mDisplayCount = mSharedPreference.getInt(uniqueTag, 0);
+    }
+
+
+    public String getAdTypeText(){
+        return AD_TYPE_TEXT[mAdType];
+    }
+
+    public String getAdPlatformText(){
+        return AD_PLATFORM_TEXT[mAdplatform];
+    }
 
 
 

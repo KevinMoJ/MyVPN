@@ -99,14 +99,17 @@ public class AdHelper {
         }
     }
 
+
     @Nullable
     private Interstitial filterBestInterstitial(String tag) {
         int minDisplayCount = Integer.MAX_VALUE;
         Interstitial interstitial = null;
         for(AdBase adBase:filterByTag(tag)){
             if(adBase instanceof Interstitial){
-                if(((Interstitial)adBase).getDisplayCount() < minDisplayCount){
+                final int displayCount = ((Interstitial) adBase).getDisplayCount();
+                if(displayCount < minDisplayCount){
                     interstitial = (Interstitial)adBase;
+                    minDisplayCount = displayCount;
                 }
             }
         }
