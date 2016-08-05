@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.ad;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ad.admob.AdMobInterstitial;
@@ -114,6 +115,10 @@ public class AdHelper {
             }
         }
         return interstitial;
+    }
+
+    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
+
     }
 
 
