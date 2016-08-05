@@ -5,10 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 
-import com.androapplite.shadowsocks.AdHelper;
+import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -30,7 +30,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
 
-        loadAd();
+        AdHelper.getInstance(getApplicationContext()).loadAll();
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
@@ -71,26 +71,4 @@ public class SplashActivity extends BaseShadowsocksActivity {
         mBackgroundReceiverIntentFilter.addAction(Action.CONNECTION_ACTIVITY_SHOW);
         mBackgroundReceiverIntentFilter.addAction(Action.NEW_USER_GUIDE_ACTIVITY_SHOW);
     }
-
-    private void loadAd(){
-        final AdHelper adHelper = AdHelper.getInstance(this);
-        adHelper.setFacebookAdListener(new AdHelper.OnAdLoadListener() {
-            @Override
-            public void onAdLoaded(Object ad) {
-            }
-
-            @Override
-            public void onAdClicked(Object ad) {
-
-            }
-
-            @Override
-            public void onError(Object ad) {
-                adHelper.loadAdmobAd();
-            }
-        });
-//        adHelper.loadFacebookAd();
-//        adHelper.loadAdmobAd();
-    }
-
 }
