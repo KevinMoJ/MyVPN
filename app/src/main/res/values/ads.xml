@@ -3,7 +3,8 @@
     <string name="banner_ad_unit_id" translatable="false">ca-app-pub-5330675173640052/3927500528</string>
     <string name="admob_interstitial_id" translatable="false">ca-app-pub-5330675173640052/1238580129</string>
     <string name="admob_application_id" translatable="false">ca-app-pub-5330675173640052~2450767323</string>
-
+    <string name="facebook_interstitial_id" translatable="false">504824046367667_534980353352036</string>
+    <string name="facebook_banner_id" translatable="false">504824046367667_534985530018185</string>
     <!--tag-->
     <string name="tag_connect" translatable="false">connect</string>
     <string name="tag_banner" translatable="false">banner</string>
