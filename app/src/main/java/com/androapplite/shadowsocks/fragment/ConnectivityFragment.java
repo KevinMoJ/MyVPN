@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.crashlytics.android.Crashlytics;
 
 import yyf.shadowsocks.utils.Constants;
 
@@ -330,6 +332,8 @@ public class ConnectivityFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mAnimatorSet.end();
+
     }
 
     public void updateConnectionState(int state){
