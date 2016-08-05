@@ -25,10 +25,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ConnectionActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".activity.NewUserGuideActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.FullScreen" >
@@ -96,6 +92,7 @@
 
         <activity
             android:name=".activity.ConnectivityActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
