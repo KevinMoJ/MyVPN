@@ -6,4 +6,5 @@
 
     <!--tag-->
     <string name="tag_connect" translatable="false">connect</string>
+    <string name="tag_banner" translatable="false">banner</string>
 </resources>

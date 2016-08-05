@@ -24,6 +24,11 @@ public class AdMobBanner extends Banner{
         mAdview.setAdListener(createAdmobAdListener());
     }
 
+    public AdMobBanner(Context context, String adUnitId, AdSize size, String tag){
+        this(context, adUnitId, size);
+        setTag(tag);
+    }
+
     @Override
     public void load(){
         if(!mAdview.isLoading() && getAdStatus() != AD_LOADED) {
@@ -38,17 +43,30 @@ public class AdMobBanner extends Banner{
         }
     }
 
+    @Override
     public void resume(){
         mAdview.resume();
     }
 
+    @Override
     public void pause(){
         mAdview.pause();
     }
 
     @Override
     public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams) {
-        super.addToViewGroup(container, layoutParams);
+        super.addToViewGroup();
         container.addView(mAdview, layoutParams);
+    }
+
+    @Override
+    public void addToViewGroup(ViewGroup container){
+        super.addToViewGroup();
+        container.addView(mAdview);
+    }
+
+    @Override
+    public void destory() {
+        ((ViewGroup)mAdview.getParent()).removeView(mAdview);
     }
 }

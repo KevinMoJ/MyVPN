@@ -32,12 +32,19 @@
             >
         </fragment>
     </LinearLayout>
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/ad_view"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        ads:adSize="LARGE_BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id" />
+        android:id="@+id/ad_view_container">
+
+    </FrameLayout>
+    <!--<com.google.android.gms.ads.AdView-->
+        <!--android:id="@+id/ad_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--ads:adSize="LARGE_BANNER"-->
+        <!--ads:adUnitId="@string/banner_ad_unit_id" />-->
 </RelativeLayout>

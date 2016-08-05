@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ad.admob.AdMobBanner;
 import com.androapplite.shadowsocks.ad.admob.AdMobInterstitial;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
@@ -55,6 +57,8 @@ public class AdHelper {
     private void initAds(Context context){
         mAds.add(new AdMobInterstitial(context, context.getString(R.string.admob_interstitial_id),
                 context.getString(R.string.tag_connect)));
+        mAds.add(new AdMobBanner(context, context.getString(R.string.banner_ad_unit_id),
+                 AdSize.LARGE_BANNER, context.getString(R.string.tag_banner)));
     }
 
     public void loadAll(){
@@ -156,11 +160,24 @@ public class AdHelper {
         return ad;
     }
 
-    public void addToViewGroup(String tag, ViewGroup container, ViewGroup.LayoutParams layoutParams){
-        if(isNoAdPhone()) return;
+    @Nullable
+    public Banner addToViewGroup(String tag, ViewGroup container, ViewGroup.LayoutParams layoutParams){
+        if(isNoAdPhone()) return null;
         Banner banner = filterBestAd(filterByTag(tag));
-        banner.addToViewGroup(container, layoutParams);
+        if(banner != null) {
+            banner.addToViewGroup(container, layoutParams);
+        }
+        return banner;
     }
 
+    @Nullable
+    public Banner addToViewGroup(String tag, ViewGroup container){
+        if(isNoAdPhone()) return null;
+        Banner banner = filterBestAd(filterByTag(tag));
+        if(banner != null) {
+            banner.addToViewGroup(container);
+        }
+        return banner;
+    }
 
 }

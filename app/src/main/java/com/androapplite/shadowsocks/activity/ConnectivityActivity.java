@@ -25,6 +25,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.BuildConfig;
@@ -32,6 +33,7 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ad.Banner;
 import com.androapplite.shadowsocks.ad.Interstitial;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
@@ -63,7 +65,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private static int REQUEST_CONNECT = 1;
     private long mConnectOrDisconnectStartTime;
     private TrafficRateFragment mTrafficRateFragment;
-    private AdView mAdView;
+//    private AdView mAdView;
+    private Banner mBanner;
 
 
     @Override
@@ -81,16 +84,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
         GAHelper.sendScreenView(this, "ConnectivityActivity");
 
-        mAdView = (AdView)findViewById(R.id.ad_view);
-        if(AdHelper.isAdNeedToShow()) {
-            final AdRequest.Builder builder = new AdRequest.Builder();
-            if(BuildConfig.DEBUG){
-                builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
-                        .addTestDevice("D02D93D7BE318DCDE226778EC2619A8D");
-            }
-            AdRequest adRequest = builder.build();
-            mAdView.loadAd(adRequest);
-        }
+//        mAdView = (AdView)findViewById(R.id.ad_view);
+//        if(AdHelper.isAdNeedToShow()) {
+//            final AdRequest.Builder builder = new AdRequest.Builder();
+//            if(BuildConfig.DEBUG){
+//                builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
+//                        .addTestDevice("D02D93D7BE318DCDE226778EC2619A8D");
+//            }
+//            AdRequest adRequest = builder.build();
+//            mAdView.loadAd(adRequest);
+//        }
+
+        mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),(ViewGroup)findViewById(R.id.ad_view_container));
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -395,20 +400,29 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
         }
-        mAdView.destroy();
+//        mAdView.destroy();
+        if(mBanner != null) {
+            mBanner.destory();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-        mAdView.resume();
+//        mAdView.resume();
+        if(mBanner != null) {
+            mBanner.resume();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mAdView.pause();
+//        mAdView.pause();
+        if(mBanner != null) {
+            mBanner.pause();
+        }
     }
 
     @Override
