@@ -26,12 +26,6 @@ public abstract class Banner extends AdBase {
         saveDisplayCount();
     }
 
-//    protected Banner getBanner(){
-//        increaseDisplayCount();
-//        saveDisplayCount();
-//        return this;
-//    }
-
     public abstract void resume();
 
     public abstract void pause();

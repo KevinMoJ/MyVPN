@@ -94,7 +94,7 @@ public abstract class AdBase {
             //nexus 4 android 4.4
             builder.addTestDevice("7CE6E7BA2138D164DA9BE6641B0F5BDD");
             //我的手机 nexus 5 android 6
-            builder.addTestDevice("c35b50cfe853bf4d75a49754dc0e4c48");
+            builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A");
         }
 
         return  builder.build();
@@ -165,6 +165,7 @@ public abstract class AdBase {
         if(mListener != null){
             mListener.onAdClosed(this);
         }
+        load();
     }
 
     protected void onAdError(int errorCode){

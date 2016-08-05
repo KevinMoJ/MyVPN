@@ -83,19 +83,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
         mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
         GAHelper.sendScreenView(this, "ConnectivityActivity");
-
-//        mAdView = (AdView)findViewById(R.id.ad_view);
-//        if(AdHelper.isAdNeedToShow()) {
-//            final AdRequest.Builder builder = new AdRequest.Builder();
-//            if(BuildConfig.DEBUG){
-//                builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A")
-//                        .addTestDevice("D02D93D7BE318DCDE226778EC2619A8D");
-//            }
-//            AdRequest adRequest = builder.build();
-//            mAdView.loadAd(adRequest);
-//        }
-
-        mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),(ViewGroup)findViewById(R.id.ad_view_container));
+        mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),
+                (ViewGroup)findViewById(R.id.ad_view_container));
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -400,7 +389,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
         }
-//        mAdView.destroy();
         if(mBanner != null) {
             mBanner.destory();
         }
@@ -410,7 +398,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-//        mAdView.resume();
         if(mBanner != null) {
             mBanner.resume();
         }
@@ -419,7 +406,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     protected void onPause() {
         super.onPause();
-//        mAdView.pause();
         if(mBanner != null) {
             mBanner.pause();
         }

@@ -25,9 +25,9 @@ public abstract class Interstitial extends AdBase{
         increaseDisplayCount();
     }
 
-    @Override
-    protected void onAdClosed() {
-        super.onAdClosed();
-        load();
-    }
+//    @Override
+//    protected void onAdClosed() {
+//        super.onAdClosed();
+//        load();
+//    }
 }
