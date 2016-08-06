@@ -8,6 +8,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RotateDrawable;
@@ -25,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 import yyf.shadowsocks.utils.Constants;
 
@@ -53,6 +55,17 @@ public class ConnectivityFragment extends Fragment {
             R.drawable.connecting_phase_7,
             R.drawable.connecting_phase_8,
     };
+    private static final int[] LOADING_PHASE_DRAWABLE_RESOURCE_END = {
+            R.drawable.connecting_phase_1_end,
+            R.drawable.connecting_phase_2_end,
+            R.drawable.connecting_phase_3_end,
+            R.drawable.connecting_phase_4_end,
+            R.drawable.connecting_phase_5_end,
+            R.drawable.connecting_phase_6_end,
+            R.drawable.connecting_phase_7_end,
+            R.drawable.connecting_phase_8_end,
+    };
+    private boolean mIsReverseAnimation;
 
     public ConnectivityFragment() {
         // Required empty public constructor
@@ -97,21 +110,37 @@ public class ConnectivityFragment extends Fragment {
 
             @Override
             public void onAnimationStart(Animator animation) {
-                mIndex = 0;
-                initProgressBarStartState();
+//                ShadowsocksApplication.debug("animation", "start");
+                if(mIsReverseAnimation){
+                    mIndex = LOADING_PHASE_DRAWABLE_RESOURCE_END.length - 1;
+                    mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
+                    mProgressBar.setBackground(getResources().getDrawable(R.drawable.connecting_phase_8_end));
+                }else{
+                    mIndex = 0;
+                    mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
+                    mProgressBar.setBackground(null);
+                }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-//                error();
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                mProgressBar.setProgress(mProgressBar.getMax());
-                mProgressBar.setBackground(mProgressBar.getProgressDrawable());
-                mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
-                mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
+//                ShadowsocksApplication.debug("animation", mIndex + "");
+                Resources resources = getResources();
+                if(mIsReverseAnimation){
+                    mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
+                    mIndex = (--mIndex + LOADING_PHASE_DRAWABLE_RESOURCE_END.length) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
+                    mProgressBar.setBackground(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE_END[mIndex]));
+
+                }else{
+                    mProgressBar.setBackground(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE_END[mIndex]));
+                    mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
+                    mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
+                }
+
             }
 
 
@@ -120,26 +149,17 @@ public class ConnectivityFragment extends Fragment {
         mProgressBar.clearAnimation();
     }
 
-
-
-    private void initProgressBarStartState() {
-        mProgressBar.setProgress(0);
-        mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_1));
-        mProgressBar.setBackground(null);
-    }
-
     public void connecting(){
         if(!mAnimatorSet.isRunning()) {
-            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(ValueAnimator.INFINITE);
+            mIsReverseAnimation = false;
             mAnimatorSet.start();
         }
     }
 
     public void stopping(){
         if(!mAnimatorSet.isRunning()) {
-            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(0);
+            mIsReverseAnimation = true;
             ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).reverse();
-            initProgressBarStartState();
         }
     }
 
@@ -159,7 +179,8 @@ public class ConnectivityFragment extends Fragment {
         mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                connecting();
+                stopping();
+//                connecting();
 //                if (mListener != null) {
 //                    mListener.onClickConnectionButton();
 //                }
@@ -169,7 +190,7 @@ public class ConnectivityFragment extends Fragment {
 
     private void stopped() {
         ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).cancel();
-        initProgressBarStartState();
+        mProgressBar.setBackground(null);
     }
 
     private void showConnectingMessage(){
