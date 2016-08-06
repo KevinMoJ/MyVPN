@@ -108,11 +108,8 @@ public class ConnectivityFragment extends Fragment {
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                Drawable d = mProgressBar.getProgressDrawable();
-                RotateDrawable r = (RotateDrawable)d;
-                GradientDrawable drawable = (GradientDrawable)r.getDrawable();
-                drawable.setUseLevel(false);
-                mProgressBar.setBackground(d);
+                mProgressBar.setProgress(mProgressBar.getMax());
+                mProgressBar.setBackground(mProgressBar.getProgressDrawable());
                 mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
                 mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
             }
