@@ -194,43 +194,19 @@ public class ConnectivityFragment extends Fragment {
     }
 
     private void showConnectingMessage(){
-        mMessageView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.connecting);
         mMessageTextView.setBackgroundResource(R.drawable.message_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
-        mMessageView.clearAnimation();
-        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mMessageView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMessageView.setVisibility(View.INVISIBLE);
-                    }
-                }, 1000);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mMessageView.startAnimation(animation);
+        startMessageViewAnimation();
     }
 
     private void showConnectMessage(){
-        mMessageView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.connected);
         mMessageTextView.setBackgroundResource(R.drawable.message_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
         mConnectedImageView.setVisibility(View.VISIBLE);
 
+        mMessageView.setVisibility(View.VISIBLE);
         mMessageView.clearAnimation();
         Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
         animation.setAnimationListener(new Animation.AnimationListener() {
@@ -259,44 +235,28 @@ public class ConnectivityFragment extends Fragment {
     }
 
     private void showStoppingMessage(){
-        mMessageView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.stopping);
         mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.stop_yellow));
-
-        mMessageView.clearAnimation();
-
-        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mMessageView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMessageView.setVisibility(View.INVISIBLE);
-                    }
-                }, 1000);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mMessageView.startAnimation(animation);
+        startMessageViewAnimation();
     }
 
     private void showStoppedMessage(){
-        mMessageView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.stoped);
         mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.stop_yellow));
+        startMessageViewAnimation();
+    }
 
+    private void showErrorMessage(){
+        mMessageTextView.setText(R.string.retry);
+        mMessageTextView.setBackgroundResource(R.drawable.message_error_frame);
+        mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_red_color));
+        startMessageViewAnimation();
+    }
+
+    private void startMessageViewAnimation() {
+        mMessageView.setVisibility(View.VISIBLE);
         mMessageView.clearAnimation();
         Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
         animation.setAnimationListener(new Animation.AnimationListener() {
@@ -321,36 +281,6 @@ public class ConnectivityFragment extends Fragment {
             }
         });
         mMessageView.startAnimation(animation);
-    }
-
-    private void showErrorMessage(){
-        mMessageView.setVisibility(View.VISIBLE);
-        mMessageTextView.setText(R.string.retry);
-        mMessageTextView.setBackgroundResource(R.drawable.message_error_frame);
-        mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_red_color));
-        mMessageView.clearAnimation();
-        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mMessageView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMessageView.setVisibility(View.INVISIBLE);
-                    }
-                }, 1000);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
     }
 
     public interface OnFragmentInteractionListener {
