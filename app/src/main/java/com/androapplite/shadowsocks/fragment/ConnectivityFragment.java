@@ -179,11 +179,11 @@ public class ConnectivityFragment extends Fragment {
         mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopping();
+//                stopping();
 //                connecting();
-//                if (mListener != null) {
-//                    mListener.onClickConnectionButton();
-//                }
+                if (mListener != null) {
+                    mListener.onClickConnectionButton();
+                }
             }
         });
     }
@@ -205,33 +205,7 @@ public class ConnectivityFragment extends Fragment {
         mMessageTextView.setBackgroundResource(R.drawable.message_frame);
         mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
         mConnectedImageView.setVisibility(View.VISIBLE);
-
-        mMessageView.setVisibility(View.VISIBLE);
-        mMessageView.clearAnimation();
-        Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.center_enlarge);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mMessageView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMessageView.setVisibility(View.INVISIBLE);
-                        mConnectedImageView.setVisibility(View.INVISIBLE);
-                    }
-                }, 1000);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mMessageView.startAnimation(animation);
+        startMessageViewAnimation();
     }
 
     private void showStoppingMessage(){
@@ -271,6 +245,8 @@ public class ConnectivityFragment extends Fragment {
                     @Override
                     public void run() {
                         mMessageView.setVisibility(View.INVISIBLE);
+                        //这条代码只对连接成功状态起作用
+                        mConnectedImageView.setVisibility(View.INVISIBLE);
                     }
                 }, 1000);
             }
