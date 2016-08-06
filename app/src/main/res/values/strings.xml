@@ -16,7 +16,7 @@
     <string name="tap_to_connect">Tap to Connect</string>
     <string name="connect">Connect</string>
     <string name="connecting">Connecting</string>
-    <string name="connected">Conncted</string>
+    <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="tap_to_connect_explain">Press the blue button to connect!</string>
     <string name="please_wait">Please wait...</string>
