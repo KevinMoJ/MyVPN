@@ -6,17 +6,17 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.media.Image;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RotateDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -24,10 +24,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.crashlytics.android.Crashlytics;
 
 import yyf.shadowsocks.utils.Constants;
 
@@ -46,6 +43,16 @@ public class ConnectivityFragment extends Fragment {
     private ImageView mConnectedImageView;
     private OnFragmentInteractionListener mListener;
     private TextView mStatusTextView;
+    private static final int[] LOADING_PHASE_DRAWABLE_RESOURCE = {
+            R.drawable.connecting_phase_1,
+            R.drawable.connecting_phase_2,
+            R.drawable.connecting_phase_3,
+            R.drawable.connecting_phase_4,
+            R.drawable.connecting_phase_5,
+            R.drawable.connecting_phase_6,
+            R.drawable.connecting_phase_7,
+            R.drawable.connecting_phase_8,
+    };
 
     public ConnectivityFragment() {
         // Required empty public constructor
@@ -86,11 +93,11 @@ public class ConnectivityFragment extends Fragment {
     private void initProgressBar() {
         mAnimatorSet = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(), R.animator.connecting);
         mAnimatorSet.getChildAnimations().get(0).addListener(new AnimatorListenerAdapter() {
-            private int mCount;
+            private int mIndex;
 
             @Override
             public void onAnimationStart(Animator animation) {
-                mCount = 0;
+                mIndex = 0;
                 initProgressBarStartState();
             }
 
@@ -101,14 +108,13 @@ public class ConnectivityFragment extends Fragment {
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                if (mCount == 0) {
-                    mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_2));
-                    mProgressBar.setBackgroundResource(R.drawable.connecting_phase_1_end);
-                } else if (mCount == 1) {
-                    mProgressBar.setProgressDrawable(getResources().getDrawable(R.drawable.connecting_phase_3));
-                    mProgressBar.setBackgroundResource(R.drawable.connecting_phase_2_end);
-                }
-                mCount++;
+                Drawable d = mProgressBar.getProgressDrawable();
+                RotateDrawable r = (RotateDrawable)d;
+                GradientDrawable drawable = (GradientDrawable)r.getDrawable();
+                drawable.setUseLevel(false);
+                mProgressBar.setBackground(d);
+                mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
+                mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
             }
 
 
@@ -127,7 +133,7 @@ public class ConnectivityFragment extends Fragment {
 
     public void connecting(){
         if(!mAnimatorSet.isRunning()) {
-            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(2);
+            ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).setRepeatCount(ValueAnimator.INFINITE);
             mAnimatorSet.start();
         }
     }
@@ -156,9 +162,10 @@ public class ConnectivityFragment extends Fragment {
         mConnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onClickConnectionButton();
-                }
+                connecting();
+//                if (mListener != null) {
+//                    mListener.onClickConnectionButton();
+//                }
             }
         });
     }
