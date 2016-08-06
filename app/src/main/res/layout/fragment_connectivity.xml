@@ -6,6 +6,22 @@
     android:gravity="center_horizontal"
     tools:context="com.androapplite.shadowsocks.fragment.ConnectivityFragment">
 
+    <TextView
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/connectivity_state"
+        android:layout_gravity="right"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginRight="@dimen/half_standard_margin"
+        android:layout_marginBottom="@dimen/half_standard_margin"
+        android:textSize="@dimen/medium_text"
+        android:id="@+id/status"
+        android:text="@string/disconnected"
+        android:enabled="false"
+        android:textColor="@color/dhi_black_text"
+        android:visibility="invisible"
+        />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +34,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/message_frame"
-            android:text="asdfdfdfdfd"
             android:textColor="@color/primary_white_text"
             android:padding="10dp"
             android:textSize="@dimen/large_text"
@@ -33,6 +48,7 @@
             android:tint="@color/message_green_color"
             android:id="@+id/message_arrow"/>
     </LinearLayout>
+
     <FrameLayout
         android:layout_width="188dp"
         android:layout_height="188dp"
