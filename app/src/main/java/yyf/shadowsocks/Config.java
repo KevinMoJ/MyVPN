@@ -6,9 +6,6 @@ import android.os.Parcelable;
 import java.net.UnknownHostException;
 
 public class Config implements Parcelable {
-    public static final String VPN_IP = "54.211.188.225";
-    public static final String VPN_DOMAIN = "1.vpnnest.com";
-
     public boolean isGlobalProxy = true;
     public boolean isGFWList = true;
     public boolean isBypassApps = false;
@@ -17,7 +14,7 @@ public class Config implements Parcelable {
 
     public String profileName = "US Server";
 //    public String proxy = "54.211.188.225";
-    public String proxy = VPN_IP;
+    public String proxy = "hub.vpnnest.com";
     public String sitekey = "vpnnest!@#123d";
     //public String route = "all";
 
