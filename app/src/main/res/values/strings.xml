@@ -40,4 +40,5 @@
     <string name="retry">Retry</string>
     <string name="stopping">Stopping</string>
     <string name="stoped">Stoped</string>
+    <string name="no_network">No network</string>
 </resources>

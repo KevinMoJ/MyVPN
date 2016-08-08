@@ -3,10 +3,15 @@ package com.androapplite.shadowsocks.activity;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Bundle;
@@ -355,6 +360,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onStart();
         registerShadowsocksCallback();
         checkConnectivity();
+        checkNetworkConnectivity();
     }
 
     private void registerShadowsocksCallback() {
@@ -428,6 +434,37 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
             AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+
+        }
+    }
+
+
+    private void checkNetworkConnectivity(){
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.TANCStyle)
+                .setView(R.layout.dialog_no_internet)
+                .create();
+        dialog.show();
+        if(connectivityManager == null){
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.no_network)
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+        }else{
+
+            final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            if(activeNetworkInfo == null){
+                ShadowsocksApplication.debug("连接", "没有连接");
+            }else if(activeNetworkInfo.isAvailable()){
+                ShadowsocksApplication.debug("连接", "连接不可用");
+            }
+
 
         }
     }
