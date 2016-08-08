@@ -3,20 +3,18 @@ package com.androapplite.shadowsocks.ad;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
-import android.util.TimeUtils;
 
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 
+import java.lang.System;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LogRecord;
 
 /**
  * Created by jim on 16/8/4.
@@ -60,7 +58,8 @@ public abstract class AdBase {
     private SharedPreferences mSharedPreference;
     private Handler mTimeoutHandler;
     private Runnable mTimeoutCallback;
-    private long mLoadingTime;
+    private long mLoadingStartTime;
+    private long mLoadingDuration;
 
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
@@ -97,7 +96,6 @@ public abstract class AdBase {
             //我的手机 nexus 5 android 6
             builder.addTestDevice("8FB883F20089D8E653BB8D6D06A1EB3A");
         }
-
         return  builder.build();
     }
 
@@ -180,6 +178,11 @@ public abstract class AdBase {
         if(mTimeoutHandler != null){
             mTimeoutHandler.removeCallbacks(mTimeoutCallback);
             mTimeoutHandler = null;
+
+            if(mLoadingStartTime != 0){
+                mLoadingDuration = System.currentTimeMillis() - mLoadingStartTime;
+                mLoadingStartTime = 0;
+            }
         }
     }
 
@@ -206,6 +209,7 @@ public abstract class AdBase {
         }
         mTimeoutHandler = new Handler();
         mTimeoutHandler.postDelayed(mTimeoutCallback, TimeUnit.MINUTES.toMillis(3));
+        mLoadingStartTime = System.currentTimeMillis();
     }
 
     public int getDisplayCount(){
