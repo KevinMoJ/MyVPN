@@ -60,6 +60,7 @@ public abstract class AdBase {
     private SharedPreferences mSharedPreference;
     private Handler mTimeoutHandler;
     private Runnable mTimeoutCallback;
+    private long mLoadingTime;
 
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
@@ -122,7 +123,7 @@ public abstract class AdBase {
     }
 
     public String getTag(){
-        return mTag;
+        return mTag != null ? mTag : "";
     }
 
     protected AdListener createAdmobAdListener(){
