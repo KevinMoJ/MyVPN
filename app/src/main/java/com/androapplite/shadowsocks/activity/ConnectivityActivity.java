@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -19,7 +18,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -30,32 +32,25 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.androapplite.shadowsocks.ad.AdHelper;
-import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.Banner;
-import com.androapplite.shadowsocks.ad.Interstitial;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 
 import java.lang.System;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
-import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.TrafficMonitor;
 
@@ -72,6 +67,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private TrafficRateFragment mTrafficRateFragment;
 //    private AdView mAdView;
     private Banner mBanner;
+    private Snackbar mSnackbar;
 
 
     @Override
@@ -441,24 +437,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void checkNetworkConnectivity(){
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        AlertDialog dialog = new AlertDialog.Builder(this, R.style.TANCStyle)
-                .setView(R.layout.dialog_no_internet)
-                .setMessage("dfdjkfjdkfjdkfjdkfjdkffdfd")
-                .setCancelable(false)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ShadowsocksApplication.debug("对话框", "NO");
-                    }
-                })
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ShadowsocksApplication.debug("对话框", "YES");
-                    }
-                })
-                .create();
-        dialog.show();
         if(connectivityManager == null){
             new AlertDialog.Builder(this)
                     .setMessage(R.string.no_network)
@@ -471,16 +449,54 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     })
                     .show();
         }else{
-
             final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             if(activeNetworkInfo == null){
-                ShadowsocksApplication.debug("连接", "没有连接");
-            }else if(activeNetworkInfo.isAvailable()){
-                ShadowsocksApplication.debug("连接", "连接不可用");
+                showNoInternetDialog(R.string.no_internet_message);
+            }else if(!activeNetworkInfo.isAvailable()){
+                showNoInternetDialog(R.string.not_available_internet);
             }
-
-
         }
+    }
+
+    private void showNoInternetDialog(@StringRes int messageId) {
+        final View rootView = getLayoutInflater().inflate(R.layout.dialog_no_internet, null);
+        final AlertDialog dialog = new AlertDialog.Builder(this, R.style.TANCStyle)
+                .setView(rootView)
+                .setCancelable(false)
+                .create();
+        TextView messageTextView = (TextView)rootView.findViewById(R.id.message);
+        messageTextView.setText(messageId);
+        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                try{
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }catch (ActivityNotFoundException e){
+                    ShadowsocksApplication.handleException(e);
+                    showNoInternetSnackbar(R.string.failed_to_open_wifi_setting);
+                }
+            }
+        });
+        rootView.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                showNoInternetSnackbar(R.string.no_internet);
+            }
+        });
+        dialog.show();
+    }
+
+    private void showNoInternetSnackbar(@StringRes int messageId) {
+        mSnackbar = Snackbar.make(findViewById(R.id.coordinator), messageId, Snackbar.LENGTH_INDEFINITE);
+        mSnackbar.setAction(R.string.close, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSnackbar.dismiss();
+            }
+        });
+        mSnackbar.show();
     }
 
 }

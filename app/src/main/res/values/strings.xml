@@ -41,4 +41,10 @@
     <string name="stopping">Stopping</string>
     <string name="stoped">Stoped</string>
     <string name="no_network">No network</string>
+    <string name="no_internet_message">There is no internet connection. Do you want to turn WiFi on?</string>
+    <string name="not_available_internet">The current internet connection is not available. Do you want to turn WiFi on?</string>
+    <string name="failed_to_open_wifi_setting">Failed to open WiFi setting panel, please turn WiFi on.</string>
+    <string name="close">close</string>
+    <string name="no_internet">There is no internet connection.</string>
+
 </resources>
