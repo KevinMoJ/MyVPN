@@ -191,6 +191,7 @@ public class ConnectivityFragment extends Fragment {
 
     private void stopped() {
         ((ObjectAnimator)mAnimatorSet.getChildAnimations().get(0)).cancel();
+        mProgressBar.setProgress(0);
         mProgressBar.setBackground(null);
     }
 
