@@ -342,6 +342,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShadowsocksService.stop();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
                 GAHelper.sendEvent(this, "连接VPN", "关闭");
+                AdHelper.getInstance(this).loadByTag(getString(R.string.tag_connect));
             }
 
         }catch (RemoteException e){
