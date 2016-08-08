@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
  * Created by jim on 16/8/4.
  */
 public abstract class Interstitial extends AdBase{
+    private boolean mShowWhenLoaded;
 
     protected Interstitial(Context context, @AdPlatform int platform){
         super(context, platform, AD_INTERSTItiAL);
@@ -25,9 +26,15 @@ public abstract class Interstitial extends AdBase{
         increaseDisplayCount();
     }
 
-//    @Override
-//    protected void onAdClosed() {
-//        super.onAdClosed();
-//        load();
-//    }
+    protected void setShowWhenLoaded(boolean showWhenLoaded){
+        mShowWhenLoaded = showWhenLoaded;
+    }
+
+    @Override
+    protected void onAdLoaded() {
+        super.onAdLoaded();
+        if(mShowWhenLoaded){
+            show();
+        }
+    }
 }

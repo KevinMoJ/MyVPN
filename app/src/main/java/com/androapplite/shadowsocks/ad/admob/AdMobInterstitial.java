@@ -46,48 +46,9 @@ public class AdMobInterstitial extends Interstitial{
         if(mInterstitial.isLoaded()) {
             mInterstitial.show();
             setAdStatus(AD_SHOWING);
+            setShowWhenLoaded(false);
+        }else{
+            setShowWhenLoaded(true);
         }
     }
-
-    /*
-new AdListener() {
-            @Override
-            public void onAdClosed() {
-                setAdStatus(AD_CLOSED);
-                OnAdLoadListener listener = getAdLoadListener();
-                if(listener != null){
-                    listener.onAdClosed();
-                }
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                setAdStatus(AD_ERROR);
-                OnAdLoadListener listener = getAdLoadListener();
-                if(listener != null){
-                    listener.onError(errorCode);
-                }
-            }
-
-            @Override
-            public void onAdOpened() {
-                setAdStatus(AD_OPENED);
-                OnAdLoadListener listener = getAdLoadListener();
-                if(listener != null){
-                    listener.onAdOpened();
-                }
-            }
-
-            @Override
-            public void onAdLoaded() {
-                setAdStatus(AD_LOADED);
-                OnAdLoadListener listener = getAdLoadListener();
-                if(listener != null){
-                    listener.onAdLoaded();
-                }
-            }
-        }
- */
-
-
 }
