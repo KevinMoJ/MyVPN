@@ -83,7 +83,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
         mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
-        GAHelper.sendScreenView(this, "ConnectivityActivity");
+        GAHelper.sendScreenView(this, "VPN连接屏幕");
         mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),
                 (ViewGroup)findViewById(R.id.ad_view_container));
     }

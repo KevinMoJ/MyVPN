@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
@@ -53,6 +54,7 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
         initNewUserGuideFinishButton();
         initBackgroundReceiverIntentFilter();
         initBackgroundReceiver();
+        GAHelper.sendScreenView(this, "新手引导屏幕");
     }
 
     private void initPagerIndicatorFragment(){

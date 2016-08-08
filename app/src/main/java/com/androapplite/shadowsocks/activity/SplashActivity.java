@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -31,6 +32,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
         ShadowsockServiceHelper.startService(this);
 
         AdHelper.getInstance(getApplicationContext()).loadAll();
+        GAHelper.sendScreenView(this, "启动屏幕");
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
