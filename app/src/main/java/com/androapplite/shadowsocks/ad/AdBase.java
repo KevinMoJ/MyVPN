@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 
 import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -33,6 +34,7 @@ public abstract class AdBase {
     @IntDef({AD_INIT, AD_LOADING, AD_LOADED, AD_OPENED, AD_CLOSED, AD_ERROR, AD_SHOWING, AD_TIMEOUT})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdStatus{}
+    private static final String[] AD_STATUS_TEXT = {"初始化", "加载中", "加载完", "打开", "关闭", "错误", "显示中", "加载超时"};
 
     public static final int AD_BANNER = 0;
     public static final int AD_INTERSTItiAL = 1;
@@ -60,6 +62,7 @@ public abstract class AdBase {
     private Runnable mTimeoutCallback;
     private long mLoadingStartTime;
     private long mLoadingDuration;
+    private Context mApplicationContext;
 
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
@@ -71,9 +74,18 @@ public abstract class AdBase {
             @Override
             public void run() {
                 setAdStatus(AD_TIMEOUT);
+                sendLoadingTimeToGA();
             }
         };
+        mApplicationContext = context.getApplicationContext();
 
+    }
+
+    private void sendLoadingTimeToGA() {
+        if(mLoadingDuration != 0) {
+            String uniqueTag = getAdPlatformText() + getAdTypeText() + getTag();
+            GAHelper.sendTimingEvent(mApplicationContext, uniqueTag, getAdStatusText(), mLoadingDuration, getAdId());
+        }
     }
 
 //    protected AdBase(@AdPlatform int platform, @AdType int type, String tag){
@@ -172,6 +184,7 @@ public abstract class AdBase {
             mListener.onAdError(this, errorCode);
         }
         clearTimeout();
+        sendLoadingTimeToGA();
     }
 
     private void clearTimeout(){
@@ -197,6 +210,7 @@ public abstract class AdBase {
             mListener.onAdLoaded(this);
         }
         clearTimeout();
+        sendLoadingTimeToGA();
     }
 
     public void load(){
@@ -237,10 +251,14 @@ public abstract class AdBase {
         return AD_TYPE_TEXT[mAdType];
     }
 
+    public String getAdStatusText(){
+        return AD_STATUS_TEXT[mAdStatus];
+    }
+
     public String getAdPlatformText(){
         return AD_PLATFORM_TEXT[mAdplatform];
     }
 
 
-
+    public abstract String getAdId();
 }

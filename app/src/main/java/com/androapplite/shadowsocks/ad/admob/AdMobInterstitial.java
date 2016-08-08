@@ -51,4 +51,9 @@ public class AdMobInterstitial extends Interstitial{
             setShowWhenLoaded(true);
         }
     }
+
+    @Override
+    public String getAdId() {
+        return mInterstitial.getAdUnitId();
+    }
 }

@@ -46,6 +46,16 @@ public final class GAHelper {
         getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value).build());
     }
 
+    public static final void sendTimingEvent(@NonNull Context context,
+                                             @NonNull String category,
+                                             @NonNull String variable,
+                                             long value,
+                                             @NonNull String label){
+        getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value)
+                .setLabel(label)
+                .build());
+    }
+
     public static final void sendScreenView(@NonNull Context context, @NonNull String screenView){
         Tracker t = getTracker(context);
         t.setScreenName(screenView);

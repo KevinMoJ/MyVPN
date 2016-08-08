@@ -69,4 +69,9 @@ public class AdMobBanner extends Banner{
     public void destory() {
         ((ViewGroup)mAdview.getParent()).removeView(mAdview);
     }
+
+    @Override
+    public String getAdId() {
+        return mAdview.getAdUnitId();
+    }
 }
