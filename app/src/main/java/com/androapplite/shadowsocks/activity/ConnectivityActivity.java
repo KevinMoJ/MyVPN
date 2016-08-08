@@ -443,6 +443,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         AlertDialog dialog = new AlertDialog.Builder(this, R.style.TANCStyle)
                 .setView(R.layout.dialog_no_internet)
+                .setMessage("dfdjkfjdkfjdkfjdkfjdkffdfd")
+                .setCancelable(false)
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ShadowsocksApplication.debug("对话框", "NO");
+                    }
+                })
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ShadowsocksApplication.debug("对话框", "YES");
+                    }
+                })
                 .create();
         dialog.show();
         if(connectivityManager == null){
