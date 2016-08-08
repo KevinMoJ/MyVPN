@@ -502,7 +502,9 @@ public class ShadowsocksVpnService extends BaseService {
     String resolve(String host,int addrType){
         try {
             Lookup lookup = new Lookup(host, addrType);
-            SimpleResolver resolver = new SimpleResolver("114.114.114.114");
+//            SimpleResolver resolver = new SimpleResolver("114.114.114.114");
+            //谷歌国内恐怕会被墙
+            SimpleResolver resolver = new SimpleResolver("8.8.8.8");
             resolver.setTimeout(5);
             lookup.setResolver(resolver);
             Record[] result = lookup.run();
