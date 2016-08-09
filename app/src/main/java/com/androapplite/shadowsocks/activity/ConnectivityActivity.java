@@ -2,10 +2,12 @@ package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -68,6 +70,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //    private AdView mAdView;
     private Banner mBanner;
     private Snackbar mSnackbar;
+    private AlertDialog mNoInternetDialog;
+    private BroadcastReceiver mConnectivityReceiver;
 
 
     @Override
@@ -86,6 +90,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),
                 (ViewGroup)findViewById(R.id.ad_view_container));
+        initConnectivityReceiver();
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -144,7 +149,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
                 registerShadowsocksCallback();
-                checkConnectivity();
+                checkVPNConnectivity();
 
             }
 
@@ -156,7 +161,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         };
     }
 
-    private void checkConnectivity() {
+    private void checkVPNConnectivity() {
         try {
             if(mShadowsocksService != null) {
                 updateConnectionState(mShadowsocksService.getState());
@@ -356,8 +361,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onStart() {
         super.onStart();
         registerShadowsocksCallback();
-        checkConnectivity();
+        checkVPNConnectivity();
         checkNetworkConnectivity();
+        registerConnectivityReceiver();
+
     }
 
     private void registerShadowsocksCallback() {
@@ -374,6 +381,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onStop() {
         super.onStop();
         unregisterShadowsocksCallback();
+        unregisterConnectivityReceiver();
     }
 
     private void unregisterShadowsocksCallback() {
@@ -437,6 +445,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
 
     private void checkNetworkConnectivity(){
+        if(mNoInternetDialog != null) {
+            mNoInternetDialog.dismiss();
+        }
+        if(mSnackbar != null) {
+            mSnackbar.dismiss();
+        }
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         if(connectivityManager == null){
             new AlertDialog.Builder(this)
@@ -449,19 +463,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         }
                     })
                     .show();
+            GAHelper.sendEvent(this, "网络连接","异常","没有网络服务");
         }else{
             final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             if(activeNetworkInfo == null){
                 showNoInternetDialog(R.string.no_internet_message);
+                GAHelper.sendEvent(this, "网络连接", "异常", "没有网络连接");
             }else if(!activeNetworkInfo.isAvailable()){
                 showNoInternetDialog(R.string.not_available_internet);
+                GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
             }
         }
     }
 
     private void showNoInternetDialog(@StringRes int messageId) {
         final View rootView = getLayoutInflater().inflate(R.layout.dialog_no_internet, null);
-        final AlertDialog dialog = new AlertDialog.Builder(this, R.style.TANCStyle)
+        mNoInternetDialog = new AlertDialog.Builder(this, R.style.TANCStyle)
                 .setView(rootView)
                 .setCancelable(false)
                 .create();
@@ -470,7 +487,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                mNoInternetDialog.dismiss();
                 try{
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                 }catch (ActivityNotFoundException e){
@@ -482,11 +499,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         rootView.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                mNoInternetDialog.dismiss();
                 showNoInternetSnackbar(R.string.no_internet);
             }
         });
-        dialog.show();
+        mNoInternetDialog.show();
     }
 
     private void showNoInternetSnackbar(@StringRes int messageId) {
@@ -498,6 +515,28 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
         mSnackbar.show();
+    }
+
+    private void initConnectivityReceiver(){
+        mConnectivityReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                    checkNetworkConnectivity();
+                }
+            }
+        };
+    }
+
+    private void registerConnectivityReceiver(){
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mConnectivityReceiver, intentFilter);
+    }
+
+    private void unregisterConnectivityReceiver(){
+        unregisterReceiver(mConnectivityReceiver);
     }
 
 }
