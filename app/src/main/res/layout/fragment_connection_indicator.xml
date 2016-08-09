@@ -5,8 +5,9 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:id="@+id/container"
+    android:visibility="invisible"
     tools:showIn="@layout/content_connectivity"
-    tools:context="com.androapplite.shadowsocks.fragment.ConectionIndicatorFragment">
+    tools:context=".fragment.ConnectionIndicatorFragment">
 
     <ImageView
         android:layout_width="16dp"

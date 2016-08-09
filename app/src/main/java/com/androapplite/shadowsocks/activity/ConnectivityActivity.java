@@ -45,6 +45,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.Banner;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 
@@ -72,7 +73,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Snackbar mSnackbar;
     private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
-
+    private ConnectionIndicatorFragment mConnectionIndicatorFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
         mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
+        mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),
                 (ViewGroup)findViewById(R.id.ad_view_container));
@@ -140,6 +142,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //
 //            }
             mConnectivityFragment.updateConnectionState(state);
+            mConnectionIndicatorFragment.updateConnectionState(state);
         }
     }
 

@@ -12,9 +12,9 @@
     <fragment
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:name="com.androapplite.shadowsocks.fragment.ConectionIndicatorFragment"
+        android:name="com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment"
         android:id="@+id/connection_indicator"
-        tools:layout="@layout/fragment_conection_indicator"
+        tools:layout="@layout/fragment_connection_indicator"
         android:layout_alignParentRight="true"
         android:layout_marginTop="@dimen/margin_4dp"
         android:layout_marginRight="@dimen/margin_4dp"

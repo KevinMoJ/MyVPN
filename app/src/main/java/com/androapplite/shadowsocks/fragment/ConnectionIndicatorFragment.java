@@ -14,10 +14,10 @@ import yyf.shadowsocks.utils.Constants;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConectionIndicatorFragment extends Fragment {
+public class ConnectionIndicatorFragment extends Fragment {
 
 
-    public ConectionIndicatorFragment() {
+    public ConnectionIndicatorFragment() {
         // Required empty public constructor
     }
 
@@ -26,19 +26,25 @@ public class ConectionIndicatorFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_conection_indicator, container, false);
+        return inflater.inflate(R.layout.fragment_connection_indicator, container, false);
     }
 
     public void updateConnectionState(int state){
+        View rootView = getView();
         if(state == Constants.State.CONNECTING.ordinal()){
         }else if(state == Constants.State.CONNECTED.ordinal()){
-            getView().setEnabled(true);
+            rootView.setEnabled(true);
+            rootView.setVisibility(View.VISIBLE);
         }else if(state == Constants.State.ERROR.ordinal()){
-            getView().setEnabled(false);
+            rootView.setEnabled(false);
+            rootView.setVisibility(View.VISIBLE);
         }else if(state == Constants.State.INIT.ordinal()){
         }else if(state == Constants.State.STOPPING.ordinal()){
+            rootView.setEnabled(false);
+            rootView.setVisibility(View.VISIBLE);
         }else if(state == Constants.State.STOPPED.ordinal()){
-            getView().setEnabled(false);
+            rootView.setEnabled(false);
+            rootView.setVisibility(View.VISIBLE);
         }
     }
 
