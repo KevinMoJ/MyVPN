@@ -218,12 +218,12 @@ public abstract class AdBase {
             mListener.onAdLoaded(this);
         }
         clearTimeout();
+        mRetryCount = 0;
         sendLoadingTimeToGA();
     }
 
     public void load(){
         setTiemeout();
-        mRetryCount = 0;
     }
 
     private void setTiemeout(){
