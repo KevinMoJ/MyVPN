@@ -1,12 +1,13 @@
 package com.androapplite.shadowsocks.ad;
 
 import android.content.Context;
+import android.view.View;
 import android.view.ViewGroup;
 
 /**
  * Created by jim on 16/8/4.
  */
-public abstract class Banner extends AdBase {
+public abstract  class  Banner extends AdBase {
 
     protected Banner(Context context, @AdPlatform int platform){
         super(context, platform, AD_BANNER);

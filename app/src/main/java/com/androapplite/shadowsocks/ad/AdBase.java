@@ -10,6 +10,9 @@ import android.support.annotation.NonNull;
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.facebook.ads.AbstractAdListener;
+import com.facebook.ads.Ad;
+import com.facebook.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 
@@ -144,55 +147,78 @@ public abstract class AdBase {
         return new AdListener() {
             @Override
             public void onAdClosed() {
-                setAdStatus(AD_CLOSED);
                 AdBase.this.onAdClosed();
-                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
-
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                setAdStatus(AD_ERROR);
                 AdBase.this.onAdError(errorCode);
-                ShadowsocksApplication.debug("广告Status", mAdStatus + " " + errorCode);
-
             }
 
             @Override
             public void onAdOpened() {
-                setAdStatus(AD_OPENED);
                 AdBase.this.onAdOpened();
-                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
-
             }
 
             @Override
             public void onAdLoaded() {
-                setAdStatus(AD_LOADED);
                 AdBase.this.onAdLoaded();
-                ShadowsocksApplication.debug("广告Status", mAdStatus + "");
-
             }
         };
     }
 
+    protected AbstractAdListener createFacebookAdListener(){
+        return new AbstractAdListener() {
+            @Override
+            public void onError(Ad ad, AdError adError) {
+                AdBase.this.onAdError(adError.getErrorCode());
+            }
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+                AdBase.this.onAdLoaded();
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                AdBase.this.onAdOpened();
+            }
+
+            @Override
+            public void onInterstitialDisplayed(Ad ad) {
+                AdBase.this.onAdOpened();
+            }
+
+            @Override
+            public void onInterstitialDismissed(Ad ad) {
+                AdBase.this.onAdClosed();
+            }
+        };
+    }
+
+
     protected void onAdClosed(){
+        setAdStatus(AD_CLOSED);
         if(mListener != null){
             mListener.onAdClosed(this);
         }
         load();
+        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
 
     protected void onAdError(int errorCode){
+        setAdStatus(AD_ERROR);
         if(mListener != null){
             mListener.onAdError(this, errorCode);
         }
         clearTimeout();
         sendLoadingTimeToGA();
+        //banner广告自己会重试的
         if(mRetryCount < mMaxRetryCount){
             load();
             mRetryCount++;
         }
+        ShadowsocksApplication.debug("广告Status", mAdStatus + " " + errorCode);
     }
 
     private void clearTimeout(){
@@ -208,18 +234,23 @@ public abstract class AdBase {
     }
 
     protected void onAdOpened(){
+        setAdStatus(AD_OPENED);
         if(mListener != null){
             mListener.onAdOpened(this);
         }
+        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+
     }
 
     protected void onAdLoaded(){
+        setAdStatus(AD_LOADED);
         if(mListener != null){
             mListener.onAdLoaded(this);
         }
         clearTimeout();
         mRetryCount = 0;
         sendLoadingTimeToGA();
+        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
 
     public void load(){

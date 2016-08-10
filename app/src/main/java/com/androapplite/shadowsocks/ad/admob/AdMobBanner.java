@@ -78,4 +78,5 @@ public class AdMobBanner extends Banner{
     public String getAdId() {
         return mAdview.getAdUnitId();
     }
+
 }
