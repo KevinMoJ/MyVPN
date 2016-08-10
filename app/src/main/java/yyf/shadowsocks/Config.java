@@ -13,17 +13,20 @@ public class Config implements Parcelable {
     public boolean isUdpDns = false;
 
     public String profileName = "US Server";
-//    public String proxy = "54.211.188.225";
     public String proxy = "hub.vpnnest.com";
     public String sitekey = "vpnnest!@#123d";
-    //public String route = "all";
-
-    public String encMethod = "aes-256-cfb";
-    public String proxiedAppString = "";
-
+    
     public int remotePort = 40010;
-    public int localPort = 1080;
+    /*临时测试server
+    public String proxy = "52.10.0.180";
+    public String sitekey = "abc!@#123d";
+    public int remotePort = 28388;
+     */
 
+    public int localPort = 1080;
+    public String proxiedAppString = "";
+    public String encMethod = "aes-256-cfb";
+    //public String route = "all";
     public static final Creator<Config> CREATOR = new Creator<Config>() {
         public Config createFromParcel(Parcel in) {
             return new Config(in);
