@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ad.AdBase;
 import com.androapplite.shadowsocks.ad.Banner;
 import com.facebook.ads.AdSize;
 import com.facebook.ads.AdView;
@@ -12,8 +11,7 @@ import com.facebook.ads.AdView;
 /**
  * Created by jim on 16/8/10.
  */
-public class FacebookBanner extends Banner {
-    private AdView mAdview;
+public class FacebookBanner extends Banner<AdView> {
 
     public FacebookBanner(Context context, String adUnitId, AdSize size){
         super(context, AD_FACEBOOK);
@@ -21,8 +19,9 @@ public class FacebookBanner extends Banner {
     }
 
     private void init(Context context, String adUnitId, AdSize size) {
-        mAdview = new AdView(context, adUnitId, size);
-        mAdview.setAdListener(createFacebookAdListener());
+        AdView adView = new AdView(context, adUnitId, size);
+        adView.setAdListener(createFacebookAdListener());
+        setAdView(adView);
     }
 
     public FacebookBanner(Context context, String adUnitId, AdSize size, String tag){
@@ -41,7 +40,8 @@ public class FacebookBanner extends Banner {
 
     @Override
     public void destory() {
-        ((ViewGroup)mAdview.getParent()).removeView(mAdview);
+        AdView adView = getAdView();
+        ((ViewGroup) adView.getParent()).removeView(adView);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class FacebookBanner extends Banner {
     public void load(){
         if(getAdStatus() != AD_LOADED) {
             try {
-                mAdview.loadAd();
+                getAdView().loadAd();
                 setAdStatus(AD_LOADING);
                 super.load();
             }catch (Exception e){
@@ -63,15 +63,4 @@ public class FacebookBanner extends Banner {
         }
     }
 
-    @Override
-    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams) {
-        super.addToViewGroup();
-        container.addView(mAdview, layoutParams);
-    }
-
-    @Override
-    public void addToViewGroup(ViewGroup container){
-        super.addToViewGroup();
-        container.addView(mAdview);
-    }
 }

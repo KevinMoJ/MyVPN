@@ -7,7 +7,8 @@ import android.view.ViewGroup;
 /**
  * Created by jim on 16/8/4.
  */
-public abstract  class  Banner extends AdBase {
+public abstract  class  Banner<T extends  View> extends AdBase {
+    private T mAdView;
 
     protected Banner(Context context, @AdPlatform int platform){
         super(context, platform, AD_BANNER);
@@ -19,15 +20,18 @@ public abstract  class  Banner extends AdBase {
         loadDisplayCount();
     }
 
-    protected void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
-        addToViewGroup();
+    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
+        increaseAndSaveDisplayCound();
+        container.addView(mAdView, layoutParams);
     }
 
-    protected void addToViewGroup(ViewGroup container){
-        addToViewGroup();
+    public void addToViewGroup(ViewGroup container){
+        increaseAndSaveDisplayCound();
+        container.addView(mAdView);
     }
 
-    protected void addToViewGroup(){
+
+    protected void increaseAndSaveDisplayCound(){
         increaseDisplayCount();
         saveDisplayCount();
     }
@@ -37,4 +41,12 @@ public abstract  class  Banner extends AdBase {
     public abstract void pause();
 
     public abstract void destory();
+
+    protected T getAdView(){
+        return mAdView;
+    }
+
+    protected void setAdView(T adView){
+        mAdView = adView;
+    }
 }

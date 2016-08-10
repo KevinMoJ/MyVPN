@@ -13,8 +13,7 @@ import com.google.android.gms.ads.AdView;
 /**
  * Created by jim on 16/8/4.
  */
-public class AdMobBanner extends Banner{
-    private AdView mAdview;
+public class AdMobBanner extends Banner<AdView>{
 
     public AdMobBanner(Context context, String adUnitId, AdSize size){
         super(context, AD_ADMOB);
@@ -22,10 +21,11 @@ public class AdMobBanner extends Banner{
     }
 
     private void init(Context context, String adUnitId, AdSize size) {
-        mAdview = new AdView(context);
-        mAdview.setAdSize(size);
-        mAdview.setAdUnitId(adUnitId);
-        mAdview.setAdListener(createAdmobAdListener());
+        AdView adView = new AdView(context);
+        adView.setAdSize(size);
+        adView.setAdUnitId(adUnitId);
+        adView.setAdListener(createAdmobAdListener());
+        setAdView(adView);
     }
 
     public AdMobBanner(Context context, String adUnitId, AdSize size, String tag){
@@ -35,9 +35,10 @@ public class AdMobBanner extends Banner{
 
     @Override
     public void load(){
-        if(!mAdview.isLoading() && getAdStatus() != AD_LOADED) {
+        AdView mAdView = getAdView();
+        if(!mAdView.isLoading() && getAdStatus() != AD_LOADED) {
             try {
-                mAdview.loadAd(createAdmobRequest());
+                mAdView.loadAd(createAdmobRequest());
                 setAdStatus(AD_LOADING);
                 super.load();
             }catch (Exception e){
@@ -49,34 +50,23 @@ public class AdMobBanner extends Banner{
 
     @Override
     public void resume(){
-        mAdview.resume();
+        getAdView().resume();
     }
 
     @Override
     public void pause(){
-        mAdview.pause();
-    }
-
-    @Override
-    public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams) {
-        super.addToViewGroup();
-        container.addView(mAdview, layoutParams);
-    }
-
-    @Override
-    public void addToViewGroup(ViewGroup container){
-        super.addToViewGroup();
-        container.addView(mAdview);
+        getAdView().pause();
     }
 
     @Override
     public void destory() {
-        ((ViewGroup)mAdview.getParent()).removeView(mAdview);
+        AdView adView = getAdView();
+        ((ViewGroup)adView.getParent()).removeView(adView);
     }
 
     @Override
     public String getAdId() {
-        return mAdview.getAdUnitId();
+        return getAdView().getAdUnitId();
     }
 
 }
