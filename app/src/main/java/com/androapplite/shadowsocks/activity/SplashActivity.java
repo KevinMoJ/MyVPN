@@ -41,13 +41,10 @@ public class SplashActivity extends BaseShadowsocksActivity {
 
     private void initAdHelper() {
         final AdHelper adHelper = AdHelper.getInstance(getApplicationContext());
-
-        int screenSize = getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK;
-
         Banner banner = null;
-        if ((screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE)
-                || (screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE)) {
+
+        int screenDensity = getResources().getConfiguration().densityDpi;
+        if(screenDensity > 240){
             banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
                     AdSize.LARGE_BANNER, getString(R.string.tag_banner));
         }else{
