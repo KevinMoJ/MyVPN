@@ -5,10 +5,13 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
+import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.admob.AdMobBanner;
 import com.androapplite.shadowsocks.ad.admob.AdMobInterstitial;
+import com.androapplite.shadowsocks.ad.facebook.FacebookInterstitial;
+import com.facebook.ads.AdSettings;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.MobileAds;
 
@@ -31,6 +34,9 @@ public class AdHelper {
         MobileAds.initialize(context, context.getString(R.string.admob_application_id));
         mAds = new ArrayList<>();
         initAds(context);
+        if(BuildConfig.DEBUG){
+            AdSettings.addTestDevice("427fac640d76f690507a46198022d54d");
+        }
     }
 
 
@@ -55,8 +61,11 @@ public class AdHelper {
     }
 
     private void initAds(Context context){
+        final String connectTag = context.getString(R.string.tag_connect);
         mAds.add(new AdMobInterstitial(context, context.getString(R.string.admob_interstitial_id),
-                context.getString(R.string.tag_connect)));
+                connectTag));
+        mAds.add(new FacebookInterstitial(context, context.getString(R.string.facebook_interstitial_id),
+                connectTag));
         /* banner 以后不放在这里初始化，放到SplashActivity里*/
 //        mAds.add(new AdMobBanner(context, context.getString(R.string.banner_ad_unit_id),
 //                 AdSize.LARGE_BANNER, context.getString(R.string.tag_banner)));
