@@ -57,8 +57,9 @@ public class AdHelper {
     private void initAds(Context context){
         mAds.add(new AdMobInterstitial(context, context.getString(R.string.admob_interstitial_id),
                 context.getString(R.string.tag_connect)));
-        mAds.add(new AdMobBanner(context, context.getString(R.string.banner_ad_unit_id),
-                 AdSize.LARGE_BANNER, context.getString(R.string.tag_banner)));
+        /* banner 以后不放在这里初始化，放到SplashActivity里*/
+//        mAds.add(new AdMobBanner(context, context.getString(R.string.banner_ad_unit_id),
+//                 AdSize.LARGE_BANNER, context.getString(R.string.tag_banner)));
     }
 
     public void loadAll(){
@@ -83,11 +84,12 @@ public class AdHelper {
         return ads;
     }
 
-//    public void addAd(AdBase adBase){
-//        mAds.add(adBase);
-//    }
-//
-//
+    /*这个方法主要是给banner用的，因为大小需要根据屏幕大小变化，而banner大小只能设置一次*/
+    public void addAd(AdBase adBase){
+        mAds.add(adBase);
+    }
+
+
     public void loadByTag(String tag){
         if(isNoAdPhone()) return;
         for(AdBase adBase:filterByTag(tag)){
@@ -104,42 +106,6 @@ public class AdHelper {
             interstitial.load();
         }
     }
-
-
-//    @Nullable
-//    private Interstitial filterBestInterstitial(String tag) {
-//        int minDisplayCount = Integer.MAX_VALUE;
-//        Interstitial interstitial = null;
-//        for(AdBase adBase:filterByTag(tag)){
-//            if(adBase instanceof Interstitial){
-//                final int displayCount = ((Interstitial) adBase).getDisplayCount();
-//                if(displayCount < minDisplayCount){
-//                    interstitial = (Interstitial)adBase;
-//                    minDisplayCount = displayCount;
-//                }
-//            }
-//        }
-//        return interstitial;
-//    }
-//
-//    @Nullable
-//    private <T extends AdBase> T filterBestAd(String tag){
-//        int minDisplayCount = Integer.MAX_VALUE;
-//        T ad = null;
-//        for(AdBase adBase: filterByTag(tag)){
-//            int displayCount = adBase.getDisplayCount();
-//            if(displayCount < minDisplayCount){
-//                try{
-//                    ad = (T)adBase;
-//                    minDisplayCount = displayCount;
-//                }catch (ClassCastException e){
-//                    ShadowsocksApplication.handleException(e);
-//                }
-//
-//            }
-//        }
-//        return ad;
-//    }
 
     @Nullable
     private <T extends AdBase> T filterBestAd(ArrayList<AdBase> ads){
