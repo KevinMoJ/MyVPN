@@ -13,6 +13,11 @@ public abstract class Banner extends AdBase {
         loadDisplayCount();
     }
 
+    protected Banner(Context context, @AdPlatform int platform, String tag){
+        super(context, platform, AD_BANNER, tag);
+        loadDisplayCount();
+    }
+
     protected void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
         addToViewGroup();
     }

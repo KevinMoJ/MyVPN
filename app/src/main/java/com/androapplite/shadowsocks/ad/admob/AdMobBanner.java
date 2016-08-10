@@ -18,6 +18,10 @@ public class AdMobBanner extends Banner{
 
     public AdMobBanner(Context context, String adUnitId, AdSize size){
         super(context, AD_ADMOB);
+        init(context, adUnitId, size);
+    }
+
+    private void init(Context context, String adUnitId, AdSize size) {
         mAdview = new AdView(context);
         mAdview.setAdSize(size);
         mAdview.setAdUnitId(adUnitId);
@@ -25,8 +29,8 @@ public class AdMobBanner extends Banner{
     }
 
     public AdMobBanner(Context context, String adUnitId, AdSize size, String tag){
-        this(context, adUnitId, size);
-        setTag(tag);
+        super(context, AD_ADMOB, tag);
+        init(context, adUnitId, size);
     }
 
     @Override

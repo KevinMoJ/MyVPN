@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
@@ -42,7 +43,7 @@ public abstract class AdBase {
     @IntDef({AD_BANNER, AD_INTERSTItiAL, AD_NATIVE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdType{}
-    private static final String[] AD_TYPE_TEXT = {"AD_BANNER", "AD_INTERSTItiAL", "AD_NATIVE"};
+    private static final String[] AD_TYPE_TEXT = {"AD_BANNER", "AD_INTERSTITIAL", "AD_NATIVE"};
 
     public static final int AD_ADMOB = 0;
     public static final int AD_FACEBOOK = 1;
@@ -80,18 +81,18 @@ public abstract class AdBase {
         mApplicationContext = context.getApplicationContext();
 
     }
+    protected AdBase(Context context, @AdPlatform int platform, @AdType int type, String tag){
+        this(context, platform, type);
+        mTag = tag;
+    }
 
     private void sendLoadingTimeToGA() {
         if(mLoadingDuration != 0) {
-            String uniqueTag = getAdPlatformText() + getAdTypeText() + getTag();
+            String uniqueTag = getFullTag();
             GAHelper.sendTimingEvent(mApplicationContext, uniqueTag, getAdStatusText(), mLoadingDuration, getAdId());
         }
     }
 
-//    protected AdBase(@AdPlatform int platform, @AdType int type, String tag){
-//        this(platform, type);
-//        mTag = tag;
-//    }
 
     public interface OnAdLoadListener{
         void onAdLoaded(AdBase adBase);
@@ -237,12 +238,17 @@ public abstract class AdBase {
     }
 
     protected void saveDisplayCount(){
-        String uniqueTag = getAdPlatformText() + getAdTypeText() + getTag();
+        String uniqueTag = getFullTag();
         mSharedPreference.edit().putInt(uniqueTag, mDisplayCount).apply();
     }
 
+    @NonNull
+    private String getFullTag() {
+        return String.format("%s_%s_%s", getAdPlatformText(), getAdTypeText(), getTag());
+    }
+
     protected void loadDisplayCount(){
-        String uniqueTag = getAdPlatformText() + getAdTypeText() + getTag();
+        String uniqueTag = getFullTag();
         mDisplayCount = mSharedPreference.getInt(uniqueTag, 0);
     }
 

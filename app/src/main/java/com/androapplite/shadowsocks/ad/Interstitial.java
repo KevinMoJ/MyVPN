@@ -17,6 +17,10 @@ public abstract class Interstitial extends AdBase{
         super(context, platform, AD_INTERSTItiAL);
     }
 
+    protected Interstitial(Context context, @AdPlatform int platform, String tag){
+        super(context, platform, AD_INTERSTItiAL, tag);
+    }
+
 
     public abstract void show();
 

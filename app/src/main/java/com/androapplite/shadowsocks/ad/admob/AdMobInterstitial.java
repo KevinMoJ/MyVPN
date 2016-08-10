@@ -16,14 +16,18 @@ public class AdMobInterstitial extends Interstitial{
 
     public AdMobInterstitial(Context context, String adUnitId){
         super(context, AD_ADMOB);
+        init(context, adUnitId);
+    }
+
+    private void init(Context context, String adUnitId) {
         mInterstitial = new InterstitialAd(context);
         mInterstitial.setAdUnitId(adUnitId);
         mInterstitial.setAdListener(createAdmobAdListener());
     }
 
     public AdMobInterstitial(Context context, String adUnitId, String tag){
-        this(context, adUnitId);
-        setTag(tag);
+        super(context, AD_ADMOB, tag);
+        init(context, adUnitId);
     }
 
     @Override
