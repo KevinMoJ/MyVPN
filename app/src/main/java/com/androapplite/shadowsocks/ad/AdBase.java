@@ -64,6 +64,8 @@ public abstract class AdBase {
     private long mLoadingStartTime;
     private long mLoadingDuration;
     private Context mApplicationContext;
+    private int mMaxRetryCount;
+    private int mRetryCount;
 
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type){
         mAdplatform = platform;
@@ -79,6 +81,7 @@ public abstract class AdBase {
             }
         };
         mApplicationContext = context.getApplicationContext();
+        mMaxRetryCount = 1;
 
     }
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type, String tag){
@@ -186,6 +189,10 @@ public abstract class AdBase {
         }
         clearTimeout();
         sendLoadingTimeToGA();
+        if(mRetryCount < mMaxRetryCount){
+            load();
+            mRetryCount++;
+        }
     }
 
     private void clearTimeout(){
@@ -216,6 +223,7 @@ public abstract class AdBase {
 
     public void load(){
         setTiemeout();
+        mRetryCount = 0;
     }
 
     private void setTiemeout(){
@@ -267,4 +275,13 @@ public abstract class AdBase {
 
 
     public abstract String getAdId();
+
+    public void setMaxRetryCount(int retryCount){
+        mRetryCount = retryCount;
+    }
+
+    public int getMaxRetryCount(){
+        return  mRetryCount;
+    }
+
 }
