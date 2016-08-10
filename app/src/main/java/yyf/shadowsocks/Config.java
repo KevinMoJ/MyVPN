@@ -13,10 +13,10 @@ public class Config implements Parcelable {
     public boolean isUdpDns = false;
 
     public String profileName = "US Server";
-    public String proxy = "hub.vpnnest.com";
-    public String sitekey = "vpnnest!@#123d";
-    
-    public int remotePort = 40010;
+    private String proxy = "hub.vpnnest.com";
+    private String sitekey = "vpnnest!@#123d";
+
+    private int remotePort = 40010;
     /*临时测试server
     public String proxy = "52.10.0.180";
     public String sitekey = "abc!@#123d";
@@ -38,12 +38,6 @@ public class Config implements Parcelable {
     };
 
     public Config() {
-//        try {
-//            java.net.InetAddress[] x= java.net.InetAddress.getAllByName(VPN_DOMAIN) ;
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//            proxy = VPN_IP;
-//        }
 
     }
 
@@ -106,4 +100,22 @@ public class Config implements Parcelable {
         out.writeInt(remotePort);
         out.writeInt(localPort);
     }
+
+    public void setProxy(String proxy){
+        this.proxy = proxy;
+    }
+
+    public String getProxy(){
+        return proxy;
+    }
+
+    public String getSitekey(){
+        return sitekey;
+    }
+
+    public int getRemotePort(){
+        return remotePort;
+    }
+
+
 }

@@ -67,7 +67,7 @@ public class ShadowsocksVpnService extends BaseService {
     //private ShadowsocksApplication application = This.getApplication();//<ShadowsocksApplication>;
     boolean isByass() {
         //       val info = net.getInfo;
-        //     info.isInRange(config.proxy);
+        //     info.isInRange(config.getProxy());
         //TODO :完成此函数  参数 SubnetUtils net
         return false;
     }
@@ -98,8 +98,9 @@ public class ShadowsocksVpnService extends BaseService {
         printWriter.close();
 
         //读取配置并写入文件
-        String conf = String.format(Locale.ENGLISH,ConfigUtils.SHADOWSOCKS,config.proxy, config.remotePort, config.localPort,
-                config.sitekey, config.encMethod, 10);
+        String conf = String.format(Locale.ENGLISH,ConfigUtils.SHADOWSOCKS,
+                config.getProxy(), config.getRemotePort(), config.localPort,
+                config.getSitekey(), config.encMethod, 10);
         printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
@@ -133,8 +134,8 @@ public class ShadowsocksVpnService extends BaseService {
     public void startDnsTunnel() {
         //读取配置 并写入文件
         String conf = String.format(Locale.ENGLISH,ConfigUtils
-                .SHADOWSOCKS,config.proxy, config.remotePort, 8163,
-                        config.sitekey, config.encMethod, 10);
+                .SHADOWSOCKS,config.getProxy(), config.getRemotePort(), 8163,
+                        config.getSitekey(), config.encMethod, 10);
 
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-tunnel-vpn.conf"));
         printWriter.println(conf);
@@ -212,7 +213,7 @@ public class ShadowsocksVpnService extends BaseService {
             //TODO 利用 builder.addDisallowedApplication 实现app不走vpn
         }
 
-        /*if (InetAddressUtils.isIPv6Address(config.proxy)) {
+        /*if (InetAddressUtils.isIPv6Address(config.getProxy())) {
             builder.addRoute("0.0.0.0", 0);
         }  TODO 添加 ipv6 支持 */
 
@@ -386,14 +387,14 @@ public class ShadowsocksVpnService extends BaseService {
             killProcesses();
             // Resolve the server address TODO:增加IPV6的支持
             boolean resolved = false;
-            if (!InetAddressUtils.isIPv4Address(config.proxy)) {
-                if(resolve(config.proxy, Type.A).isEmpty()){
-                    if(!resolve(config.proxy).isEmpty()) {
-                        resolve(config.proxy);
+            if (!InetAddressUtils.isIPv4Address(config.getProxy())) {
+                if(resolve(config.getProxy(), Type.A).isEmpty()){
+                    if(!resolve(config.getProxy()).isEmpty()) {
+                        resolve(config.getProxy());
                         resolved = true;
                     }
                 }else{
-                    config.proxy = resolve(config.proxy, Type.A);
+                    config.setProxy(resolve(config.getProxy(), Type.A));
                     resolved = true;
                 }
             } else {
