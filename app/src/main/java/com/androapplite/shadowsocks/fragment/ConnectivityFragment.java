@@ -45,7 +45,6 @@ public class ConnectivityFragment extends Fragment {
     private ImageView mMessageArrowView;
     private ImageView mConnectedImageView;
     private OnFragmentInteractionListener mListener;
-//    private TextView mStatusTextView;
     private static final int[] LOADING_PHASE_DRAWABLE_RESOURCE = {
             R.drawable.connecting_phase_1,
             R.drawable.connecting_phase_2,
@@ -87,22 +86,8 @@ public class ConnectivityFragment extends Fragment {
         mMessageTextView = (TextView)rootView.findViewById(R.id.message_body);
         mMessageArrowView = (ImageView)rootView.findViewById(R.id.message_arrow);
         mConnectedImageView = (ImageView)rootView.findViewById(R.id.connected);
-//        mStatusTextView = (TextView)rootView.findViewById(R.id.status);
         return rootView;
     }
-
-//    private void showStatusViewConnected(){
-//
-//        mStatusTextView.setVisibility(View.VISIBLE);
-//        mStatusTextView.setEnabled(true);
-//        mStatusTextView.setText(R.string.connected);
-//    }
-//
-//    private void showStatusViewDisconnected(){
-//        mStatusTextView.setVisibility(View.VISIBLE);
-//        mStatusTextView.setEnabled(false);
-//        mStatusTextView.setText(R.string.disconnected);
-//    }
 
     private void initProgressBar() {
         mAnimatorSet = (AnimatorSet) AnimatorInflater.loadAnimator(getActivity(), R.animator.connecting);
@@ -291,20 +276,16 @@ public class ConnectivityFragment extends Fragment {
         }else if(state == Constants.State.CONNECTED.ordinal()){
             connected();
             showConnectMessage();
-//            showStatusViewConnected();
         }else if(state == Constants.State.ERROR.ordinal()){
             error();
             showErrorMessage();
-//            showStatusViewDisconnected();
         }else if(state == Constants.State.INIT.ordinal()){
         }else if(state == Constants.State.STOPPING.ordinal()){
             stopping();
             showStoppingMessage();
-//            showStatusViewDisconnected();
         }else if(state == Constants.State.STOPPED.ordinal()){
             showStoppedMessage();
             stopped();
-//            showStatusViewDisconnected();
         }
     }
 
