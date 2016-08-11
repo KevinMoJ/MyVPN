@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.facebook.ads.AbstractAdListener;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
@@ -75,7 +76,7 @@ public abstract class AdBase {
         mAdType = type;
         mAdStatus = AD_INIT;
         mDisplayCount = 0;
-        mSharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
+        mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         mTimeoutCallback = new Runnable() {
             @Override
             public void run() {
