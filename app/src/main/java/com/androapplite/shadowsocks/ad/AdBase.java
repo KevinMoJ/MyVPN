@@ -238,7 +238,7 @@ public abstract class AdBase {
         if(mListener != null){
             mListener.onAdOpened(this);
         }
-        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+//        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
 
     }
 
@@ -250,7 +250,7 @@ public abstract class AdBase {
         clearTimeout();
         mRetryCount = 0;
         sendLoadingTimeToGA();
-        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+//        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
 
     public void load(){
