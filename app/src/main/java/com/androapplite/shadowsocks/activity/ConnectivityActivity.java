@@ -233,12 +233,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
-            View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
-            popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-            popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.overlay_popup_menu_bg));
-            View toobar = findViewById(R.id.toolbar);
-            popupWindow.showAsDropDown(toobar, toobar.getWidth()-popupView.getWidth(), 0);
+            if(mShadowsocksService != null){
+                int state = mShadowsocksService.getState();
+                if(state == Constants.State.INIT.ordinal() ||
+                        state == Constants.State.STOPPED.ordinal()){
+                    View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
+                    popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                    PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+                    popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.overlay_popup_menu_bg));
+                    View toobar = findViewById(R.id.toolbar);
+                    popupWindow.showAsDropDown(toobar, toobar.getWidth()-popupView.getWidth(), 0);
+                }
+            })
             return true;
         }
 
@@ -547,6 +553,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void unregisterConnectivityReceiver(){
         unregisterReceiver(mConnectivityReceiver);
+    }
+
+    public void chooseVPN(View view){
+        if(view instanceof Button){
+            Button button = (Button)view;
+            SharedPreference sharedPreference = DefaultSharedPreferenceUtil.getDefaultSharedPreferences(this);
+        }
     }
 
 }

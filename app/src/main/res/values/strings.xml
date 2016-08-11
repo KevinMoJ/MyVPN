@@ -47,4 +47,9 @@
     <string name="close">close</string>
     <string name="no_internet">There is no internet connection.</string>
 
+    <string name="vpn_name_us">US</string>
+    <string name="vpn_name_uk">UK</string>
+    <string name="vpn_server_us" translatable="false"></string>
+    <string name="vpn_server_uk" translatable="false"></string>
+
 </resources>

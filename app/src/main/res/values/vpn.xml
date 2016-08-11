@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--我自己的-->
+    <array name="vpn_us">
+        <item>@string/vpn_name_us</item>
+        <item>@string/vpn_server_us</item>
+    </array>
+    <array name="vpn_uk">
+        <item>@string/vpn_name_uk</item>
+        <item>@string/vpn_server_uk</item>
+    </array>
+
+</resources>
