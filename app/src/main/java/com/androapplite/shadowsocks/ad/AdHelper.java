@@ -64,8 +64,8 @@ public class AdHelper {
         final String connectTag = context.getString(R.string.tag_connect);
         mAds.add(new AdMobInterstitial(context, context.getString(R.string.admob_interstitial_id),
                 connectTag));
-        mAds.add(new FacebookInterstitial(context, context.getString(R.string.facebook_interstitial_id),
-                connectTag));
+//        mAds.add(new FacebookInterstitial(context, context.getString(R.string.facebook_interstitial_id),
+//                connectTag));
         /* banner 以后不放在这里初始化，放到SplashActivity里*/
 //        mAds.add(new AdMobBanner(context, context.getString(R.string.banner_ad_unit_id),
 //                 AdSize.LARGE_BANNER, context.getString(R.string.tag_banner)));
