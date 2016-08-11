@@ -11,6 +11,7 @@
         android:title="@string/action_choose_server"
         android:icon="@drawable/ic_flag_us"
         app:showAsAction="always"
+        android:id="@+id/action_flag"
         >
         <!--<menu>-->
             <!--<group>-->

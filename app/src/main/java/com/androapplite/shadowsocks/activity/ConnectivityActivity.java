@@ -36,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.ad.AdHelper;
@@ -231,9 +232,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
+        if (id == R.id.action_flag) {
+            View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
+            popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+            popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.overlay_popup_menu_bg));
+            View toobar = findViewById(R.id.toolbar);
+            popupWindow.showAsDropDown(toobar, toobar.getWidth()-popupView.getWidth(), 0);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }

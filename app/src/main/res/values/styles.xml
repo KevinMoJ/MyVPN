@@ -52,10 +52,6 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
 
     </style>
-    <style name="PopupTextViewStyle" parent="@android:style/TextAppearance.Widget.TextView">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
     <style name="TANCStyle" parent="@android:style/Theme.Dialog">
         <!-- 更换背景图片实现全透明 -->
         <item name="android:windowBackground">@drawable/dialog_no_internet_bg</item>
