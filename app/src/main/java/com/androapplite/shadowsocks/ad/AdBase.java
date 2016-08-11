@@ -120,7 +120,7 @@ public abstract class AdBase {
 
     protected synchronized void setAdStatus(@AdStatus int status){
         mAdStatus = status;
-        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+        ShadowsocksApplication.debug("广告", getAdStatusText());
     }
 
     public synchronized  @AdStatus int getAdStatus(){
@@ -203,7 +203,7 @@ public abstract class AdBase {
             mListener.onAdClosed(this);
         }
         load();
-        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
+//        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
 
     protected void onAdError(int errorCode){
@@ -218,7 +218,7 @@ public abstract class AdBase {
             load();
             mRetryCount++;
         }
-        ShadowsocksApplication.debug("广告Status", mAdStatus + " " + errorCode);
+//        ShadowsocksApplication.debug("广告Status", mAdStatus + " " + errorCode);
     }
 
     private void clearTimeout(){
