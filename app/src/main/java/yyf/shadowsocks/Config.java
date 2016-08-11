@@ -41,6 +41,10 @@ public class Config implements Parcelable {
 
     }
 
+    public Config(String proxy){
+        this.proxy = proxy;
+    }
+
     public Config(boolean isGlobalProxy, boolean isGFWList, boolean isBypassApps,
                   boolean isTrafficStat, boolean isUdpDns, String profileName, String proxy, String sitekey,
                   String encMethod, String proxiedAppString, String route, int remotePort, int localPort) {

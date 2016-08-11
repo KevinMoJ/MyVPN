@@ -8,4 +8,8 @@
     <!--tag-->
     <string name="tag_connect" translatable="false">connect</string>
     <string name="tag_banner" translatable="false">banner</string>
+
+    <string name="vpn_proxy">
+        <item>hub.vpnnest.com</item>
+    </string>
 </resources>

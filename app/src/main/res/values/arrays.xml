@@ -194,25 +194,4 @@
         <item>208.0.0.0/4</item>
     </string-array>
 
-    <!--我自己的-->
-    <array name="new_user_guide_step_1_resources">
-        <item>@drawable/new_user_guide_1</item>
-        <item>@string/forever_free</item>
-        <item>@string/forever_free_explain</item>
-    </array>
-    <array name="new_user_guide_step_2_resources">
-        <item>@drawable/new_user_guide_2</item>
-        <item>@string/browse_without_borders</item>
-        <item>@string/browse_without_borders_explain</item>
-    </array>
-    <array name="new_user_guide_step_3_resources">
-        <item>@drawable/new_user_guide_3</item>
-        <item>@string/protect_your_identify</item>
-        <item>@string/protect_your_identity_explain</item>
-    </array>
-    <array name="new_user_guide_resources">
-        <item>@array/new_user_guide_step_1_resources</item>
-        <item>@array/new_user_guide_step_2_resources</item>
-        <item>@array/new_user_guide_step_3_resources</item>
-    </array>
 </resources>

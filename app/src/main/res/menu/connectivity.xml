@@ -11,5 +11,22 @@
         android:title="@string/action_choose_server"
         android:icon="@drawable/ic_flag_us"
         app:showAsAction="always"
-        />
+        >
+        <!--<menu>-->
+            <!--<group>-->
+                <!--<item-->
+                    <!--android:orderInCategory="100"-->
+                    <!--android:title="@string/action_choose_server"-->
+                    <!--android:icon="@drawable/ic_flag_us"></item>-->
+                <!--<item-->
+                    <!--android:orderInCategory="100"-->
+                    <!--android:title="@string/action_choose_server"-->
+                    <!--android:icon="@drawable/ic_flag_us"></item>-->
+                <!--<item-->
+                    <!--android:orderInCategory="100"-->
+                    <!--android:title="@string/action_choose_server"-->
+                    <!--android:icon="@drawable/ic_flag_us"></item>-->
+            <!--</group>-->
+        <!--</menu>-->
+    </item>
 </menu>
