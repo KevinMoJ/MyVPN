@@ -12,6 +12,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -34,6 +35,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -250,9 +252,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
                     popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                     PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-//                    popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.overlay_popup_menu_bg));
                     View toobar = findViewById(R.id.toolbar);
-                    popupWindow.showAsDropDown(toobar, toobar.getWidth()-popupView.getWidth(), 0);
+                    int offset = (int)getResources().getDimension(R.dimen.half_standard_margin);
+                    popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
                 }
             }
             return true;
