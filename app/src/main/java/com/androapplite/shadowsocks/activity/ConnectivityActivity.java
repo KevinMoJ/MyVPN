@@ -9,8 +9,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -36,6 +38,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -49,6 +52,8 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import java.lang.System;
 
@@ -234,7 +239,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
             if(mShadowsocksService != null){
-                int state = mShadowsocksService.getState();
+                int state = 0;
+                try {
+                    state = mShadowsocksService.getState();
+                } catch (RemoteException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
                 if(state == Constants.State.INIT.ordinal() ||
                         state == Constants.State.STOPPED.ordinal()){
                     View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
@@ -244,7 +254,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     View toobar = findViewById(R.id.toolbar);
                     popupWindow.showAsDropDown(toobar, toobar.getWidth()-popupView.getWidth(), 0);
                 }
-            })
+            }
             return true;
         }
 
@@ -354,8 +364,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onClickConnectionButton() {
         try {
-            if (mShadowsocksService == null || mShadowsocksService.getState() == Constants.State.INIT.ordinal()
-                    || mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()) {
+            final int state = mShadowsocksService.getState();
+            if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
+                    || state == Constants.State.STOPPED.ordinal()) {
                 prepareStartService();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
                 GAHelper.sendEvent(this, "连接VPN", "打开");
@@ -445,16 +456,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             //bindService(intent,connection,BIND_AUTO_CREATE);
             if(mShadowsocksService != null){
                 try {
-                    Config config = new Config();
+                    Config config = new Config(findVPNServer());
                     mShadowsocksService.start(config);
                     ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
+                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }catch(RemoteException e){
                     ShadowsocksApplication.handleException(e);
                 }
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
-            AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
 
         }
     }
@@ -558,8 +569,28 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public void chooseVPN(View view){
         if(view instanceof Button){
             Button button = (Button)view;
-            SharedPreference sharedPreference = DefaultSharedPreferenceUtil.getDefaultSharedPreferences(this);
+            SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+            sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, button.getText().toString()).apply();
         }
+    }
+
+    private String findVPNServer(){
+        SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        String vpnName = sharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
+        int i = 0;
+        if(vpnName != null){
+            TypedArray a = getResources().obtainTypedArray(R.array.vpn_names);
+            for(i = 0; i < a.length(); i++){
+                if(vpnName.equals(a.getString(i))){
+                    break;
+                }
+            }
+            if(i >= a.length()){
+                i = 0;
+            }
+        }
+        TypedArray b = getResources().obtainTypedArray(R.array.vpn_servers);
+        return b.getString(i);
     }
 
 }

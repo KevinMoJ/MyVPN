@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_flag_us"
         android:text="@string/vpn_name_us"
-        android:click="chooseServer"/>
+        android:onClick="chooseServer"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
