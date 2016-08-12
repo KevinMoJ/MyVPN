@@ -388,11 +388,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     || state == Constants.State.STOPPED.ordinal()) {
                 prepareStartService();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                GAHelper.sendEvent(this, "连接VPN", "打开");
+                GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
             }else{
                 mShadowsocksService.stop();
                 mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                GAHelper.sendEvent(this, "连接VPN", "关闭");
+                GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
                 AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
             }
 
