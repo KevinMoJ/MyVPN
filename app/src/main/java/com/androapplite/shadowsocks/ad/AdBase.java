@@ -80,8 +80,7 @@ public abstract class AdBase {
         mTimeoutCallback = new Runnable() {
             @Override
             public void run() {
-                setAdStatus(AD_TIMEOUT);
-                sendLoadingTimeToGA();
+                onTimeout();
             }
         };
         mApplicationContext = context.getApplicationContext();
@@ -106,6 +105,7 @@ public abstract class AdBase {
         void onAdOpened(AdBase adBase);
         void onAdClosed(AdBase adBase);
         void onAdError(AdBase adBase, int errorCode);
+        void onTimeout(AdBase adBase);
     }
 
     protected AdRequest createAdmobRequest(){
@@ -234,6 +234,20 @@ public abstract class AdBase {
         }
     }
 
+    protected void onTimeout(){
+        setAdStatus(AD_TIMEOUT);
+        if(mListener != null){
+            mListener.onTimeout(this);
+        }
+        //banner广告自己会重试的
+        if(mRetryCount < mMaxRetryCount){
+            load();
+            mRetryCount++;
+        }
+        clearTimeout();
+        sendLoadingTimeToGA();
+    }
+
     protected void onAdOpened(){
         setAdStatus(AD_OPENED);
         if(mListener != null){
@@ -253,6 +267,7 @@ public abstract class AdBase {
         sendLoadingTimeToGA();
 //        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
+
 
     public void load(){
         setTiemeout();

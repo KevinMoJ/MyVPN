@@ -32,22 +32,27 @@ public class AdMobInterstitial extends Interstitial{
 
     @Override
     public void load(){
-        if(!mInterstitial.isLoading() && getAdStatus() != AD_LOADED){
-            try{
-                mInterstitial.loadAd(createAdmobRequest());
-                setAdStatus(AD_LOADING);
-                super.load();
+        if(!mInterstitial.isLoading() ){
+            final int status = getAdStatus();
+            if(status == AD_INIT || status == AD_OPENED || status == AD_CLOSED || status == AD_ERROR || status == AD_TIMEOUT) {
                 ShadowsocksApplication.debug("广告load", mInterstitial.isLoading() + " " + getAdStatusText());
-            }catch (Exception e){
-                ShadowsocksApplication.handleException(e);
-                setAdStatus(AD_ERROR);
+                try {
+                    mInterstitial.loadAd(createAdmobRequest());
+                    setAdStatus(AD_LOADING);
+                    super.load();
+                    ShadowsocksApplication.debug("广告load", mInterstitial.isLoading() + " " + getAdStatusText());
+                } catch (Exception e) {
+                    ShadowsocksApplication.handleException(e);
+                    setAdStatus(AD_ERROR);
+                }
             }
         }
     }
 
     @Override
     public void show(){
-        if(mInterstitial.isLoaded()) {
+        if(mInterstitial.isLoaded() && getAdStatus() == AD_LOADED) {
+            ShadowsocksApplication.debug("广告show", mInterstitial.isLoading() + " " + getAdStatusText());
             mInterstitial.show();
             setAdStatus(AD_SHOWING);
             setShowWhenLoaded(false);
