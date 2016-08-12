@@ -9,5 +9,9 @@
         <item>@string/vpn_server_us</item>
         <item>@string/vpn_server_uk</item>
     </array>
+    <array name="vpn_icons">
+        <item>@drawable/ic_flag_us</item>
+        <item>@drawable/ic_flag_uk</item>
+    </array>
 
 </resources>

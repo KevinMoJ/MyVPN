@@ -12,8 +12,8 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -24,6 +24,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -35,7 +36,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,12 +76,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private static int REQUEST_CONNECT = 1;
     private long mConnectOrDisconnectStartTime;
     private TrafficRateFragment mTrafficRateFragment;
-//    private AdView mAdView;
     private Banner mBanner;
     private Snackbar mSnackbar;
     private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
     private ConnectionIndicatorFragment mConnectionIndicatorFragment;
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,6 +228,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.connectivity, menu);
+        mMenu = menu;
+        changeProxyFlagIcon();
         return true;
     }
 
@@ -249,18 +251,33 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 if(state == Constants.State.INIT.ordinal() ||
                         state == Constants.State.STOPPED.ordinal()){
-                    View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
-                    popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                    PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-                    View toobar = findViewById(R.id.toolbar);
-                    int offset = (int)getResources().getDimension(R.dimen.half_standard_margin);
-                    popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
+                    showProxyChangePopupWindow();
                 }
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showProxyChangePopupWindow() {
+        final View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        View toobar = findViewById(R.id.toolbar);
+        int offset = (int)getResources().getDimension(R.dimen.half_standard_margin);
+        popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseVPN(v);
+                changeProxyFlagIcon();
+                popupWindow.dismiss();
+            }
+        };
+        popupView.findViewById(R.id.proxy_us).setOnClickListener(listener);
+        popupView.findViewById(R.id.proxy_uk).setOnClickListener(listener);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -577,6 +594,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private String findVPNServer(){
+        int i = indexOfSelectedVPN();
+        TypedArray b = getResources().obtainTypedArray(R.array.vpn_servers);
+        return b.getString(i);
+    }
+
+    private int indexOfSelectedVPN() {
         SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         String vpnName = sharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
         int i = 0;
@@ -591,8 +614,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 i = 0;
             }
         }
-        TypedArray b = getResources().obtainTypedArray(R.array.vpn_servers);
-        return b.getString(i);
+        return i;
+    }
+
+    private void changeProxyFlagIcon(){
+        int i = indexOfSelectedVPN();
+        TypedArray icons = getResources().obtainTypedArray(R.array.vpn_icons);
+        mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(i));
     }
 
 }
