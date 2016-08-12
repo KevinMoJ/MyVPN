@@ -32,4 +32,6 @@
     <color name="connectivity_loading_7">#4a25e9</color>
     <color name="connectivity_loading_8">#25a6e9</color>
 
+    <color name="connectivity_button_bg">#e4e3e0</color>
+
 </resources>

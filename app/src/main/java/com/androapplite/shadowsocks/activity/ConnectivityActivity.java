@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -264,8 +265,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         final View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
         popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+
         View toobar = findViewById(R.id.toolbar);
-        int offset = (int)getResources().getDimension(R.dimen.half_standard_margin);
+        int offset = (int)getResources().getDimension(R.dimen.standard_margin);
         popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
 
         View.OnClickListener listener = new View.OnClickListener() {
