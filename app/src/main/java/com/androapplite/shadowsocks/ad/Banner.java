@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.ad;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 /**
  * Created by jim on 16/8/4.
@@ -22,11 +23,20 @@ public abstract  class  Banner<T extends  View> extends AdBase {
 
     public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
         increaseAndSaveDisplayCound();
+
+        final ViewParent parent = mAdView.getParent();
+        if(parent != null){
+            ((ViewGroup) parent).removeView(mAdView);
+        }
         container.addView(mAdView, layoutParams);
     }
 
     public void addToViewGroup(ViewGroup container){
         increaseAndSaveDisplayCound();
+        final ViewParent parent = mAdView.getParent();
+        if(parent != null){
+            ((ViewGroup) parent).removeView(mAdView);
+        }
         container.addView(mAdView);
     }
 
