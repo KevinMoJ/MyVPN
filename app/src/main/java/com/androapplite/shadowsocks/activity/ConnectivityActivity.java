@@ -253,6 +253,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 if(state == Constants.State.INIT.ordinal() ||
                         state == Constants.State.STOPPED.ordinal()){
                     showProxyChangePopupWindow();
+                    GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
+                }else{
+                    Snackbar.make(findViewById(R.id.coordinator), R.string.change_proxy_tip, Snackbar.LENGTH_SHORT).show();
+                    GAHelper.sendEvent(this, "ProxyPopup", "错误时机", String.valueOf(state));
+
                 }
             }
             return true;

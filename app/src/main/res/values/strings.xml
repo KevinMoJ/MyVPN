@@ -52,4 +52,6 @@
     <string name="vpn_server_us" translatable="false">v3.vpnnest.com</string>
     <string name="vpn_server_uk" translatable="false">v4.vpnnest.com</string>
 
+    <string name="change_proxy_tip">Please change proxy when the connection is off.</string>
+
 </resources>
