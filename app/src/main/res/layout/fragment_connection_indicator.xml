@@ -12,7 +12,7 @@
     <ImageView
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:src="@drawable/ic_check_24dp"
+        android:src="@drawable/connection_icon"
         android:tint="@color/activity_background"
         android:background="@drawable/connection_icon_bg"
         android:id="@+id/indicator_icon"
