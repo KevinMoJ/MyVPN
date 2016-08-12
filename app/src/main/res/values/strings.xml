@@ -49,7 +49,7 @@
 
     <string name="vpn_name_us">US</string>
     <string name="vpn_name_uk">UK</string>
-    <string name="vpn_server_us" translatable="false"></string>
-    <string name="vpn_server_uk" translatable="false"></string>
+    <string name="vpn_server_us" translatable="false">hub.vpnnest.com</string>
+    <string name="vpn_server_uk" translatable="false">hub.vpnnest.com</string>
 
 </resources>
