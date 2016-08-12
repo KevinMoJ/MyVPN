@@ -250,7 +250,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
                     popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                     PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-                    popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.overlay_popup_menu_bg));
+//                    popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.overlay_popup_menu_bg));
                     View toobar = findViewById(R.id.toolbar);
                     popupWindow.showAsDropDown(toobar, toobar.getWidth()-popupView.getWidth(), 0);
                 }
