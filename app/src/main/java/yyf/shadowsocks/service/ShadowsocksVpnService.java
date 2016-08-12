@@ -523,6 +523,8 @@ public class ShadowsocksVpnService extends BaseService {
             ShadowsocksApplication.handleException(e);
         } catch (org.xbill.DNS.TextParseException e){
             ShadowsocksApplication.handleException(e);
+        } catch (RuntimeException e){
+            ShadowsocksApplication.handleException(e);
         }
         return null;
     }
