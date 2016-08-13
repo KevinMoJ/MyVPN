@@ -43,11 +43,16 @@ public class SplashActivity extends BaseShadowsocksActivity {
         final AdHelper adHelper = AdHelper.getInstance(getApplicationContext());
         Banner banner = null;
 
-        int screenDensity = getResources().getConfiguration().densityDpi;
-        if(screenDensity > 240){
-            banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
-                    AdSize.LARGE_BANNER, getString(R.string.tag_banner));
-        }else{
+        try {
+            int screenDensity = getResources().getConfiguration().densityDpi;
+            if (screenDensity > 240) {
+                banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
+                        AdSize.LARGE_BANNER, getString(R.string.tag_banner));
+            } else {
+                banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
+                        AdSize.SMART_BANNER, getString(R.string.tag_banner));
+            }
+        }catch (NoSuchFieldError e){
             banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
                     AdSize.SMART_BANNER, getString(R.string.tag_banner));
         }
