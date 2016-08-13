@@ -102,6 +102,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),
                 (ViewGroup)findViewById(R.id.ad_view_container));
         initConnectivityReceiver();
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                final SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
+                if(sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
+                    try {
+                        showProxyChangePopupWindow();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, false).apply();
+                    }catch (RuntimeException e){
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
+            }
+        });
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){

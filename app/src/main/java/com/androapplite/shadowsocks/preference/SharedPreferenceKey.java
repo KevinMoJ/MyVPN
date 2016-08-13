@@ -6,6 +6,6 @@ package com.androapplite.shadowsocks.preference;
 public final class SharedPreferenceKey {
     public static final String IS_NEW_USER = "IS_NEW_USER";
     public static final String IS_RATE_US_FRAGMENT_SHOWN = "IS_RATE_US_FRAGMENT_SHOWN";
-    public static final String CONNECTION_TIME = "CONNECTION_TIME";
     public static final String VPN_NAME = "VPN_NAME";
+    public static final String NEED_TO_SHOW_PROXY_POPUP = "NEED_TO_SHOW_PROXY_POPUP";
 }
