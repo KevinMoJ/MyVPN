@@ -39,12 +39,6 @@ public class FacebookBanner extends Banner<AdView> {
     }
 
     @Override
-    public void destory() {
-        AdView adView = getAdView();
-        ((ViewGroup) adView.getParent()).removeView(adView);
-    }
-
-    @Override
     public String getAdId() {
         return getAdId();
     }

@@ -23,20 +23,13 @@ public abstract  class  Banner<T extends  View> extends AdBase {
 
     public void addToViewGroup(ViewGroup container, ViewGroup.LayoutParams layoutParams){
         increaseAndSaveDisplayCound();
-
-        final ViewParent parent = mAdView.getParent();
-        if(parent != null){
-            ((ViewGroup) parent).removeView(mAdView);
-        }
+        removeFromParent();
         container.addView(mAdView, layoutParams);
     }
 
     public void addToViewGroup(ViewGroup container){
         increaseAndSaveDisplayCound();
-        final ViewParent parent = mAdView.getParent();
-        if(parent != null){
-            ((ViewGroup) parent).removeView(mAdView);
-        }
+        removeFromParent();
         container.addView(mAdView);
     }
 
@@ -46,11 +39,20 @@ public abstract  class  Banner<T extends  View> extends AdBase {
         saveDisplayCount();
     }
 
+    private void removeFromParent(){
+        final ViewParent parent = mAdView.getParent();
+        if(parent != null){
+            ((ViewGroup) parent).removeView(mAdView);
+        }
+    }
+
     public abstract void resume();
 
     public abstract void pause();
 
-    public abstract void destory();
+    public void destory(){
+        removeFromParent();
+    }
 
     protected T getAdView(){
         return mAdView;
