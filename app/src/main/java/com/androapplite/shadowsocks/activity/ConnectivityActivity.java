@@ -611,7 +611,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(view instanceof Button){
             Button button = (Button)view;
             SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, button.getText().toString()).apply();
+            final String vpnName = button.getText().toString();
+            sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
+            GAHelper.sendEvent(this, "选择VPN", vpnName);
+
         }
     }
 
