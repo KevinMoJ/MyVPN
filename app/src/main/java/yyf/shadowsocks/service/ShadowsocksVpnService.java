@@ -453,12 +453,6 @@ public class ShadowsocksVpnService extends BaseService {
     public void stopRunner() {
         // channge the state
         changeState(Constants.State.STOPPING);
-        // send event
-//        application.tracker.send(new EventBuilder()
-//                .setCategory(TAG)
-//                .setAction("stop")
-//                .setLabel(getVersionName())
-//                .build());
         // reset VPN
         killProcesses();
         if(mShadowsocksVpnThread != null){
