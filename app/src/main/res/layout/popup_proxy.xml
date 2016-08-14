@@ -7,7 +7,36 @@
     android:paddingBottom="@dimen/standard_margin"
     android:background="@drawable/overlay_popup_menu_bg"
     >
-
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+        <Button
+            android:layout_width="wrap_content"
+            android:minWidth="148dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/popup_menu_item_bg"
+            android:id="@+id/proxy_opt"
+            android:text="@string/vpn_name_opt"
+            android:textColor="@color/primary_white_text"
+            android:textSize="@dimen/medium_text"
+            android:layout_gravity="center_vertical"
+            android:gravity="left|center_vertical"
+            android:paddingLeft="64dp"
+            />
+        <com.joooonho.SelectableRoundedImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_flag_us"
+            android:scaleType="centerCrop"
+            app:sriv_left_top_corner_radius="3dp"
+            app:sriv_right_top_corner_radius="3dp"
+            app:sriv_left_bottom_corner_radius="3dp"
+            app:sriv_right_bottom_corner_radius="3dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/standard_margin"
+            />
+    </FrameLayout>
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,8 +66,6 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="@dimen/standard_margin"
             />
-
-
     </FrameLayout>
     <FrameLayout
         android:layout_width="wrap_content"
