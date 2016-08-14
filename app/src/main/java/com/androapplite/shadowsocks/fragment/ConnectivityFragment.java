@@ -143,7 +143,12 @@ public class ConnectivityFragment extends Fragment {
     }
 
     public void stopping(){
-        if(!mAnimatorSet.isRunning()) {
+
+        if(mAnimatorSet.isRunning() && !mIsReverseAnimation){
+            mAnimatorSet.cancel();
+        }
+        if(!mAnimatorSet.isRunning()){
+            //准备倒转
             mIsReverseAnimation = true;
             ((ObjectAnimator) mAnimatorSet.getChildAnimations().get(0)).reverse();
         }
