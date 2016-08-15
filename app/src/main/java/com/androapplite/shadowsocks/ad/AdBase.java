@@ -203,7 +203,7 @@ public abstract class AdBase {
         if(mListener != null){
             mListener.onAdClosed(this);
         }
-        load();
+//        load();
 //        ShadowsocksApplication.debug("广告Status", mAdStatus + "");
     }
 
