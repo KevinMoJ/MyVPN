@@ -112,7 +112,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 final SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
                 if(sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
                     try {
-                        showProxyChangePopupWindow();
+                        showVpnServerChangePopupWindow();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, false).apply();
                     }catch (RuntimeException e){
                         ShadowsocksApplication.handleException(e);
@@ -277,7 +277,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 if(state == Constants.State.INIT.ordinal() ||
                         state == Constants.State.STOPPED.ordinal()){
-//                    showProxyChangePopupWindow();
                     showVpnServerChangePopupWindow();
                     GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
                 }else{
@@ -292,46 +291,25 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void showProxyChangePopupWindow() {
-        final View popupView = getLayoutInflater().inflate(R.layout.popup_proxy, null);
-        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        popupWindow.setBackgroundDrawable(new BitmapDrawable());
-
-        View toobar = findViewById(R.id.toolbar);
-        int offset = (int)getResources().getDimension(R.dimen.standard_margin);
-        popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
-
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chooseVPN(v);
-                mTemporaryVpnSelectIndex = indexOfSelectedVPN();
-                changeProxyFlagIcon();
-                popupWindow.dismiss();
-            }
-        };
-        popupView.findViewById(R.id.proxy_opt).setOnClickListener(listener);
-        popupView.findViewById(R.id.proxy_us).setOnClickListener(listener);
-        popupView.findViewById(R.id.proxy_uk).setOnClickListener(listener);
-    }
-
     private void showVpnServerChangePopupWindow(){
         final View popupView = getLayoutInflater().inflate(R.layout.popup_vpn_server, null);
 
         ListView vpnServerListView = (ListView) popupView.findViewById(R.id.vpn_server_list);
         vpnServerListView.setAdapter(new VpnServerItemAdapter());
-        vpnServerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ShadowsocksApplication.debug("popup vpn server", popupView + "");
-            }
-        });
 
         popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-//        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        vpnServerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                saveVpnName(position);
+                mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+                changeProxyFlagIcon();
+                popupWindow.dismiss();
+            }
+        });
+
         View toobar = findViewById(R.id.toolbar);
         int offset = (int)getResources().getDimension(R.dimen.standard_margin);
         popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
@@ -712,6 +690,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
+    private void saveVpnName(int position){
+        Resources resources = getResources();
+        TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
+        final String vpnName = names.getString(position);
+        SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
+        GAHelper.sendEvent(this, "选择VPN", vpnName);
+    }
+
     private String findVPNServer(){
         mTemporaryVpnSelectIndex = indexOfSelectedVPNWithParsingOptimizedServer();
         TypedArray b = getResources().obtainTypedArray(R.array.vpn_servers);
@@ -755,11 +742,4 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private void restoreVpnSelectIndex(){
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
-
-//    private void resetProxyFlagIcon(){
-//        int i = indexOfSelectedVPN();
-//        TypedArray icons = getResources().obtainTypedArray(R.array.vpn_icons);
-//        mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(i));
-//    }
-
 }
