@@ -12,6 +12,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
@@ -39,7 +40,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -272,7 +277,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 if(state == Constants.State.INIT.ordinal() ||
                         state == Constants.State.STOPPED.ordinal()){
-                    showProxyChangePopupWindow();
+//                    showProxyChangePopupWindow();
+                    showVpnServerChangePopupWindow();
                     GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
                 }else{
                     Snackbar.make(findViewById(R.id.coordinator), R.string.change_proxy_tip, Snackbar.LENGTH_SHORT).show();
@@ -309,6 +315,82 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         popupView.findViewById(R.id.proxy_us).setOnClickListener(listener);
         popupView.findViewById(R.id.proxy_uk).setOnClickListener(listener);
     }
+
+    private void showVpnServerChangePopupWindow(){
+        final View popupView = getLayoutInflater().inflate(R.layout.popup_vpn_server, null);
+
+        ListView vpnServerListView = (ListView) popupView.findViewById(R.id.vpn_server_list);
+        vpnServerListView.setAdapter(new VpnServerItemAdapter());
+        vpnServerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ShadowsocksApplication.debug("popup vpn server", popupView + "");
+            }
+        });
+
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+//        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.setBackgroundDrawable(new BitmapDrawable());
+        View toobar = findViewById(R.id.toolbar);
+        int offset = (int)getResources().getDimension(R.dimen.standard_margin);
+        popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
+    }
+
+    public class VpnServerItemAdapter extends BaseAdapter{
+        private TypedArray mServerNames;
+        private TypedArray mServerIcons;
+
+        public VpnServerItemAdapter(){
+            Resources resources = getResources();
+            mServerNames = resources.obtainTypedArray(R.array.vpn_names);
+            mServerIcons = resources.obtainTypedArray(R.array.vpn_icons);
+        }
+
+        @Override
+        public int getCount() {
+            return mServerNames.length();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mServerNames.getString(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = null;
+            ViewHolder viewHolder = null;
+            if(convertView == null) {
+                view = getLayoutInflater().inflate(R.layout.item_popup_vpn_server, null);
+                viewHolder = new ViewHolder();
+                viewHolder.vpnIconImageView = (ImageView)view.findViewById(R.id.vpn_icon);
+                viewHolder.vpnNameTextView = (TextView)view.findViewById(R.id.vpn_name);
+                view.setTag(viewHolder);
+            }else{
+                view = convertView;
+                viewHolder = (ViewHolder)view.getTag();
+            }
+            viewHolder.vpnIconImageView.setImageResource(
+                    mServerIcons.getResourceId(position, R.drawable.ic_close_24dp));
+            viewHolder.vpnNameTextView.setText(
+                    mServerNames.getResourceId(position, R.string.vpn_name_opt)
+            );
+            return view;
+        }
+
+        public class ViewHolder{
+            public ImageView vpnIconImageView;
+            public TextView vpnNameTextView;
+        }
+
+    }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
