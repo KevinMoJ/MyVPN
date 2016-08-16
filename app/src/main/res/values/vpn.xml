@@ -3,18 +3,28 @@
     <!--我自己的-->
     <array name="vpn_names">
         <item>@string/vpn_name_opt</item>
-        <item>@string/vpn_name_us</item>
+        <item>@string/vpn_name_mia_us</item>
+        <item>@string/vpn_name_la_us</item>
         <item>@string/vpn_name_uk</item>
+        <item>@string/vpn_name_fr</item>
+        <item>@string/vpn_name_jp</item>
+
     </array>
     <array name="vpn_servers">
-        <item>@string/vpn_name_opt</item>
-        <item>@string/vpn_server_us</item>
+        <item>@string/vpn_server_opt</item>
+        <item>@string/vpn_server_mia_us</item>
+        <item>@string/vpn_server_la_us</item>
         <item>@string/vpn_server_uk</item>
+        <item>@string/vpn_server_fr</item>
+        <item>@string/vpn_server_jp</item>
     </array>
     <array name="vpn_icons">
-        <item>@drawable/ic_announcement_24dp</item>
+        <item>@drawable/ic_flag_global_anim</item>
+        <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_uk</item>
+        <item>@drawable/ic_flag_fr</item>
+        <item>@drawable/ic_flag_jp</item>
     </array>
 
 </resources>

@@ -735,7 +735,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private void changeProxyFlagIcon(){
         TypedArray icons = getResources().obtainTypedArray(R.array.vpn_icons);
         if(mMenu != null) {
-            mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
+            if(mTemporaryVpnSelectIndex == 0){
+                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global_clicked);
+            }else {
+                mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
+            }
+//            mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
         }
     }
 
