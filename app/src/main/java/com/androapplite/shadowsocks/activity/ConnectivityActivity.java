@@ -482,14 +482,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onClickConnectionButton() {
-        findVPNServer();
-        ShadowsocksApplication.debug("select vpn", mTemporaryVpnSelectIndex + "");
-        changeProxyFlagIcon();
         if(mShadowsocksService != null) {
             try {
                 final int state = mShadowsocksService.getState();
                 if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
                         || state == Constants.State.STOPPED.ordinal()) {
+                    findVPNServer();
+                    ShadowsocksApplication.debug("select vpn", mTemporaryVpnSelectIndex + "");
+                    changeProxyFlagIcon();
                     prepareStartService();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
