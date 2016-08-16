@@ -291,7 +291,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void showVpnServerChangePopupWindow(){
+    private void showVpnServerChangePopupWindow() {
         final View popupView = getLayoutInflater().inflate(R.layout.popup_vpn_server, null);
 
         ListView vpnServerListView = (ListView) popupView.findViewById(R.id.vpn_server_list);
@@ -311,8 +311,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         });
 
         View toobar = findViewById(R.id.toolbar);
-        int offset = (int)getResources().getDimension(R.dimen.standard_margin);
-        popupWindow.showAsDropDown(toobar, toobar.getWidth()-offset-popupView.getMeasuredWidth(), -offset);
+        int offset = (int) getResources().getDimension(R.dimen.standard_margin);
+        try {
+            popupWindow.showAsDropDown(toobar, toobar.getWidth() - offset - popupView.getMeasuredWidth(), -offset);
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+            Snackbar.make(findViewById(R.id.coordinator), R.string.not_open_vpn_popup, Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     public class VpnServerItemAdapter extends BaseAdapter{
@@ -460,13 +465,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
 
     private void prepareStartService(){
-        Intent intent = VpnService.prepare(this);
-        if (intent != null) {
-            startActivityForResult(intent, REQUEST_CONNECT);
-            ShadowsocksApplication.debug("ss-vpn", "startActivityForResult");
-        } else {
-            onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
-            ShadowsocksApplication.debug("ss-vpn", "onActivityResult");
+        try {
+            Intent intent = VpnService.prepare(this);
+            if (intent != null) {
+                startActivityForResult(intent, REQUEST_CONNECT);
+                ShadowsocksApplication.debug("ss-vpn", "startActivityForResult");
+            } else {
+                onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
+                ShadowsocksApplication.debug("ss-vpn", "onActivityResult");
+            }
+        }catch(Exception e){
+            Snackbar.make(findViewById(R.id.coordinator), R.string.not_start_vpn, Snackbar.LENGTH_SHORT).show();
+            ShadowsocksApplication.handleException(e);
         }
     }
 
@@ -475,22 +485,24 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         findVPNServer();
         ShadowsocksApplication.debug("select vpn", mTemporaryVpnSelectIndex + "");
         changeProxyFlagIcon();
-        try {
-            final int state = mShadowsocksService.getState();
-            if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
-                    || state == Constants.State.STOPPED.ordinal()) {
-                prepareStartService();
-                mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
-            }else{
-                mShadowsocksService.stop();
-                mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
-                AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
-            }
+        if(mShadowsocksService != null) {
+            try {
+                final int state = mShadowsocksService.getState();
+                if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
+                        || state == Constants.State.STOPPED.ordinal()) {
+                    prepareStartService();
+                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                    GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
+                } else {
+                    mShadowsocksService.stop();
+                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                    GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
+                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+                }
 
-        }catch (RemoteException e){
-            ShadowsocksApplication.handleException(e);
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
         }
 
     }

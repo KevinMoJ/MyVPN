@@ -47,24 +47,22 @@
     <string name="close">close</string>
     <string name="no_internet">There is no internet connection.</string>
 
-    <string name="vpn_name_us">US</string>
-
     <string name="vpn_name_opt">Global</string>
-    <string name="vpn_name_mia_us">Miami, US</string>
-    <string name="vpn_name_la_us">LA, US</string>
-    <string name="vpn_name_uk">UK</string>
     <string name="vpn_name_fr">France</string>
     <string name="vpn_name_jp">Japan</string>
+    <string name="vpn_name_uk">UK</string>
+    <string name="vpn_name_mia_us">Miami, US</string>
+    <string name="vpn_name_la_us">LA, US</string>
 
-    <string name="vpn_server_us" translatable="false">v3.vpnnest.com</string>
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
+    <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>
+    <string name="vpn_server_jp" translatable="false">v6.vpnnest.com</string>
+    <string name="vpn_server_uk" translatable="false">v4.vpnnest.com</string>
     <string name="vpn_server_mia_us" translatable="false">v3.vpnnest.com</string>
     <string name="vpn_server_la_us" translatable="false">v5.vpnnest.com</string>
-    <string name="vpn_server_uk" translatable="false">v4.vpnnest.com</string>
-    <string name="vpn_server_fr" translatable="false">v3.vpnnest.com</string>
-    <string name="vpn_server_jp" translatable="false">v3.vpnnest.com</string>
 
 
     <string name="change_proxy_tip">Please change proxy when the connection is off.</string>
-
+    <string name="not_start_vpn">VPN connection not start. Please try again.</string>
+    <string name="not_open_vpn_popup">Could not open window. Please try again.</string>
 </resources>
