@@ -51,7 +51,7 @@
     <string name="vpn_name_fr">France</string>
     <string name="vpn_name_jp">Japan</string>
     <string name="vpn_name_uk">UK</string>
-    <string name="vpn_name_mia_us">Miami, US</string>
+    <string name="vpn_name_mia_us">Mia, US</string>
     <string name="vpn_name_la_us">LA, US</string>
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
