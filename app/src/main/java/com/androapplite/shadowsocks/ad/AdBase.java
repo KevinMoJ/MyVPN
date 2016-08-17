@@ -84,7 +84,7 @@ public abstract class AdBase {
             }
         };
         mApplicationContext = context.getApplicationContext();
-        mMaxRetryCount = 1;
+        mMaxRetryCount = 3;
 
     }
     protected AdBase(Context context, @AdPlatform int platform, @AdType int type, String tag){
