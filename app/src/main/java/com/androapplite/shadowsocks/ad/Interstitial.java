@@ -41,4 +41,11 @@ public abstract class Interstitial extends AdBase{
             show();
         }
     }
+
+
+    @Override
+    protected void onRetryFailed() {
+        super.onRetryFailed();
+        mShowWhenLoaded = false;
+    }
 }

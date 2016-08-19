@@ -34,12 +34,13 @@ public abstract class AdBase {
     public static final int AD_ERROR = 5;
     public static final int AD_SHOWING = 6;
     public static final int AD_TIMEOUT = 7;
+    public static final int AD_RETRY_FAILED = 8;
 
 
-    @IntDef({AD_INIT, AD_LOADING, AD_LOADED, AD_OPENED, AD_CLOSED, AD_ERROR, AD_SHOWING, AD_TIMEOUT})
+    @IntDef({AD_INIT, AD_LOADING, AD_LOADED, AD_OPENED, AD_CLOSED, AD_ERROR, AD_SHOWING, AD_TIMEOUT, AD_RETRY_FAILED})
     @Retention(RetentionPolicy.SOURCE)
     public @interface AdStatus{}
-    private static final String[] AD_STATUS_TEXT = {"初始化", "加载中", "加载完", "打开", "关闭", "错误", "显示中", "加载超时"};
+    private static final String[] AD_STATUS_TEXT = {"初始化", "加载中", "加载完", "打开", "关闭", "错误", "显示中", "加载超时", "错误尝试失败"};
 
     public static final int AD_BANNER = 0;
     public static final int AD_INTERSTItiAL = 1;
@@ -218,6 +219,8 @@ public abstract class AdBase {
         if(mRetryCount < mMaxRetryCount){
             load();
             mRetryCount++;
+        }else{
+            onRetryFailed();
         }
 //        ShadowsocksApplication.debug("广告Status", mAdStatus + " " + errorCode);
     }
@@ -243,6 +246,8 @@ public abstract class AdBase {
         if(mRetryCount < mMaxRetryCount){
             load();
             mRetryCount++;
+        }else{
+            onRetryFailed();
         }
         clearTimeout();
         sendLoadingTimeToGA();
@@ -271,6 +276,10 @@ public abstract class AdBase {
 
     public void load(){
         setTiemeout();
+    }
+
+    protected void onRetryFailed(){
+        setAdStatus(AD_RETRY_FAILED);
     }
 
     private void setTiemeout(){
@@ -330,5 +339,7 @@ public abstract class AdBase {
     public int getMaxRetryCount(){
         return  mRetryCount;
     }
+
+
 
 }

@@ -34,7 +34,7 @@ public class AdMobInterstitial extends Interstitial{
     public void load(){
         if(!mInterstitial.isLoading() ){
             final int status = getAdStatus();
-            if(status == AD_INIT || status == AD_OPENED || status == AD_CLOSED || status == AD_ERROR || status == AD_TIMEOUT) {
+            if(status == AD_INIT || status == AD_CLOSED || status == AD_TIMEOUT || status == AD_RETRY_FAILED) {
                 ShadowsocksApplication.debug("广告load", mInterstitial.isLoading() + " " + getAdStatusText());
                 try {
                     mInterstitial.loadAd(createAdmobRequest());
