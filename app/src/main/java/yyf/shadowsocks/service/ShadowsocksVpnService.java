@@ -59,6 +59,7 @@ public class ShadowsocksVpnService extends BaseService {
     private NotificationManager notificationManager = null;
     private BroadcastReceiver receiver = null;
     private ShadowsocksVpnThread mShadowsocksVpnThread;
+    private NativeProcessMonitorThread mNativeProcessMonitorThread;
 
 
     //Array<ProxiedApp> apps = null; 功能去掉...
@@ -404,6 +405,8 @@ public class ShadowsocksVpnService extends BaseService {
             ShadowsocksApplication.debug("ss-vpn", "resolved:" + resolved);
             if (resolved && handleConnection()) {
                 changeState(Constants.State.CONNECTED);
+                mNativeProcessMonitorThread = new NativeProcessMonitorThread(this);
+                mNativeProcessMonitorThread.start();
             } else {
                 stopRunnerForError();
             }
@@ -430,6 +433,10 @@ public class ShadowsocksVpnService extends BaseService {
         if(mShadowsocksVpnThread != null){
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
+        }
+        if(mNativeProcessMonitorThread != null){
+            mNativeProcessMonitorThread.stopThread();
+            mNativeProcessMonitorThread = null;
         }
         // close connections
         if (conn != null) {
@@ -458,6 +465,11 @@ public class ShadowsocksVpnService extends BaseService {
         if(mShadowsocksVpnThread != null){
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
+        }
+
+        if(mNativeProcessMonitorThread != null){
+            mNativeProcessMonitorThread.stopThread();
+            mNativeProcessMonitorThread = null;
         }
         // close connections
         if (conn != null) {

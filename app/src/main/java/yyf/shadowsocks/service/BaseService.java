@@ -1,13 +1,16 @@
 package yyf.shadowsocks.service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.support.v7.app.NotificationCompat;
 
+import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 import java.lang.System;
@@ -40,6 +43,7 @@ public abstract class BaseService extends VpnService {
     protected Config config = null;
     private Timer mHoulyUpdater;
     private long mStartTime;
+
 
 
 
@@ -84,6 +88,7 @@ public abstract class BaseService extends VpnService {
         }
 
     };
+    private int mNotificationId = 1021;
 
     @Override
     public void onCreate() {
@@ -188,6 +193,7 @@ public abstract class BaseService extends VpnService {
                     public void run() {
                         if(mTrafficMonitor.updateRate()){
                             updateTrafficRate();
+                            notifyInfo();
                         }
                     }
                 };
@@ -298,6 +304,32 @@ public abstract class BaseService extends VpnService {
         }
 
     }
+
+    private void notifyInfo(){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Context context = BaseService.this;
+                String txRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.txRate);
+                String rxRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.rxRate);
+                String txTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.txTotal);
+                String rxTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.rxTotal);
+                NotificationCompat.Builder mBuilder =
+                        (NotificationCompat.Builder) new NotificationCompat.Builder(context)
+                                .setSmallIcon(R.drawable.ic_flag_global_clicked)
+                                .setContentTitle(getString(R.string.app_name))
+                                .setContentText(String.format("↑%s, %s", txRate, txTotal))
+                                .setSubText(String.format("↓%s, %s", rxRate, rxTotal))
+                                .setAutoCancel(false)
+                                .setOngoing(true);
+
+                NotificationManager mNotifyMgr =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                mNotifyMgr.notify(mNotificationId, mBuilder.build());
+            }
+        });
+    }
+
 
 
 }
