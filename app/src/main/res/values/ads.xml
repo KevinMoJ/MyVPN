@@ -8,4 +8,5 @@
     <!--tag-->
     <string name="tag_connect" translatable="false">connect</string>
     <string name="tag_banner" translatable="false">banner</string>
+    <string name="tag_activity_resume" translatable="false">activity_resume</string>
 </resources>

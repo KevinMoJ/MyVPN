@@ -61,7 +61,7 @@ public class AdHelper {
     }
 
     private void initAds(Context context){
-        final String connectTag = context.getString(R.string.tag_connect);
+        final String connectTag = context.getString(R.string.tag_activity_resume);
         mAds.add(new AdMobInterstitial(context, context.getString(R.string.admob_interstitial_id),
                 connectTag));
 //        mAds.add(new FacebookInterstitial(context, context.getString(R.string.facebook_interstitial_id),
