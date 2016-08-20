@@ -349,7 +349,7 @@ public abstract class BaseService extends VpnService {
         String rxTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.rxTotal);
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.notification_icon)
                         .setContentIntent(pendingIntent)
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText(String.format("↑%s, %s", txRate, txTotal))
