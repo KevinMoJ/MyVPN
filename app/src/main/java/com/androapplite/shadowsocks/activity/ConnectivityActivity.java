@@ -497,7 +497,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
-                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+//                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }
 
             } catch (RemoteException e) {
@@ -563,6 +563,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mBanner != null) {
             mBanner.resume();
         }
+        AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
 
     }
 
@@ -584,7 +585,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     Config config = new Config(findVPNServer());
                     mShadowsocksService.start(config);
                     ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
-                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+//                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }catch(RemoteException e){
                     ShadowsocksApplication.handleException(e);
                 }
