@@ -36,6 +36,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.TimeUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +49,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.ad.AdBase;
 import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
@@ -62,6 +64,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import java.lang.System;
+import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
@@ -87,6 +90,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Menu mMenu;
     private int mTemporaryVpnSelectIndex;
+    private boolean mShowAdSwitch;
+    private Handler mAdSwitchHandler;
+    private Runnable mAdSwitchCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +127,32 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+
+        initInterstitialAd();
+    }
+
+    private void initInterstitialAd() {
+        mShowAdSwitch = true;
+        mAdSwitchCallback = new Runnable() {
+            @Override
+            public void run() {
+                mShowAdSwitch = true;
+//                ShadowsocksApplication.debug("广告开关", "打开");
+            }
+        };
+        AdHelper.getInstance(this).setOnAdListener(getString(R.string.tag_activity_resume), new AdBase.AdListenerAdapter(){
+            @Override
+            public void onAdClosed(AdBase adBase) {
+                mShowAdSwitch = false;
+//                ShadowsocksApplication.debug("广告开关", "关闭");
+                if(mAdSwitchHandler != null){
+                    mAdSwitchHandler.removeCallbacks(mAdSwitchCallback);
+                }
+                //关闭广告后,用户2分钟内不再看广告
+                mAdSwitchHandler = new Handler();
+                mAdSwitchHandler.postDelayed(mAdSwitchCallback, TimeUnit.MINUTES.toMillis(2));
+            }
+        });
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -563,7 +595,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mBanner != null) {
             mBanner.resume();
         }
-        AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+        if(mShowAdSwitch) {
+            AdHelper.getInstance(this).showByTag(getString(R.string.tag_activity_resume));
+        }
+//        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
 
     }
 

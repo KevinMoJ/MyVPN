@@ -2,20 +2,19 @@ package com.androapplite.shadowsocks.ad;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ad.admob.AdMobBanner;
 import com.androapplite.shadowsocks.ad.admob.AdMobInterstitial;
-import com.androapplite.shadowsocks.ad.facebook.FacebookInterstitial;
 import com.facebook.ads.AdSettings;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jim on 16/8/4.
@@ -153,6 +152,15 @@ public class AdHelper {
             banner.addToViewGroup(container);
         }
         return banner;
+    }
+
+    public void setOnAdListener(@NonNull String tag, @Nullable AdBase.OnAdListener listener){
+        List<AdBase> ads = filterByTag(tag);
+        if(!ads.isEmpty()){
+            for(AdBase ad: ads){
+                ad.setAdListener(listener);
+            }
+        }
     }
 
 }

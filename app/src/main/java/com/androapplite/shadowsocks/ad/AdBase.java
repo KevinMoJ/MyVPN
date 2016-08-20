@@ -3,7 +3,6 @@ package com.androapplite.shadowsocks.ad;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -60,7 +59,7 @@ public abstract class AdBase {
     private volatile @AdStatus int mAdStatus;
     private @AdType int mAdType;
     private @AdPlatform int mAdplatform;
-    private OnAdLoadListener mListener;
+    private OnAdListener mListener;
     private String mTag;
     private int mDisplayCount;
     private SharedPreferences mSharedPreference;
@@ -101,12 +100,20 @@ public abstract class AdBase {
     }
 
 
-    public interface OnAdLoadListener{
+    public interface OnAdListener {
         void onAdLoaded(AdBase adBase);
         void onAdOpened(AdBase adBase);
         void onAdClosed(AdBase adBase);
         void onAdError(AdBase adBase, int errorCode);
         void onTimeout(AdBase adBase);
+    }
+
+    public static abstract class AdListenerAdapter implements OnAdListener{
+        public void onAdLoaded(AdBase adBase){}
+        public void onAdOpened(AdBase adBase){}
+        public void onAdClosed(AdBase adBase){}
+        public void onAdError(AdBase adBase, int errorCode){}
+        public void onTimeout(AdBase adBase){}
     }
 
     protected AdRequest createAdmobRequest(){
@@ -129,11 +136,11 @@ public abstract class AdBase {
         return  mAdStatus;
     }
 
-    public void setAdLoadListener(OnAdLoadListener listener){
+    public void setAdListener(OnAdListener listener){
         mListener = listener;
     }
 
-    public OnAdLoadListener getAdLoadListener(){
+    public OnAdListener getAdLoadListener(){
         return mListener;
     }
 
