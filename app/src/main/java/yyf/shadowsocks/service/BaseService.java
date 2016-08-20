@@ -2,6 +2,7 @@ package yyf.shadowsocks.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
@@ -12,6 +13,8 @@ import android.support.v7.app.NotificationCompat;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.activity.SplashActivity;
 
 import java.lang.System;
 import java.util.Calendar;
@@ -28,6 +31,8 @@ import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.TrafficMonitor;
 import yyf.shadowsocks.utils.TrafficMonitorThread;
+
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 /**
  * Created by yyf on 2015/6/18.
@@ -334,13 +339,18 @@ public abstract class BaseService extends VpnService {
 
     private void updateNotitication(){
         Context context = BaseService.this;
+        Intent intent = new Intent(this, ConnectivityActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
+
         String txRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.txRate);
         String rxRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.rxRate);
         String txTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.txTotal);
         String rxTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.rxTotal);
         NotificationCompat.Builder mBuilder =
                 (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_flag_global_clicked)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentIntent(pendingIntent)
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText(String.format("↑%s, %s", txRate, txTotal))
                         .setSubText(String.format("↓%s, %s", rxRate, rxTotal))
