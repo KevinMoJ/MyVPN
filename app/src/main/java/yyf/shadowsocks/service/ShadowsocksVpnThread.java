@@ -6,6 +6,8 @@ import android.net.LocalSocketAddress;
 import android.net.VpnService;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -93,19 +95,19 @@ public class ShadowsocksVpnThread extends Thread {
                             output.close();
 
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            ShadowsocksApplication.handleException(ex);
                         }
 
                         // close socket
                         try {
                             socket.close();
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            ShadowsocksApplication.handleException(ex);
                         }
                     }
                 });
             } catch (IOException ex) {
-                Log.e(TAG, "Error when accept socket", ex);
+                ShadowsocksApplication.handleException(ex);
                 return;
             }
         }
