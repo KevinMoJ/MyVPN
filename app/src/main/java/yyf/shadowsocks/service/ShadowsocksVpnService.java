@@ -409,7 +409,7 @@ public class ShadowsocksVpnService extends BaseService {
             boolean resolved = false;
             if (!InetAddressUtils.isIPv4Address(config.getProxy())) {
                 final String ipaddress = resolve(config.getProxy(), Type.A);
-                if(ipaddress == null) {
+                if(ipaddress != null) {
                     if (ipaddress.isEmpty()) {
                         if (!resolve(config.getProxy()).isEmpty()) {
                             resolve(config.getProxy());
