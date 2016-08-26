@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -25,19 +27,34 @@ public class GuardedProcess extends Process {
     private volatile boolean isDestroyed;
     private volatile Process process;
     private volatile boolean isRestart;
-    private String cmd;
     private List<String> cmdPars;
+    private String cmd;
 
     public interface OnRestartCallback{
         void callback();
     }
 
     public GuardedProcess(String cmd){
+        cmdPars = Arrays.asList(cmd.split("\\s+"));
         this.cmd = cmd;
     }
 
-    public GuardedProcess(List<String> cmdPars){
-        this.cmdPars = cmdPars;
+    public GuardedProcess(String[] cmds){
+        cmdPars = Arrays.asList(cmds);
+        StringBuilder sb = new StringBuilder();
+        for(String s:cmds){
+            sb.append(s).append(" ");
+        }
+        cmd = sb.toString();
+    }
+
+    public GuardedProcess(List<String> cmds){
+        cmdPars = cmds;
+        StringBuilder sb = new StringBuilder();
+        for(String s:cmds){
+            sb.append(s).append(" ");
+        }
+        cmd = sb.toString();
     }
 
     public GuardedProcess start(final OnRestartCallback callback){
@@ -58,7 +75,7 @@ public class GuardedProcess extends Process {
                                     Log.i(TAG, username + " " + userId);
                                     long startTime = System.currentTimeMillis();
 
-                                    final ProcessBuilder processBuilder = new ProcessBuilder(cmd.split("\\s+")).redirectErrorStream(true);
+                                    final ProcessBuilder processBuilder = new ProcessBuilder(cmdPars).redirectErrorStream(true);
 //                                    processBuilder.directory(new File(Constants.Path.BASE));
                                     process = processBuilder.start();
 //                                    process = Runtime.getRuntime().exec(cmd);
