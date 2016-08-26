@@ -35,6 +35,7 @@ public class ShadowsocksApplication extends Application {
                     googleAnalytics.setDryRun(BuildConfig.DEBUG);
                     mTracker = googleAnalytics.newTracker(R.xml.ga_tracker);
                     mTracker.enableAdvertisingIdCollection(true);
+                    mTracker.enableExceptionReporting(!BuildConfig.DEBUG);
                     return mTracker;
                 }else{
                     return mTracker;

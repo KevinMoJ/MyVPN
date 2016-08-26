@@ -3,9 +3,9 @@
     <string name="ga_trackingId">UA-77521118-3</string>
     <string name="ga_sampleFrequency">100.0</string>
     <integer name="ga_sessionTimeout">1800</integer>
-    <bool name="ga_autoActivityTracking">true</bool>
+    <bool name="ga_autoActivityTracking">false</bool>
     <bool name="ga_anonymizeIp">false</bool>
-    <bool name="ga_reportUncaughtExceptions">true</bool>
+    <bool name="ga_reportUncaughtExceptions">false</bool>
 
     <screenName name="com.androapplite.shadowsocks.activity.SplashActivity">启动屏幕</screenName>
     <screenName name="com.androapplite.shadowsocks.activity.ConnectivityActivity">VPN连接屏幕</screenName>
