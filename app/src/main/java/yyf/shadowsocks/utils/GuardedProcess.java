@@ -78,6 +78,7 @@ public class GuardedProcess extends Process {
                                     final ProcessBuilder processBuilder = new ProcessBuilder(cmdPars).redirectErrorStream(true);
                                     process = processBuilder.start();
                                     new StreamGobbler(process.getInputStream(), "OUTPUT");
+                                    new StreamGobbler(process.getErrorStream(), "ERROR");
                                     if (callback != null) {
                                         callback.callback();
                                     }
@@ -96,7 +97,7 @@ public class GuardedProcess extends Process {
                                 }
                             }catch (InterruptedException e) {
                                 Log.i(TAG, "thread interrupt, destroy process: " + cmd);
-                                process.destroy();
+                                destroyProcess();
                             }catch (IOException e){
                                 ShadowsocksApplication.handleException(e);
                             }finally {
@@ -113,12 +114,23 @@ public class GuardedProcess extends Process {
         return this;
     }
 
+    private void destroyProcess(){
+        new StreamGobbler(process.getInputStream(), "OUTPUT");
+        new StreamGobbler(process.getErrorStream(), "ERROR");
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+        process.destroy();
+    }
+
     @Override
     public void destroy() {
         isDestroyed = true;
 
         guardThread.interrupt();
-        process.destroy();
+        destroyProcess();
 
         try {
             guardThread.join();
