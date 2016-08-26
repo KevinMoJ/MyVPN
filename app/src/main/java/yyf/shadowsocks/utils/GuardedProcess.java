@@ -76,9 +76,8 @@ public class GuardedProcess extends Process {
                                     long startTime = System.currentTimeMillis();
 
                                     final ProcessBuilder processBuilder = new ProcessBuilder(cmdPars).redirectErrorStream(true);
-//                                    processBuilder.directory(new File(Constants.Path.BASE));
                                     process = processBuilder.start();
-//                                    process = Runtime.getRuntime().exec(cmd);
+                                    new StreamGobbler(process.getInputStream(), "OUTPUT");
                                     if (callback != null) {
                                         callback.callback();
                                     }
@@ -86,12 +85,6 @@ public class GuardedProcess extends Process {
                                     int exitValue = process.waitFor();
                                     Log.i(TAG, "exitValue " +  exitValue + " " + cmd);
 
-//                                    InputStream stdout = process.getInputStream ();
-//                                    BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
-//                                    String line;
-//                                    while ((line = reader.readLine ()) != null) {
-//                                        System.out.println ("Stdout: " + line);
-//                                    }
                                     if(isRestart){
                                         isRestart = false;
                                     }else{
@@ -164,5 +157,33 @@ public class GuardedProcess extends Process {
     public int waitFor() throws InterruptedException {
         guardThread.join();
         return 0;
+    }
+
+    class StreamGobbler extends Thread {
+        InputStream is;
+        String type;
+
+        StreamGobbler(InputStream is, String type) {
+            this.is = is;
+            this.type = type;
+        }
+
+        public void run() {
+            try {
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
+                String line = null;
+                while ((line = br.readLine()) != null)
+                    System.out.println(type + ">" + line);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }finally {
+                try {
+                    is.close();
+                }catch (IOException e){
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+        }
     }
 }
