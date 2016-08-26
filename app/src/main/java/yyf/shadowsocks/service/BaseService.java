@@ -340,7 +340,6 @@ public abstract class BaseService extends VpnService {
     private void updateNotitication(){
         Context context = BaseService.this;
         Intent intent = new Intent(this, ConnectivityActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
 
         String txRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.txRate);
