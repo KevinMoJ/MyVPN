@@ -452,10 +452,10 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-        if(mNativeProcessMonitorThread != null){
-            mNativeProcessMonitorThread.stopThread();
-            mNativeProcessMonitorThread = null;
-        }
+//        if(mNativeProcessMonitorThread != null){
+//            mNativeProcessMonitorThread.stopThread();
+//            mNativeProcessMonitorThread = null;
+//        }
         // close connections
         if (conn != null) {
             try {
