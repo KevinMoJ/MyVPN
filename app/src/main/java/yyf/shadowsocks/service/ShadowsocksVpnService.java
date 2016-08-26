@@ -43,6 +43,7 @@ import yyf.shadowsocks.jni.System;
 import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
+import yyf.shadowsocks.utils.GuardedProcess;
 import yyf.shadowsocks.utils.TrafficMonitor;
 import yyf.shadowsocks.utils.TrafficMonitorThread;
 
@@ -59,7 +60,12 @@ public class ShadowsocksVpnService extends BaseService {
     private NotificationManager notificationManager = null;
     private BroadcastReceiver receiver = null;
     private ShadowsocksVpnThread mShadowsocksVpnThread;
-    private NativeProcessMonitorThread mNativeProcessMonitorThread;
+//    private NativeProcessMonitorThread mNativeProcessMonitorThread;
+
+    private GuardedProcess mSslocalProcess;
+    private GuardedProcess mSstunnelProcess;
+    private GuardedProcess mPdnsdProcess;
+    private GuardedProcess mTun2socksProcess;
 
 
     //Array<ProxiedApp> apps = null; 功能去掉...
@@ -124,11 +130,9 @@ public class ShadowsocksVpnService extends BaseService {
         list.add(Constants.Path.BASE + "acl.list");
         cmd = list.toArray(new String[0]);
 
-
-        if (BuildConfig.DEBUG)
-            Log.d(TAG, cmd.toString());
         //Log.d(TAG, cmd.mkString(" "));
-        Console.runCommand(Console.mkCMD(cmd));
+//        Console.runCommand(Console.mkCMD(cmd));
+        mSslocalProcess = new GuardedProcess(cmd).start(null);
         ShadowsocksApplication.debug("ss-vpn", Console.mkCMD(cmd));
     }
 
@@ -156,11 +160,10 @@ public class ShadowsocksVpnService extends BaseService {
                 , "-c", Constants.Path.BASE + "ss-tunnel-vpn.conf"
                 , "-f", Constants.Path.BASE + "ss-tunnel-vpn.pid"};
         //执行
-        if (BuildConfig.DEBUG)
-            Log.d(TAG, Console.mkCMD(cmd));
         //Log.d(TAG, cmd.mkString(" "))
-        Console.runCommand(Console.mkCMD(cmd));
-        ShadowsocksApplication.debug("ss-vpn", "start DnsTun");
+//        Console.runCommand(Console.mkCMD(cmd));
+        mSstunnelProcess = new GuardedProcess(cmd).start(null);
+//        ShadowsocksApplication.debug("ss-vpn", "start DnsTun");
         ShadowsocksApplication.debug("ss-vpn", Console.mkCMD(cmd));
     }
 
@@ -177,10 +180,9 @@ public class ShadowsocksVpnService extends BaseService {
 
         String cmd = Constants.Path.BASE + "pdnsd -c " + Constants.Path.BASE + "pdnsd-vpn.conf";
 
-        if (BuildConfig.DEBUG)
-            Log.d(TAG, cmd);
-        Console.runCommand(cmd);
-        ShadowsocksApplication.debug("ss-vpn", "start DnsDaemon");
+//        Console.runCommand(cmd);
+        mPdnsdProcess = new GuardedProcess(cmd).start(null);
+//        ShadowsocksApplication.debug("ss-vpn", "start DnsDaemon");
         ShadowsocksApplication.debug("ss-vpn", cmd);
     }
 
@@ -270,11 +272,11 @@ public class ShadowsocksVpnService extends BaseService {
             //cmd += " --fake-proc";
       //  }
 
-        if (BuildConfig.DEBUG)
-            Log.d(TAG, cmd);
 
-        Console.runCommand(cmd);
+//        Console.runCommand(cmd);
+        mTun2socksProcess = new GuardedProcess(cmd).start(null);
         sendFd(fd);
+        ShadowsocksApplication.debug("ss-vpn", cmd);
 //        yyf.shadowsocks.jni.System.exec(cmd);
     }
 
@@ -328,6 +330,22 @@ public class ShadowsocksVpnService extends BaseService {
     }
 
     public void killProcesses() {
+        if(mSslocalProcess != null){
+            mSslocalProcess.destroy();
+            mSslocalProcess = null;
+        }
+        if(mSstunnelProcess != null){
+            mSstunnelProcess.destroy();
+            mSstunnelProcess = null;
+        }
+        if(mPdnsdProcess != null){
+            mPdnsdProcess.destroy();
+            mPdnsdProcess = null;
+        }
+        if(mTun2socksProcess != null){
+            mTun2socksProcess.destroy();
+            mTun2socksProcess = null;
+        }
         String[] tasks = {"ss-local", "ss-tunnel", "pdnsd", "tun2socks"};
         for (String task : tasks) {
             File f = new File(Constants.Path.BASE + task + "-vpn.pid");
@@ -405,8 +423,8 @@ public class ShadowsocksVpnService extends BaseService {
             ShadowsocksApplication.debug("ss-vpn", "resolved:" + resolved);
             if (resolved && handleConnection()) {
                 changeState(Constants.State.CONNECTED);
-                mNativeProcessMonitorThread = new NativeProcessMonitorThread(this);
-                mNativeProcessMonitorThread.start();
+//                mNativeProcessMonitorThread = new NativeProcessMonitorThread(this);
+//                mNativeProcessMonitorThread.start();
             } else {
                 stopRunnerForError();
             }
@@ -467,10 +485,10 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread = null;
         }
 
-        if(mNativeProcessMonitorThread != null){
-            mNativeProcessMonitorThread.stopThread();
-            mNativeProcessMonitorThread = null;
-        }
+//        if(mNativeProcessMonitorThread != null){
+//            mNativeProcessMonitorThread.stopThread();
+//            mNativeProcessMonitorThread = null;
+//        }
         // close connections
         if (conn != null) {
             try {
