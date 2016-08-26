@@ -568,7 +568,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void unregisterShadowsocksCallback() {
-        if(mShadowsocksService != null){
+        if(mShadowsocksService != null && mShadowsocksServiceCallbackBinder != null){
             try {
                 mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
             } catch (RemoteException e) {
