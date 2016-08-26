@@ -1,20 +1,14 @@
 package yyf.shadowsocks.service;
 
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.support.v7.app.NotificationCompat;
 
-import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.ConnectivityActivity;
-import com.androapplite.shadowsocks.activity.SplashActivity;
 
 import java.lang.System;
 import java.util.Calendar;
@@ -24,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.broadcast.Action;
+import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.preferences.DefaultSharedPrefeencesUtil;
 import yyf.shadowsocks.preferences.SharedPreferenceKey;
 import yyf.shadowsocks.utils.Constants;
@@ -31,8 +26,6 @@ import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.TrafficMonitor;
 import yyf.shadowsocks.utils.TrafficMonitorThread;
-
-import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 /**
  * Created by yyf on 2015/6/18.
@@ -42,12 +35,11 @@ public abstract class BaseService extends VpnService {
     volatile private int callbacksCount = 0;
     private TrafficMonitorThread trafficMonitorThread;
     private TrafficMonitor mTrafficMonitor;
-//    private Timer timer;
+    private Timer timer;
     private Handler handler;
     protected Config config = null;
     private Timer mHoulyUpdater;
     private long mStartTime;
-    private Timer mTrafficUpdatTimer;
 
 
 
@@ -72,7 +64,7 @@ public abstract class BaseService extends VpnService {
         }
 
         public void stop() {
-            if (state != Constants.State.STOPPING) {
+            if (state != Constants.State.CONNECTING && state != Constants.State.STOPPING) {
                 stopRunner();
             }
         }
@@ -92,7 +84,6 @@ public abstract class BaseService extends VpnService {
         }
 
     };
-    private static final int NOTIFICATION_ID = 1021;
 
     @Override
     public void onCreate() {
@@ -110,7 +101,6 @@ public abstract class BaseService extends VpnService {
         mTrafficMonitor.reset();
         trafficMonitorThread = new TrafficMonitorThread(this);
         trafficMonitorThread.start();
-        startTrafficUpdateTimer();
     }
     public void stopRunner(){
         updateTrafficTotal(mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
@@ -119,11 +109,6 @@ public abstract class BaseService extends VpnService {
             trafficMonitorThread.stopThread();
             trafficMonitorThread = null;
         }
-//        if(timer != null){
-//            timer.cancel();
-//            timer = null;
-//        }
-        stopTrafficUpdateTimer();
         // stop the service if no callback registered
         if (callbacksCount == 0) {
             stopSelf();
@@ -173,7 +158,6 @@ public abstract class BaseService extends VpnService {
             public void run() {
                 if (state != s) {
                     if (callbacksCount > 0) {
-
                         int n = callbacks.beginBroadcast();
                         for (int i = 0; i < n; i++) {
                             try {
@@ -198,18 +182,18 @@ public abstract class BaseService extends VpnService {
     public void registerCallback(IShadowsocksServiceCallback callback){
         if(callback != null && callbacks.register(callback)) {
             callbacksCount += 1;
-//            if (callbacksCount != 0 && timer == null) {
-//                TimerTask task = new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        if(mTrafficMonitor.updateRate()){
-//                            updateTrafficRate();
-//                        }
-//                    }
-//                };
-//                timer = new Timer(true);
-//                timer.schedule(task, 1000, 1000);
-//            }
+            if (callbacksCount != 0 && timer == null) {
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(mTrafficMonitor.updateRate()){
+                            updateTrafficRate();
+                        }
+                    }
+                };
+                timer = new Timer(true);
+                timer.schedule(task, 1000, 1000);
+            }
             mTrafficMonitor.updateRate();
             try {
                 callback.trafficUpdated(mTrafficMonitor.txRate, mTrafficMonitor.rxRate, mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
@@ -245,10 +229,10 @@ public abstract class BaseService extends VpnService {
     public void unregisterCallback(IShadowsocksServiceCallback callback){
         if (callback != null && callbacks.unregister(callback)) {
             callbacksCount -= 1;
-//            if (callbacksCount == 0 && timer != null) {
-//                timer.cancel();
-//                timer = null;
-//            }
+            if (callbacksCount == 0 && timer != null) {
+                timer.cancel();
+                timer = null;
+            }
         }
     }
 
@@ -315,56 +299,5 @@ public abstract class BaseService extends VpnService {
 
     }
 
-    private void startTrafficUpdateTimer(){
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                if(mTrafficMonitor.updateRate()){
-                    updateTrafficRate();
-                    updateNotitication();
-                }
-            }
-        };
-        mTrafficUpdatTimer = new Timer(true);
-        mTrafficUpdatTimer.schedule(task, 1000, 1000);
-    }
-
-    private void stopTrafficUpdateTimer(){
-        if(mTrafficUpdatTimer != null) {
-            mTrafficUpdatTimer.cancel();
-            mTrafficUpdatTimer = null;
-            clearNotification();
-        }
-    }
-
-    private void updateNotitication(){
-        Context context = BaseService.this;
-        Intent intent = new Intent(this, ConnectivityActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
-
-        String txRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.txRate);
-        String rxRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.rxRate);
-        String txTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.txTotal);
-        String rxTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.rxTotal);
-        NotificationCompat.Builder mBuilder =
-                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.notification_icon)
-                        .setContentIntent(pendingIntent)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(String.format("↑%s, %s", txRate, txTotal))
-                        .setSubText(String.format("↓%s, %s", rxRate, rxTotal))
-                        .setAutoCancel(false)
-                        .setOngoing(true);
-
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
-    }
-
-    private void clearNotification(){
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.cancel(NOTIFICATION_ID);
-    }
 
 }

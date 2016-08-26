@@ -44,6 +44,7 @@ import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.GuardedProcess;
+import yyf.shadowsocks.utils.ShadowsocksNotification;
 import yyf.shadowsocks.utils.TrafficMonitor;
 import yyf.shadowsocks.utils.TrafficMonitorThread;
 
@@ -67,7 +68,7 @@ public class ShadowsocksVpnService extends BaseService {
     private GuardedProcess mPdnsdProcess;
     private GuardedProcess mTun2socksProcess;
 
-
+    private ShadowsocksNotification mShadowsocksNotification;
     //Array<ProxiedApp> apps = null; 功能去掉...
 
 
@@ -423,6 +424,7 @@ public class ShadowsocksVpnService extends BaseService {
             ShadowsocksApplication.debug("ss-vpn", "resolved:" + resolved);
             if (resolved && handleConnection()) {
                 changeState(Constants.State.CONNECTED);
+                mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
 //                mNativeProcessMonitorThread = new NativeProcessMonitorThread(this);
 //                mNativeProcessMonitorThread.start();
             } else {
@@ -451,6 +453,10 @@ public class ShadowsocksVpnService extends BaseService {
         if(mShadowsocksVpnThread != null){
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
+        }
+        if (mShadowsocksNotification != null) {
+            mShadowsocksNotification.destroy();
+            mShadowsocksNotification = null;
         }
 //        if(mNativeProcessMonitorThread != null){
 //            mNativeProcessMonitorThread.stopThread();
@@ -483,6 +489,10 @@ public class ShadowsocksVpnService extends BaseService {
         if(mShadowsocksVpnThread != null){
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
+        }
+        if (mShadowsocksNotification != null) {
+            mShadowsocksNotification.destroy();
+            mShadowsocksNotification = null;
         }
 
 //        if(mNativeProcessMonitorThread != null){

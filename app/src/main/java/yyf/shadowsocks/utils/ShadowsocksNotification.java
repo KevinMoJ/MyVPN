@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 
@@ -40,28 +41,7 @@ public class ShadowsocksNotification {
         mNotificationManager = (NotificationManager)mService.getSystemService(Context.NOTIFICATION_SERVICE);
         mProfileName = profileName;
         mIsVisible = true;
-        /*
-                Intent intent = new Intent(this, ConnectivityActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
 
-        String txRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.txRate);
-        String rxRate = TrafficMonitor.formatTrafficRate(context, mTrafficMonitor.rxRate);
-        String txTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.txTotal);
-        String rxTotal = TrafficMonitor.formatTraffic(context, mTrafficMonitor.rxTotal);
-        NotificationCompat.Builder mBuilder =
-                (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.notification_icon)
-                        .setContentIntent(pendingIntent)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(String.format("↑%s, %s", txRate, txTotal))
-                        .setSubText(String.format("↓%s, %s", rxRate, rxTotal))
-                        .setAutoCancel(false)
-                        .setOngoing(true);
-
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
-         */
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
         mBuilder = new NotificationCompat.Builder(mService)
@@ -104,6 +84,8 @@ public class ShadowsocksNotification {
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         mService.registerReceiver(mLockReceiver, intentFilter);
+        PowerManager powerManager = (PowerManager) mService.getSystemService(Context.POWER_SERVICE);
+        update(powerManager.isScreenOn() ? Intent.ACTION_SCREEN_ON : Intent.ACTION_SCREEN_OFF);
 
     }
 
