@@ -408,14 +408,19 @@ public class ShadowsocksVpnService extends BaseService {
             // Resolve the server address TODO:增加IPV6的支持
             boolean resolved = false;
             if (!InetAddressUtils.isIPv4Address(config.getProxy())) {
-                if(resolve(config.getProxy(), Type.A).isEmpty()){
-                    if(!resolve(config.getProxy()).isEmpty()) {
-                        resolve(config.getProxy());
+                final String ipaddress = resolve(config.getProxy(), Type.A);
+                if(ipaddress == null) {
+                    if (ipaddress.isEmpty()) {
+                        if (!resolve(config.getProxy()).isEmpty()) {
+                            resolve(config.getProxy());
+                            resolved = true;
+                        }
+                    } else {
+                        config.setProxy(resolve(config.getProxy(), Type.A));
                         resolved = true;
                     }
                 }else{
-                    config.setProxy(resolve(config.getProxy(), Type.A));
-                    resolved = true;
+                    stopRunner();
                 }
             } else {
                 resolved = true;
