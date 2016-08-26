@@ -36,6 +36,7 @@ public class ShadowsocksVpnThread extends Thread {
             try {
                 serverSocket.close();
             } catch (Exception ex) {
+                ShadowsocksApplication.handleException(ex);
             }
             serverSocket = null;
         }
@@ -50,6 +51,7 @@ public class ShadowsocksVpnThread extends Thread {
         try {
             new File(PATH).delete();
         } catch (Exception ex) {
+            ShadowsocksApplication.handleException(ex);
         }
 
         try {
