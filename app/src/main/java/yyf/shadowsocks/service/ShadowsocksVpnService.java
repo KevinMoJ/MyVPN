@@ -121,15 +121,15 @@ public class ShadowsocksVpnService extends BaseService {
 //                "-A",
                 "-P", Constants.Path.BASE,
                 "-b", "127.0.0.1",
-                "-t", "600", "-c",
-                Constants.Path.BASE + "ss-local-vpn.conf", "-f ",
-                Constants.Path.BASE + "ss-local-vpn.pid"
+                "-t", "600",
+                "-c", Constants.Path.BASE + "ss-local-vpn.conf",
+                "-f", Constants.Path.BASE + "ss-local-vpn.pid"
         };
         //加入 acl
-        List<String> list = new ArrayList<>(Arrays.asList(cmd));
-        list.add("--acl");
-        list.add(Constants.Path.BASE + "acl.list");
-        cmd = list.toArray(new String[0]);
+//        List<String> list = new ArrayList<>(Arrays.asList(cmd));
+//        list.add("--acl");
+//        list.add(Constants.Path.BASE + "acl.list");
+//        cmd = list.toArray(new String[0]);
 
         //Log.d(TAG, cmd.mkString(" "));
 //        Console.runCommand(Console.mkCMD(cmd));
