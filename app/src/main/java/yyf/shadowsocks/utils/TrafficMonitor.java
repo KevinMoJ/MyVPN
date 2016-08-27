@@ -77,7 +77,6 @@ public final class TrafficMonitor {
                 rxRate = (rxTotal - rxLast) * 1000 / delta;
                 txLast = txTotal;
                 rxLast = rxTotal;
-                timestampLast = now;
                 dirty = false;
                 updated = true;
             }else{
@@ -90,6 +89,7 @@ public final class TrafficMonitor {
                     updated = true;
                 }
             }
+            timestampLast = now;
         }
         return updated;
     }

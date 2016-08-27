@@ -97,7 +97,8 @@ public class GuardedProcess extends Process {
                                 }
                             }catch (InterruptedException e) {
                                 Log.i(TAG, "thread interrupt, destroy process: " + cmd);
-                                destroyProcess();
+//                                destroyProcess();
+                                process.destroy();
                             }catch (IOException e){
                                 ShadowsocksApplication.handleException(e);
                             }finally {
@@ -130,8 +131,8 @@ public class GuardedProcess extends Process {
         isDestroyed = true;
 
         guardThread.interrupt();
-        destroyProcess();
-
+//        destroyProcess();
+        process.destroy();
         try {
             guardThread.join();
         } catch (InterruptedException e) {

@@ -99,17 +99,17 @@ public class ShadowsocksVpnService extends BaseService {
     public void startShadowsocksDaemon() {
         //ACL 写入文件
         //String[] acl =  getResources().getStringArray(R.array.private_route);
-        String[] acl =  getResources().getStringArray(R.array.chn_route_full);
-        PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "acl.list"));
-        for (int i = 0; i < acl.length; i++)
-            printWriter.println(acl[i]);
-        printWriter.close();
+//        String[] acl =  getResources().getStringArray(R.array.chn_route_full);
+//        PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "acl.list"));
+//        for (int i = 0; i < acl.length; i++)
+//            printWriter.println(acl[i]);
+//        printWriter.close();
 
         //读取配置并写入文件
         String conf = String.format(Locale.ENGLISH,ConfigUtils.SHADOWSOCKS,
                 config.getProxy(), config.getRemotePort(), config.localPort,
                 config.getSitekey(), config.encMethod, 10);
-        printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
+        PrintWriter printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
 
@@ -123,7 +123,7 @@ public class ShadowsocksVpnService extends BaseService {
                 "-b", "127.0.0.1",
                 "-t", "600",
                 "-c", Constants.Path.BASE + "ss-local-vpn.conf",
-                "-f", Constants.Path.BASE + "ss-local-vpn.pid"
+//                "-f", Constants.Path.BASE + "ss-local-vpn.pid"
         };
         //加入 acl
 //        List<String> list = new ArrayList<>(Arrays.asList(cmd));
@@ -159,7 +159,8 @@ public class ShadowsocksVpnService extends BaseService {
                 , "-L", "8.8.8.8:53"
                 , "-P", Constants.Path.BASE
                 , "-c", Constants.Path.BASE + "ss-tunnel-vpn.conf"
-                , "-f", Constants.Path.BASE + "ss-tunnel-vpn.pid"};
+//                , "-f", Constants.Path.BASE + "ss-tunnel-vpn.pid"
+        };
         //执行
         //Log.d(TAG, cmd.mkString(" "))
 //        Console.runCommand(Console.mkCMD(cmd));
@@ -172,8 +173,9 @@ public class ShadowsocksVpnService extends BaseService {
         String reject = getResources().getString(R.string.reject);
         String blackList = getResources().getString(R.string.black_list);
 
+        //PDNSD_DIRECT的模板里去掉pid, daemon是off
         String conf = String.format(Locale.ENGLISH, ConfigUtils.PDNSD_DIRECT, "0.0.0.0", 8153,
-                Constants.Path.BASE + "pdnsd-vpn.pid", reject, blackList, 8163);
+                 reject, blackList, 8163);
         ShadowsocksApplication.debug("ss-vpn", "DnsDaemon:config write to file");
         PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "pdnsd-vpn.conf"));
         printWriter.println(conf);
@@ -259,7 +261,7 @@ public class ShadowsocksVpnService extends BaseService {
                         + "--tunfd %d "
                         + "--tunmtu %d "
                         + "--loglevel 3 "
-                        + "--pid %stun2socks-vpn.pid "
+//                        + "--pid %stun2socks-vpn.pid "
                         + "--sock-path %ssock_path "
                         + "--logger stdout",
                 String.format(Locale.ENGLISH,PRIVATE_VLAN, "2"), config.localPort, fd, VPN_MTU, Constants.Path.BASE, Constants.Path.BASE);

@@ -90,7 +90,7 @@ public class ConfigUtils {
     static public String PDNSD_DIRECT =
             "global {\n" +
             " perm_cache = 2048;\n" +
-            " cache_dir = \"/data/" + Constants.Path.BASE + "\";\n" +
+            " cache_dir = \"" + Constants.Path.BASE + "\";\n" +
             " server_ip = %s;\n" +
             " server_port = %d;\n" +
             " query_method = tcp_only;\n" +
@@ -98,8 +98,8 @@ public class ConfigUtils {
             " min_ttl = 15m;\n" +
             " max_ttl = 1w;\n" +
             " timeout = 10;\n" +
-            " daemon = on;\n" +
-            " pid_file = \"%s\";\n" +
+            " daemon = off;\n" +
+//            " pid_file = \"%s\";\n" +
             "}\n" +
             "server {\n" +
             " label = \"china-servers\";\n" +
