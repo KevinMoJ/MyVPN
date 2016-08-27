@@ -107,7 +107,7 @@ public class GuardedProcess extends Process {
                     }
             , "GuardThread-" + cmd);
             guardThread.start();
-            semaphore.release();
+            semaphore.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -152,17 +152,17 @@ public class GuardedProcess extends Process {
 
     @Override
     public InputStream getErrorStream() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public InputStream getInputStream() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public OutputStream getOutputStream() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
