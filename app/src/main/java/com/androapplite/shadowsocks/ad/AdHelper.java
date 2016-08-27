@@ -31,7 +31,9 @@ public class AdHelper {
 
     private AdHelper(Context context){
         try {
-            MobileAds.initialize(context, context.getString(R.string.admob_application_id));
+            if(!BuildConfig.DEBUG) {
+                MobileAds.initialize(context, context.getString(R.string.admob_application_id));
+            }
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
