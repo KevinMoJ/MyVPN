@@ -115,18 +115,19 @@ public class ConnectivityFragment extends Fragment {
             @Override
             public void onAnimationRepeat(Animator animation) {
 //                ShadowsocksApplication.debug("animation", mIndex + "");
-                Resources resources = getResources();
-                if(mIsReverseAnimation){
-                    mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
-                    mIndex = (--mIndex + LOADING_PHASE_DRAWABLE_RESOURCE_END.length) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
-                    mProgressBar.setBackground(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE_END[mIndex]));
+                if(!isDetached()) {
+                    Resources resources = getResources();
+                    if (mIsReverseAnimation) {
+                        mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
+                        mIndex = (--mIndex + LOADING_PHASE_DRAWABLE_RESOURCE_END.length) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
+                        mProgressBar.setBackground(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE_END[mIndex]));
 
-                }else{
-                    mProgressBar.setBackground(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE_END[mIndex]));
-                    mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
-                    mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
+                    } else {
+                        mProgressBar.setBackground(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE_END[mIndex]));
+                        mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
+                        mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
+                    }
                 }
-
             }
 
 
