@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -39,26 +40,18 @@ public class ShadowsockServiceHelper {
         }
         if (filenames != null) {
             for (String filename:filenames) {
+
                 File outFile = new File(Constants.Path.BASE, filename);
                 if(!outFile.exists()) {
-                    InputStream in = null;
+                    copyAsset(assetManager, path, filename, outFile);
+                }else {
                     try {
-                        if (!path.isEmpty()) {
-                            in = assetManager.open(path + "/" + filename);
-                        } else {
-                            in = assetManager.open(filename);
+                        InputStream assetInputStream = assetManager.open(path.isEmpty() ? filename : path + "/" + filename);
+                        if(outFile.length() != assetInputStream.available()){
+                            copyAsset(assetInputStream, outFile);
                         }
-
-                        OutputStream out = new FileOutputStream(outFile);
-                        copyFile(in, out);
-                        in.close();
-                        in = null;
-                        out.flush();
-                        out.close();
-                        out = null;
-
-                    } catch (Exception e) {
-                        Log.e("ss-error", e.getMessage());
+                    } catch (IOException e) {
+                        ShadowsocksApplication.handleException(e);
                     }
                 }
                 if (!(outFile.canRead() && outFile.canExecute())) {
@@ -67,6 +60,33 @@ public class ShadowsockServiceHelper {
             }
         }
     }
+
+    private static void copyAsset(@NonNull AssetManager assetManager, @NonNull String path, String filename, File outFile) {
+        InputStream in = null;
+        try {
+            in = assetManager.open(path.isEmpty() ? filename : path + "/" + filename);
+            copyAsset(in, outFile);
+
+        } catch (Exception e) {
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    private static void copyAsset(@NonNull InputStream in, @NonNull File outFile){
+        try {
+            OutputStream out = new FileOutputStream(outFile);
+            copyFile(in, out);
+            in.close();
+            in = null;
+            out.flush();
+            out.close();
+            out = null;
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+
 
     public static final void startService(@NonNull Context context){
         Intent intent = new Intent(context, ShadowsocksVpnService.class);
