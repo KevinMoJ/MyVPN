@@ -47,6 +47,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.GAHelper;
@@ -59,6 +60,8 @@ import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.smartads.Plugins;
+import com.smartads.ads.AdBannerType;
 
 import java.lang.System;
 
@@ -88,6 +91,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean mShowAdSwitch;
     private Handler mAdSwitchHandler;
     private Runnable mAdSwitchCallback;
+
+    private static boolean INITED = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +125,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+
+        if (INITED) {
+            Plugins.init(this);
+        } else {
+            Plugins.onCreate(this);
+            INITED = true;
+        }
+        Plugins.adRequestBanner(this, AdBannerType.CENTER_BOTTOM);
+        this.getWindow().getDecorView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int height = ConnectivityActivity.this.getWindowManager().getDefaultDisplay().getHeight();
+                int height1 = ConnectivityActivity.this.getWindow().getDecorView().getHeight();
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                params.bottomMargin = Math.abs(height - height1);
+                Plugins.setBannerPosition(ConnectivityActivity.this, params);
+            }
+        }, 1000);
     }
 
 
@@ -556,6 +581,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onResume() {
+        Plugins.onResume(this, "MainActivity");
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
         //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
@@ -565,6 +591,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onPause() {
+        Plugins.onPause(this, "MainActivity");
         super.onPause();
     }
 

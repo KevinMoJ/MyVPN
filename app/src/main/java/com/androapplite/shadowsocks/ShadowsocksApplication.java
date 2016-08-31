@@ -14,13 +14,14 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.smartads.plugin.GameApplication;
 
 import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends Application {
+public class ShadowsocksApplication extends GameApplication {
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
