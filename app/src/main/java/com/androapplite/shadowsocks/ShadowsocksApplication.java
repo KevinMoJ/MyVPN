@@ -6,7 +6,6 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.ad.*;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.crashlytics.android.Crashlytics;

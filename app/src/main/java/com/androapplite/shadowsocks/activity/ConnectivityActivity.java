@@ -49,13 +49,10 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.ad.AdBase;
-import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ad.Banner;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
@@ -64,7 +61,6 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import java.lang.System;
-import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
@@ -83,7 +79,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private static int REQUEST_CONNECT = 1;
     private long mConnectOrDisconnectStartTime;
     private TrafficRateFragment mTrafficRateFragment;
-    private Banner mBanner;
     private Snackbar mSnackbar;
     private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
@@ -109,8 +104,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
         mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
-        mBanner = AdHelper.getInstance(this).addToViewGroup(getString(R.string.tag_banner),
-                (ViewGroup)findViewById(R.id.ad_view_container));
         initConnectivityReceiver();
         toolbar.post(new Runnable() {
             @Override
@@ -127,33 +120,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
-
-        initInterstitialAd();
     }
 
-    private void initInterstitialAd() {
-        mShowAdSwitch = true;
-        mAdSwitchCallback = new Runnable() {
-            @Override
-            public void run() {
-                mShowAdSwitch = true;
-//                ShadowsocksApplication.debug("广告开关", "打开");
-            }
-        };
-        AdHelper.getInstance(this).setOnAdListener(getString(R.string.tag_activity_resume), new AdBase.AdListenerAdapter(){
-            @Override
-            public void onAdClosed(AdBase adBase) {
-                mShowAdSwitch = false;
-//                ShadowsocksApplication.debug("广告开关", "关闭");
-                if(mAdSwitchHandler != null){
-                    mAdSwitchHandler.removeCallbacks(mAdSwitchCallback);
-                }
-                //关闭广告后,用户2分钟内不再看广告
-                mAdSwitchHandler = new Handler();
-                mAdSwitchHandler.postDelayed(mAdSwitchCallback, TimeUnit.MINUTES.toMillis(2));
-            }
-        });
-    }
+
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
         return new IShadowsocksServiceCallback.Stub(){
@@ -583,21 +552,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
         }
-        if(mBanner != null) {
-            mBanner.destory();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-        if(mBanner != null) {
-            mBanner.resume();
-        }
-        if(mShowAdSwitch) {
-            AdHelper.getInstance(this).showByTag(getString(R.string.tag_activity_resume));
-        }
+        //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
 //        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
 
     }
@@ -605,9 +566,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     protected void onPause() {
         super.onPause();
-        if(mBanner != null) {
-            mBanner.pause();
-        }
     }
 
     @Override

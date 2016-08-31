@@ -10,11 +10,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.ad.AdHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
-import com.androapplite.shadowsocks.ad.Banner;
-import com.androapplite.shadowsocks.ad.admob.AdMobBanner;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.google.android.gms.ads.AdSize;
@@ -35,29 +32,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
 
-        initAdHelper();
         GAHelper.sendScreenView(this, "启动屏幕");
-    }
-
-    private void initAdHelper() {
-        final AdHelper adHelper = AdHelper.getInstance(getApplicationContext());
-        Banner banner = null;
-
-        try {
-            int screenDensity = getResources().getConfiguration().densityDpi;
-            if (screenDensity > 240) {
-                banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
-                        AdSize.LARGE_BANNER, getString(R.string.tag_banner));
-            } else {
-                banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
-                        AdSize.SMART_BANNER, getString(R.string.tag_banner));
-            }
-        }catch (NoSuchFieldError e){
-            banner = new AdMobBanner(this, getString(R.string.banner_ad_unit_id),
-                    AdSize.SMART_BANNER, getString(R.string.tag_banner));
-        }
-        adHelper.addAd(banner);
-        adHelper.loadAll();
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
