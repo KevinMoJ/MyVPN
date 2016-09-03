@@ -115,7 +115,7 @@ public class ConnectivityFragment extends Fragment {
             @Override
             public void onAnimationRepeat(Animator animation) {
 //                ShadowsocksApplication.debug("animation", mIndex + "");
-                if(!isDetached()) {
+                try{
                     Resources resources = getResources();
                     if (mIsReverseAnimation) {
                         mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
@@ -127,6 +127,8 @@ public class ConnectivityFragment extends Fragment {
                         mIndex = (++mIndex) % LOADING_PHASE_DRAWABLE_RESOURCE.length;
                         mProgressBar.setProgressDrawable(resources.getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[mIndex]));
                     }
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
                 }
             }
 
