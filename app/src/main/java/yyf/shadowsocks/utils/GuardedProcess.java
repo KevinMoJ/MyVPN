@@ -77,8 +77,8 @@ public class GuardedProcess extends Process {
 
                                     final ProcessBuilder processBuilder = new ProcessBuilder(cmdPars).redirectErrorStream(true);
                                     process = processBuilder.start();
-                                    new StreamGobbler(process.getInputStream(), "OUTPUT");
-                                    new StreamGobbler(process.getErrorStream(), "ERROR");
+                                    new StreamGobbler(process.getInputStream(), "OUTPUT").start();
+                                    new StreamGobbler(process.getErrorStream(), "ERROR").start();
                                     if (callback != null) {
                                         callback.callback();
                                     }
@@ -116,8 +116,8 @@ public class GuardedProcess extends Process {
     }
 
     private void destroyProcess(){
-        new StreamGobbler(process.getInputStream(), "OUTPUT");
-        new StreamGobbler(process.getErrorStream(), "ERROR");
+        new StreamGobbler(process.getInputStream(), "OUTPUT").start();
+        new StreamGobbler(process.getErrorStream(), "ERROR").start();
         try {
             process.waitFor();
         } catch (InterruptedException e) {

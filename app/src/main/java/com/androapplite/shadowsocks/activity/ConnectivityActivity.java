@@ -145,6 +145,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 Plugins.setBannerPosition(ConnectivityActivity.this, params);
             }
         }, 1000);
+
+        Plugins.showGameAd(this, 0);
+        Plugins.showGameAd(this, 1);
     }
 
 
@@ -523,6 +526,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
+                    Plugins.showGameAd(this, 0);
+                    Plugins.showGameAd(this, 1);
 //                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }
 
@@ -612,6 +617,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
+            Plugins.showGameAd(this, 0);
+            Plugins.showGameAd(this, 1);
 
         }
     }

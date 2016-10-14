@@ -8,6 +8,11 @@
         <item>@string/vpn_name_uk</item>
         <item>@string/vpn_name_fr</item>
         <item>@string/vpn_name_jp</item>
+        <item>@string/vpn_name_au</item>
+        <item>@string/vpn_name_da_us</item>
+        <item>@string/vpn_name_de</item>
+        <item>@string/vpn_name_sg</item>
+        <item>@string/vpn_name_nl</item>
 
     </array>
     <array name="vpn_servers">
@@ -17,6 +22,12 @@
         <item>@string/vpn_server_uk</item>
         <item>@string/vpn_server_fr</item>
         <item>@string/vpn_server_jp</item>
+        <item>@string/vpn_server_au</item>
+        <item>@string/vpn_server_da_us</item>
+        <item>@string/vpn_server_de</item>
+        <item>@string/vpn_server_sg</item>
+        <item>@string/vpn_server_nl</item>
+
     </array>
     <array name="vpn_icons">
         <item>@drawable/ic_flag_global_anim</item>
@@ -25,6 +36,11 @@
         <item>@drawable/ic_flag_uk</item>
         <item>@drawable/ic_flag_fr</item>
         <item>@drawable/ic_flag_jp</item>
+        <item>@drawable/ic_flag_au</item>
+        <item>@drawable/ic_flag_us</item>
+        <item>@drawable/ic_flag_de</item>
+        <item>@drawable/ic_flag_sg</item>
+        <item>@drawable/ic_flag_nl</item>
     </array>
 
 </resources>
