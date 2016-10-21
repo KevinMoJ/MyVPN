@@ -12,6 +12,7 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    mavenCentral()
 }
 
 
@@ -30,8 +31,8 @@ android {
         applicationId "com.androapplite.shadowsocks"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 10
-        versionName "1.6.0"
+        versionCode 13
+        versionName "1.6.2"
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
@@ -65,6 +66,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-analytics:8.4.0'
     compile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'com.facebook.android:audience-network-sdk:4.8.2'
+    compile 'com.facebook.android:facebook-android-sdk:4.8.2'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.joooonho:selectableroundedimageview:1.0.1'
 }

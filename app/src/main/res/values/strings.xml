@@ -75,4 +75,6 @@
     <string name="change_proxy_tip">Please change proxy when the connection is off.</string>
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>
     <string name="not_open_vpn_popup">Could not open window. Please try again.</string>
+
+    <string name="facebook_app_id" translatable="false">504824046367667</string>
 </resources>
