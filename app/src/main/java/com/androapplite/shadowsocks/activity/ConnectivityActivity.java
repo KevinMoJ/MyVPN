@@ -59,6 +59,8 @@ import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 import java.lang.System;
 
@@ -558,14 +560,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-        //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
-//        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
-
+        AppEventsLogger.activateApp(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        AppEventsLogger.deactivateApp(this);
     }
 
     @Override

@@ -67,7 +67,8 @@ public class ShadowsocksApplication extends Application {
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
         // Initialize the SDK before executing any other operations,
         FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this, getString(R.string.facebook_app_id));
+        AppEventsLogger.activateApp(this);
+//        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
 
     }
 
