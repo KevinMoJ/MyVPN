@@ -105,15 +105,18 @@ public class ConnectivityFragment extends Fragment {
             @Override
             public void onAnimationStart(Animator animation) {
 //                ShadowsocksApplication.debug("animation", "start");
-                if(mIsReverseAnimation){
-                    mIndex = LOADING_PHASE_DRAWABLE_RESOURCE_END.length - 1;
-                    mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
-                    mProgressBar.setBackground(getResources().getDrawable(R.drawable.connecting_phase_8_end));
-                }else{
-                    mIndex = 0;
-                    mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
-                    mProgressBar.setBackground(null);
+                if(isAdded()){
+                    if(mIsReverseAnimation){
+                        mIndex = LOADING_PHASE_DRAWABLE_RESOURCE_END.length - 1;
+                        mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
+                        mProgressBar.setBackground(getResources().getDrawable(R.drawable.connecting_phase_8_end));
+                    }else{
+                        mIndex = 0;
+                        mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
+                        mProgressBar.setBackground(null);
+                    }
                 }
+
             }
 
             @Override
