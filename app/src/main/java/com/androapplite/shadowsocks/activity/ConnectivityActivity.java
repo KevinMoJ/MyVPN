@@ -37,6 +37,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.TimeUtils;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +45,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -62,6 +64,8 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.smartads.Plugins;
 import com.smartads.ads.AdBannerType;
+import com.smartads.ads.AdType;
+import com.smartads.plugin.PluginAdListener;
 
 import java.lang.System;
 
@@ -92,7 +96,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Handler mAdSwitchHandler;
     private Runnable mAdSwitchCallback;
 
-    private static boolean INITED = false;
+    public static boolean INITED = false;
+    boolean showFirst = false;
+
+    public static final String NAME = "ConnectivityActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +121,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             public void run() {
                 final SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
-                if(sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
+                if (sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
                     try {
                         showVpnServerChangePopupWindow();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, false).apply();
-                    }catch (RuntimeException e){
+                    } catch (RuntimeException e) {
                         ShadowsocksApplication.handleException(e);
                     }
                 }
@@ -126,28 +133,42 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         });
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
 
-        if (INITED) {
-            Plugins.init(this);
-        } else {
-            Plugins.onCreate(this);
-            INITED = true;
-        }
-        Plugins.adRequestBanner(this, AdBannerType.CENTER_BOTTOM);
-        this.getWindow().getDecorView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int height = ConnectivityActivity.this.getWindowManager().getDefaultDisplay().getHeight();
-                int height1 = ConnectivityActivity.this.getWindow().getDecorView().getHeight();
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                params.bottomMargin = Math.abs(height - height1);
-                Plugins.setBannerPosition(ConnectivityActivity.this, params);
-            }
-        }, 1000);
 
-        Plugins.showGameAd(this, 0);
-        Plugins.showGameAd(this, 1);
+        if (!ConnectivityActivity.INITED) {
+            Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
+            Plugins.initBannerAd(ConnectivityActivity.NAME);
+            Plugins.initNgsAd(ConnectivityActivity.NAME);
+            ConnectivityActivity.INITED = true;
+        }
+
+        Plugins.setPluginAdListener(new PluginAdListener() {
+            @Override
+            public void onReceiveAd(String s, AdType adType) {
+                if (adType == AdType.Ngs) {
+                    if (!showFirst) {
+                        showFirst = true;
+                        Plugins.adNgs(NAME, -1);
+                    }
+                }
+            }
+
+            @Override
+            public void onAdClosed(String s, AdType adType) {
+                if (adType == AdType.Ngs) {
+                    Plugins.loadNewNgsAd(NAME);
+                }
+            }
+        });
+
+        Plugins.loadNewBannerAd(ConnectivityActivity.NAME);
+        Plugins.loadNewNgsAd(ConnectivityActivity.NAME);
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(Plugins.adBanner(NAME), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 
@@ -522,12 +543,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     prepareStartService();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
+                    Plugins.adNgs(NAME, -1);
+                    Plugins.loadNewNgsAd(NAME);
                 } else {
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
-                    Plugins.showGameAd(this, 0);
-                    Plugins.showGameAd(this, 1);
+                    Plugins.adNgs(NAME, -1);
+                    Plugins.loadNewNgsAd(NAME);
 //                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }
 
@@ -586,17 +609,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onResume() {
-        Plugins.onResume(this, "MainActivity");
+        Plugins.onResume(NAME, this.getApplicationContext());
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
         //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
 //        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
-
+        Plugins.adNgs(NAME, -1);
+        Plugins.loadNewNgsAd(NAME);
     }
 
     @Override
     protected void onPause() {
-        Plugins.onPause(this, "MainActivity");
+        Plugins.onPause(NAME, this.getApplicationContext());
         super.onPause();
     }
 
@@ -617,8 +641,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
-            Plugins.showGameAd(this, 0);
-            Plugins.showGameAd(this, 1);
+            Plugins.adNgs(NAME, -1);
 
         }
     }

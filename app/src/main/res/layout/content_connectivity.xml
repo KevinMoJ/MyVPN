@@ -45,7 +45,7 @@
     </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:id="@+id/ad_view_container">
 <!-- todo 显示横幅广告 -->

@@ -15,6 +15,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.google.android.gms.ads.AdSize;
+import com.smartads.Plugins;
 
 import java.util.concurrent.TimeUnit;
 
