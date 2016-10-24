@@ -12,6 +12,7 @@ import android.os.Bundle;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.google.android.gms.ads.AdSize;
@@ -52,7 +53,11 @@ public class SplashActivity extends BaseShadowsocksActivity {
         new Thread() {
             @Override
             public void run() {
-                ShadowsockServiceHelper.checkAndCopyAsset(getAssets(), yyf.shadowsocks.jni.System.getABI());
+                try {
+                    ShadowsockServiceHelper.checkAndCopyAsset(getAssets(), yyf.shadowsocks.jni.System.getABI());
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
+                }
             }
         }.start();
     }

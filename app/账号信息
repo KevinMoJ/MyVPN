@@ -13,3 +13,7 @@ vpnnest_1: 54.211.188.225
 Fabric
 https://fabric.io/zhangs-projects10/android/apps/com.androapplite.shadowsocks/issues?build=all&event_type=crash&time=last-seven-days
 watchfacedev@gmail.com
+
+keyhash
+keytool -exportcert -alias shadowsocks -keystore shadowsocks.jks | openssl sha1 -binary | openssl base64
+nVSjT7MzUyFP2M2q8vglFWnVlfc=

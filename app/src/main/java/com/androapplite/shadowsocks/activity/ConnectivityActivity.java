@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -66,6 +67,8 @@ import com.smartads.Plugins;
 import com.smartads.ads.AdBannerType;
 import com.smartads.ads.AdType;
 import com.smartads.plugin.PluginAdListener;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 
 import java.lang.System;
 
@@ -145,10 +148,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             public void onReceiveAd(String s, AdType adType) {
                 if (adType == AdType.Ngs) {
-                    if (!showFirst) {
-                        showFirst = true;
-                        Plugins.adNgs(NAME, -1);
-                    }
+                    ngsLoaded = true;
                 }
             }
 
@@ -160,8 +160,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
 
-        Plugins.loadNewBannerAd(ConnectivityActivity.NAME);
-        Plugins.loadNewNgsAd(ConnectivityActivity.NAME);
+        Plugins.loadNewBannerAd(NAME);
+        Plugins.loadNewNgsAd(NAME);
         FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
@@ -169,9 +169,23 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        handler1.sendEmptyMessageDelayed(1000, 1000);
     }
 
-
+    private boolean ngsLoaded = false;
+    private Handler handler1 = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1000) {
+                if (ngsLoaded) {
+                    Plugins.adNgs(NAME, -1);
+                } else {
+                    handler1.sendEmptyMessageDelayed(1000, 200);
+                }
+            }
+        }
+    };
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
         return new IShadowsocksServiceCallback.Stub(){
@@ -544,13 +558,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
                     Plugins.adNgs(NAME, -1);
-                    Plugins.loadNewNgsAd(NAME);
                 } else {
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
                     Plugins.adNgs(NAME, -1);
-                    Plugins.loadNewNgsAd(NAME);
 //                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }
 
@@ -614,14 +626,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
         //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
 //        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
-        Plugins.adNgs(NAME, -1);
-        Plugins.loadNewNgsAd(NAME);
+        AppEventsLogger.activateApp(this);
     }
 
     @Override
     protected void onPause() {
         Plugins.onPause(NAME, this.getApplicationContext());
         super.onPause();
+        AppEventsLogger.deactivateApp(this);
     }
 
     @Override

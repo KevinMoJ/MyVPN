@@ -8,6 +8,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -66,6 +67,9 @@ public class ConnectivityFragment extends Fragment {
             R.drawable.connecting_phase_8_end,
     };
     private boolean mIsReverseAnimation;
+    private int colorGreen;
+    private int colorRed;
+    private int colorYellow;
 
     public ConnectivityFragment() {
         // Required empty public constructor
@@ -86,6 +90,10 @@ public class ConnectivityFragment extends Fragment {
         mMessageTextView = (TextView)rootView.findViewById(R.id.message_body);
         mMessageArrowView = (ImageView)rootView.findViewById(R.id.message_arrow);
         mConnectedImageView = (ImageView)rootView.findViewById(R.id.connected);
+        Resources resources = getResources();
+        colorGreen = resources.getColor(R.color.message_green_color);
+        colorRed = resources.getColor(R.color.message_red_color);
+        colorYellow = resources.getColor(R.color.stop_yellow);
         return rootView;
     }
 
@@ -97,15 +105,18 @@ public class ConnectivityFragment extends Fragment {
             @Override
             public void onAnimationStart(Animator animation) {
 //                ShadowsocksApplication.debug("animation", "start");
-                if(mIsReverseAnimation){
-                    mIndex = LOADING_PHASE_DRAWABLE_RESOURCE_END.length - 1;
-                    mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
-                    mProgressBar.setBackground(getResources().getDrawable(R.drawable.connecting_phase_8_end));
-                }else{
-                    mIndex = 0;
-                    mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
-                    mProgressBar.setBackground(null);
+                if(isAdded()){
+                    if(mIsReverseAnimation){
+                        mIndex = LOADING_PHASE_DRAWABLE_RESOURCE_END.length - 1;
+                        mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
+                        mProgressBar.setBackground(getResources().getDrawable(R.drawable.connecting_phase_8_end));
+                    }else{
+                        mIndex = 0;
+                        mProgressBar.setProgressDrawable(getResources().getDrawable(LOADING_PHASE_DRAWABLE_RESOURCE[0]));
+                        mProgressBar.setBackground(null);
+                    }
                 }
+
             }
 
             @Override
@@ -189,39 +200,49 @@ public class ConnectivityFragment extends Fragment {
     }
 
     private void showConnectingMessage(){
-        mMessageTextView.setText(R.string.connecting);
-        mMessageTextView.setBackgroundResource(R.drawable.message_frame);
-        mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
-        startMessageViewAnimation();
+        if(isAdded()){
+            mMessageTextView.setText(R.string.connecting);
+            mMessageTextView.setBackgroundResource(R.drawable.message_frame);
+            mMessageArrowView.setColorFilter(colorGreen);
+            startMessageViewAnimation();
+        }
     }
 
     private void showConnectMessage(){
-        mMessageTextView.setText(R.string.connected);
-        mMessageTextView.setBackgroundResource(R.drawable.message_frame);
-        mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_green_color));
-        mConnectedImageView.setVisibility(View.VISIBLE);
-        startMessageViewAnimation();
+        if(isAdded()){
+            mMessageTextView.setText(R.string.connected);
+            mMessageTextView.setBackgroundResource(R.drawable.message_frame);
+            mMessageArrowView.setColorFilter(colorGreen);
+            mConnectedImageView.setVisibility(View.VISIBLE);
+            startMessageViewAnimation();
+        }
     }
 
     private void showStoppingMessage(){
-        mMessageTextView.setText(R.string.stopping);
-        mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
-        mMessageArrowView.setColorFilter(getResources().getColor(R.color.stop_yellow));
-        startMessageViewAnimation();
+        if(isAdded()){
+            mMessageTextView.setText(R.string.stopping);
+            mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
+            mMessageArrowView.setColorFilter(colorYellow);
+            startMessageViewAnimation();
+        }
     }
 
     private void showStoppedMessage(){
-        mMessageTextView.setText(R.string.stoped);
-        mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
-        mMessageArrowView.setColorFilter(getResources().getColor(R.color.stop_yellow));
-        startMessageViewAnimation();
+        if(isAdded()){
+            mMessageTextView.setText(R.string.stoped);
+            mMessageTextView.setBackgroundResource(R.drawable.message_stop_frame);
+            mMessageArrowView.setColorFilter(colorYellow);
+            startMessageViewAnimation();
+        }
     }
 
     private void showErrorMessage(){
-        mMessageTextView.setText(R.string.retry);
-        mMessageTextView.setBackgroundResource(R.drawable.message_error_frame);
-        mMessageArrowView.setColorFilter(getResources().getColor(R.color.message_red_color));
-        startMessageViewAnimation();
+        if(isAdded()){
+            mMessageTextView.setText(R.string.retry);
+            mMessageTextView.setBackgroundResource(R.drawable.message_error_frame);
+            mMessageArrowView.setColorFilter(colorRed);
+            startMessageViewAnimation();
+        }
     }
 
     private void startMessageViewAnimation() {
@@ -261,6 +282,16 @@ public class ConnectivityFragment extends Fragment {
     @Override
     public void onAttach(Activity context) {
         super.onAttach(context);
+        initListener(context);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        initListener(context);
+    }
+
+    private void initListener(Context context) {
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -274,7 +305,6 @@ public class ConnectivityFragment extends Fragment {
         super.onDetach();
         mListener = null;
         mAnimatorSet.end();
-
     }
 
     public void updateConnectionState(int state){
