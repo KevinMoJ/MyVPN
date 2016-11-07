@@ -54,6 +54,11 @@ public class ServerConfig {
         }
     }
 
+    private static ServerConfig addGlobalConfig(Resources resources){
+        return new ServerConfig("Global", "opt.vpnnest.com",
+                createUriFromResourceId(resources, R.drawable.ic_flag_global_anim));
+    }
+
     public ServerConfig(String name, String server, Uri uri){
         this.name = name;
         this.server = server;
@@ -64,12 +69,17 @@ public class ServerConfig {
         ArrayList<ServerConfig> arrayList = null;
         try{
             JSONArray jsonArray = new JSONArray(jsonArrayString);
-            arrayList = new ArrayList<>(jsonArray.length());
-            for(int i=0; i< jsonArray.length(); i++){
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                ServerConfig serverConfig = new ServerConfig(resources, jsonObject);
-                arrayList.add(serverConfig);
+            if(jsonArray.length() > 0){
+                arrayList = new ArrayList<>(jsonArray.length());
+                arrayList.add(addGlobalConfig(resources));
+                for(int i=0; i< jsonArray.length(); i++){
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    ServerConfig serverConfig = new ServerConfig(resources, jsonObject);
+                    arrayList.add(serverConfig);
+                }
             }
+
+
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
@@ -92,7 +102,7 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public static Uri createUriFromResourceId(Resources resources, @IdRes int resId){
+    public static Uri createUriFromResourceId(Resources resources, int resId){
         final Uri uri = new Uri.Builder()
                 .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(resources.getResourcePackageName(resId))

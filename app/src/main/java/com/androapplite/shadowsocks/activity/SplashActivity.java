@@ -45,7 +45,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
                         DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectivityActivity.class
                 ));
             }
-        }, TimeUnit.SECONDS.toMillis(2));
+        }, TimeUnit.SECONDS.toMillis(3));
     }
 
     private void checkAndCopyAsset() {
