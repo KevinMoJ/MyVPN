@@ -43,7 +43,7 @@ public class ServerConfig {
         iconUri = uri;
     }
 
-    public ArrayList<ServerConfig> createServerList(String jsonArrayString){
+    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
         ArrayList<ServerConfig> arrayList = null;
         try{
             JSONArray jsonArray = new JSONArray(jsonArrayString);
@@ -59,7 +59,7 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public ArrayList<ServerConfig> createDefaultServerList(Context context){
+    public static ArrayList<ServerConfig> createDefaultServerList(Context context){
         Resources resources = context.getResources();
         TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
         TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
@@ -75,7 +75,7 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public Uri createUriFromResourceId(Resources resources, @IdRes int resId){
+    public static Uri createUriFromResourceId(Resources resources, @IdRes int resId){
         final Uri uri = new Uri.Builder()
                 .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(resources.getResourcePackageName(resId))

@@ -57,12 +57,14 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment;
 import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
 import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
+import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
 import java.lang.System;
+import java.util.ArrayList;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
@@ -87,9 +89,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Menu mMenu;
     private int mTemporaryVpnSelectIndex;
-    private boolean mShowAdSwitch;
-    private Handler mAdSwitchHandler;
-    private Runnable mAdSwitchCallback;
+    private ArrayList<ServerConfig> mServerConfigs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +122,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+        mServerConfigs = ServerConfig.createDefaultServerList(this);
     }
 
 
@@ -324,23 +325,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     public class VpnServerItemAdapter extends BaseAdapter{
-        private TypedArray mServerNames;
-        private TypedArray mServerIcons;
 
         public VpnServerItemAdapter(){
-            Resources resources = getResources();
-            mServerNames = resources.obtainTypedArray(R.array.vpn_names);
-            mServerIcons = resources.obtainTypedArray(R.array.vpn_icons);
         }
 
         @Override
         public int getCount() {
-            return mServerNames.length();
+            return mServerConfigs != null ? mServerConfigs.size() : 0;
         }
 
         @Override
         public Object getItem(int position) {
-            return mServerNames.getString(position);
+            return mServerConfigs.get(position);
         }
 
         @Override
@@ -362,12 +358,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 view = convertView;
                 viewHolder = (ViewHolder)view.getTag();
             }
-
-            viewHolder.vpnIconImageView.setImageResource(
-                    mServerIcons.getResourceId(position, R.drawable.ic_close_24dp));
-            viewHolder.vpnNameTextView.setText(
-                    mServerNames.getResourceId(position, R.string.vpn_name_opt)
-            );
+            ServerConfig serverConfig = (ServerConfig)getItem(position);
+            viewHolder.vpnIconImageView.setImageURI(serverConfig.iconUri);
+            viewHolder.vpnNameTextView.setText(serverConfig.name);
             return view;
         }
 

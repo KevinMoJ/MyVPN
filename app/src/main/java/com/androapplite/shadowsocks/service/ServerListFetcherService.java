@@ -27,12 +27,12 @@ public class ServerListFetcherService extends IntentService {
 
     public ServerListFetcherService(){
         super("ServletListFetcher");
-        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        sp.edit().remove(SharedPreferenceKey.SERVER_LIST).apply();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        sp.edit().remove(SharedPreferenceKey.SERVER_LIST).apply();
         OkHttpClient client = new OkHttpClient();
         String url = "http://192.168.31.29/vpn/server_list.json";
         Request request = new Request.Builder()
@@ -43,7 +43,7 @@ public class ServerListFetcherService extends IntentService {
         try {
             Response response = client.newCall(request).execute();
             String jsonString = response.body().string();
-            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+//            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
             sp.edit().putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
         } catch (IOException e) {
             e.printStackTrace();
