@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by jim on 16/11/7.
@@ -23,15 +24,31 @@ public class ServerConfig {
     public String name;
     public String server;
     public String flag;
-    public int connection;
+//    public int connection;
     public Uri iconUri;
 
-    public ServerConfig(JSONObject json){
+    private static HashMap<String, Integer> flagResMap = new HashMap<>();
+    static{
+        flagResMap.put("ic_flag_global_anim", R.drawable.ic_flag_global_anim);
+        flagResMap.put("ic_flag_us", R.drawable.ic_flag_us);
+        flagResMap.put("ic_flag_uk", R.drawable.ic_flag_uk);
+        flagResMap.put("ic_flag_fr", R.drawable.ic_flag_fr);
+        flagResMap.put("ic_flag_jp", R.drawable.ic_flag_jp);
+        flagResMap.put("ic_flag_au", R.drawable.ic_flag_au);
+        flagResMap.put("ic_flag_de", R.drawable.ic_flag_de);
+        flagResMap.put("ic_flag_sg", R.drawable.ic_flag_sg);
+        flagResMap.put("ic_flag_nl", R.drawable.ic_flag_nl);
+    }
+
+    public ServerConfig(Resources resources, JSONObject json){
         try{
             name = json.optString("name", null);
             server = json.optString("server", null);
             flag = json.optString("flag", null);
-            connection = json.optInt("connection", -1);
+            if(!flag.startsWith("http://")){
+                int flagRes = flagResMap.get(flag);
+                iconUri = createUriFromResourceId(resources, flagRes);
+            }
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
@@ -43,14 +60,14 @@ public class ServerConfig {
         iconUri = uri;
     }
 
-    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
+    public static ArrayList<ServerConfig> createServerList(Resources resources, String jsonArrayString){
         ArrayList<ServerConfig> arrayList = null;
         try{
             JSONArray jsonArray = new JSONArray(jsonArrayString);
             arrayList = new ArrayList<>(jsonArray.length());
             for(int i=0; i< jsonArray.length(); i++){
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                ServerConfig serverConfig = new ServerConfig(jsonObject);
+                ServerConfig serverConfig = new ServerConfig(resources, jsonObject);
                 arrayList.add(serverConfig);
             }
         }catch (Exception e){

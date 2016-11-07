@@ -121,7 +121,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
             }
         });
-        mServerConfigs = ServerConfig.createDefaultServerList(this);
+        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
+        if(serverlist != null){
+            mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
+        }else{
+            mServerConfigs = ServerConfig.createDefaultServerList(this);
+
+        }
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
 
@@ -712,7 +719,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private int indexOfSelectedVPNWithParsingOptimizedServer() {
         int i = indexOfSelectedVPN();
         if(i == 0){
-            TypedArray a = getResources().obtainTypedArray(R.array.vpn_names);
             i = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
         }
         return i;
