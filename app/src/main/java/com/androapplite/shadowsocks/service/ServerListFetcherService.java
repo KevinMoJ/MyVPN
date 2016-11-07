@@ -33,8 +33,8 @@ public class ServerListFetcherService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        sp.edit().remove(SharedPreferenceKey.SERVER_LIST).apply();
+        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
+        editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
         OkHttpClient client = new OkHttpClient();
 
         String url = "http://192.168.31.29/vpn/server_list.json";
@@ -50,7 +50,7 @@ public class ServerListFetcherService extends IntentService {
             GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
             String jsonString = response.body().string();
 //            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            sp.edit().putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
+            editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
         } catch (IOException e) {
             long t2 = System.currentTimeMillis();
             GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
