@@ -93,7 +93,7 @@
             <!--</intent-filter>-->
 
         </activity>
-        <service android:name=".service.ServerListFetcher" />
+        <service android:name=".service.ServerListFetcherService" />
     </application>
 
 </manifest>

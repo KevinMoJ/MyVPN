@@ -362,6 +362,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 view = convertView;
                 viewHolder = (ViewHolder)view.getTag();
             }
+
             viewHolder.vpnIconImageView.setImageResource(
                     mServerIcons.getResourceId(position, R.drawable.ic_close_24dp));
             viewHolder.vpnNameTextView.setText(

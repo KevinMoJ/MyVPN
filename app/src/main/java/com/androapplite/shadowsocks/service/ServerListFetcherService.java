@@ -4,11 +4,14 @@ package com.androapplite.shadowsocks.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
+
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -20,10 +23,12 @@ import okhttp3.Response;
  * Created by jim on 16/11/7.
  */
 
-public class ServerListFetcher extends IntentService {
+public class ServerListFetcherService extends IntentService {
 
-    public ServerListFetcher(){
+    public ServerListFetcherService(){
         super("ServletListFetcher");
+        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        sp.edit().remove(SharedPreferenceKey.SERVER_LIST).apply();
     }
 
     @Override
@@ -38,17 +43,17 @@ public class ServerListFetcher extends IntentService {
         try {
             Response response = client.newCall(request).execute();
             String jsonString = response.body().string();
-            JSONArray servers = new JSONArray(jsonString);
-            Log.d("server name", servers.getJSONObject(0).optString("name"));
+            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+            sp.edit().putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     public static void fetchServerListAsync(Context context){
-        Intent intent = new Intent(context, ServerListFetcher.class);
+        Intent intent = new Intent(context, ServerListFetcherService.class);
         context.startService(intent);
     }
+
+
 }

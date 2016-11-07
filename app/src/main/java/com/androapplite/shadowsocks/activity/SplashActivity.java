@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.androapplite.shadowsocks.GAHelper;
@@ -15,8 +13,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.service.ServerListFetcher;
-import com.google.android.gms.ads.AdSize;
+import com.androapplite.shadowsocks.service.ServerListFetcherService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +31,7 @@ public class SplashActivity extends BaseShadowsocksActivity {
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
 
-        ServerListFetcher.fetchServerListAsync(this);
+        ServerListFetcherService.fetchServerListAsync(this);
 
         GAHelper.sendScreenView(this, "启动屏幕");
     }
