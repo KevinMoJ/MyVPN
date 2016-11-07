@@ -121,8 +121,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
             }
         });
-        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
         mServerConfigs = ServerConfig.createDefaultServerList(this);
+        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
 
 
@@ -680,21 +680,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         unregisterReceiver(mConnectivityReceiver);
     }
 
-    public void chooseVPN(View view){
-        if(view instanceof Button){
-            Button button = (Button)view;
-            SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            final String vpnName = button.getText().toString();
-            sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
-            GAHelper.sendEvent(this, "选择VPN", vpnName);
-
-        }
-    }
-
     private void saveVpnName(int position){
-        Resources resources = getResources();
-        TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
-        final String vpnName = names.getString(position);
+        String vpnName = mServerConfigs.get(position).name;
         SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
         GAHelper.sendEvent(this, "选择VPN", vpnName);
@@ -702,22 +689,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private String findVPNServer(){
         mTemporaryVpnSelectIndex = indexOfSelectedVPNWithParsingOptimizedServer();
-        TypedArray b = getResources().obtainTypedArray(R.array.vpn_servers);
-        return b.getString(mTemporaryVpnSelectIndex);
+        return mServerConfigs.get(mTemporaryVpnSelectIndex).server;
     }
 
     private int indexOfSelectedVPN() {
         SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         String vpnName = sharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
-        TypedArray a = getResources().obtainTypedArray(R.array.vpn_names);
         int i = 0;
         if(vpnName != null){
-            for(i = 0; i < a.length(); i++){
-                if(vpnName.equals(a.getString(i))){
+            for(i = 0; i < mServerConfigs.size(); i++){
+                if(vpnName.equals(mServerConfigs.get(i).name)){
                     break;
                 }
             }
-            if(i >= a.length()){
+            if(i >= mServerConfigs.size()){
                 i = 0;
             }
         }
@@ -728,7 +713,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         int i = indexOfSelectedVPN();
         if(i == 0){
             TypedArray a = getResources().obtainTypedArray(R.array.vpn_names);
-            i = (int) (Math.random() * (a.length() - 1) + 1);
+            i = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
         }
         return i;
     }
