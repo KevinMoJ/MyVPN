@@ -126,14 +126,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //                }
 //            }
 //        });
-//        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-//        String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
-//        if(serverlist != null){
-//            mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
-//        }else{
-//            mServerConfigs = ServerConfig.createDefaultServerList(this);
-//
-//        }
+
 //        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
 
@@ -292,7 +285,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         getMenuInflater().inflate(R.menu.connectivity, menu);
         mMenu = menu;
         //todo: onCreateOption会在onCreate之前
-        changeProxyFlagIcon();
         return true;
     }
 
@@ -587,6 +579,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
+        loadServerList(false);
         AppEventsLogger.activateApp(this);
     }
 
@@ -772,5 +765,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void restoreVpnSelectIndex(){
 //        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+    }
+
+    private void loadServerList(boolean force){
+        if(force || mServerConfigs == null){
+            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+            String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
+            if(serverlist != null){
+                mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
+            }else{
+                mServerConfigs = ServerConfig.createDefaultServerList(this);
+            }
+        }
     }
 }

@@ -46,7 +46,7 @@ public class ServerConfig {
         TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
         for(int i=0; i<icons.length(); i++){
             int resId = icons.getResourceId(i, R.drawable.ic_flag_global_anim);
-            flagResMap.put(resources.getResourceName(resId), resId);
+            flagResMap.put(resources.getResourceEntryName(resId), resId);
         }
 
         try{
