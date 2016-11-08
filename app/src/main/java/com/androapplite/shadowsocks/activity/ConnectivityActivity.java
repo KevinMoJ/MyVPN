@@ -123,15 +123,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //                }
 //            }
 //        });
-        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
-        if(serverlist != null){
-            mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
-        }else{
-            mServerConfigs = ServerConfig.createDefaultServerList(this);
-
-        }
-        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+//        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+//        String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
+//        if(serverlist != null){
+//            mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
+//        }else{
+//            mServerConfigs = ServerConfig.createDefaultServerList(this);
+//
+//        }
+//        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
 
 
@@ -268,6 +268,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.connectivity, menu);
         mMenu = menu;
+        //todo: onCreateOption会在onCreate之前
         changeProxyFlagIcon();
         return true;
     }
