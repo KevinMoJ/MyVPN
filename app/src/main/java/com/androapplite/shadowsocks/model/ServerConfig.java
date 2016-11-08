@@ -25,51 +25,37 @@ public class ServerConfig {
     public String name;
     public String server;
     public String flag;
-    public Uri iconUri;
-    private HashMap<String, Integer> flagResMap;
 
-    public ServerConfig(Resources resources, JSONObject json){
-        flagResMap = new HashMap<>();
-        TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
-        for(int i=0; i<icons.length(); i++){
-            int resId = icons.getResourceId(i, R.drawable.ic_flag_global_anim);
-            flagResMap.put(resources.getResourceEntryName(resId), resId);
-        }
-
+    public ServerConfig(JSONObject json){
         try{
             name = json.optString("name", null);
             server = json.optString("server", null);
             flag = json.optString("flag", null);
-            if(!flag.startsWith("http://")){
-                int flagRes = flagResMap.get(flag);
-                iconUri = createUriFromResourceId(resources, flagRes);
-            }
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
     }
 
-    private static ServerConfig addGlobalConfig(Resources resources){
-        return new ServerConfig("Global", "opt.vpnnest.com",
-                createUriFromResourceId(resources, R.drawable.ic_flag_global_anim));
+    private static ServerConfig addGlobalConfig(){
+        return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global_anim");
     }
 
-    public ServerConfig(String name, String server, Uri uri){
+    public ServerConfig(String name, String server, String flag){
         this.name = name;
         this.server = server;
-        iconUri = uri;
+        this.flag = flag;
     }
 
-    public static ArrayList<ServerConfig> createServerList(Resources resources, String jsonArrayString){
+    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
         ArrayList<ServerConfig> arrayList = null;
         try{
             JSONArray jsonArray = new JSONArray(jsonArrayString);
             if(jsonArray.length() > 0){
                 arrayList = new ArrayList<>(jsonArray.length());
-                arrayList.add(addGlobalConfig(resources));
+                arrayList.add(addGlobalConfig());
                 for(int i=0; i< jsonArray.length(); i++){
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    ServerConfig serverConfig = new ServerConfig(resources, jsonObject);
+                    ServerConfig serverConfig = new ServerConfig(jsonObject);
                     arrayList.add(serverConfig);
                 }
             }
@@ -81,8 +67,7 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public static ArrayList<ServerConfig> createDefaultServerList(Context context){
-        Resources resources = context.getResources();
+    public static ArrayList<ServerConfig> createDefaultServerList(Resources resources){
         TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
         TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
         TypedArray servers = resources.obtainTypedArray(R.array.vpn_servers);
@@ -90,29 +75,15 @@ public class ServerConfig {
         for(int i=0; i<names.length(); i++){
             String name = names.getString(i);
             String server = servers.getString(i);
-            Uri uri = createUriFromResourceId(resources, icons.getResourceId(i, R.drawable.ic_close_24dp));
-            ServerConfig serverConfig = new ServerConfig(name, server, uri);
+            String flag = resources.getResourceTypeName(icons.getResourceId(i, R.drawable.ic_close_24dp));
+            ServerConfig serverConfig = new ServerConfig(name, server, flag);
             arrayList.add(serverConfig);
         }
         return arrayList;
     }
 
-    public static Uri createUriFromResourceId(Resources resources, int resId){
-        final Uri uri = new Uri.Builder()
-                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                .authority(resources.getResourcePackageName(resId))
-                .appendPath(resources.getResourceTypeName(resId))
-                .appendPath(resources.getResourceEntryName(resId))
-                .build();
-        return uri;
-    }
-
-    public static int getResourceId(Context context, Uri uri){
-        List<String> pars = uri.getPathSegments();
-        return context.getResources().getIdentifier(pars.get(1),pars.get(0), context.getPackageName());
-    }
-
     public int getResourceId(Context context){
-        return getResourceId(context, iconUri);
+        return context.getResources().getIdentifier(flag, "drawable", context.getPackageName());
     }
+
 }

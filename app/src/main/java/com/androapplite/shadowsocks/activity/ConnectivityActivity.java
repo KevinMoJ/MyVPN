@@ -378,7 +378,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 viewHolder = (ViewHolder)view.getTag();
             }
             ServerConfig serverConfig = (ServerConfig)getItem(position);
-            viewHolder.vpnIconImageView.setImageURI(serverConfig.iconUri);
+            viewHolder.vpnIconImageView.setImageResource(serverConfig.getResourceId(view.getContext()));
             viewHolder.vpnNameTextView.setText(serverConfig.name);
             return view;
         }
@@ -748,13 +748,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(force || mServerConfigs == null){
             String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
             if(serverlist != null){
-                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(getResources(), serverlist);
+                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(serverlist);
                 if(serverList != null && !serverList.isEmpty()){
                     mServerConfigs = serverList;
                     return;
                 }
             }
-            mServerConfigs = ServerConfig.createDefaultServerList(this);
+            mServerConfigs = ServerConfig.createDefaultServerList(getResources());
         }
     }
 
