@@ -508,12 +508,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     changeProxyFlagIcon();
                     prepareStartService();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                    GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
+                    if(mConnectingConfig != null && mConnectingConfig.name != null) {
+                        GAHelper.sendEvent(this, "建立连接", mConnectingConfig.name, String.valueOf(state));
+                    }else{
+                        GAHelper.sendEvent(this, "建立连接", "错误", String.valueOf(state));
+                    }
                 } else {
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                    GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
-//                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+                    if(mConnectingConfig != null && mConnectingConfig.name != null){
+                        GAHelper.sendEvent(this, "关闭连接", mConnectingConfig.name, String.valueOf(state));
+                    }else{
+                        GAHelper.sendEvent(this, "关闭连接", "错误", String.valueOf(state));
+                    }
                 }
 
             } catch (RemoteException e) {
@@ -741,10 +748,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(force || mServerConfigs == null){
             String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
             if(serverlist != null){
-                mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
-            }else{
-                mServerConfigs = ServerConfig.createDefaultServerList(this);
+                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(getResources(), serverlist);
+                if(serverList != null && !serverList.isEmpty()){
+                    mServerConfigs = serverList;
+                    return;
+                }
             }
+            mServerConfigs = ServerConfig.createDefaultServerList(this);
         }
     }
 
