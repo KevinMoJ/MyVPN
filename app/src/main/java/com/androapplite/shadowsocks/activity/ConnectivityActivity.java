@@ -109,20 +109,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                final SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
-                if(sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
-                    try {
-                        showVpnServerChangePopupWindow();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, false).apply();
-                    }catch (RuntimeException e){
-                        ShadowsocksApplication.handleException(e);
-                    }
-                }
-            }
-        });
+//        toolbar.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                final SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
+//                if(sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
+//                    try {
+//                        showVpnServerChangePopupWindow();
+//                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, false).apply();
+//                    }catch (RuntimeException e){
+//                        ShadowsocksApplication.handleException(e);
+//                    }
+//                }
+//            }
+//        });
         SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
         if(serverlist != null){
