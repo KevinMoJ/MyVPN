@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -726,10 +727,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mMenu != null) {
             if(mConnectingConfig != null && !mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))) {
                 try {
-                    final Uri iconUri = mConnectingConfig.iconUri;
-                    InputStream is = getContentResolver().openInputStream(iconUri);
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) BitmapDrawable.createFromStream(is, is.toString());
-                    mMenu.findItem(R.id.action_flag).setIcon(bitmapDrawable);
+                    mMenu.findItem(R.id.action_flag).setIcon(mConnectingConfig.getResourceId(this));
+//                    final Uri iconUri = mConnectingConfig.iconUri;
+//                    InputStream is = getContentResolver().openInputStream(iconUri);
+//                    BitmapDrawable bitmapDrawable = (BitmapDrawable) BitmapDrawable.createFromStream(is, is.toString());
+
+//                    mMenu.findItem(R.id.action_flag).setIcon(bitmapDrawable);
                 } catch (Exception e) {
                     ShadowsocksApplication.handleException(e);
                 }

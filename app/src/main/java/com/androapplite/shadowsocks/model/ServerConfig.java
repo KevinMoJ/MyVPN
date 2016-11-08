@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by jim on 16/11/7.
@@ -118,5 +119,14 @@ public class ServerConfig {
                 .appendPath(resources.getResourceEntryName(resId))
                 .build();
         return uri;
+    }
+
+    public static int getResourceId(Context context, Uri uri){
+        List<String> pars = uri.getPathSegments();
+        return context.getResources().getIdentifier(pars.get(1),pars.get(0), context.getPackageName());
+    }
+
+    public int getResourceId(Context context){
+        return getResourceId(context, iconUri);
     }
 }
