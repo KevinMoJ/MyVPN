@@ -95,6 +95,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Menu mMenu;
     private ArrayList<ServerConfig> mServerConfigs;
     private ServerConfig mConnectingConfig;
+    private SharedPreferences mSharedPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +115,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
-
+        mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -177,6 +178,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if(state == Constants.State.CONNECTING.ordinal()){
 
             }else if(state == Constants.State.CONNECTED.ordinal()){
+
             }else if(state == Constants.State.ERROR.ordinal()){
                 restoreServerConfig();
                 changeProxyFlagIcon();
@@ -695,7 +697,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     public void saveVpnName(ServerConfig config){
         String vpnName = config.name;
-        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).edit();
+        SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
         GAHelper.sendEvent(this, "选择VPN", vpnName);
     }
@@ -704,8 +706,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         loadServerList(false);
         if(mConnectingConfig == null || mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))){
 
-            SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            if(sharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+            if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
                 mConnectingConfig = mServerConfigs.get(1);
             }else{
                 int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
@@ -735,8 +736,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void loadServerList(boolean force){
         if(force || mServerConfigs == null){
-            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            String serverlist = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
+            String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
             if(serverlist != null){
                 mServerConfigs = ServerConfig.createServerList(getResources(), serverlist);
             }else{
@@ -747,8 +747,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void loadConnectingServerConfig(){
         if(mServerConfigs!= null && !mServerConfigs.contains(mConnectingConfig)){
-            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            String vpnName = sp.getString(SharedPreferenceKey.VPN_NAME, null);
+            String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
             if(vpnName != null && !vpnName.equals(getString(R.string.vpn_name_opt))){
                 for(ServerConfig config: mServerConfigs){
                     if(config.name.equals(vpnName)){
@@ -761,8 +760,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void restoreServerConfig(){
-        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        String vpnName = sp.getString(SharedPreferenceKey.VPN_NAME, null);
+        String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
         if(vpnName == null || vpnName.equals(getString(R.string.vpn_name_opt))){
             mConnectingConfig = null;
         }
