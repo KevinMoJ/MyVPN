@@ -37,6 +37,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TimeUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,6 +101,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         initNavigationView();
+        initForegroundBroadcastReceiver();
+        initForegroundBroadcastIntentFilter();
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
@@ -134,6 +137,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
 
+    private void initForegroundBroadcastIntentFilter(){
+        mForgroundReceiverIntentFilter = new IntentFilter();
+        mForgroundReceiverIntentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
+    }
+
+    private void initForegroundBroadcastReceiver(){
+        mForgroundReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch(action){
+                    case Action.SERVER_LIST_FETCH_FINISH:
+                        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
+                        String serverList = sp.getString(SharedPreferenceKey.SERVER_LIST, null);
+                        Log.d("server list", serverList);
+                        break;
+                }
+            }
+        };
+    }
 
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
@@ -748,6 +771,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void restoreVpnSelectIndex(){
-        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+//        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
     }
 }

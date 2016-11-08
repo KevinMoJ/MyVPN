@@ -5,10 +5,12 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
@@ -49,8 +51,8 @@ public class ServerListFetcherService extends IntentService {
             long t2 = System.currentTimeMillis();
             GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
             String jsonString = response.body().string();
-//            SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
             editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
+            broadcastServerListFetchFinish();
         } catch (IOException e) {
             long t2 = System.currentTimeMillis();
             GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
@@ -62,6 +64,11 @@ public class ServerListFetcherService extends IntentService {
         Intent intent = new Intent(context, ServerListFetcherService.class);
         context.startService(intent);
     }
+
+    private void broadcastServerListFetchFinish(){
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.SERVER_LIST_FETCH_FINISH));
+    }
+
 
 
 }
