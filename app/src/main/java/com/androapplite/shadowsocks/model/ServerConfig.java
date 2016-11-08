@@ -26,21 +26,29 @@ public class ServerConfig {
     public String flag;
 //    public int connection;
     public Uri iconUri;
+    private HashMap<String, Integer> flagResMap;
 
-    private static HashMap<String, Integer> flagResMap = new HashMap<>();
-    static{
-        flagResMap.put("ic_flag_global_anim", R.drawable.ic_flag_global_anim);
-        flagResMap.put("ic_flag_us", R.drawable.ic_flag_us);
-        flagResMap.put("ic_flag_uk", R.drawable.ic_flag_uk);
-        flagResMap.put("ic_flag_fr", R.drawable.ic_flag_fr);
-        flagResMap.put("ic_flag_jp", R.drawable.ic_flag_jp);
-        flagResMap.put("ic_flag_au", R.drawable.ic_flag_au);
-        flagResMap.put("ic_flag_de", R.drawable.ic_flag_de);
-        flagResMap.put("ic_flag_sg", R.drawable.ic_flag_sg);
-        flagResMap.put("ic_flag_nl", R.drawable.ic_flag_nl);
-    }
+//    private HashMap<String, Integer> flagResMap = new HashMap<>();
+//    static{
+//        flagResMap.put("ic_flag_global_anim", R.drawable.ic_flag_global_anim);
+//        flagResMap.put("ic_flag_us", R.drawable.ic_flag_us);
+//        flagResMap.put("ic_flag_uk", R.drawable.ic_flag_uk);
+//        flagResMap.put("ic_flag_fr", R.drawable.ic_flag_fr);
+//        flagResMap.put("ic_flag_jp", R.drawable.ic_flag_jp);
+//        flagResMap.put("ic_flag_au", R.drawable.ic_flag_au);
+//        flagResMap.put("ic_flag_de", R.drawable.ic_flag_de);
+//        flagResMap.put("ic_flag_sg", R.drawable.ic_flag_sg);
+//        flagResMap.put("ic_flag_nl", R.drawable.ic_flag_nl);
+//    }
 
     public ServerConfig(Resources resources, JSONObject json){
+        flagResMap = new HashMap<>();
+        TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
+        for(int i=0; i<icons.length(); i++){
+            int resId = icons.getResourceId(i, R.drawable.ic_flag_global_anim);
+            flagResMap.put(resources.getResourceName(resId), resId);
+        }
+
         try{
             name = json.optString("name", null);
             server = json.optString("server", null);

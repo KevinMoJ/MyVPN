@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -63,6 +64,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
+import java.io.InputStream;
 import java.lang.System;
 import java.util.ArrayList;
 
@@ -725,15 +727,23 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void changeProxyFlagIcon(){
-        TypedArray icons = getResources().obtainTypedArray(R.array.vpn_icons);
-        if(mMenu != null) {
-            if(mTemporaryVpnSelectIndex == 0){
-                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global_clicked);
-            }else {
-                mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
-            }
-//            mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
-        }
+//        if(mMenu != null) {
+//            if(mTemporaryVpnSelectIndex == 0){
+//                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global_clicked);
+//            }else {
+//                try {
+//                    final Uri iconUri = mServerConfigs.get(mTemporaryVpnSelectIndex).iconUri;
+//                    InputStream is = getContentResolver().openInputStream(iconUri);
+//                    Drawable drawable = Drawable.createFromStream(is, iconUri.toString());
+//                    drawable.setBounds(0, 0, 84, 57);
+//                    mMenu.findItem(R.id.action_flag).setIcon(drawable);
+//                }catch (Exception e){
+//                    ShadowsocksApplication.handleException(e);
+//                }
+////                mMenu.findItem(R.id.action_flag).setIcon(getResources());
+//
+//            }
+//        }
     }
 
     private void restoreVpnSelectIndex(){
