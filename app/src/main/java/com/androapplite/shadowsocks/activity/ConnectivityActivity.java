@@ -181,7 +181,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
             }else if(state == Constants.State.CONNECTED.ordinal()){
                 if(mConnectingConfig != null){
-                    mSharedPreference.edit().putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name).apply();
+                    mSharedPreference.edit()
+                            .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
+                            .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
+                            .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
+                            .apply();
                 }else{
                     loadServerList(false);
                     loadConnectingServerConfig();
@@ -775,17 +779,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     try {
                         if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()){
                             vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-                            if(vpnName != null){
-                                for(ServerConfig config: mServerConfigs){
-                                    if(config.name.equals(vpnName)){
-                                        mConnectingConfig = config;
-                                        break;
-                                    }
-                                }
-                            }
+                            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+                            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+                            mConnectingConfig = new ServerConfig(vpnName, server, flag);
                         }
                     } catch (RemoteException e) {
-                        e.printStackTrace();
+                        ShadowsocksApplication.handleException(e);
                     }
                 }
 

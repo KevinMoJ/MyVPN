@@ -10,4 +10,6 @@ public final class SharedPreferenceKey {
     public static final String NEED_TO_SHOW_PROXY_POPUP = "NEED_TO_SHOW_PROXY_POPUP";
     public static final String SERVER_LIST = "SERVER_LIST";
     public static final String CONNECTING_VPN_NAME = "CONNECTING_VPN_NAME";
+    public static final String CONNECTING_VPN_SERVER = "CONNECTING_VPN_SERVER";
+    public static final String CONNECTING_VPN_FLAG = "CONNECTING_VPN_FLAG";
 }
