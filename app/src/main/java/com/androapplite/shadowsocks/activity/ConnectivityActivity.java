@@ -190,8 +190,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     loadServerList(false);
                     loadConnectingServerConfig();
                     changeProxyFlagIcon();
-                    ConnectionTestService.testConnection(this);
                 }
+                ConnectionTestService.testConnection(this);
             }else if(state == Constants.State.ERROR.ordinal()){
                 restoreServerConfig();
                 changeProxyFlagIcon();

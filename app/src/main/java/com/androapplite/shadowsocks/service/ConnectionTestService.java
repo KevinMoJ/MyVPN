@@ -43,7 +43,7 @@ public class ConnectionTestService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             OkHttpClient client = new OkHttpClient();
-            String url = "http://www.gstatic.com/generate_204";
+            String url = "http://www.bing.com/";
             Request request = new Request.Builder()
                     .url(url)
                     .build();
