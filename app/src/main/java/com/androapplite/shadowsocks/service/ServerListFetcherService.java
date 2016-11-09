@@ -35,31 +35,34 @@ public class ServerListFetcherService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-        editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
-        OkHttpClient client = new OkHttpClient();
+        if(intent != null){
+            SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
+            editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
+            OkHttpClient client = new OkHttpClient();
 
-        String url = "http://192.168.31.29/vpn/server_list.json";
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+            String url = "http://192.168.31.29/vpn/server_list.json";
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
 
-        long t1 = System.currentTimeMillis();
-        try {
-            Response response = client.newCall(request).execute();
-            long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
-            String jsonString = response.body().string();
-            if(jsonString != null && !jsonString.isEmpty()){
-                editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
-                broadcastServerListFetchFinish();
+            long t1 = System.currentTimeMillis();
+            try {
+                Response response = client.newCall(request).execute();
+                long t2 = System.currentTimeMillis();
+                GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
+                String jsonString = response.body().string();
+                if(jsonString != null && !jsonString.isEmpty()){
+                    editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
+                    broadcastServerListFetchFinish();
+                }
+            } catch (IOException e) {
+                long t2 = System.currentTimeMillis();
+                GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
+                ShadowsocksApplication.handleException(e);
             }
-        } catch (IOException e) {
-            long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
-            ShadowsocksApplication.handleException(e);
         }
+
     }
 
     public static void fetchServerListAsync(Context context){

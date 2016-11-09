@@ -65,6 +65,7 @@ import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.service.ConnectionTestService;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
@@ -185,6 +186,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     loadServerList(false);
                     loadConnectingServerConfig();
                     changeProxyFlagIcon();
+                    ConnectionTestService.testConnection(this);
                 }
             }else if(state == Constants.State.ERROR.ordinal()){
                 restoreServerConfig();
