@@ -388,8 +388,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 viewHolder = (ViewHolder)view.getTag();
             }
             ServerConfig serverConfig = (ServerConfig)getItem(position);
-//            viewHolder.vpnIconImageView.setImageResource(serverConfig.getResourceId(view.getContext()));
-            Glide.with(view.getContext()).load(serverConfig.getResourceId(view.getContext())).into(viewHolder.vpnIconImageView);
+
+            final Context context = view.getContext();
+            if(serverConfig.flag.startsWith("http://")){
+                Glide.with(context).load(serverConfig.flag).into(viewHolder.vpnIconImageView);
+            }else{
+                Glide.with(context).load(serverConfig.getResourceId(context)).into(viewHolder.vpnIconImageView);
+            }
             viewHolder.vpnNameTextView.setText(serverConfig.name);
             return view;
         }
@@ -745,13 +750,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mMenu != null) {
             if(mConnectingConfig != null && !mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))) {
                 try {
-//                    mMenu.findItem(R.id.action_flag).setIcon(mConnectingConfig.getResourceId(this));
-                    Glide.with(this).load(mConnectingConfig.getResourceId(this)).into(new SimpleTarget<GlideDrawable>() {
+                    final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                             mMenu.findItem(R.id.action_flag).setIcon(resource);
                         }
-                    });
+                    };
+                    if (mConnectingConfig.flag.startsWith("http")) {
+                        Glide.with(this).load(mConnectingConfig.flag).into(target);
+                    } else {
+                        Glide.with(this).load(mConnectingConfig.getResourceId(this)).into(target);
+                    }
                 } catch (Exception e) {
                     ShadowsocksApplication.handleException(e);
                 }
