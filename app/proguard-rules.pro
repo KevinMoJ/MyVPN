@@ -53,6 +53,7 @@
   **[] $VALUES;
   public *;
 }
+-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 -dontwarn okio.**
 -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor

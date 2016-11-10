@@ -66,6 +66,10 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
@@ -384,7 +388,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 viewHolder = (ViewHolder)view.getTag();
             }
             ServerConfig serverConfig = (ServerConfig)getItem(position);
-            viewHolder.vpnIconImageView.setImageResource(serverConfig.getResourceId(view.getContext()));
+//            viewHolder.vpnIconImageView.setImageResource(serverConfig.getResourceId(view.getContext()));
+            Glide.with(view.getContext()).load(serverConfig.getResourceId(view.getContext())).into(viewHolder.vpnIconImageView);
             viewHolder.vpnNameTextView.setText(serverConfig.name);
             return view;
         }
@@ -740,7 +745,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mMenu != null) {
             if(mConnectingConfig != null && !mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))) {
                 try {
-                    mMenu.findItem(R.id.action_flag).setIcon(mConnectingConfig.getResourceId(this));
+//                    mMenu.findItem(R.id.action_flag).setIcon(mConnectingConfig.getResourceId(this));
+                    Glide.with(this).load(mConnectingConfig.getResourceId(this)).into(new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            mMenu.findItem(R.id.action_flag).setIcon(resource);
+                        }
+                    });
                 } catch (Exception e) {
                     ShadowsocksApplication.handleException(e);
                 }

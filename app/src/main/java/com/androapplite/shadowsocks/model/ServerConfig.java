@@ -37,7 +37,7 @@ public class ServerConfig {
     }
 
     private static ServerConfig addGlobalConfig(){
-        return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global_anim");
+        return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global_clicked");
     }
 
     public ServerConfig(String name, String server, String flag){

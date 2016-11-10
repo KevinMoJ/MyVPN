@@ -18,10 +18,10 @@
         android:paddingLeft="64dp"
         />
     <com.joooonho.SelectableRoundedImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
         android:src="@drawable/ic_flag_us"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         app:sriv_left_top_corner_radius="3dp"
         app:sriv_right_top_corner_radius="3dp"
         app:sriv_left_bottom_corner_radius="3dp"
