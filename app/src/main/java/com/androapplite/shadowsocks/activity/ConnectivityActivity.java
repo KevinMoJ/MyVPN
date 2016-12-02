@@ -73,8 +73,13 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.System;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import yyf.shadowsocks.Config;
@@ -742,6 +747,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
                 mConnectingConfig = mServerConfigs.get(index);
             }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    long t1 = System.currentTimeMillis();
+                    boolean r = ping(mConnectingConfig.server);
+                    long t2 = System.currentTimeMillis();
+                    boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
+                    long t3 = System.currentTimeMillis();
+                    Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
+                    Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
+                }
+            }).start();
+
         }
         return mConnectingConfig.server;
     }
@@ -818,4 +836,35 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mConnectingConfig = null;
         }
     }
+
+    public static boolean ping(String ipAddress) {
+        int  timeOut =  3000 ;  //超时应该在3钞以上
+        boolean status = false;     // 当返回值是true时，说明host是可用的，false则不可。
+        try {
+            status = InetAddress.getByName(ipAddress).isReachable(timeOut);
+        } catch (IOException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+        return status;
+    }
+
+    public static boolean isPortOpen(final String ip, final int port, final int timeout) {
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), timeout);
+            socket.close();
+            return true;
+        }
+
+        catch(ConnectException ce){
+            ShadowsocksApplication.handleException(ce);
+            return false;
+        }
+
+        catch (Exception ex) {
+            ShadowsocksApplication.handleException(ex);
+            return false;
+        }
+    }
+
 }
