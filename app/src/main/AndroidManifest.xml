@@ -107,7 +107,9 @@
         <service android:name=".service.ServerListFetcherService" />
         <service
             android:name=".service.ConnectionTestService"
-            android:exported="false"></service>
+            android:exported="false" />
+
+        <activity android:name=".activity.ServerListActivity"></activity>
     </application>
 
 </manifest>

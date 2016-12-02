@@ -306,21 +306,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
             if(mShadowsocksService != null){
-                int state = 0;
-                try {
-                    state = mShadowsocksService.getState();
-                } catch (RemoteException e) {
-                    ShadowsocksApplication.handleException(e);
-                }
-                if(state == Constants.State.INIT.ordinal() ||
-                        state == Constants.State.STOPPED.ordinal()){
-                    showVpnServerChangePopupWindow();
-                    GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
-                }else{
-                    Snackbar.make(findViewById(R.id.coordinator), R.string.change_proxy_tip, Snackbar.LENGTH_SHORT).show();
-                    GAHelper.sendEvent(this, "ProxyPopup", "错误时机", String.valueOf(state));
-
-                }
+//                int state = 0;
+//                try {
+//                    state = mShadowsocksService.getState();
+//                } catch (RemoteException e) {
+//                    ShadowsocksApplication.handleException(e);
+//                }
+//                if(state == Constants.State.INIT.ordinal() ||
+//                        state == Constants.State.STOPPED.ordinal()){
+//                    showVpnServerChangePopupWindow();
+//                    GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
+//                }else{
+//                    Snackbar.make(findViewById(R.id.coordinator), R.string.change_proxy_tip, Snackbar.LENGTH_SHORT).show();
+//                    GAHelper.sendEvent(this, "ProxyPopup", "错误时机", String.valueOf(state));
+//
+//                }
+                startActivityForResult(new Intent(this, ServerListActivity.class), 1);
             }
             return true;
         }
