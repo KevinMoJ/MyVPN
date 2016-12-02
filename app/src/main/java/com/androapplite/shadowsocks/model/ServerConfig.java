@@ -75,7 +75,7 @@ public class ServerConfig {
         for(int i=0; i<names.length(); i++){
             String name = names.getString(i);
             String server = servers.getString(i);
-            String flag = resources.getResourceTypeName(icons.getResourceId(i, R.drawable.ic_close_24dp));
+            String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_close_24dp));
             ServerConfig serverConfig = new ServerConfig(name, server, flag);
             arrayList.add(serverConfig);
         }
