@@ -524,16 +524,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 final int state = mShadowsocksService.getState();
                 if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
                         || state == Constants.State.STOPPED.ordinal()) {
-                    loadServerList(false);
-                    findVPNServer();
-                    changeProxyFlagIcon();
-                    prepareStartService();
-                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                    if(mConnectingConfig != null && mConnectingConfig.name != null) {
-                        GAHelper.sendEvent(this, "建立连接", mConnectingConfig.name, String.valueOf(state));
-                    }else{
-                        GAHelper.sendEvent(this, "建立连接", "错误", String.valueOf(state));
-                    }
+                    connectVpnServerAsync();
+
                 } else {
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
@@ -549,6 +541,29 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         }
 
+    }
+
+    private void connectVpnServerAsync() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loadServerList(false);
+                findVPNServer();
+                getWindow().getDecorView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeProxyFlagIcon();
+                    }
+                });
+                prepareStartService();
+                mConnectOrDisconnectStartTime = System.currentTimeMillis();
+                if(mConnectingConfig != null && mConnectingConfig.name != null) {
+                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", mConnectingConfig.name);
+                }else{
+                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", "错误");
+                }
+            }
+        }).start();
     }
 
 
@@ -616,14 +631,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            //Intent intent = new Intent(this, ShadowsocksVpnService.class);
-            //bindService(intent,connection,BIND_AUTO_CREATE);
             if(mShadowsocksService != null){
                 try {
                     Config config = new Config(findVPNServer());
                     mShadowsocksService.start(config);
                     ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
-//                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }catch(RemoteException e){
                     ShadowsocksApplication.handleException(e);
                 }
@@ -747,18 +759,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
                 mConnectingConfig = mServerConfigs.get(index);
             }
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    long t1 = System.currentTimeMillis();
-                    boolean r = ping(mConnectingConfig.server);
-                    long t2 = System.currentTimeMillis();
-                    boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
-                    long t3 = System.currentTimeMillis();
-                    Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
-                    Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
-                }
-            }).start();
+            long t1 = System.currentTimeMillis();
+            boolean r = ping(mConnectingConfig.server);
+            long t2 = System.currentTimeMillis();
+            boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
+            long t3 = System.currentTimeMillis();
+            Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
+            Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
 
         }
         return mConnectingConfig.server;
