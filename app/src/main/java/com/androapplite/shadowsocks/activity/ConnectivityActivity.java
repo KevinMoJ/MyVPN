@@ -861,14 +861,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             socket.connect(new InetSocketAddress(ip, port), timeout);
             socket.close();
             return true;
-        }
-
-        catch(ConnectException ce){
+        } catch(ConnectException ce){
             ShadowsocksApplication.handleException(ce);
             return false;
-        }
-
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ShadowsocksApplication.handleException(ex);
             return false;
         }
