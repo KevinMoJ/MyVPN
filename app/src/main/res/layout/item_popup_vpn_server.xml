@@ -20,7 +20,7 @@
         />
     <com.joooonho.SelectableRoundedImageView
         android:layout_width="26dp"
-        android:layout_height="26dp"
+        android:layout_height="22dp"
         android:src="@drawable/ic_flag_us"
         android:scaleType="fitCenter"
         app:sriv_left_top_corner_radius="3dp"
