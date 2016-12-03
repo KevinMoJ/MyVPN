@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -27,7 +28,8 @@ import com.androapplite.shadowsocks.service.ServerListFetcherService;
 
 import java.util.ArrayList;
 
-public class ServerListActivity extends BaseShadowsocksActivity implements SwipeRefreshLayout.OnRefreshListener{
+public class ServerListActivity extends BaseShadowsocksActivity implements
+        SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener{
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SharedPreferences mPreferences;
@@ -35,6 +37,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
     private ArrayList<String> mFlags;
     private ListView mListView;
     private String mNation;
+    private int mSelectedIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
 
         mListView = (ListView)findViewById(R.id.vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
+        mListView.setOnItemClickListener(this);
 
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
@@ -148,7 +152,12 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
             holder.mFlagImageView.setImageResource(resid);
             String nation = mNations.get(position);
             holder.mNationTextView.setText(nation);
-            holder.mItemView.setSelected(nation.equals(mNation));
+            if(nation.equals(mNation)) {
+                holder.mItemView.setSelected(true);
+                mSelectedIndex = position;
+            }else{
+                holder.mItemView.setSelected(false);
+            }
             return view;
         }
 
@@ -163,5 +172,17 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_server_list, menu);
         return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        View selectedView = parent.getChildAt(mSelectedIndex);
+        ServerListAdapter.ViewHolder holder = (ServerListAdapter.ViewHolder) selectedView.getTag();
+        holder.mItemView.setSelected(false);
+
+        String nation = mNations.get(position);
+        mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation).apply();
+        setResult(RESULT_OK);
+        finish();
     }
 }

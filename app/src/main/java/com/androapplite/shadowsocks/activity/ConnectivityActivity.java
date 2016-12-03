@@ -637,13 +637,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if(mShadowsocksService != null){
-                try {
-                    Config config = new Config(findVPNServer());
-                    mShadowsocksService.start(config);
-                    ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
-                }catch(RemoteException e){
-                    ShadowsocksApplication.handleException(e);
-                }
+//                try {
+//                    Config config = new Config(findVPNServer());
+//                    mShadowsocksService.start(config);
+//                    ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
+//                }catch(RemoteException e){
+//                    ShadowsocksApplication.handleException(e);
+//                }
             }else{
                 ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
             }
