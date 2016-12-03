@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +26,6 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class ServerListActivity extends BaseShadowsocksActivity implements SwipeRefreshLayout.OnRefreshListener{
 
@@ -36,6 +34,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
     private ArrayList<String> mNations;
     private ArrayList<String> mFlags;
     private ListView mListView;
+    private String mNation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +58,8 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
         mNations = new ArrayList<>();
         mFlags = new ArrayList<>();
         mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
+
         if(mPreferences.contains(SharedPreferenceKey.SERVER_LIST)){
 
         }else{
@@ -132,10 +133,10 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
             ViewHolder holder;
             final Context context = parent.getContext();
             if(convertView != null){
-                view = convertView;
+                view = (View) convertView;
                 holder = (ViewHolder)view.getTag();
             }else{
-                view = View.inflate(context, R.layout.item_popup_vpn_server, null);
+                view = (View) View.inflate(context, R.layout.item_popup_vpn_server, null);
                 holder = new ViewHolder();
                 holder.mFlagImageView = (ImageView)view.findViewById(R.id.vpn_icon);
                 holder.mNationTextView = (TextView)view.findViewById(R.id.vpn_name);
@@ -146,7 +147,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
             holder.mFlagImageView.setImageResource(resid);
             String nation = mNations.get(position);
             holder.mNationTextView.setText(nation);
-
+            view.setSelected(nation.equals(mNation));
             return view;
         }
 

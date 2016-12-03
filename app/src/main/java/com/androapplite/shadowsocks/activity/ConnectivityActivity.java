@@ -12,13 +12,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ScaleDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -41,14 +35,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TimeUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -70,11 +62,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.System;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -127,6 +117,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
+
+        initVpnNameAndNation();
+    }
+
+    private void initVpnNameAndNation() {
+        String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
+        if(vpnName == null){
+            mSharedPreference.edit()
+                    .putString(SharedPreferenceKey.VPN_NAME, getString(R.string.vpn_name_opt))
+                    .putString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt))
+                    .apply();
+
+        }
     }
 
     private void initForegroundBroadcastIntentFilter(){
