@@ -13,7 +13,7 @@
     <color name="grey_e3">#E3E3E3</color>
     <color name="grey_cc">#cccccc</color>
     <color name="button_green">#92cf68</color>
-    <color name="activity_background">#e4e4e4</color>
+    <color name="activity_background">@android:color/white</color>
     <color name="connect_button_error">#f58559</color>
     <color name="usage">#fa6567</color>
     <color name="available">#568735</color>

@@ -7,7 +7,7 @@
     <FrameLayout
         android:id="@+id/vpn_server_list_item"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:background="@drawable/server_list_item_bg">
         <TextView
             android:layout_width="match_parent"
@@ -19,8 +19,6 @@
             android:textSize="@dimen/medium_text"
             android:layout_gravity="center_vertical"
             android:gravity="left|center_vertical"
-            android:paddingTop="@dimen/standard_margin"
-            android:paddingBottom="@dimen/standard_margin"
             android:paddingLeft="64dp"
             />
         <com.joooonho.SelectableRoundedImageView

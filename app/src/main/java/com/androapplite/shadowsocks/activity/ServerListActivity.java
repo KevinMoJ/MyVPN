@@ -133,13 +133,14 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
             ViewHolder holder;
             final Context context = parent.getContext();
             if(convertView != null){
-                view = (View) convertView;
+                view = convertView;
                 holder = (ViewHolder)view.getTag();
             }else{
-                view = (View) View.inflate(context, R.layout.item_popup_vpn_server, null);
+                view = View.inflate(context, R.layout.item_popup_vpn_server, null);
                 holder = new ViewHolder();
                 holder.mFlagImageView = (ImageView)view.findViewById(R.id.vpn_icon);
                 holder.mNationTextView = (TextView)view.findViewById(R.id.vpn_name);
+                holder.mItemView = view.findViewById(R.id.vpn_server_list_item);
                 view.setTag(holder);
             }
             String flag = mFlags.get(position);
@@ -147,13 +148,14 @@ public class ServerListActivity extends BaseShadowsocksActivity implements Swipe
             holder.mFlagImageView.setImageResource(resid);
             String nation = mNations.get(position);
             holder.mNationTextView.setText(nation);
-            view.setSelected(nation.equals(mNation));
+            holder.mItemView.setSelected(nation.equals(mNation));
             return view;
         }
 
         class ViewHolder{
             ImageView mFlagImageView;
             TextView mNationTextView;
+            View mItemView;
         }
     }
 
