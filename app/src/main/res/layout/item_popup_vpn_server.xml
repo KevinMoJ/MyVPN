@@ -8,11 +8,11 @@
         android:id="@+id/vpn_server_list_item"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@drawable/server_list_item_bg">
+        android:background="@drawable/server_list_item_bg"
+        >
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/popup_menu_item_bg"
             android:id="@+id/vpn_name"
             android:text="@string/vpn_name_opt"
             android:textColor="@color/primary_black_text"

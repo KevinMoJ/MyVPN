@@ -14,7 +14,9 @@
             android:layout_height="match_parent"
             android:id="@+id/vpn_server_list"
             android:divider="@null"
-            android:choiceMode="singleChoice"></ListView>
+            android:choiceMode="singleChoice"
+            android:listSelector="@color/grey_e3"
+            ></ListView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
