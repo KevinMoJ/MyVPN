@@ -42,6 +42,14 @@ public class ServerConfig {
         return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global", "Select the fastest server");
     }
 
+    private static ServerConfig addGlobalConfig(Resources resources){
+        String name = resources.getString(R.string.vpn_name_opt);
+        String server = resources.getString(R.string.vpn_server_opt);
+        String flag = resources.getResourceEntryName(R.drawable.ic_flag_global);
+        String nation = resources.getString(R.string.vpn_nation_opt);
+        return new ServerConfig(name, server, flag, nation);
+    }
+
     public ServerConfig(String name, String server, String flag, String nation){
         this.name = name;
         this.server = server;
@@ -49,21 +57,38 @@ public class ServerConfig {
         this.nation = nation;
     }
 
-    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
+//    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
+//        ArrayList<ServerConfig> arrayList = null;
+//        try{
+//            JSONArray jsonArray = new JSONArray(jsonArrayString);
+//            if(jsonArray.length() > 0){
+//                arrayList = new ArrayList<>(jsonArray.length());
+//                arrayList.add(addGlobalConfig());
+//                for(int i=0; i< jsonArray.length(); i++){
+//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                    ServerConfig serverConfig = new ServerConfig(jsonObject);
+//                    arrayList.add(serverConfig);
+//                }
+//            }
+//        }catch (Exception e){
+//            ShadowsocksApplication.handleException(e);
+//        }
+//        return arrayList;
+//    }
+
+    public static ArrayList<ServerConfig> createServerList(Context context, String jsonArrayString){
         ArrayList<ServerConfig> arrayList = null;
         try{
             JSONArray jsonArray = new JSONArray(jsonArrayString);
             if(jsonArray.length() > 0){
                 arrayList = new ArrayList<>(jsonArray.length());
-                arrayList.add(addGlobalConfig());
+                arrayList.add(addGlobalConfig(context.getResources()));
                 for(int i=0; i< jsonArray.length(); i++){
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     ServerConfig serverConfig = new ServerConfig(jsonObject);
                     arrayList.add(serverConfig);
                 }
             }
-
-
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }

@@ -13,7 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/vpn_server_list"
-            android:divider="@null"></ListView>
+            android:divider="@null"
+            android:choiceMode="singleChoice"></ListView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

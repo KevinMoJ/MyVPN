@@ -194,6 +194,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
                             .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
                             .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
+                            .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
                             .apply();
                 }else{
                     loadServerList(false);
@@ -800,7 +801,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(force || mServerConfigs == null){
             String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
             if(serverlist != null){
-                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(serverlist);
+                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
                 if(serverList != null && !serverList.isEmpty()){
                     mServerConfigs = serverList;
                     return;

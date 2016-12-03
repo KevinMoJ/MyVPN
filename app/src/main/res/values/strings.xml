@@ -89,6 +89,6 @@
 
     <string name="facebook_app_id" translatable="false">504824046367667</string>
 
-    <string name="server_list">Server List</string>
+    <string name="server_list">Server Location</string>
     <string name="repair">REPAIR</string>
 </resources>
