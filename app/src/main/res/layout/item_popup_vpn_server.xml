@@ -9,7 +9,7 @@
         android:background="@drawable/popup_menu_item_bg"
         android:id="@+id/vpn_name"
         android:text="@string/vpn_name_opt"
-        android:textColor="@color/primary_white_text"
+        android:textColor="@color/primary_black_text"
         android:textSize="@dimen/medium_text"
         android:layout_gravity="center_vertical"
         android:gravity="left|center_vertical"

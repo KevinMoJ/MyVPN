@@ -827,7 +827,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
                             String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
                             String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-                            mConnectingConfig = new ServerConfig(vpnName, server, flag);
+                            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+                            mConnectingConfig = new ServerConfig(vpnName, server, flag, nation);
                         }
                     } catch (RemoteException e) {
                         ShadowsocksApplication.handleException(e);

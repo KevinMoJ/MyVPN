@@ -71,6 +71,18 @@
     <string name="vpn_server_sg" translatable="false">v11.vpnnest.com</string>
     <string name="vpn_server_nl" translatable="false">v12.vpnnest.com</string>
 
+    <string name="vpn_nation_opt">Selected the fast server</string>
+    <string name="vpn_nation_fr">France</string>
+    <string name="vpn_nation_jp">Japan</string>
+    <string name="vpn_nation_uk">United Kindom</string>
+    <string name="vpn_nation_mia_us">United States</string>
+    <string name="vpn_nation_la_us">United States</string>
+    <string name="vpn_nation_au" translatable="false">Australla</string>
+    <string name="vpn_nation_da_us" translatable="false">United States</string>
+    <string name="vpn_nation_de" translatable="false">Germany</string>
+    <string name="vpn_nation_sg" translatable="false">Singapore</string>
+    <string name="vpn_nation_nl" translatable="false">Netherlands</string>
+
 
     <string name="change_proxy_tip">Please change proxy when the connection is off.</string>
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>

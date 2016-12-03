@@ -12,4 +12,6 @@ public final class SharedPreferenceKey {
     public static final String CONNECTING_VPN_NAME = "CONNECTING_VPN_NAME";
     public static final String CONNECTING_VPN_SERVER = "CONNECTING_VPN_SERVER";
     public static final String CONNECTING_VPN_FLAG = "CONNECTING_VPN_FLAG";
+    public static final String CONNECTING_VPN_NATION = "CONNECTING_VPN_NATION";
+
 }

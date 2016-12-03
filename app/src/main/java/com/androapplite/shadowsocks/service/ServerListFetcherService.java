@@ -54,13 +54,13 @@ public class ServerListFetcherService extends IntentService {
                 String jsonString = response.body().string();
                 if(jsonString != null && !jsonString.isEmpty()){
                     editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).apply();
-                    broadcastServerListFetchFinish();
                 }
             } catch (IOException e) {
                 long t2 = System.currentTimeMillis();
                 GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
                 ShadowsocksApplication.handleException(e);
             }
+            broadcastServerListFetchFinish();
         }
 
     }
