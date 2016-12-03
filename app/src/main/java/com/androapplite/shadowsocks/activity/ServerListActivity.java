@@ -79,9 +79,13 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
+        final int itemId = item.getItemId();
+        if(itemId == android.R.id.home){
             finish();
             return true;
+        }else if(itemId == R.id.menu_repair){
+            mSwipeRefreshLayout.setRefreshing(true);
+            ServerListFetcherService.fetchServerListAsync(this);
         }
         return super.onOptionsItemSelected(item);
     }
