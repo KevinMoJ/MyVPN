@@ -87,6 +87,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private ConnectivityFragment mConnectivityFragment;
     private static int REQUEST_CONNECT = 1;
+    private static int OPEN_SERVER_LIST = 2;
     private long mConnectOrDisconnectStartTime;
     private TrafficRateFragment mTrafficRateFragment;
     private Snackbar mSnackbar;
@@ -325,7 +326,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //                    GAHelper.sendEvent(this, "ProxyPopup", "错误时机", String.valueOf(state));
 //
 //                }
-                startActivityForResult(new Intent(this, ServerListActivity.class), 1);
+                startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
             }
             return true;
         }
@@ -636,18 +637,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if(mShadowsocksService != null){
-//                try {
-//                    Config config = new Config(findVPNServer());
-//                    mShadowsocksService.start(config);
-//                    ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
-//                }catch(RemoteException e){
-//                    ShadowsocksApplication.handleException(e);
-//                }
-            }else{
-                ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
-            }
+            if(requestCode == REQUEST_CONNECT){
+                if(mShadowsocksService != null && mConnectingConfig != null){
+                    Config config = new Config(mConnectingConfig.server);
+                    try {
+                        mShadowsocksService.start(config);
+                        ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
+                    } catch (RemoteException e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
 
+            }else if(requestCode == OPEN_SERVER_LIST){
+                connectVpnServerAsync();
+            }
         }
     }
 
@@ -756,23 +759,25 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private String findVPNServer(){
         loadServerList(false);
-        if(mConnectingConfig == null || mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))){
+//        if(mConnectingConfig == null || mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))){
+//
+//            if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+//                mConnectingConfig = mServerConfigs.get(1);
+//            }else{
+//                int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
+//                mConnectingConfig = mServerConfigs.get(index);
+//            }
+//        }
+        int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
+        mConnectingConfig = mServerConfigs.get(index);
 
-            if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
-                mConnectingConfig = mServerConfigs.get(1);
-            }else{
-                int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
-                mConnectingConfig = mServerConfigs.get(index);
-            }
-            long t1 = System.currentTimeMillis();
-            boolean r = ping(mConnectingConfig.server);
-            long t2 = System.currentTimeMillis();
-            boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
-            long t3 = System.currentTimeMillis();
-            Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
-            Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
-
-        }
+        long t1 = System.currentTimeMillis();
+        boolean r = ping(mConnectingConfig.server);
+        long t2 = System.currentTimeMillis();
+        boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
+        long t3 = System.currentTimeMillis();
+        Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
+        Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
         return mConnectingConfig.server;
     }
 
