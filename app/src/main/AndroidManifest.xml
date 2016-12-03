@@ -109,7 +109,8 @@
             android:name=".service.ConnectionTestService"
             android:exported="false" />
 
-        <activity android:name=".activity.ServerListActivity"></activity>
+        <activity android:name=".activity.ServerListActivity"
+            android:label="@string/server_list"></activity>
     </application>
 
 </manifest>
