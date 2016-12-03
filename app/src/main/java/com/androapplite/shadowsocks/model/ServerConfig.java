@@ -39,7 +39,7 @@ public class ServerConfig {
     }
 
     private static ServerConfig addGlobalConfig(){
-        return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global_clicked", "Select the fastest server");
+        return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global", "Select the fastest server");
     }
 
     public ServerConfig(String name, String server, String flag, String nation){

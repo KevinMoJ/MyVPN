@@ -30,7 +30,7 @@
 
     </array>
     <array name="vpn_icons">
-        <item>@drawable/ic_flag_global_clicked</item>
+        <item>@drawable/ic_flag_global</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_uk</item>
