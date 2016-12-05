@@ -77,6 +77,8 @@
         android:text="@string/more"
         android:textAllCaps="false"
         android:inputType="textCapWords"
+        android:onClick="moreShare"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
         />
 
 </LinearLayout>

@@ -444,14 +444,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void share(){
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getPlayStoreUrlString());
-        shareIntent.setType("text/plain");
-        try {
-            startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share)));
-        }catch(ActivityNotFoundException e){
-            ShadowsocksApplication.handleException(e);
-        }
+        startActivity(new Intent(this, ShareActivity.class));
     }
 
     @NonNull
