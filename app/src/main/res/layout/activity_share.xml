@@ -17,7 +17,9 @@
         android:drawableLeft="@drawable/ic_facebook_circle"
         android:drawablePadding="24dp"
         android:paddingLeft="24dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:onClick="shareByFacebook"
+        />
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
@@ -46,10 +48,13 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:layout_gravity="center"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/standard_margin"
             >
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:src="@drawable/vpn_qrcode"
                 android:layout_gravity="center_horizontal"
                 />
@@ -58,8 +63,9 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 android:text="@string/scan_qr_code_download"
-                android:lines="2"
-                android:gravity="center"/>
+                android:minLines="2"
+                android:gravity="center"
+                />
         </LinearLayout>
     </FrameLayout>
     <Button
