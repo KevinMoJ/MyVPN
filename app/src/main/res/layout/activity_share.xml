@@ -35,7 +35,9 @@
         android:drawableLeft="@drawable/ic_bluetooth_24dp"
         android:drawablePadding="24dp"
         android:paddingLeft="24dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:onClick="shareByBluetooth"
+        />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
