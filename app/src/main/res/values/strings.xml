@@ -24,7 +24,7 @@
         <item quantity="one">Byte</item>
         <item quantity="other">Bytes</item>
     </plurals>
-    <string name="more">more</string>
+    <string name="more">More</string>
     <string name="connection_failed">Connection failed</string>
     <string name="connection_failed_explain">A fatal error occured, try to reboot phone.</string>
     <string name="traffic_used">Used:</string>
@@ -91,4 +91,8 @@
 
     <string name="server_list">Server Location</string>
     <string name="repair">REPAIR</string>
+
+    <string name="facebook">Facebook</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="scan_qr_code_download">Scan QR code\ndownload on Google Play</string>
 </resources>
