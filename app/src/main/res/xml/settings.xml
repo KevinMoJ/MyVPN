@@ -8,6 +8,8 @@
             android:title="@string/auto_connect"
             android:key="auto_connect" />
     </PreferenceCategory>
+    <Preference android:selectable="false"
+        android:layout="@layout/preference_divider" />
     <PreferenceCategory
         android:title="@string/information"
         android:layout="@layout/preference_category">
