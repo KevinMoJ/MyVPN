@@ -95,4 +95,9 @@
     <string name="facebook">Facebook</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="scan_qr_code_download">Scan QR code\ndownload on Google Play</string>
+
+    <string name="connection">Connection</string>
+    <string name="auto_connect">Connect when VPN starts</string>
+    <string name="information">Information</string>
+    <string name="notification">Notification</string>
 </resources>

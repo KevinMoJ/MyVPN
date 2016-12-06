@@ -2,10 +2,21 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="Connection">
+        android:title="@string/connection"
+        android:layout="@layout/preference_category">
         <SwitchPreference
-            android:title="Connect when VPN starts"
+            android:title="@string/auto_connect"
             android:key="auto_connect" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/information"
+        android:layout="@layout/preference_category">
+        <SwitchPreference
+            android:title="@string/notification"
+            android:key="notification" />
+        <Preference
+            android:title="@string/about"
+            android:key="about" />
     </PreferenceCategory>
 
 </PreferenceScreen>
