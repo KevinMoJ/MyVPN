@@ -21,6 +21,6 @@
     android:paddingLeft="@dimen/standard_margin"
     android:paddingTop="@dimen/standard_margin"
     android:paddingBottom="0dp"
-    android:textColor="@color/grey_cc"
+    android:textColor="@color/secondary_black_text"
     android:textSize="@dimen/small_text"
     />

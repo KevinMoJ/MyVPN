@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import static java.security.AccessController.getContext;
@@ -37,6 +38,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getPreferenceManager().setSharedPreferencesName(DefaultSharedPrefeencesUtil.PREFERENCE_NAME);
         addPreferencesFromResource(R.xml.settings);
 
         Preference aboutPreference = findPreference("about");
