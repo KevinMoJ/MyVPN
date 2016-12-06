@@ -2,19 +2,14 @@ package com.androapplite.shadowsocks.fragment;
 
 
 import android.app.Activity;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
@@ -63,7 +58,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         String key = preference.getKey();
         if(key.equals(SharedPreferenceKey.NOTIFICATION)){
             if(mListener != null){
-                mListener.setNotificationEnable((Boolean)newValue);
+                mListener.enableNotification((Boolean)newValue);
             }
             return true;
         }
@@ -72,7 +67,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
     public interface OnSettingsActionListener {
         void about();
-        void setNotificationEnable(boolean enable);
+        void enableNotification(boolean enable);
     }
 
     @Override

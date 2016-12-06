@@ -1,7 +1,11 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +14,16 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.fragment.SettingsFragment;
 
+import yyf.shadowsocks.IShadowsocksService;
+
 public class SettingsActivity extends AppCompatActivity implements SettingsFragment.OnSettingsActionListener {
+
+    private IShadowsocksService mShadowsocksService;
+    private ServiceConnection mShadowsocksServiceConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +34,24 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mShadowsocksServiceConnection = createShadowsocksServiceConnection();
+        ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
+    }
+
+    private ServiceConnection createShadowsocksServiceConnection(){
+        return new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
+
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mShadowsocksService = null;
+            }
+        };
     }
 
     @Override
@@ -55,7 +83,22 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
     }
 
     @Override
-    public void setNotificationEnable(boolean enable) {
+    public void enableNotification(boolean enable) {
         Toast.makeText(this, "notification " + enable, Toast.LENGTH_SHORT).show();
+        if(mShadowsocksService != null){
+            try {
+                mShadowsocksService.enableNotification(enable);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mShadowsocksServiceConnection != null) {
+            unbindService(mShadowsocksServiceConnection);
+        }
     }
 }

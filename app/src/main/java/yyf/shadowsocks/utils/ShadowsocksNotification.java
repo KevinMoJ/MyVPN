@@ -99,11 +99,15 @@ public class ShadowsocksNotification {
                     break;
                 case Intent.ACTION_SCREEN_ON:
                     setVisible(mKeyguardManager.inKeyguardRestrictedInputMode());
-                    mService.registerCallback(mCallback);
-                    mCallbackRegistered = true;
+                    registerCallback();
                     break;
             }
         }
+    }
+
+    private void registerCallback() {
+        mService.registerCallback(mCallback);
+        mCallbackRegistered = true;
     }
 
     private void setVisible(boolean visible){
@@ -127,6 +131,14 @@ public class ShadowsocksNotification {
             mLockReceiver = null;
         }
 
+        disableNotification();
+    }
+
+    public void enableNotification(){
+        registerCallback();
+    }
+
+    public void disableNotification(){
         unregisterCallback();
         mService.stopForeground(true);
         mNotificationManager.cancel(1);

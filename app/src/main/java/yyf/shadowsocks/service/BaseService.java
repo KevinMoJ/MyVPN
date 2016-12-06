@@ -41,8 +41,6 @@ public abstract class BaseService extends VpnService {
     private Timer mHoulyUpdater;
     private long mStartTime;
 
-
-
     final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
     IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
         public int getMode(){
@@ -86,6 +84,9 @@ public abstract class BaseService extends VpnService {
             return DefaultSharedPrefeencesUtil.getRxTotal(BaseService.this);
         }
 
+        public void enableNotification(boolean enable){
+            BaseService.this.enableNotification(enable);
+        }
     };
 
     @Override
@@ -302,5 +303,6 @@ public abstract class BaseService extends VpnService {
 
     }
 
+    protected abstract void enableNotification(boolean enable);
 
 }
