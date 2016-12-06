@@ -100,4 +100,5 @@
     <string name="auto_connect">Connect when VPN starts</string>
     <string name="information">Information</string>
     <string name="notification">Notification</string>
+    <string name="settings">Settings</string>
 </resources>
