@@ -230,21 +230,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 registerShadowsocksCallback();
                 checkVPNConnectivity();
 
-                final int state;
-                try {
-                    state = mShadowsocksService.getState();
-                    if(state == Constants.State.INIT.ordinal() || state == Constants.State.STOPPED.ordinal()
-                            ){
-                        if(mSharedPreference != null){
-                            boolean autoConnect = mSharedPreference.getBoolean(SharedPreferenceKey.AUTO_CONNECT, false);
-                            if(autoConnect){
-                                connectVpnServerAsync();
-                            }
-                        }
-                    }
-                } catch (RemoteException e) {
-                    ShadowsocksApplication.handleException(e);
-                }
+                autoConnect();
 
             }
 
@@ -254,6 +240,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShadowsocksService = null;
             }
         };
+    }
+
+    private void autoConnect() {
+        if(mShadowsocksService != null) {
+            final int state;
+            try {
+                state = mShadowsocksService.getState();
+                if (state == Constants.State.INIT.ordinal() || state == Constants.State.STOPPED.ordinal()
+                        ) {
+                    if (mSharedPreference != null) {
+                        boolean autoConnect = mSharedPreference.getBoolean(SharedPreferenceKey.AUTO_CONNECT, false);
+                        if (autoConnect) {
+                            connectVpnServerAsync();
+                        }
+                    }
+                }
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
     }
 
     //todo: 这个方法的调用有问题
