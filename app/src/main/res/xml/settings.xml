@@ -18,7 +18,8 @@
             android:key="notification" />
         <Preference
             android:title="@string/about"
-            android:key="about" />
+            android:key="about"
+            />
     </PreferenceCategory>
 
 </PreferenceScreen>

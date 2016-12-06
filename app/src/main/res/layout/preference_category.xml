@@ -23,5 +23,4 @@
     android:paddingBottom="0dp"
     android:textColor="@color/grey_cc"
     android:textSize="@dimen/small_text"
-    android:textStyle="bold"
     />
