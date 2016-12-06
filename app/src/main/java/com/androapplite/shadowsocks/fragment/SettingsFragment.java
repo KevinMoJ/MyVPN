@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -13,16 +14,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import static java.security.AccessController.getContext;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener {
+public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceClickListener,
+        Preference.OnPreferenceChangeListener
+{
 
 
     public SettingsFragment() {
@@ -36,6 +41,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         Preference aboutPreference = findPreference("about");
         aboutPreference.setOnPreferenceClickListener(this);
+
+        SwitchPreference notificationPreference = (SwitchPreference)findPreference(SharedPreferenceKey.NOTIFICATION);
+        notificationPreference.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -67,5 +75,15 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         } catch (PackageManager.NameNotFoundException e) {
             ShadowsocksApplication.handleException(e);
         }
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        String key = preference.getKey();
+        if(key.equals(SharedPreferenceKey.NOTIFICATION)){
+            Toast.makeText(getActivity(), "notification " + newValue, Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 }

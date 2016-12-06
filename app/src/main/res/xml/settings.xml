@@ -15,7 +15,8 @@
         android:layout="@layout/preference_category">
         <SwitchPreference
             android:title="@string/notification"
-            android:key="notification" />
+            android:key="notification"
+            android:defaultValue="true"/>
         <Preference
             android:title="@string/about"
             android:key="about"
