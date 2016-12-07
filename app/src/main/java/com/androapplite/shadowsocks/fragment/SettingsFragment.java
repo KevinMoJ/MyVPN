@@ -36,6 +36,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         SwitchPreference notificationPreference = (SwitchPreference)findPreference(SharedPreferenceKey.NOTIFICATION);
         notificationPreference.setOnPreferenceChangeListener(this);
+        
     }
 
     @Override
