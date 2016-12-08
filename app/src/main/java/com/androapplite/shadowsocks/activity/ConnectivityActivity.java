@@ -136,6 +136,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     @Override
                     public void run() {
                         updateConnectionState(state);
+                        Log.d("连接状态", "state " + state);
                     }
                 });
             }
@@ -477,6 +478,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             protected void onPostExecute(ServerConfig serverConfig) {
                 mConnectingConfig = serverConfig;
+                prepareStartService();
             }
         }.execute();
     }
@@ -701,16 +703,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //                mConnectingConfig = mServerConfigs.get(index);
 //            }
 //        }
-        int index = (int) (Math.random() * (serverConfigs.size() -1) + 1);
-        ServerConfig serverConfig = serverConfigs.get(index);
-
-        long t1 = System.currentTimeMillis();
-        boolean r = ping(serverConfig.server);
-        long t2 = System.currentTimeMillis();
-        boolean rr = isPortOpen(serverConfig.server, 40010, 3000);
-        long t3 = System.currentTimeMillis();
-        Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
-        Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
+//        int index = (int) (Math.random() * (serverConfigs.size() -1) + 1);
+//        ServerConfig serverConfig = serverConfigs.get(index);
+//
+//        long t1 = System.currentTimeMillis();
+//        boolean r = ping(serverConfig.server);
+//        long t2 = System.currentTimeMillis();
+//        boolean rr = isPortOpen(serverConfig.server, 40010, 3000);
+//        long t3 = System.currentTimeMillis();
+//        Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
+//        Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
+        ServerConfig serverConfig = new ServerConfig("fr", "107.191.46.208", "ic_flag_fr", "France");
         return serverConfig;
     }
 
