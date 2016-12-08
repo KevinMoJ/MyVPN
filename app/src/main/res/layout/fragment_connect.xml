@@ -78,7 +78,8 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/connect_btn"
                         android:layout_gravity="center"
-                        style="@style/Base.Widget.AppCompat.Button.Borderless"/>
+                        style="@style/Base.Widget.AppCompat.Button.Borderless"
+                        android:id="@+id/connect_button"/>
                 </FrameLayout>
             </LinearLayout>
         </FrameLayout>
@@ -87,6 +88,16 @@
             android:layout_height="wrap_content"
             android:src="@drawable/jaguar_unconnected"
             android:layout_gravity="center_horizontal"
+            android:id="@+id/jaguar_image_view"
+            android:visibility="invisible"
+            />
+        <ImageView
+            android:layout_width="214dp"
+            android:layout_height="90dp"
+            android:src="@drawable/jaguar_run"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/jaguar_animation_image_view"
+            android:layout_marginTop="15dp"
             />
     </FrameLayout>
 </FrameLayout>
