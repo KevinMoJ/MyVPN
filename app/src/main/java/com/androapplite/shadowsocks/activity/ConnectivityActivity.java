@@ -86,15 +86,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
-    private ConnectivityFragment mConnectivityFragment;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private long mConnectOrDisconnectStartTime;
-    private TrafficRateFragment mTrafficRateFragment;
+//    private ConnectivityFragment mConnectivityFragment;
+//    private TrafficRateFragment mTrafficRateFragment;
+//    private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Snackbar mSnackbar;
     private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
-    private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Menu mMenu;
 //    private ArrayList<ServerConfig> mServerConfigs;
     private ServerConfig mConnectingConfig;
@@ -112,9 +112,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         FragmentManager fragmentManager = getSupportFragmentManager();
-        mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
-        mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
-        mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
+//        mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
+//        mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
+//        mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
 
@@ -154,49 +154,36 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
                 ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
                 ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
-                if(mTrafficRateFragment != null){
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTrafficRateFragment.updateRate(TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate),
-                                    TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
-                        }
-                    });
-                }
             }
         };
     }
 
     private void updateConnectionState(int state){
-        if(mConnectivityFragment != null){
-            if(state == Constants.State.CONNECTING.ordinal()){
+        if(state == Constants.State.CONNECTING.ordinal()){
 
-            }else if(state == Constants.State.CONNECTED.ordinal()){
-                if(mConnectingConfig != null){
-                    mSharedPreference.edit()
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
-                            .apply();
-                }else{
-                    mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
-                    changeProxyFlagIcon();
-                }
-                ConnectionTestService.testConnection(this);
-            }else if(state == Constants.State.ERROR.ordinal()){
-                restoreServerConfig();
-                changeProxyFlagIcon();
-            }else if(state == Constants.State.INIT.ordinal()){
-                restoreServerConfig();
-                changeProxyFlagIcon();
-            }else if(state == Constants.State.STOPPING.ordinal()){
-            }else if(state == Constants.State.STOPPED.ordinal()){
-                restoreServerConfig();
+        }else if(state == Constants.State.CONNECTED.ordinal()){
+            if(mConnectingConfig != null){
+                mSharedPreference.edit()
+                        .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
+                        .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
+                        .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
+                        .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
+                        .apply();
+            }else{
+                mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
                 changeProxyFlagIcon();
             }
-            mConnectivityFragment.updateConnectionState(state);
-            mConnectionIndicatorFragment.updateConnectionState(state);
+            ConnectionTestService.testConnection(this);
+        }else if(state == Constants.State.ERROR.ordinal()){
+            restoreServerConfig();
+            changeProxyFlagIcon();
+        }else if(state == Constants.State.INIT.ordinal()){
+            restoreServerConfig();
+            changeProxyFlagIcon();
+        }else if(state == Constants.State.STOPPING.ordinal()){
+        }else if(state == Constants.State.STOPPED.ordinal()){
+            restoreServerConfig();
+            changeProxyFlagIcon();
         }
     }
 
