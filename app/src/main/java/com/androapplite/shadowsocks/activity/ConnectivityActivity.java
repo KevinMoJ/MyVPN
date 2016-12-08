@@ -52,9 +52,6 @@ import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
-import com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment;
-import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
-import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -80,8 +77,7 @@ import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        ConnectivityFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
@@ -424,31 +420,31 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
-    @Override
-    public void onClickConnectionButton() {
-        if(mShadowsocksService != null) {
-            try {
-                final int state = mShadowsocksService.getState();
-                if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
-                        || state == Constants.State.STOPPED.ordinal()) {
-                    connectVpnServerAsync();
-
-                } else {
-                    mShadowsocksService.stop();
-                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                    if(mConnectingConfig != null && mConnectingConfig.name != null){
-                        GAHelper.sendEvent(this, "关闭连接", mConnectingConfig.name, String.valueOf(state));
-                    }else{
-                        GAHelper.sendEvent(this, "关闭连接", "错误", String.valueOf(state));
-                    }
-                }
-
-            } catch (RemoteException e) {
-                ShadowsocksApplication.handleException(e);
-            }
-        }
-
-    }
+//    @Override
+//    public void onClickConnectionButton() {
+//        if(mShadowsocksService != null) {
+//            try {
+//                final int state = mShadowsocksService.getState();
+//                if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
+//                        || state == Constants.State.STOPPED.ordinal()) {
+//                    connectVpnServerAsync();
+//
+//                } else {
+//                    mShadowsocksService.stop();
+//                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
+//                    if(mConnectingConfig != null && mConnectingConfig.name != null){
+//                        GAHelper.sendEvent(this, "关闭连接", mConnectingConfig.name, String.valueOf(state));
+//                    }else{
+//                        GAHelper.sendEvent(this, "关闭连接", "错误", String.valueOf(state));
+//                    }
+//                }
+//
+//            } catch (RemoteException e) {
+//                ShadowsocksApplication.handleException(e);
+//            }
+//        }
+//
+//    }
 
     private void connectVpnServerAsync() {
 //        new Thread(new Runnable() {

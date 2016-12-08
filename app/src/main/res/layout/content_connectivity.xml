@@ -9,40 +9,7 @@
     tools:context="com.androapplite.shadowsocks.activity.ConnectivityActivity"
     tools:showIn="@layout/app_bar_connectivity">
 
-    <fragment
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:name="com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment"
-        android:id="@+id/connection_indicator"
-        tools:layout="@layout/fragment_connection_indicator"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="@dimen/margin_4dp"
-        android:layout_marginRight="@dimen/margin_4dp"
-        />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
-        <fragment
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.androapplite.shadowsocks.fragment.ConnectivityFragment"
-            android:id="@+id/connection_fragment"
-            tools:layout="@layout/fragment_connectivity"
-            android:layout_centerHorizontal="true"/>
-        <fragment
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/half_standard_margin"
-            android:id="@+id/traffic_fragment"
-            android:name="com.androapplite.shadowsocks.fragment.TrafficRateFragment"
-            tools:layout="@layout/fragment_traffic_rate"
-            >
-        </fragment>
-    </LinearLayout>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
