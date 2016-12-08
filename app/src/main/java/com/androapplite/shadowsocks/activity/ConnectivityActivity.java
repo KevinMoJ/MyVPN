@@ -17,6 +17,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -95,7 +96,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private BroadcastReceiver mConnectivityReceiver;
     private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Menu mMenu;
-    private ArrayList<ServerConfig> mServerConfigs;
+//    private ArrayList<ServerConfig> mServerConfigs;
     private ServerConfig mConnectingConfig;
     private SharedPreferences mSharedPreference;
 
@@ -106,8 +107,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         initNavigationView();
-        initForegroundBroadcastReceiver();
-        initForegroundBroadcastIntentFilter();
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
@@ -132,26 +131,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         }
     }
-
-    private void initForegroundBroadcastIntentFilter(){
-        mForgroundReceiverIntentFilter = new IntentFilter();
-        mForgroundReceiverIntentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
-    }
-
-    private void initForegroundBroadcastReceiver(){
-        mForgroundReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                switch(action){
-                    case Action.SERVER_LIST_FETCH_FINISH:
-                        loadServerList(true);
-                        break;
-                }
-            }
-        };
-    }
-
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
         return new IShadowsocksServiceCallback.Stub(){
@@ -201,8 +180,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
                             .apply();
                 }else{
-                    loadServerList(false);
-                    loadConnectingServerConfig();
+                    mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
                     changeProxyFlagIcon();
                 }
                 ConnectionTestService.testConnection(this);
@@ -357,90 +335,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void showVpnServerChangePopupWindow() {
-        final View popupView = getLayoutInflater().inflate(R.layout.popup_vpn_server, null);
-
-        ListView vpnServerListView = (ListView) popupView.findViewById(R.id.vpn_server_list);
-        vpnServerListView.setAdapter(new VpnServerItemAdapter());
-
-        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        popupWindow.setBackgroundDrawable(new BitmapDrawable());
-        vpnServerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mConnectingConfig = mServerConfigs.get(position);
-                saveVpnName(mConnectingConfig);
-                changeProxyFlagIcon();
-                popupWindow.dismiss();
-            }
-        });
-
-        View toobar = findViewById(R.id.toolbar);
-        int offset = (int) getResources().getDimension(R.dimen.standard_margin);
-        try {
-            popupWindow.showAsDropDown(toobar, toobar.getWidth() - offset - popupView.getMeasuredWidth(), -offset);
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
-            Snackbar.make(findViewById(R.id.coordinator), R.string.not_open_vpn_popup, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    public class VpnServerItemAdapter extends BaseAdapter{
-
-        public VpnServerItemAdapter(){
-            loadServerList(false);
-        }
-
-        @Override
-        public int getCount() {
-            return mServerConfigs != null ? mServerConfigs.size() : 0;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mServerConfigs.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = null;
-            ViewHolder viewHolder = null;
-            if(convertView == null) {
-                view = getLayoutInflater().inflate(R.layout.item_popup_vpn_server, null);
-                viewHolder = new ViewHolder();
-                viewHolder.vpnIconImageView = (ImageView)view.findViewById(R.id.vpn_icon);
-                viewHolder.vpnNameTextView = (TextView)view.findViewById(R.id.vpn_name);
-                view.setTag(viewHolder);
-            }else{
-                view = convertView;
-                viewHolder = (ViewHolder)view.getTag();
-            }
-            ServerConfig serverConfig = (ServerConfig)getItem(position);
-
-            final Context context = view.getContext();
-            if(serverConfig.flag.startsWith("http://")){
-                Glide.with(context).load(serverConfig.flag).into(viewHolder.vpnIconImageView);
-            }else{
-                Glide.with(context).load(serverConfig.getResourceId(context)).into(viewHolder.vpnIconImageView);
-            }
-            viewHolder.vpnNameTextView.setText(serverConfig.name);
-            return view;
-        }
-
-        public class ViewHolder{
-            public ImageView vpnIconImageView;
-            public TextView vpnNameTextView;
-        }
-
-    }
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -570,26 +464,38 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void connectVpnServerAsync() {
-        new Thread(new Runnable() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+////                loadServerList(false);
+//                findVPNServer();
+//                getWindow().getDecorView().post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        changeProxyFlagIcon();
+//                    }
+//                });
+//                prepareStartService();
+//                mConnectOrDisconnectStartTime = System.currentTimeMillis();
+//                if(mConnectingConfig != null && mConnectingConfig.name != null) {
+//                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", mConnectingConfig.name);
+//                }else{
+//                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", "错误");
+//                }
+//            }
+//        }).start();
+
+        new AsyncTask<Void, Void, ServerConfig>(){
             @Override
-            public void run() {
-                loadServerList(false);
-                findVPNServer();
-                getWindow().getDecorView().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        changeProxyFlagIcon();
-                    }
-                });
-                prepareStartService();
-                mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                if(mConnectingConfig != null && mConnectingConfig.name != null) {
-                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", mConnectingConfig.name);
-                }else{
-                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", "错误");
-                }
+            protected ServerConfig doInBackground(Void... params) {
+                return findVPNServer();
             }
-        }).start();
+
+            @Override
+            protected void onPostExecute(ServerConfig serverConfig) {
+                mConnectingConfig = serverConfig;
+            }
+        }.execute();
     }
 
 
@@ -642,8 +548,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-        loadServerList(false);
-        loadConnectingServerConfig();
+//        loadServerList(false);
+        mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
         changeProxyFlagIcon();
         AppEventsLogger.activateApp(this);
     }
@@ -770,15 +676,39 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         unregisterReceiver(mConnectivityReceiver);
     }
 
-    public void saveVpnName(ServerConfig config){
-        String vpnName = config.name;
-        SharedPreferences.Editor editor = mSharedPreference.edit();
-        editor.putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
-        GAHelper.sendEvent(this, "选择VPN", vpnName);
-    }
+//    public void saveVpnName(ServerConfig config){
+//        String vpnName = config.name;
+//        SharedPreferences.Editor editor = mSharedPreference.edit();
+//        editor.putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
+//        GAHelper.sendEvent(this, "选择VPN", vpnName);
+//    }
 
-    private String findVPNServer(){
-        loadServerList(false);
+//    private String findVPNServer(){
+//        ArrayList<ServerConfig> serverConfigs = loadServerList();
+////        if(mConnectingConfig == null || mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))){
+////
+////            if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+////                mConnectingConfig = mServerConfigs.get(1);
+////            }else{
+////                int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
+////                mConnectingConfig = mServerConfigs.get(index);
+////            }
+////        }
+//        int index = (int) (Math.random() * (serverConfigs.size() -1) + 1);
+//        mConnectingConfig = serverConfigs.get(index);
+//
+//        long t1 = System.currentTimeMillis();
+//        boolean r = ping(mConnectingConfig.server);
+//        long t2 = System.currentTimeMillis();
+//        boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
+//        long t3 = System.currentTimeMillis();
+//        Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
+//        Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
+//        return mConnectingConfig.server;
+//    }
+
+    private ServerConfig findVPNServer(){
+        ArrayList<ServerConfig> serverConfigs = loadServerList();
 //        if(mConnectingConfig == null || mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))){
 //
 //            if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
@@ -788,17 +718,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //                mConnectingConfig = mServerConfigs.get(index);
 //            }
 //        }
-        int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
-        mConnectingConfig = mServerConfigs.get(index);
+        int index = (int) (Math.random() * (serverConfigs.size() -1) + 1);
+        ServerConfig serverConfig = serverConfigs.get(index);
 
         long t1 = System.currentTimeMillis();
-        boolean r = ping(mConnectingConfig.server);
+        boolean r = ping(serverConfig.server);
         long t2 = System.currentTimeMillis();
-        boolean rr = isPortOpen(mConnectingConfig.server, 40010, 3000);
+        boolean rr = isPortOpen(serverConfig.server, 40010, 3000);
         long t3 = System.currentTimeMillis();
         Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
         Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
-        return mConnectingConfig.server;
+        return serverConfig;
     }
 
     private void changeProxyFlagIcon(){
@@ -825,27 +755,72 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
-    private void loadServerList(boolean force){
-        if(force || mServerConfigs == null){
-            String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
-            if(serverlist != null){
-                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
-                if(serverList != null && !serverList.isEmpty()){
-                    mServerConfigs = serverList;
-                    return;
-                }
+//    private void loadServerList(boolean force){
+//        if(force || mServerConfigs == null){
+//            String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+//            if(serverlist != null){
+//                ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
+//                if(serverList != null && !serverList.isEmpty()){
+//                    mServerConfigs = serverList;
+//                    return;
+//                }
+//            }
+//            mServerConfigs = ServerConfig.createDefaultServerList(getResources());
+//        }
+//    }
+//
+//    private void loadConnectingServerConfig(){
+//        if(mServerConfigs!= null && !mServerConfigs.contains(mConnectingConfig)){
+//            String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
+//            if(vpnName != null && !vpnName.equals(getString(R.string.vpn_name_opt))){
+//                for(ServerConfig config: mServerConfigs){
+//                    if(config.name.equals(vpnName)){
+//                        mConnectingConfig = config;
+//                        break;
+//                    }
+//                }
+//            }else if(vpnName != null && vpnName.equals(getString(R.string.vpn_name_opt))){
+//                if(mShadowsocksService != null){
+//                    try {
+//                        if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()){
+//                            vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+//                            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+//                            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+//                            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+//                            mConnectingConfig = new ServerConfig(vpnName, server, flag, nation);
+//                        }
+//                    } catch (RemoteException e) {
+//                        ShadowsocksApplication.handleException(e);
+//                    }
+//                }
+//
+//            }
+//        }
+//    }
+
+    private ArrayList<ServerConfig> loadServerList(){
+        ArrayList<ServerConfig> result = null;
+        String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+        if(serverlist != null){
+            ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
+            if(serverList != null && !serverList.isEmpty()){
+                result = serverList;
             }
-            mServerConfigs = ServerConfig.createDefaultServerList(getResources());
         }
+        if(result == null){
+            result = ServerConfig.createDefaultServerList(getResources());
+        }
+        return result;
     }
 
-    private void loadConnectingServerConfig(){
-        if(mServerConfigs!= null && !mServerConfigs.contains(mConnectingConfig)){
+    private ServerConfig loadConnectingServerConfig(ServerConfig connectingConfig){
+        ArrayList<ServerConfig> serverConfigs = loadServerList();
+        if(serverConfigs!= null && !serverConfigs.contains(connectingConfig)){
             String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
             if(vpnName != null && !vpnName.equals(getString(R.string.vpn_name_opt))){
-                for(ServerConfig config: mServerConfigs){
+                for(ServerConfig config: serverConfigs){
                     if(config.name.equals(vpnName)){
-                        mConnectingConfig = config;
+                        connectingConfig = config;
                         break;
                     }
                 }
@@ -857,7 +832,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
                             String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
                             String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-                            mConnectingConfig = new ServerConfig(vpnName, server, flag, nation);
+                            connectingConfig = new ServerConfig(vpnName, server, flag, nation);
                         }
                     } catch (RemoteException e) {
                         ShadowsocksApplication.handleException(e);
@@ -866,7 +841,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
             }
         }
+        return connectingConfig;
     }
+
+
 
     private void restoreServerConfig(){
         String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
