@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.R;
 
@@ -18,9 +19,9 @@ import com.androapplite.shadowsocks.R;
  * Use the {@link RateUsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RateUsFragment extends Fragment {
-    private Button mRateUsButton;
+public class RateUsFragment extends Fragment implements View.OnClickListener{
     private OnFragmentInteractionListener mListener;
+    private LinearLayout mStartContainer;
 
     public RateUsFragment() {
         // Required empty public constructor
@@ -35,22 +36,16 @@ public class RateUsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_rate_us, container, false);
-        mRateUsButton = (Button)rootView.findViewById(R.id.rate_us_btn);
-        initRateUsButton();
+        mStartContainer = (LinearLayout)rootView.findViewById(R.id.star_container);
+        for(int i = 0; i< mStartContainer.getChildCount(); i++){
+            View view = mStartContainer.getChildAt(i);
+            if(view instanceof ImageButton){
+                view.setOnClickListener(this);
+            }
+        }
         return rootView;
     }
 
-
-    private void initRateUsButton(){
-        mRateUsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onRateUs();
-                }
-            }
-        });
-    }
 
     @Override
     public void onAttach(Activity context) {
@@ -85,5 +80,18 @@ public class RateUsFragment extends Fragment {
         void onRateUs();
     }
 
-
+    @Override
+    public void onClick(View v) {
+        int selectedIndex = mStartContainer.indexOfChild(v);
+        for(int i = 0; i< mStartContainer.getChildCount(); i++){
+            View view = mStartContainer.getChildAt(i);
+            if(view instanceof ImageButton){
+                if(i <= selectedIndex){
+                    view.setSelected(true);
+                }else{
+                    view.setSelected(false);
+                }
+            }
+        }
+    }
 }

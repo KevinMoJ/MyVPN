@@ -54,6 +54,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
+import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -79,7 +80,8 @@ import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ConnectFragment.OnConnectActionListener{
+        implements NavigationView.OnNavigationItemSelectedListener,
+        ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
@@ -885,6 +887,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mConnectFragment.startAnimation();
         }
         connectVpnServerAsync();
+
+    }
+
+    @Override
+    public void onCloseRateUs() {
+
+    }
+
+    @Override
+    public void onRateUs() {
 
     }
 }
