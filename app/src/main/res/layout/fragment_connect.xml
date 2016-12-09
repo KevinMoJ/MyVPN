@@ -72,6 +72,8 @@
                         android:indeterminateOnly="false"
                         android:paddingTop="6dp"
                         android:paddingBottom="6dp"
+                        android:visibility="invisible"
+                        android:id="@+id/progress_bar"
                         />
                     <ImageButton
                         android:layout_width="wrap_content"
@@ -86,10 +88,9 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/jaguar_unconnected"
+            android:src="@drawable/jaguar_stay"
             android:layout_gravity="center_horizontal"
             android:id="@+id/jaguar_image_view"
-            android:visibility="invisible"
             />
         <ImageView
             android:layout_width="214dp"
@@ -98,6 +99,7 @@
             android:layout_gravity="center_horizontal"
             android:id="@+id/jaguar_animation_image_view"
             android:layout_marginTop="15dp"
+            android:visibility="invisible"
             />
     </FrameLayout>
 </FrameLayout>

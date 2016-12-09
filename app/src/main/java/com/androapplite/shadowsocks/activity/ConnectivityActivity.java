@@ -27,6 +27,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -52,6 +53,7 @@ import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -77,7 +79,7 @@ import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, ConnectFragment.OnConnectActionListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
@@ -85,16 +87,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private long mConnectOrDisconnectStartTime;
-//    private ConnectivityFragment mConnectivityFragment;
-//    private TrafficRateFragment mTrafficRateFragment;
-//    private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Snackbar mSnackbar;
     private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
     private Menu mMenu;
-//    private ArrayList<ServerConfig> mServerConfigs;
     private ServerConfig mConnectingConfig;
     private SharedPreferences mSharedPreference;
+    private ConnectFragment mConnectFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,14 +106,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-//        mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
-//        mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
-//        mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
 
         initVpnNameAndNation();
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        if(fragment instanceof ConnectFragment){
+            mConnectFragment = (ConnectFragment)fragment;
+        }
     }
 
     private void initVpnNameAndNation() {
@@ -159,6 +162,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(state == Constants.State.CONNECTING.ordinal()){
 
         }else if(state == Constants.State.CONNECTED.ordinal()){
+            if(mConnectFragment != null){
+                mConnectFragment.setConnectResult(true);
+            }
             if(mConnectingConfig != null){
                 mSharedPreference.edit()
                         .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
@@ -172,13 +178,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
             ConnectionTestService.testConnection(this);
         }else if(state == Constants.State.ERROR.ordinal()){
+            if(mConnectFragment != null){
+                mConnectFragment.setConnectResult(false);
+            }
             restoreServerConfig();
             changeProxyFlagIcon();
         }else if(state == Constants.State.INIT.ordinal()){
+            if(mConnectFragment != null){
+                mConnectFragment.setConnectResult(false);
+            }
             restoreServerConfig();
             changeProxyFlagIcon();
         }else if(state == Constants.State.STOPPING.ordinal()){
         }else if(state == Constants.State.STOPPED.ordinal()){
+            if(mConnectFragment != null){
+                mConnectFragment.setConnectResult(false);
+            }
             restoreServerConfig();
             changeProxyFlagIcon();
         }
@@ -865,4 +880,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
+    @Override
+    public void onConnectButtonClick() {
+        if(mConnectFragment != null){
+            mConnectFragment.startAnimation();
+        }
+        connectVpnServerAsync();
+
+    }
 }
