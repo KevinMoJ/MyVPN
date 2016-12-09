@@ -15,13 +15,21 @@
         tools:layout="@layout/fragment_connect"
         android:id="@+id/connect_fragment"/>
     
-    <fragment
+    <!--<fragment-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_margin="@dimen/half_standard_margin"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"-->
+        <!--tools:layout="@layout/fragment_rate_us"-->
+        <!--android:id="@+id/rate_us" />-->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_margin="@dimen/standard_margin"
         android:layout_height="wrap_content"
-        android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
-        tools:layout="@layout/fragment_rate_us"
-        android:id="@+id/rate_us" />
+        android:layout_margin="@dimen/half_standard_margin"
+        android:id="@+id/rate_us_frame_layout"
+        >
+
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

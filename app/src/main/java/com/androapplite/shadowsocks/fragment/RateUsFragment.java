@@ -76,8 +76,8 @@ public class RateUsFragment extends Fragment implements View.OnClickListener{
     }
 
     public interface OnFragmentInteractionListener {
-        void onCloseRateUs();
-        void onRateUs();
+        void onCloseRateUs(RateUsFragment fragment);
+        void onRateUs(RateUsFragment fragment);
     }
 
     @Override
@@ -91,6 +91,13 @@ public class RateUsFragment extends Fragment implements View.OnClickListener{
                 }else{
                     view.setSelected(false);
                 }
+            }
+        }
+        if(mListener != null){
+            if(v.getId() == R.id.rate_us_image_button){
+                mListener.onRateUs(this);
+            }else{
+                mListener.onCloseRateUs(this);
             }
         }
     }

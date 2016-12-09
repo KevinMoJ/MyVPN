@@ -60,6 +60,7 @@
             android:layout_height="wrap_content"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:src="@drawable/start5"
+            android:id="@+id/rate_us_image_button"
             />
     </LinearLayout>
 </LinearLayout>

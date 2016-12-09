@@ -30,6 +30,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -110,7 +111,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
-
         initVpnNameAndNation();
     }
 
@@ -180,6 +180,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 changeProxyFlagIcon();
             }
             ConnectionTestService.testConnection(this);
+            getWindow().getDecorView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getSupportFragmentManager().beginTransaction()
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                            .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                            .commitAllowingStateLoss();
+                }
+            }, 2000);
         }else if(state == Constants.State.ERROR.ordinal()){
             if(mConnectFragment != null){
                 mConnectFragment.setConnectResult(false);
@@ -891,12 +900,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     @Override
-    public void onCloseRateUs() {
-
+    public void onCloseRateUs(final RateUsFragment fragment) {
+        getWindow().getDecorView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getSupportFragmentManager().popBackStack();
+            }
+        }, 1000);
     }
 
     @Override
-    public void onRateUs() {
-
+    public void onRateUs(final RateUsFragment fragment) {
+        getWindow().getDecorView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getSupportFragmentManager().beginTransaction()
+                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                        .remove(fragment)
+                        .add(R.id.rate_us_frame_layout, new Fragment())
+                        .commitAllowingStateLoss();
+            }
+        }, 1000);
     }
 }
