@@ -14,6 +14,14 @@
         android:name="com.androapplite.shadowsocks.fragment.ConnectFragment"
         tools:layout="@layout/fragment_connect"
         android:id="@+id/connect_fragment"/>
+    
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_margin="@dimen/standard_margin"
+        android:layout_height="140dp"
+        android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"
+        tools:layout="@layout/fragment_rate_us"
+        android:id="@+id/rate_us" />
 
     <FrameLayout
         android:layout_width="match_parent"
