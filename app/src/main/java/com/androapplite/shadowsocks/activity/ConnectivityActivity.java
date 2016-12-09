@@ -86,7 +86,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
-    private long mConnectOrDisconnectStartTime;
+//    private long mConnectOrDisconnectStartTime;
     private Snackbar mSnackbar;
     private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
@@ -171,6 +171,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
                         .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
                         .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
+                        .putLong(SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
                         .apply();
             }else{
                 mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
@@ -242,19 +243,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         try {
             if(mShadowsocksService != null) {
                 updateConnectionState(mShadowsocksService.getState());
-                if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()) {
-                    if (mConnectOrDisconnectStartTime > 0) {
-                        long t = System.currentTimeMillis();
-                        GAHelper.sendTimingEvent(this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
-                        mConnectOrDisconnectStartTime = 0;
-                    }
-                }else if(mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()){
-                    if (mConnectOrDisconnectStartTime > 0) {
-                        long t = System.currentTimeMillis();
-                        GAHelper.sendTimingEvent(this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
-                        mConnectOrDisconnectStartTime = 0;
-                    }
-                }
+//                if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()) {
+//                    if (mConnectOrDisconnectStartTime > 0) {
+//                        long t = System.currentTimeMillis();
+//                        GAHelper.sendTimingEvent(this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
+//                        mConnectOrDisconnectStartTime = 0;
+//                    }
+//                }else if(mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()){
+//                    if (mConnectOrDisconnectStartTime > 0) {
+//                        long t = System.currentTimeMillis();
+//                        GAHelper.sendTimingEvent(this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
+//                        mConnectOrDisconnectStartTime = 0;
+//                    }
+//                }
             }
         } catch (RemoteException e) {
             e.printStackTrace();

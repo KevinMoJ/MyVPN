@@ -15,6 +15,7 @@ public final class SharedPreferenceKey {
     public static final String CONNECTING_VPN_NATION = "CONNECTING_VPN_NATION";
     public static final String AUTO_CONNECT = "auto_connect";
     public static final String NOTIFICATION = "notification";
+    public static final String CONNECT_TIME = "CONNECT_TIME";
 
 
 }

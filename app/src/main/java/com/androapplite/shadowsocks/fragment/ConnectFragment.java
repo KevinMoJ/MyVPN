@@ -7,11 +7,13 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.animation.AnimatorListenerCompat;
 import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+
+import java.text.SimpleDateFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,6 +103,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         if(progressAnimator != null) {
             progressAnimator.end();
         }
+        Timer timer = (Timer) mElapseTextView.getTag();
+        if(timer != null){
+            timer.cancel();
+            timer.purge();
+            mElapseTextView.setTag(null);
+        }
     }
 
     public void startAnimation(){
@@ -109,6 +123,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         progressAnimator.start();
         mProgressBar.setTag(progressAnimator);
         mMessageTextView.setText(R.string.connecting);
+        mElapseTextView.setVisibility(View.INVISIBLE);
+        Timer timer = (Timer) mElapseTextView.getTag();
+        if(timer != null){
+            timer.cancel();
+            mElapseTextView.setTag(null);
+        }
 
     }
 
@@ -144,7 +164,29 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
             mConnectButton.setImageLevel(1);
             mMessageTextView.setText(R.string.connected);
             mElapseTextView.setVisibility(View.VISIBLE);
-            Timer
+            Timer timer = (Timer) mElapseTextView.getTag();
+            if(timer == null){
+                TimerTask timerTask= new TimerTask() {
+                    @Override
+                    public void run() {
+                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+                        final long current = System.currentTimeMillis();
+                        long start = sharedPreferences.getLong(SharedPreferenceKey.CONNECT_TIME, current);
+                        long elapse = (current - start)/1000;
+                        final String elpasedTime = DateUtils.formatElapsedTime(elapse);
+                        mElapseTextView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mElapseTextView.setText(elpasedTime);
+                            }
+                        });
+                    }
+                };
+                timer = new Timer();
+                timer.schedule(timerTask, 1000, 1000);
+                mElapseTextView.setTag(timer);
+            }
+
         }else{
             mJaguarImageView.setImageLevel(0);
             mConnectButton.setImageLevel(0);
