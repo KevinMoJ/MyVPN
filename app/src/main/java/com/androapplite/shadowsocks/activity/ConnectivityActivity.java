@@ -184,9 +184,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             restoreServerConfig();
             changeProxyFlagIcon();
         }else if(state == Constants.State.INIT.ordinal()){
-            if(mConnectFragment != null){
-                mConnectFragment.setConnectResult(false);
-            }
+
             restoreServerConfig();
             changeProxyFlagIcon();
         }else if(state == Constants.State.STOPPING.ordinal()){

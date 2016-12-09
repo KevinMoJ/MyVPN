@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
 
@@ -31,6 +32,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     private ImageButton mConnectButton;
     private ProgressBar mProgressBar;
     private boolean mIsSuccess;
+    private TextView mMessageTextView;
+    private TextView mElapseTextView;
 
 
     public ConnectFragment() {
@@ -48,6 +51,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mJaguarImageView = (ImageView)view.findViewById(R.id.jaguar_image_view);
         mJaguarAnimationImageView = (ImageView)view.findViewById(R.id.jaguar_animation_image_view);
         mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);
+        mMessageTextView = (TextView)view.findViewById(R.id.message);
+        mElapseTextView = (TextView)view.findViewById(R.id.elapse);
         return view;
     }
 
@@ -103,6 +108,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         progressAnimator.setDuration(15000);
         progressAnimator.start();
         mProgressBar.setTag(progressAnimator);
+        mMessageTextView.setText(R.string.connecting);
 
     }
 
@@ -136,10 +142,16 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         if(mIsSuccess){
             mJaguarImageView.setImageLevel(1);
             mConnectButton.setImageLevel(1);
+            mMessageTextView.setText(R.string.connected);
+            mElapseTextView.setVisibility(View.VISIBLE);
+            Timer
         }else{
             mJaguarImageView.setImageLevel(0);
             mConnectButton.setImageLevel(0);
+            mMessageTextView.setText(R.string.retry);
+            mElapseTextView.setVisibility(View.INVISIBLE);
         }
+
     }
 
     @Override
