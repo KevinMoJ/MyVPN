@@ -25,5 +25,5 @@
     <color name="disconnect_red">#e93d25</color>
     <color name="progress">#17D478</color>
     <color name="rate_us_bg">#F7FBFB</color>
-
+    <color name="nav_draw_icon">#747D87</color>
 </resources>

@@ -104,7 +104,7 @@ public class ServerConfig {
         for(int i=0; i<names.length(); i++){
             String name = names.getString(i);
             String server = servers.getString(i);
-            String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_announcement_24dp));
+            String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_bluetooth_24dp));
             String nation = nations.getString(i);
             ServerConfig serverConfig = new ServerConfig(name, server, flag, nation);
             arrayList.add(serverConfig);
