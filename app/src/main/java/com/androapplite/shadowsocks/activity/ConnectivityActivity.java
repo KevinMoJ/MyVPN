@@ -180,14 +180,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 changeProxyFlagIcon();
             }
             ConnectionTestService.testConnection(this);
-            getWindow().getDecorView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                            .commitAllowingStateLoss();
-                }
-            }, 2000);
+            if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
+                getWindow().getDecorView().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                                .commitAllowingStateLoss();
+                    }
+                }, 2000);
+            }
         }else if(state == Constants.State.ERROR.ordinal()){
             if(mConnectFragment != null){
                 mConnectFragment.setConnectResult(false);
@@ -904,12 +906,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onCloseRateUs(final RateUsFragment fragment) {
+        remoeRateUsFragment(fragment);
+    }
+
+    private void remoeRateUsFragment(RateUsFragment fragment) {
         getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
     }
 
     @Override
     public void onRateUs(final RateUsFragment fragment) {
-        getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        remoeRateUsFragment(fragment);
         rateUs();
     }
 }
