@@ -4,10 +4,13 @@ package com.androapplite.shadowsocks.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -19,9 +22,10 @@ import com.androapplite.shadowsocks.R;
  * Use the {@link RateUsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RateUsFragment extends Fragment implements View.OnClickListener{
+public class RateUsFragment extends Fragment implements View.OnClickListener, Animation.AnimationListener{
     private OnFragmentInteractionListener mListener;
     private LinearLayout mStartContainer;
+    private @IdRes int mClickedStartButtonId;
 
     public RateUsFragment() {
         // Required empty public constructor
@@ -93,12 +97,39 @@ public class RateUsFragment extends Fragment implements View.OnClickListener{
                 }
             }
         }
+        mClickedStartButtonId = v.getId();
+        getView().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+                animation.setAnimationListener(RateUsFragment.this);
+                getView().startAnimation(animation);
+            }
+        }, 1000);
+//        Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+//        animation.setAnimationListener(RateUsFragment.this);
+//        getView().startAnimation(animation);
+    }
+
+    @Override
+    public void onAnimationStart(Animation animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animation animation) {
         if(mListener != null){
-            if(v.getId() == R.id.rate_us_image_button){
+            if(mClickedStartButtonId == R.id.rate_us_image_button){
                 mListener.onRateUs(this);
             }else{
                 mListener.onCloseRateUs(this);
             }
         }
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation) {
+
     }
 }
