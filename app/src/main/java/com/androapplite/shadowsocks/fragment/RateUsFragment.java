@@ -74,6 +74,15 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Animation animation = getView().getAnimation();
+        if(animation != null){
+            animation.cancel();
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -106,9 +115,6 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
                 getView().startAnimation(animation);
             }
         }, 1000);
-//        Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
-//        animation.setAnimationListener(RateUsFragment.this);
-//        getView().startAnimation(animation);
     }
 
     @Override
@@ -125,7 +131,6 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
                 mListener.onCloseRateUs(this);
             }
         }
-
     }
 
     @Override
