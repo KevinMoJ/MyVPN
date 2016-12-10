@@ -141,7 +141,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     @Override
                     public void run() {
                         updateConnectionState(state);
-                        Log.d("连接状态", "state " + state);
                     }
                 });
             }
@@ -180,16 +179,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 changeProxyFlagIcon();
             }
             ConnectionTestService.testConnection(this);
-            if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
-                getWindow().getDecorView().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getSupportFragmentManager().beginTransaction()
-                                .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                                .commitAllowingStateLoss();
-                    }
-                }, 2000);
-            }
+            showRateUsFragment();
         }else if(state == Constants.State.ERROR.ordinal()){
             if(mConnectFragment != null){
                 mConnectFragment.setConnectResult(false);
@@ -207,6 +197,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
             restoreServerConfig();
             changeProxyFlagIcon();
+        }
+    }
+
+    private void showRateUsFragment() {
+        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
+            getWindow().getDecorView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                            .commitAllowingStateLoss();
+                }
+            }, 2000);
         }
     }
 
