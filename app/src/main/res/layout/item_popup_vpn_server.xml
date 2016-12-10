@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="@drawable/server_list_item_bg"
+        android:paddingLeft="@dimen/standard_margin"
+        android:paddingRight="@dimen/standard_margin"
         >
         <TextView
             android:layout_width="match_parent"
@@ -31,9 +33,13 @@
             app:sriv_left_bottom_corner_radius="3dp"
             app:sriv_right_bottom_corner_radius="3dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/standard_margin"
             android:id="@+id/vpn_icon"
             />
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="27dp"
+            android:src="@drawable/server_signal_4"
+            android:layout_gravity="right|center_vertical" />
     </FrameLayout>
 
 </FrameLayout>
