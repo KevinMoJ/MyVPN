@@ -112,10 +112,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
         initVpnNameAndNation();
-
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                .commitAllowingStateLoss();
     }
 
     @Override
@@ -184,15 +180,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 changeProxyFlagIcon();
             }
             ConnectionTestService.testConnection(this);
-//            getWindow().getDecorView().postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    getSupportFragmentManager().beginTransaction()
-//                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-//                            .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-//                            .commitAllowingStateLoss();
-//                }
-//            }, 2000);
+            getWindow().getDecorView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                            .commitAllowingStateLoss();
+                }
+            }, 2000);
         }else if(state == Constants.State.ERROR.ordinal()){
             if(mConnectFragment != null){
                 mConnectFragment.setConnectResult(false);

@@ -47,6 +47,8 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
                 view.setOnClickListener(this);
             }
         }
+        Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_in);
+        rootView.startAnimation(animation);
         return rootView;
     }
 
