@@ -769,7 +769,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     ShadowsocksApplication.handleException(e);
                 }
             }else{
-                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global_clicked);
+                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global);
             }
         }
     }
