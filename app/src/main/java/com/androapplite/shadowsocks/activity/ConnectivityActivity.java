@@ -392,8 +392,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         try {
             startActivity(goToMarket);
         } catch (ActivityNotFoundException e) {
-            startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(getPlayStoreUrlString())));
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(getPlayStoreUrlString())));
+            }catch (Exception ex){
+                ShadowsocksApplication.handleException(ex);
+            }
         }
     }
 
@@ -905,15 +909,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onRateUs(final RateUsFragment fragment) {
-        getWindow().getDecorView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getSupportFragmentManager().beginTransaction()
-                        .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                        .remove(fragment)
-                        .add(R.id.rate_us_frame_layout, new Fragment())
-                        .commitAllowingStateLoss();
-            }
-        }, 1000);
+        getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        rateUs();
     }
 }
