@@ -3,16 +3,10 @@ package com.androapplite.shadowsocks.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
-import java.util.Calendar;
-
-import yyf.shadowsocks.broadcast.*;
 import yyf.shadowsocks.broadcast.Action;
-import yyf.shadowsocks.preferences.SharedPreferenceKey;
 
 public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
     public ShadowsocksVPNServiceReceiver() {
@@ -22,7 +16,7 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent != null) {
             String action = intent.getAction();
-            long duration = intent.getLongExtra(SharedPreferenceKey.DURATION, 0);
+            long duration = intent.getLongExtra(yyf.shadowsocks.preferences.SharedPreferenceKey.DURATION, 0);
             switch (action){
                 case Action.INIT:
                     break;
