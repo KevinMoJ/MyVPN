@@ -33,7 +33,7 @@ import java.util.TimerTask;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConnectFragment extends Fragment implements View.OnClickListener, Animator.AnimatorListener{
+public class ConnectFragment extends Fragment implements View.OnClickListener{
     private ImageView mJaguarImageView;
     private ImageView mJaguarAnimationImageView;
     private OnConnectActionListener mListener;
@@ -111,14 +111,26 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         }
     }
 
-    public void startAnimation(){
+    public void animateConnecting(){
+        startAnimation();
+        mMessageTextView.setText(R.string.connecting);
+
+    }
+
+    private void startAnimation(){
         mJaguarImageView.setVisibility(View.INVISIBLE);
         mJaguarAnimationImageView.setVisibility(View.VISIBLE);
         AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
         animationDrawable.start();
         mConnectButton.setVisibility(View.INVISIBLE);
+        mConnectButton.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mConnectButton.setVisibility(View.VISIBLE);
+            }
+        }, 20000);
         mProgressBar.setVisibility(View.VISIBLE);
-        int max = 15000;
+        int max = 120000;
         mProgressBar.setMax(max);
         ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 0, mProgressBar.getMax());
         progressAnimator.setDuration(max);
@@ -131,7 +143,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
             timer.cancel();
             mElapseTextView.setTag(null);
         }
+    }
 
+
+    public void animateStopping(){
+        startAnimation();
+        mMessageTextView.setText(R.string.stopping);
     }
 
     public void setConnectResult(boolean success){
@@ -141,19 +158,18 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         }
         progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", mProgressBar.getProgress(), mProgressBar.getMax());
         progressAnimator.setDuration(200);
-        progressAnimator.addListener(this);
+        progressAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                stopAnimation();
+            }
+        });
         progressAnimator.start();
         mProgressBar.setTag(progressAnimator);
         mIsSuccess = success;
     }
 
-    @Override
-    public void onAnimationStart(Animator animation) {
-
-    }
-
-    @Override
-    public void onAnimationEnd(Animator animation) {
+    private void stopAnimation(){
         mJaguarImageView.setVisibility(View.VISIBLE);
         mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
         AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
@@ -195,16 +211,5 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
             mMessageTextView.setText(R.string.retry);
             mElapseTextView.setVisibility(View.INVISIBLE);
         }
-
-    }
-
-    @Override
-    public void onAnimationCancel(Animator animation) {
-
-    }
-
-    @Override
-    public void onAnimationRepeat(Animator animation) {
-
     }
 }

@@ -12,41 +12,29 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.GAHelper;
@@ -450,7 +438,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             ShadowsocksApplication.handleException(e);
         }
     }
-    
+
     private void connectVpnServerAsync() {
 //        new Thread(new Runnable() {
 //            @Override
@@ -477,7 +465,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             protected void onPreExecute() {
                 if(mConnectFragment != null){
-                    mConnectFragment.startAnimation();
+                    mConnectFragment.animateConnecting();
                 }
             }
 
