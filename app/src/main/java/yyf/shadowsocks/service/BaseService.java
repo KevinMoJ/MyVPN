@@ -129,28 +129,46 @@ public abstract class BaseService extends VpnService {
     }
     public void changeState(Constants.State s) {
         changeState(s, null);
-
-        if(s == Constants.State.CONNECTED){
-            mStartTime = System.currentTimeMillis();
-        }else if(s == Constants.State.STOPPED){
-            //send broadcast
-            Intent intent = new Intent(Action.STOPPED);
-            if(mStartTime != 0) {
-                long c = System.currentTimeMillis();
-                intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+        Intent intent = new Intent();
+        long c= System.currentTimeMillis();
+        switch (s){
+            case INIT:
+                intent.setAction(Action.INIT);
+                break;
+            case CONNECTING:
+                mStartTime = c;
+                intent.setAction(Action.CONNECTING);
+                break;
+            case CONNECTED:
+                intent.setAction(Action.CONNECTED);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
+                mStartTime = c;
+                break;
+            case STOPPING:
+                intent.setAction(Action.STOPPING);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
+                mStartTime = c;
+                break;
+            case STOPPED:
+                intent.setAction(Action.STOPPED);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
                 mStartTime = 0;
-            }
-            sendBroadcast(intent);
-        }else if(s == Constants.State.ERROR){
-            //send broadcast
-            Intent intent = new Intent(Action.ERROR);
-            if(mStartTime != 0) {
-                long c = System.currentTimeMillis();
-                intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                break;
+            case ERROR:
+                intent.setAction(Action.ERROR);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
                 mStartTime = 0;
-            }
-            sendBroadcast(intent);
+                break;
         }
+        sendBroadcast(intent);
     }
 
     protected void changeState(final Constants.State s,final String msg) {
