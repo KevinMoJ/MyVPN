@@ -317,27 +317,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
-            if(mShadowsocksService != null){
-//                int state = 0;
-//                try {
-//                    state = mShadowsocksService.getState();
-//                } catch (RemoteException e) {
-//                    ShadowsocksApplication.handleException(e);
-//                }
-//                if(state == Constants.State.INIT.ordinal() ||
-//                        state == Constants.State.STOPPED.ordinal()){
-//                    showVpnServerChangePopupWindow();
-//                    GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
-//                }else{
-//                    Snackbar.make(findViewById(R.id.coordinator), R.string.change_proxy_tip, Snackbar.LENGTH_SHORT).show();
-//                    GAHelper.sendEvent(this, "ProxyPopup", "错误时机", String.valueOf(state));
-//
-//                }
+            if(mState != Constants.State.CONNECTING || mState != Constants.State.STOPPED) {
                 startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
+            }else if(mState == Constants.State.CONNECTING){
+                Snackbar.make(getWindow().getDecorView(), R.string.connecting_tip, Snackbar.LENGTH_SHORT).show();
+            }else{
+                Snackbar.make(getWindow().getDecorView(), R.string.stopping, Snackbar.LENGTH_SHORT).show();
             }
+            GAHelper.sendEvent(this, "打开服务器列表", mState.name());
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
