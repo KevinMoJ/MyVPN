@@ -128,6 +128,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mSharedPreference.edit()
                     .putString(SharedPreferenceKey.VPN_NAME, getString(R.string.vpn_name_opt))
                     .putString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt))
+                    .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
                     .apply();
 
         }
@@ -184,18 +185,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if(mConnectFragment != null){
                 mConnectFragment.setConnectResult(false);
             }
-            restoreServerConfig();
             changeProxyFlagIcon();
         }else if(state == Constants.State.INIT.ordinal()){
 
-            restoreServerConfig();
             changeProxyFlagIcon();
         }else if(state == Constants.State.STOPPING.ordinal()){
         }else if(state == Constants.State.STOPPED.ordinal()){
             if(mConnectFragment != null){
                 mConnectFragment.setConnectResult(false);
             }
-            restoreServerConfig();
             changeProxyFlagIcon();
         }
     }
@@ -220,7 +218,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
                 registerShadowsocksCallback();
                 checkVPNConnectivity();
-
                 autoConnect();
 
             }
@@ -521,7 +518,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onStart() {
         super.onStart();
         registerShadowsocksCallback();
-        checkVPNConnectivity();
+//        checkVPNConnectivity();
         checkNetworkConnectivity();
         registerConnectivityReceiver();
 
@@ -567,7 +564,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
 //        loadServerList(false);
-        mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
+//        mConnectingConfig = loadConnectingServerConfig(mConnectingConfig);
         changeProxyFlagIcon();
         AppEventsLogger.activateApp(this);
     }
@@ -750,26 +747,55 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return serverConfig;
     }
 
+//    private void changeProxyFlagIcon(){
+//        if(mMenu != null) {
+//            if(mConnectingConfig != null && !mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))) {
+//                try {
+//                    final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
+//                        @Override
+//                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+//                            mMenu.findItem(R.id.action_flag).setIcon(resource);
+//                        }
+//                    };
+//                    if (mConnectingConfig.flag.startsWith("http")) {
+//                        Glide.with(this).load(mConnectingConfig.flag).into(target);
+//                    } else {
+//                        Glide.with(this).load(mConnectingConfig.getResourceId(this)).into(target);
+//                    }
+//                } catch (Exception e) {
+//                    ShadowsocksApplication.handleException(e);
+//                }
+//            }else{
+//                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global);
+//            }
+//        }
+//    }
+
     private void changeProxyFlagIcon(){
-        if(mMenu != null) {
-            if(mConnectingConfig != null && !mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))) {
-                try {
-                    final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
-                        @Override
-                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                            mMenu.findItem(R.id.action_flag).setIcon(resource);
-                        }
-                    };
-                    if (mConnectingConfig.flag.startsWith("http")) {
-                        Glide.with(this).load(mConnectingConfig.flag).into(target);
-                    } else {
-                        Glide.with(this).load(mConnectingConfig.getResourceId(this)).into(target);
-                    }
-                } catch (Exception e) {
-                    ShadowsocksApplication.handleException(e);
+        if(mMenu != null && mShadowsocksService != null && mSharedPreference != null){
+            try {
+                int state = mShadowsocksService.getState();
+                String flag = null;
+                String globalFlag = getResources().getResourceEntryName(R.drawable.ic_flag_global);
+                if(state == Constants.State.CONNECTED.ordinal()){
+                    flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, globalFlag);
+                }else {
+                   flag =  mSharedPreference.getString(SharedPreferenceKey.VPN_FLAG, globalFlag);
                 }
-            }else{
-                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global);
+                final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        mMenu.findItem(R.id.action_flag).setIcon(resource);
+                    }
+                };
+                if (flag.startsWith("http")) {
+                    Glide.with(this).load(flag).into(target);
+                } else {
+                    int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
+                    Glide.with(this).load(resId).into(target);
+                }
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
             }
         }
     }
@@ -861,15 +887,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         }
         return connectingConfig;
-    }
-
-
-
-    private void restoreServerConfig(){
-        String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
-        if(vpnName == null || vpnName.equals(getString(R.string.vpn_name_opt))){
-            mConnectingConfig = null;
-        }
     }
 
     public static boolean ping(String ipAddress) {

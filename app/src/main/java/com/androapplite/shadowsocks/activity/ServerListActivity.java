@@ -185,7 +185,10 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         holder.mItemView.setSelected(false);
 
         String nation = mNations.get(position);
-        mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation).apply();
+        String flag = mFlags.get(position);
+        mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
+                .putString(SharedPreferenceKey.VPN_FLAG, flag)
+                .apply();
         setResult(RESULT_OK);
         finish();
     }
