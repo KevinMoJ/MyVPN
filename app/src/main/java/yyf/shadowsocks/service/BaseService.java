@@ -136,8 +136,11 @@ public abstract class BaseService extends VpnService {
                 intent.setAction(Action.INIT);
                 break;
             case CONNECTING:
-                mStartTime = c;
                 intent.setAction(Action.CONNECTING);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
+                mStartTime = c;
                 break;
             case CONNECTED:
                 intent.setAction(Action.CONNECTED);

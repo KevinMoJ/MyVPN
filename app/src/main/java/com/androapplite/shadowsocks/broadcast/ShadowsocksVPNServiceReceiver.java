@@ -22,22 +22,40 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent != null) {
             String action = intent.getAction();
-            if(action.equals(Action.CONNECTED)){
-                GAHelper.sendEvent(context, "VPN状态", "连接");
-            }else if(action.equals(Action.STOPPED)){
-                long duration = intent.getLongExtra(SharedPreferenceKey.DURATION, 0);
-                if(duration != 0){
-                    GAHelper.sendTimingEvent(context, "VPN计时", "使用", duration);
-                }
-                GAHelper.sendEvent(context, "VPN状态", "断开");
-
-            }else if(action.equals(Action.ERROR)){
-                long duration = intent.getLongExtra(SharedPreferenceKey.DURATION, 0);
-                if(duration != 0){
-                    GAHelper.sendTimingEvent(context, "VPN计时","错误", duration);
-                }
-                GAHelper.sendEvent(context, "VPN状态", "错误");
-
+            long duration = intent.getLongExtra(SharedPreferenceKey.DURATION, 0);
+            switch (action){
+                case Action.INIT:
+                    break;
+                case Action.CONNECTING:
+                    GAHelper.sendEvent(context, "VPN状态", "开始连接");
+                    if(duration > 0){
+                        GAHelper.sendTimingEvent(context, "VPN计时", "使用", duration);
+                    }
+                    break;
+                case Action.CONNECTED:
+                    GAHelper.sendEvent(context, "VPN状态", "连接成功");
+                    if(duration > 0){
+                        GAHelper.sendTimingEvent(context, "VPN计时", "连接", duration);
+                    }
+                    break;
+                case Action.STOPPING:
+                    GAHelper.sendEvent(context, "VPN状态", "开始断开");
+                    if(duration > 0){
+                        GAHelper.sendTimingEvent(context, "VPN计时", "使用", duration);
+                    }
+                    break;
+                case Action.STOPPED:
+                    GAHelper.sendEvent(context, "VPN状态", "断开成功");
+                    if(duration > 0){
+                        GAHelper.sendTimingEvent(context, "VPN计时", "断开", duration);
+                    }
+                    break;
+                case Action.ERROR:
+                    GAHelper.sendEvent(context, "VPN状态", "错误");
+                    if(duration > 0){
+                        GAHelper.sendTimingEvent(context, "VPN计时", "错误", duration);
+                    }
+                    break;
             }
         }
     }
