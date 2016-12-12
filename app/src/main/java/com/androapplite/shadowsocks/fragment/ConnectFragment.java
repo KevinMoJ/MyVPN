@@ -118,8 +118,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         animationDrawable.start();
         mConnectButton.setVisibility(View.INVISIBLE);
         mProgressBar.setVisibility(View.VISIBLE);
+        int max = 15000;
+        mProgressBar.setMax(max);
         ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 0, mProgressBar.getMax());
-        progressAnimator.setDuration(15000);
+        progressAnimator.setDuration(max);
         progressAnimator.start();
         mProgressBar.setTag(progressAnimator);
         mMessageTextView.setText(R.string.connecting);
