@@ -38,7 +38,6 @@ public abstract class BaseService extends VpnService {
     private Timer timer;
     private Handler handler;
     protected Config config = null;
-    private Timer mHoulyUpdater;
     private long mStartTime;
 
     final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
@@ -94,8 +93,6 @@ public abstract class BaseService extends VpnService {
         super.onCreate();
         mTrafficMonitor = new TrafficMonitor();
         handler = new Handler(getMainLooper());
-        mHoulyUpdater = new Timer(true);
-        initHourlyUpdater();
         initLastResetMonth();
     }
 
@@ -252,46 +249,9 @@ public abstract class BaseService extends VpnService {
         return mTrafficMonitor;
     }
 
-    private void initHourlyUpdater(){
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                checkLastResetMonth();
-            }
-        };
-//        mHoulyUpdater.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
-        mHoulyUpdater.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.HOURS.toMillis(1));
-
-    }
-
-    private void checkLastResetMonth() {
-        long txTotal = DefaultSharedPrefeencesUtil.getTxTotal(this);
-        long rxTotal = DefaultSharedPrefeencesUtil.getRxTotal(this);
-        Calendar lastResetMonth = DefaultSharedPrefeencesUtil.getLastResetMonth(this);
-        Calendar currentMonth = Calendar.getInstance();
-//        if(currentMonth.getTimeInMillis() - lastResetMonth.getTimeInMillis() > 10000){
-        if(lastResetMonth.get(Calendar.MONTH) != currentMonth.get(Calendar.MONTH) ){
-            DefaultSharedPrefeencesUtil.resetTxTotalAndRxTotal(this);
-            DefaultSharedPrefeencesUtil.setLastResetMonth(this, currentMonth);
-            mTrafficMonitor.reset();
-
-            //send broadcast
-            Intent intent = new Intent(Action.RESET_TOTAL);
-            intent.putExtra(SharedPreferenceKey.TX_TOTAL, txTotal);
-            intent.putExtra(SharedPreferenceKey.RX_TOTAL, rxTotal);
-            intent.putExtra(SharedPreferenceKey.LAST_RESET_MONTH, lastResetMonth.getTimeInMillis());
-            sendBroadcast(intent);
-
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mHoulyUpdater != null){
-            mHoulyUpdater.cancel();
-            mHoulyUpdater = null;
-        }
     }
 
     private void initLastResetMonth(){

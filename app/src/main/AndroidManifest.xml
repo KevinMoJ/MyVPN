@@ -23,10 +23,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.FullScreen">
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
+             <intent-filter>
+             <action android:name="android.intent.action.MAIN" />
+             <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
         </activity>
         <activity
             android:name=".activity.NewUserGuideActivity"
@@ -83,7 +83,6 @@
 
         <receiver android:name=".broadcast.ShadowsocksVPNServiceReceiver">
             <intent-filter>
-                <action android:name="${applicationId}.RESET_TOTAL" />
                 <action android:name="${applicationId}.CONNECTED" />
                 <action android:name="${applicationId}.STOPPED" />
                 <action android:name="${applicationId}.ERROR" />
@@ -94,11 +93,11 @@
             android:name=".activity.ConnectivityActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
 
         <service android:name=".service.ServerListFetcherService" />
