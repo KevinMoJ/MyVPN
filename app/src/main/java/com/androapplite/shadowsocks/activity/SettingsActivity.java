@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -80,18 +81,19 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         } catch (PackageManager.NameNotFoundException e) {
             ShadowsocksApplication.handleException(e);
         }
+        GAHelper.sendEvent(this, "设置", "关于");
     }
 
     @Override
     public void enableNotification(boolean enable) {
-        Toast.makeText(this, "notification " + enable, Toast.LENGTH_SHORT).show();
         if(mShadowsocksService != null){
             try {
                 mShadowsocksService.enableNotification(enable);
             } catch (RemoteException e) {
-                e.printStackTrace();
+                ShadowsocksApplication.handleException(e);
             }
         }
+        GAHelper.sendEvent(this, "设置", "通知", String.valueOf(enable));
     }
 
     @Override
@@ -100,5 +102,10 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
         }
+    }
+
+    @Override
+    public void autoConect(boolean enable) {
+        GAHelper.sendEvent(this, "设置", "自动连接", String.valueOf(enable));
     }
 }

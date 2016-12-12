@@ -36,6 +36,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         SwitchPreference notificationPreference = (SwitchPreference)findPreference(SharedPreferenceKey.NOTIFICATION);
         notificationPreference.setOnPreferenceChangeListener(this);
+
+        findPreference(SharedPreferenceKey.AUTO_CONNECT).setOnPreferenceChangeListener(this);
         
     }
 
@@ -62,6 +64,11 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 mListener.enableNotification((Boolean)newValue);
             }
             return true;
+        }else if(key.equals(SharedPreferenceKey.AUTO_CONNECT)){
+            if(mListener != null){
+                mListener.autoConect((Boolean)newValue);
+            }
+            return true;
         }
         return false;
     }
@@ -69,6 +76,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public interface OnSettingsActionListener {
         void about();
         void enableNotification(boolean enable);
+        void autoConect(boolean enable);
     }
 
     @Override

@@ -142,10 +142,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
                 ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
                 ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
-                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
-                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
-                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
-                ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
+//                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
+//                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
+//                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
+//                ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
             }
         };
     }
@@ -240,6 +240,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             boolean autoConnect = mSharedPreference.getBoolean(SharedPreferenceKey.AUTO_CONNECT, false);
             if (autoConnect) {
                 connectVpnServerAsync();
+                GAHelper.sendEvent(this, "连接VPN", "自动连接", mState.name());
             }
         }
 
@@ -780,8 +781,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mShadowsocksService != null) {
             if (mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR) {
                 connectVpnServerAsync();
+                GAHelper.sendEvent(this, "连接VPN", "打开", mState.name());
             } else {
                 disconnectVpnServiceAsync();
+                GAHelper.sendEvent(this, "连接VPN", "关闭", mState.name());
             }
         }
 
