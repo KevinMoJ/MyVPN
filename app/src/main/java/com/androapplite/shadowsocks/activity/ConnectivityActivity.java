@@ -302,9 +302,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if(mState != Constants.State.CONNECTING || mState != Constants.State.STOPPED) {
                 startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
             }else if(mState == Constants.State.CONNECTING){
-                Snackbar.make(getWindow().getDecorView(), R.string.connecting_tip, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.coordinator), R.string.connecting_tip, Snackbar.LENGTH_SHORT).show();
             }else{
-                Snackbar.make(getWindow().getDecorView(), R.string.stopping, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.coordinator), R.string.stopping, Snackbar.LENGTH_SHORT).show();
             }
             GAHelper.sendEvent(this, "打开服务器列表", mState.name());
             return true;
@@ -538,7 +538,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void checkNetworkConnectivity(){
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        final View decorView = getWindow().getDecorView();
+        final View decorView = findViewById(R.id.coordinator);
         if(connectivityManager == null){
             Snackbar.make(decorView, R.string.no_network, Snackbar.LENGTH_INDEFINITE).show();
             GAHelper.sendEvent(this, "网络连接","异常","没有网络服务");
@@ -555,7 +555,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void showNoInternetSnackbar(@StringRes int messageId) {
-        final View decorView = getWindow().getDecorView();
+        final View decorView = findViewById(R.id.coordinator);
         mNoInternetSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_INDEFINITE);
         mNoInternetSnackbar.setAction(android.R.string.yes, new View.OnClickListener() {
             @Override
