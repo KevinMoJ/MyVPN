@@ -15,6 +15,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -31,6 +33,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -536,9 +539,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
 
-    private void checkNetworkConnectivity(){
+    private boolean checkNetworkConnectivity(){
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         final View decorView = findViewById(R.id.coordinator);
+        boolean r = false;
         if(connectivityManager == null){
             Snackbar.make(decorView, R.string.no_network, Snackbar.LENGTH_INDEFINITE).show();
             GAHelper.sendEvent(this, "网络连接","异常","没有网络服务");
@@ -547,16 +551,32 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if(activeNetworkInfo == null){
                 showNoInternetSnackbar(R.string.no_internet_message);
                 GAHelper.sendEvent(this, "网络连接", "异常", "没有网络连接");
-            }else if(!activeNetworkInfo.isAvailable()){
+            }else if(!activeNetworkInfo.isConnected()){
                 showNoInternetSnackbar(R.string.not_available_internet);
                 GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
+//            }else if(activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+//                final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//                final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
+//                NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(connectionInfo.getSupplicantState());
+//                if (state == NetworkInfo.DetailedState.CONNECTED){
+//                    r = true;
+//                }else{
+//                    showNoInternetSnackbar(R.string.not_available_internet);
+//                    GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
+//                }
+            }else{
+//                NetworkInfo.State state = activeNetworkInfo.getState();
+//                NetworkInfo.DetailedState detailedState = activeNetworkInfo.getDetailedState();
+
+                r = true;
             }
         }
+        return r;
     }
 
     private void showNoInternetSnackbar(@StringRes int messageId) {
         final View decorView = findViewById(R.id.coordinator);
-        mNoInternetSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_INDEFINITE);
+        mNoInternetSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_LONG);
         mNoInternetSnackbar.setAction(android.R.string.yes, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -565,7 +585,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }catch (ActivityNotFoundException e){
                     ShadowsocksApplication.handleException(e);
                     mNoInternetSnackbar.dismiss();
-                    mNoInternetSnackbar = Snackbar.make(decorView, R.string.failed_to_open_wifi_setting, Snackbar.LENGTH_INDEFINITE);
+                    mNoInternetSnackbar = Snackbar.make(decorView, R.string.failed_to_open_wifi_setting, Snackbar.LENGTH_LONG);
                     mNoInternetSnackbar.show();
                 }
 
@@ -688,7 +708,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public void onConnectButtonClick() {
         if(mShadowsocksService != null) {
             if (mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR) {
-                connectVpnServerAsync();
+                if(checkNetworkConnectivity()) {
+                    connectVpnServerAsync();
+                }
                 GAHelper.sendEvent(this, "连接VPN", "打开", mState.name());
             } else {
                 disconnectVpnServiceAsync();
