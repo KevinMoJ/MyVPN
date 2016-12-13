@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -35,7 +34,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
@@ -66,7 +64,6 @@ import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
-import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -77,14 +74,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
-    private Snackbar mSnackbar;
-    private AlertDialog mNoInternetDialog;
     private BroadcastReceiver mConnectivityReceiver;
     private Menu mMenu;
     private ServerConfig mConnectingConfig;
     private SharedPreferences mSharedPreference;
     private ConnectFragment mConnectFragment;
     private Constants.State mState;
+    private Snackbar mNoInternetSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,9 +217,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 updateConnectionState();
                 registerShadowsocksCallback();
-                checkVPNConnectivity();
                 autoConnect();
-
             }
 
             @Override
@@ -246,30 +240,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     }
 
-    //todo: 这个方法的调用有问题
-    private void checkVPNConnectivity() {
-//        try {
-//            if(mShadowsocksService != null) {
-//                updateConnectionState();
-////                if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()) {
-////                    if (mConnectOrDisconnectStartTime > 0) {
-////                        long t = System.currentTimeMillis();
-////                        GAHelper.sendTimingEvent(this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
-////                        mConnectOrDisconnectStartTime = 0;
-////                    }
-////                }else if(mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()){
-////                    if (mConnectOrDisconnectStartTime > 0) {
-////                        long t = System.currentTimeMillis();
-////                        GAHelper.sendTimingEvent(this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
-////                        mConnectOrDisconnectStartTime = 0;
-////                    }
-////                }
-//            }
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        }
-    }
-
     private void initNavigationView(){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -279,7 +249,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                GAHelper.sendEvent(drawerView.getContext(), "菜单", "关闭");
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                GAHelper.sendEvent(drawerView.getContext(), "菜单", "打开");
+            }
+        });
         toggle.syncState();
     }
 
@@ -294,6 +275,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+
         } else {
             super.onBackPressed();
         }
@@ -351,7 +333,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         } else if(id == R.id.nav_settings){
             startActivity(new Intent(this, SettingsActivity.class));
             GAHelper.sendEvent(this, "菜单", "设置");
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -437,27 +418,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void connectVpnServerAsync() {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-////                loadServerList(false);
-//                findVPNServer();
-//                getWindow().getDecorView().post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        changeProxyFlagIcon();
-//                    }
-//                });
-//                prepareStartService();
-//                mConnectOrDisconnectStartTime = System.currentTimeMillis();
-//                if(mConnectingConfig != null && mConnectingConfig.name != null) {
-//                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", mConnectingConfig.name);
-//                }else{
-//                    GAHelper.sendEvent(ConnectivityActivity.this, "建立连接", "错误");
-//                }
-//            }
-//        }).start();
-
         new AsyncTask<Void, Void, ServerConfig>(){
             @Override
             protected void onPreExecute() {
@@ -507,9 +467,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onStart() {
         super.onStart();
         registerShadowsocksCallback();
-//        checkVPNConnectivity();
         checkNetworkConnectivity();
         registerConnectivityReceiver();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
+        updateConnectionState();
+        AppEventsLogger.activateApp(this);
 
     }
 
@@ -528,6 +490,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onStop();
         unregisterShadowsocksCallback();
         unregisterConnectivityReceiver();
+        AppEventsLogger.deactivateApp(this);
+        if(mNoInternetSnackbar != null){
+            mNoInternetSnackbar.dismiss();
+            mNoInternetSnackbar = null;
+        }
     }
 
     private void unregisterShadowsocksCallback() {
@@ -546,20 +513,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-        updateConnectionState();
-        AppEventsLogger.activateApp(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        AppEventsLogger.deactivateApp(this);
     }
 
     @Override
@@ -584,76 +537,42 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
 
     private void checkNetworkConnectivity(){
-        if(mNoInternetDialog != null) {
-            mNoInternetDialog.dismiss();
-        }
-        if(mSnackbar != null) {
-            mSnackbar.dismiss();
-        }
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        final View decorView = getWindow().getDecorView();
         if(connectivityManager == null){
-            new AlertDialog.Builder(this)
-                    .setMessage(R.string.no_network)
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .show();
+            Snackbar.make(decorView, R.string.no_network, Snackbar.LENGTH_INDEFINITE).show();
             GAHelper.sendEvent(this, "网络连接","异常","没有网络服务");
         }else{
             final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             if(activeNetworkInfo == null){
-                showNoInternetDialog(R.string.no_internet_message);
+                showNoInternetSnackbar(R.string.no_internet_message);
                 GAHelper.sendEvent(this, "网络连接", "异常", "没有网络连接");
             }else if(!activeNetworkInfo.isAvailable()){
-                showNoInternetDialog(R.string.not_available_internet);
+                showNoInternetSnackbar(R.string.not_available_internet);
                 GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
             }
         }
     }
 
-    private void showNoInternetDialog(@StringRes int messageId) {
-        final View rootView = getLayoutInflater().inflate(R.layout.dialog_no_internet, null);
-        mNoInternetDialog = new AlertDialog.Builder(this, R.style.TANCStyle)
-                .setView(rootView)
-                .setCancelable(false)
-                .create();
-        TextView messageTextView = (TextView)rootView.findViewById(R.id.message);
-        messageTextView.setText(messageId);
-        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+    private void showNoInternetSnackbar(@StringRes int messageId) {
+        final View decorView = getWindow().getDecorView();
+        mNoInternetSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_INDEFINITE);
+        mNoInternetSnackbar.setAction(android.R.string.yes, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mNoInternetDialog.dismiss();
                 try{
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                 }catch (ActivityNotFoundException e){
                     ShadowsocksApplication.handleException(e);
-                    showNoInternetSnackbar(R.string.failed_to_open_wifi_setting);
+                    mNoInternetSnackbar.dismiss();
+                    mNoInternetSnackbar = Snackbar.make(decorView, R.string.failed_to_open_wifi_setting, Snackbar.LENGTH_INDEFINITE);
+                    mNoInternetSnackbar.show();
                 }
-            }
-        });
-        rootView.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mNoInternetDialog.dismiss();
-                showNoInternetSnackbar(R.string.no_internet);
-            }
-        });
-        mNoInternetDialog.show();
-    }
 
-    private void showNoInternetSnackbar(@StringRes int messageId) {
-        mSnackbar = Snackbar.make(findViewById(R.id.coordinator), messageId, Snackbar.LENGTH_INDEFINITE);
-        mSnackbar.setAction(R.string.close, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSnackbar.dismiss();
+                GAHelper.sendEvent(v.getContext(), "网络连接", "异常", "打开WIFI");
             }
         });
-        mSnackbar.show();
+        mNoInternetSnackbar.show();
     }
 
     private void initConnectivityReceiver(){
