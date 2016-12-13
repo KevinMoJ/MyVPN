@@ -57,7 +57,21 @@ public class ServerConfig {
         this.nation = nation;
     }
 
-//    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
+    @Override
+    public boolean equals(Object o) {
+        if(this == o){
+            return true;
+        }else if(!(o instanceof ServerConfig)){
+            return false;
+        }else{
+            ServerConfig other = (ServerConfig)o;
+            return name.equals(other.name) && server.equals(other.server)
+                    && flag.equals(other.flag) && nation.equals(other.nation);
+        }
+
+    }
+
+    //    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
 //        ArrayList<ServerConfig> arrayList = null;
 //        try{
 //            JSONArray jsonArray = new JSONArray(jsonArrayString);
@@ -81,7 +95,7 @@ public class ServerConfig {
         try{
             JSONArray jsonArray = new JSONArray(jsonArrayString);
             if(jsonArray.length() > 0){
-                arrayList = new ArrayList<>(jsonArray.length());
+                arrayList = new ArrayList<>(jsonArray.length() + 1);
                 arrayList.add(addGlobalConfig(context.getResources()));
                 for(int i=0; i< jsonArray.length(); i++){
                     JSONObject jsonObject = jsonArray.getJSONObject(i);

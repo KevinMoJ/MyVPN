@@ -15,8 +15,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -33,7 +31,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,6 +51,8 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.appevents.AppEventsLogger;
+
+import junit.framework.Assert;
 
 import java.io.IOException;
 import java.lang.System;
@@ -99,7 +98,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
-        initVpnNameAndNation();
+        initVpnFlagAndNation();
     }
 
     @Override
@@ -110,11 +109,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
-    private void initVpnNameAndNation() {
-        String vpnName = mSharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
-        if(vpnName == null){
+    private void initVpnFlagAndNation() {
+        String vpnNation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, null);
+        if(vpnNation == null){
             mSharedPreference.edit()
-                    .putString(SharedPreferenceKey.VPN_NAME, getString(R.string.vpn_name_opt))
                     .putString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt))
                     .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
                     .apply();
@@ -618,27 +616,39 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private ServerConfig findVPNServer(){
+        ServerConfig serverConfig = null;
+        if(mState == Constants.State.INIT || mState == Constants.State.STOPPED){
+            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+            if(vpnName != null && server != null && flag != null && nation != null) {
+                serverConfig = new ServerConfig(vpnName, server, flag, nation);
+            }
+        }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
-//        if(mConnectingConfig == null || mConnectingConfig.name.equals(getString(R.string.vpn_name_opt))){
-//
-//            if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
-//                mConnectingConfig = mServerConfigs.get(1);
-//            }else{
-//                int index = (int) (Math.random() * (mServerConfigs.size() -1) + 1);
-//                mConnectingConfig = mServerConfigs.get(index);
-//            }
-//        }
-//        int index = (int) (Math.random() * (serverConfigs.size() -1) + 1);
-//        ServerConfig serverConfig = serverConfigs.get(index);
-//
-//        long t1 = System.currentTimeMillis();
-//        boolean r = ping(serverConfig.server);
-//        long t2 = System.currentTimeMillis();
-//        boolean rr = isPortOpen(serverConfig.server, 40010, 3000);
-//        long t3 = System.currentTimeMillis();
-//        Log.d("服务器状态", "ping: " + r + ", time: " + (t2-t1) );
-//        Log.d("服务器状态", "port: " + rr + ", time: " + (t3-t2) );
-        ServerConfig serverConfig = new ServerConfig("fr", "107.191.46.208", "ic_flag_fr", "France");
+        if(serverConfig != null && !serverConfigs.contains(serverConfig)){
+            serverConfig = null;
+        }
+
+        if(serverConfig == null){
+            final String global = getString(R.string.vpn_nation_opt);
+            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+            int index = 0;
+            if(nation.equals(global)){
+                index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
+            }else{
+                Assert.assertTrue(serverConfigs.size() > 1);
+                for(int i = index + 1; i < serverConfigs.size(); i++){
+                    ServerConfig config = serverConfigs.get(i);
+                    if(nation.equals(config.nation)){
+                        index = i;
+                        break;
+                    }
+                }
+            }
+            serverConfig = serverConfigs.get(index);
+        }
         return serverConfig;
     }
 
@@ -668,7 +678,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
         if(serverlist != null){
             ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
-            if(serverList != null && !serverList.isEmpty()){
+            if(serverList != null && serverList.size() > 1){
                 result = serverList;
             }
         }
