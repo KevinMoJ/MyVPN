@@ -31,6 +31,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -129,16 +130,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     public void run() {
                         mState = Constants.State.values()[state];
                         updateConnectionState();
+                        Log.d("状态", mState.name());
                     }
                 });
             }
 
             @Override
             public void trafficUpdated(final long txRate, final long rxRate, final long txTotal, final long rxTotal) throws RemoteException {
-                ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
-                ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
-                ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
-                ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
+//                ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
+//                ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
+//                ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
+//                ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
 //                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
 //                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
 //                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
@@ -158,7 +160,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
                             .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
                             .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
-                            .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
                             .apply();
                 }
                 break;
@@ -166,12 +167,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 if(mConnectFragment != null){
                     mConnectFragment.setConnectResult(true);
                 }
+
                 if(mConnectingConfig == null){
                     String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
                     String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
                     String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
                     String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
                     mConnectingConfig = new ServerConfig(vpnName, server, flag, nation);
+                }else{
+                    if(mSharedPreference != null) {
+                        mSharedPreference.edit()
+                                .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
+                                .apply();
+                    }
                 }
                 ConnectionTestService.testConnection(this);
                 showRateUsFragment();
