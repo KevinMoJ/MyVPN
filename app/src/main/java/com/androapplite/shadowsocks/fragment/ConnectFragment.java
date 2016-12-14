@@ -127,6 +127,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             @Override
             public void run() {
                 mConnectButton.setVisibility(View.VISIBLE);
+                mConnectButton.setImageLevel(1);
             }
         }, 20000);
         mProgressBar.setVisibility(View.VISIBLE);
@@ -182,6 +183,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mConnectButton.setImageLevel(1);
             mMessageTextView.setText(R.string.connected);
             mElapseTextView.setVisibility(View.VISIBLE);
+            mElapseTextView.setText(R.string.time_elapse);
             Timer timer = (Timer) mElapseTextView.getTag();
             if(timer == null){
                 TimerTask timerTask= new TimerTask() {
