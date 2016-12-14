@@ -82,7 +82,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ServerConfig mConnectingConfig;
     private SharedPreferences mSharedPreference;
     private ConnectFragment mConnectFragment;
-    private Constants.State mState;
+    private Constants.State mNewState;
+    private Constants.State mCurrentState;
     private Snackbar mNoInternetSnackbar;
 
     @Override
@@ -92,7 +93,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         initNavigationView();
-        mState = Constants.State.INIT;
+        mNewState = Constants.State.INIT;
+        mCurrentState = mNewState;
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
@@ -128,9 +130,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 getWindow().getDecorView().post(new Runnable() {
                     @Override
                     public void run() {
-                        mState = Constants.State.values()[state];
+                        mNewState = Constants.State.values()[state];
                         updateConnectionState();
-                        Log.d("状态", mState.name());
+                        Log.d("状态", mNewState.name());
                     }
                 });
             }
@@ -150,52 +152,55 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void updateConnectionState(){
-        switch (mState){
-            case INIT:
-                break;
-            case CONNECTING:
-                if(mSharedPreference != null) {
-                    mSharedPreference.edit()
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
-                            .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
-                            .apply();
-                }
-                break;
-            case CONNECTED:
-                if(mConnectFragment != null){
-                    mConnectFragment.setConnectResult(true);
-                }
-
-                if(mConnectingConfig == null){
-                    String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-                    String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-                    String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-                    String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-                    mConnectingConfig = new ServerConfig(vpnName, server, flag, nation);
-                }else{
-                    if(mSharedPreference != null) {
+        if(mNewState != mCurrentState) {
+            mCurrentState = mNewState;
+            switch (mNewState) {
+                case INIT:
+                    break;
+                case CONNECTING:
+                    if (mSharedPreference != null) {
                         mSharedPreference.edit()
-                                .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
                                 .apply();
                     }
-                }
-                ConnectionTestService.testConnection(this);
-                showRateUsFragment();
-                break;
-            case STOPPING:
-                break;
-            case STOPPED:
-                if(mConnectFragment != null){
-                    mConnectFragment.setConnectResult(false);
-                }
-                break;
-            case ERROR:
-                if(mConnectFragment != null){
-                    mConnectFragment.setConnectResult(false);
-                }
-                break;
+                    break;
+                case CONNECTED:
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(true);
+                    }
+
+                    if (mConnectingConfig == null) {
+                        String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+                        String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+                        String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+                        String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+                        mConnectingConfig = new ServerConfig(vpnName, server, flag, nation);
+                    } else {
+                        if (mSharedPreference != null) {
+                            mSharedPreference.edit()
+                                    .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
+                                    .apply();
+                        }
+                    }
+                    ConnectionTestService.testConnection(this);
+                    showRateUsFragment();
+                    break;
+                case STOPPING:
+                    break;
+                case STOPPED:
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(false);
+                    }
+                    break;
+                case ERROR:
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(false);
+                    }
+                    break;
+            }
         }
         changeProxyFlagIcon();
     }
@@ -220,7 +225,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
                 try {
                     int state = mShadowsocksService.getState();
-                    mState = Constants.State.values()[state];
+                    mNewState = Constants.State.values()[state];
                 } catch (RemoteException e) {
                     ShadowsocksApplication.handleException(e);
                 }
@@ -239,11 +244,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void autoConnect() {
         if(mSharedPreference != null
-                && (mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR)) {
+                && (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR)) {
             boolean autoConnect = mSharedPreference.getBoolean(SharedPreferenceKey.AUTO_CONNECT, false);
             if (autoConnect) {
                 connectVpnServerAsync();
-                GAHelper.sendEvent(this, "连接VPN", "自动连接", mState.name());
+                GAHelper.sendEvent(this, "连接VPN", "自动连接", mNewState.name());
             }
         }
 
@@ -308,14 +313,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
-            if(mState != Constants.State.CONNECTING || mState != Constants.State.STOPPED) {
+            if(mNewState != Constants.State.CONNECTING || mNewState != Constants.State.STOPPED) {
                 startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
-            }else if(mState == Constants.State.CONNECTING){
+            }else if(mNewState == Constants.State.CONNECTING){
                 Snackbar.make(findViewById(R.id.coordinator), R.string.connecting_tip, Snackbar.LENGTH_SHORT).show();
             }else{
                 Snackbar.make(findViewById(R.id.coordinator), R.string.stopping, Snackbar.LENGTH_SHORT).show();
             }
-            GAHelper.sendEvent(this, "打开服务器列表", mState.name());
+            GAHelper.sendEvent(this, "打开服务器列表", mNewState.name());
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -625,7 +630,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private ServerConfig findVPNServer(){
         ServerConfig serverConfig = null;
-        if(mState == Constants.State.INIT || mState == Constants.State.STOPPED){
+        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
             String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
             String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
             String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
@@ -664,7 +669,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private void changeProxyFlagIcon(){
         if(mMenu != null && mShadowsocksService != null && mSharedPreference != null){
             final String globalFlag = getResources().getResourceEntryName(R.drawable.ic_flag_global);
-            final String flagKey = mState == Constants.State.CONNECTED ? SharedPreferenceKey.CONNECTING_VPN_FLAG : SharedPreferenceKey.VPN_FLAG;
+            final String flagKey = mNewState == Constants.State.CONNECTED ? SharedPreferenceKey.CONNECTING_VPN_FLAG : SharedPreferenceKey.VPN_FLAG;
             final String flag = mSharedPreference.getString(flagKey, globalFlag);
             final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
                 @Override
@@ -725,14 +730,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onConnectButtonClick() {
         if(mShadowsocksService != null) {
-            if (mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR) {
+            if (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR) {
                 if(checkNetworkConnectivity()) {
                     connectVpnServerAsync();
                 }
-                GAHelper.sendEvent(this, "连接VPN", "打开", mState.name());
+                GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
             } else {
                 disconnectVpnServiceAsync();
-                GAHelper.sendEvent(this, "连接VPN", "关闭", mState.name());
+                GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
             }
         }
 
