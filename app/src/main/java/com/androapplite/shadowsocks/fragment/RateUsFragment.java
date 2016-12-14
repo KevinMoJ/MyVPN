@@ -109,14 +109,17 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
             }
         }
         mClickedStartButtonId = v.getId();
-        getView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
-                animation.setAnimationListener(RateUsFragment.this);
-                getView().startAnimation(animation);
-            }
-        }, 1000);
+        final View view = getView();
+        if(view != null) {
+            view.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
+                    animation.setAnimationListener(RateUsFragment.this);
+                    view.startAnimation(animation);
+                }
+            }, 1000);
+        }
     }
 
     @Override

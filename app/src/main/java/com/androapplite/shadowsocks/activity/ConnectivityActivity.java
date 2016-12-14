@@ -207,14 +207,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private void showRateUsFragment() {
         if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
-            getWindow().getDecorView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                            .commitAllowingStateLoss();
-                }
-            }, 2000);
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
+            if(fragment == null) {
+                getWindow().getDecorView().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                                .commitAllowingStateLoss();
+                    }
+                }, 2000);
+            }
         }
     }
 
