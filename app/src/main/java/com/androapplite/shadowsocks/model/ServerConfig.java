@@ -1,11 +1,8 @@
 package com.androapplite.shadowsocks.model;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.net.Uri;
-import android.support.annotation.IdRes;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -14,8 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by jim on 16/11/7.
@@ -26,6 +21,14 @@ public class ServerConfig {
     public String server;
     public String flag;
     public String nation;
+    public int signal;
+
+    public static final int[] SINAL_IMAGES = {
+            R.drawable.server_signal_1,
+            R.drawable.server_signal_2,
+            R.drawable.server_signal_3,
+            R.drawable.server_signal_4
+    };
 
     public ServerConfig(JSONObject json){
         try{
@@ -33,13 +36,10 @@ public class ServerConfig {
             server = json.optString("server", null);
             flag = json.optString("flag", null);
             nation = json.optString("nation", null);
+            signal = json.optInt("signal", 0);
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
-    }
-
-    private static ServerConfig addGlobalConfig(){
-        return new ServerConfig("Global", "opt.vpnnest.com", "ic_flag_global", "Select the fastest server");
     }
 
     private static ServerConfig addGlobalConfig(Resources resources){
@@ -47,14 +47,15 @@ public class ServerConfig {
         String server = resources.getString(R.string.vpn_server_opt);
         String flag = resources.getResourceEntryName(R.drawable.ic_flag_global);
         String nation = resources.getString(R.string.vpn_nation_opt);
-        return new ServerConfig(name, server, flag, nation);
+        return new ServerConfig(name, server, flag, nation, SINAL_IMAGES.length - 1);
     }
 
-    public ServerConfig(String name, String server, String flag, String nation){
+    public ServerConfig(String name, String server, String flag, String nation, int signal){
         this.name = name;
         this.server = server;
         this.flag = flag;
         this.nation = nation;
+        this.signal = signal;
     }
 
     @Override
@@ -70,25 +71,6 @@ public class ServerConfig {
         }
 
     }
-
-    //    public static ArrayList<ServerConfig> createServerList(String jsonArrayString){
-//        ArrayList<ServerConfig> arrayList = null;
-//        try{
-//            JSONArray jsonArray = new JSONArray(jsonArrayString);
-//            if(jsonArray.length() > 0){
-//                arrayList = new ArrayList<>(jsonArray.length());
-//                arrayList.add(addGlobalConfig());
-//                for(int i=0; i< jsonArray.length(); i++){
-//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                    ServerConfig serverConfig = new ServerConfig(jsonObject);
-//                    arrayList.add(serverConfig);
-//                }
-//            }
-//        }catch (Exception e){
-//            ShadowsocksApplication.handleException(e);
-//        }
-//        return arrayList;
-//    }
 
     public static ArrayList<ServerConfig> createServerList(Context context, String jsonArrayString){
         ArrayList<ServerConfig> arrayList = null;
@@ -120,7 +102,7 @@ public class ServerConfig {
             String server = servers.getString(i);
             String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_bluetooth_24dp));
             String nation = nations.getString(i);
-            ServerConfig serverConfig = new ServerConfig(name, server, flag, nation);
+            ServerConfig serverConfig = new ServerConfig(name, server, flag, nation, 3);
             arrayList.add(serverConfig);
         }
         return arrayList;
