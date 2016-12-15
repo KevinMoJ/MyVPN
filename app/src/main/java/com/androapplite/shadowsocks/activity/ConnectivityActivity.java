@@ -42,6 +42,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
+import com.androapplite.shadowsocks.fragment.DisconnectFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -70,7 +71,8 @@ import yyf.shadowsocks.utils.Constants;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener{
+        ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener,
+        DisconnectFragment.OnDisconnectActionListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
@@ -739,8 +741,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
             } else {
-                disconnectVpnServiceAsync();
-                GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
+                DisconnectFragment disconnectFragment = new DisconnectFragment();
+                disconnectFragment.show(getSupportFragmentManager(), "disconnect");
             }
         }
 
@@ -760,5 +762,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public void onRateUs(final RateUsFragment fragment) {
         remoeRateUsFragment(fragment);
         rateUs();
+    }
+
+    @Override
+    public void onCancel(DisconnectFragment disconnectFragment) {
+        GAHelper.sendEvent(this, "连接VPN", "取消关闭");
+    }
+
+    @Override
+    public void onDisconnect(DisconnectFragment disconnectFragment) {
+        disconnectVpnServiceAsync();
+        GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
     }
 }

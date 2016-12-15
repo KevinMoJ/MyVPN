@@ -110,4 +110,7 @@
 
     <string name="connecting_tip">VPN is connectiong. Please try it later!</string>
     <string name="stopping_tip">VPN is stopping. Please try it later!</string>
+
+    <string name="disconnect">disconnect</string>
+    <string name="disconnect_dialog_title">Do you want to disconnect?</string>
 </resources>

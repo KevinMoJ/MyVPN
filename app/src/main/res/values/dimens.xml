@@ -6,6 +6,7 @@
     <dimen name="standard_margin">16dp</dimen>
     <dimen name="half_standard_margin">8dp</dimen>
     <dimen name="margin_4dp">4dp</dimen>
+    <dimen name="margin_24dp">24dp</dimen>
     <dimen name="corner_8dp">8dp</dimen>
     <dimen name="corner_4dp">4dp</dimen>
 
