@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.animation.AnimatorListenerCompat;
 import android.support.v4.animation.ValueAnimatorCompat;
@@ -29,6 +30,8 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import yyf.shadowsocks.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -152,7 +155,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mMessageTextView.setText(R.string.stopping);
     }
 
-    public void setConnectResult(boolean success){
+    public void setConnectResult(final Constants.State state){
         ObjectAnimator progressAnimator = (ObjectAnimator) mProgressBar.getTag();
         if(progressAnimator != null) {
             progressAnimator.end();
@@ -162,15 +165,14 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         progressAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                stopAnimation();
+                stopAnimation(state);
             }
         });
         progressAnimator.start();
         mProgressBar.setTag(progressAnimator);
-        mIsSuccess = success;
     }
-
-    private void stopAnimation(){
+    
+    private void stopAnimation(Constants.State state){
         mJaguarImageView.setVisibility(View.VISIBLE);
         mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
         AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
@@ -178,7 +180,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectButton.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.INVISIBLE);
         mProgressBar.setTag(null);
-        if(mIsSuccess){
+        if(state == Constants.State.CONNECTED){
             mJaguarImageView.setImageLevel(1);
             mConnectButton.setImageLevel(1);
             mMessageTextView.setText(R.string.connected);
@@ -207,7 +209,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 mElapseTextView.setTag(timer);
             }
 
-        }else{
+        }else if(state == Constants.State.STOPPED){
+            mJaguarImageView.setImageLevel(0);
+            mConnectButton.setImageLevel(0);
+            mMessageTextView.setText(R.string.tap_to_connect);
+            mElapseTextView.setVisibility(View.INVISIBLE);
+        }else if(state == Constants.State.ERROR){
             mJaguarImageView.setImageLevel(0);
             mConnectButton.setImageLevel(0);
             mMessageTextView.setText(R.string.retry);

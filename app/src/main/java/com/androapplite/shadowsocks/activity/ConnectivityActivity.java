@@ -171,7 +171,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     break;
                 case CONNECTED:
                     if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(true);
+                        mConnectFragment.setConnectResult(mNewState);
                     }
 
                     if (mConnectingConfig == null) {
@@ -194,12 +194,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     break;
                 case STOPPED:
                     if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(false);
+                        mConnectFragment.setConnectResult(mNewState);
                     }
                     break;
                 case ERROR:
                     if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(false);
+                        mConnectFragment.setConnectResult(mNewState);
                     }
                     break;
             }
