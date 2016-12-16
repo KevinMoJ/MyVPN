@@ -38,6 +38,9 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
 
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
+
+        GAHelper.sendScreenView(this, "设置屏幕");
+
     }
 
     private ServiceConnection createShadowsocksServiceConnection(){
