@@ -105,6 +105,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         super.onDetach();
         ObjectAnimator progressAnimator = (ObjectAnimator) mProgressBar.getTag();
         if(progressAnimator != null) {
+            progressAnimator.removeAllListeners();
             progressAnimator.end();
         }
         Timer timer = (Timer) mElapseTextView.getTag();
