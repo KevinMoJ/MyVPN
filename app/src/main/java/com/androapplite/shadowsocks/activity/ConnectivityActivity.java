@@ -462,8 +462,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
             @Override
             protected void onPostExecute(ServerConfig serverConfig) {
-                mConnectingConfig = serverConfig;
-                prepareStartService();
+                if(serverConfig != null) {
+                    mConnectingConfig = serverConfig;
+                    prepareStartService();
+                }else {
+                    Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
+                    if(mConnectFragment != null){
+                        mConnectFragment.setConnectResult(Constants.State.ERROR);
+                    }
+                }
             }
         }.execute();
     }
@@ -644,44 +651,59 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private ServerConfig findVPNServer(){
-        Pair<Boolean, Long> pair = isPortOpen("107.191.46.208", 40010, 15000);
-        Log.d("测试连接", pair.first.toString() + " " + pair.second.toString());
         ServerConfig serverConfig = null;
-
-        serverConfig = new ServerConfig("france", "107.191.46.208", "ic_flag_fr", "France", 3);
-//        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
-//            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-//            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-//            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-//            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-//            int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_NATION, 0);
-//            if(vpnName != null && server != null && flag != null && nation != null) {
-//                serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
-//            }
-//        }
-//        ArrayList<ServerConfig> serverConfigs = loadServerList();
-//        if(serverConfig != null && !serverConfigs.contains(serverConfig)){
-//            serverConfig = null;
-//        }
-//
-//        if(serverConfig == null){
-//            final String global = getString(R.string.vpn_nation_opt);
-//            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
-//            int index = 0;
-//            if(nation.equals(global)){
-//                index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
-//            }else{
-//                Assert.assertTrue(serverConfigs.size() > 1);
-//                for(int i = index + 1; i < serverConfigs.size(); i++){
-//                    ServerConfig config = serverConfigs.get(i);
-//                    if(nation.equals(config.nation)){
-//                        index = i;
-//                        break;
-//                    }
-//                }
-//            }
-//            serverConfig = serverConfigs.get(index);
-//        }
+        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
+            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+            int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
+            if(vpnName != null && server != null && flag != null && nation != null) {
+                serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+            }
+        }
+        ArrayList<ServerConfig> serverConfigs = loadServerList();
+        if(serverConfig != null){
+            if(!serverConfigs.contains(serverConfig)){
+                serverConfig = null;
+            }else{
+                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+                if(!pair.first){
+                    serverConfig = null;
+                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                }else {
+                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                }
+            }
+        }
+        final String global = getString(R.string.vpn_nation_opt);
+        final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+        int index = 0;
+        while (serverConfig == null){
+            if(nation.equals(global)){
+                index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
+            }else{
+                Assert.assertTrue(serverConfigs.size() > 1);
+                for(int i = index + 1; i < serverConfigs.size(); i++){
+                    ServerConfig config = serverConfigs.get(i);
+                    if(nation.equals(config.nation)){
+                        index = i;
+                        break;
+                    }
+                }
+                if(index >= serverConfigs.size() - 1){
+                    break;
+                }
+            }
+            serverConfig = serverConfigs.get(index);
+            Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+            if(!pair.first){
+                serverConfig = null;
+                GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+            }else {
+                GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+            }
+        }
         return serverConfig;
     }
 
@@ -743,6 +765,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             socket.connect(new InetSocketAddress(ip, port), timeout);
             osw = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
             osw.write(ip, 0, ip.length());
+            osw.flush();
             result = true;
         } catch (Exception ex) {
             ShadowsocksApplication.handleException(ex);
