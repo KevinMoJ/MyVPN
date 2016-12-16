@@ -30,6 +30,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.RunnableFuture;
 
 import yyf.shadowsocks.utils.Constants;
 
@@ -112,11 +113,26 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             timer.purge();
             mElapseTextView.setTag(null);
         }
+        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
+        mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
+        mConnectButton.setTag(null);
     }
 
     public void animateConnecting(){
         startAnimation();
         mMessageTextView.setText(R.string.connecting);
+        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
+        if(showDisconnectDelayRunnable == null){
+            showDisconnectDelayRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    mConnectButton.setVisibility(View.VISIBLE);
+                    mConnectButton.setImageLevel(1);
+                }
+            };
+            mConnectButton.setTag(showDisconnectDelayRunnable);
+        }
+        mConnectButton.postDelayed(showDisconnectDelayRunnable, 20000);
 
     }
 
@@ -126,13 +142,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
         animationDrawable.start();
         mConnectButton.setVisibility(View.INVISIBLE);
-        mConnectButton.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mConnectButton.setVisibility(View.VISIBLE);
-                mConnectButton.setImageLevel(1);
-            }
-        }, 20000);
+
         mProgressBar.setVisibility(View.VISIBLE);
         int max = 120000;
         mProgressBar.setMax(max);
@@ -208,7 +218,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 timer.schedule(timerTask, 1000, 1000);
                 mElapseTextView.setTag(timer);
             }
-
+            Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
+            mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
         }else if(state == Constants.State.STOPPED){
             mJaguarImageView.setImageLevel(0);
             mConnectButton.setImageLevel(0);
