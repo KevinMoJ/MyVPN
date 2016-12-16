@@ -231,6 +231,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mConnectButton.setImageLevel(0);
             mMessageTextView.setText(R.string.retry);
             mElapseTextView.setVisibility(View.INVISIBLE);
+            Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
+            mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
         }
     }
 }
