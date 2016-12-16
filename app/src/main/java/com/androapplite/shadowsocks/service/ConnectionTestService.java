@@ -48,14 +48,23 @@ public class ConnectionTestService extends IntentService {
                     .url(url)
                     .build();
             long t1 = System.currentTimeMillis();
+            Response response = null;
             try {
-                client.newCall(request).execute();
+                response = client.newCall(request).execute();
                 long t2 = System.currentTimeMillis();
                 GAHelper.sendTimingEvent(this, "连接测试", "成功", t2-t1);
             } catch (IOException e) {
                 long t2 = System.currentTimeMillis();
                 GAHelper.sendTimingEvent(this, "连接测试", "失败", t2-t1);
                 ShadowsocksApplication.handleException(e);
+            }finally {
+                if(response != null) {
+                    try {
+                        response.body().close();
+                    }catch (Exception e){
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
             }
         }
     }

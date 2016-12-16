@@ -669,8 +669,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
                 if(!pair.first){
-                    serverConfig = null;
                     GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                    serverConfig = null;
                 }else {
                     GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
                 }
@@ -702,8 +702,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             serverConfig = serverConfigs.get(index);
             Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
             if(!pair.first){
-                serverConfig = null;
                 GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                serverConfig = null;
             }else {
                 GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
             }
