@@ -62,22 +62,31 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
 
+        parseServerList();
+
+        ServerListFetcherService.fetchServerListAsync(this);
+    }
+
+    private void parseServerList() {
         mNations = new ArrayList<>();
         mFlags = new ArrayList<>();
         mSignalResIds = new HashMap<>();
         mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
-        if(mPreferences.contains(SharedPreferenceKey.SERVER_LIST)){
-
-        }else{
-            ArrayList<ServerConfig> serverConfigs = ServerConfig.createDefaultServerList(getResources());
-            for(ServerConfig serverConfig:serverConfigs){
-                if(!mNations.contains(serverConfig.nation)){
-                    mNations.add(serverConfig.nation);
-                    mFlags.add(serverConfig.flag);
-                    mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
-                }
+        ArrayList<ServerConfig> serverConfigs = null;
+        String serverListJson = mPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
+        if(serverListJson != null){
+            serverConfigs = ServerConfig.createServerList(this, serverListJson);
+        }
+        if(serverConfigs == null || serverConfigs.isEmpty()){
+            serverConfigs = ServerConfig.createDefaultServerList(getResources());
+        }
+        for(ServerConfig serverConfig:serverConfigs){
+            if(!mNations.contains(serverConfig.nation)){
+                mNations.add(serverConfig.nation);
+                mFlags.add(serverConfig.flag);
+                mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
             }
         }
     }
@@ -113,11 +122,13 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 switch(action){
                     case Action.SERVER_LIST_FETCH_FINISH:
                         mSwipeRefreshLayout.setRefreshing(false);
-                        if(mPreferences.contains(SharedPreferenceKey.SERVER_LIST)){
-                            Toast.makeText(context, "获取server list成功", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(context, "获取server list失败", Toast.LENGTH_SHORT).show();
-                        }
+//                        if(mPreferences.contains(SharedPreferenceKey.SERVER_LIST)){
+//                            Toast.makeText(context, "获取server list成功", Toast.LENGTH_SHORT).show();
+//                        }else{
+//                            Toast.makeText(context, "获取server list失败", Toast.LENGTH_SHORT).show();
+//                        }
+                        parseServerList();
+                        ((BaseAdapter)mListView.getAdapter()).notifyDataSetChanged();
                         break;
                 }
             }
