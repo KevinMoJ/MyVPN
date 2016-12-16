@@ -37,6 +37,9 @@ public class ServerConfig {
             flag = json.optString("flag", null);
             nation = json.optString("nation", null);
             signal = json.optInt("signal", 0);
+            if(signal < 0 || signal > SINAL_IMAGES.length){
+                signal = 0;
+            }
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
