@@ -96,6 +96,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Constants.State mNewState;
     private Constants.State mCurrentState;
     private Snackbar mNoInternetSnackbar;
+    private boolean mIsConnecting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,10 +200,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     ConnectionTestService.testConnection(this, mConnectingConfig.name);
                     showRateUsFragment();
+                    mIsConnecting = false;
                     break;
                 case STOPPING:
                     break;
                 case STOPPED:
+                    mIsConnecting = false;
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
@@ -211,6 +214,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
+                    mIsConnecting = false;
                     break;
             }
         }
@@ -452,6 +456,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             protected void onPreExecute() {
                 if(mConnectFragment != null){
                     mConnectFragment.animateConnecting();
+                    mIsConnecting = true;
                 }
             }
 
@@ -783,7 +788,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onConnectButtonClick() {
         if(mShadowsocksService != null) {
-            if (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR) {
+//            if (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR) {
+            if(!mIsConnecting){
                 if(checkNetworkConnectivity()) {
                     connectVpnServerAsync();
                 }
