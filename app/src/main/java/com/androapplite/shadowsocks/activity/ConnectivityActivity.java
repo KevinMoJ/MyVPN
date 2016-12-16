@@ -506,6 +506,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         checkNetworkConnectivity();
         registerConnectivityReceiver();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
+        if(mShadowsocksService != null){
+            try {
+                mNewState = Constants.State.values()[mShadowsocksService.getState()];
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
         updateConnectionState();
         AppEventsLogger.activateApp(this);
 
