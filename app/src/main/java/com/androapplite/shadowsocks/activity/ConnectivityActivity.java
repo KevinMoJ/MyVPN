@@ -678,23 +678,27 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         final String global = getString(R.string.vpn_nation_opt);
         final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+        boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
+        final boolean isGlobalOption = nation.equals(global);
         int index = 0;
         while (serverConfig == null){
-            if(nation.equals(global)){
+            if(isGlobalOption && !hasServerListJson){
                 index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
             }else{
                 Assert.assertTrue(serverConfigs.size() > 1);
-                for(int i = index + 1; i < serverConfigs.size(); i++){
+                int i;
+                for(i = index + 1; i < serverConfigs.size(); i++){
                     ServerConfig config = serverConfigs.get(i);
-                    if(nation.equals(config.nation)){
+                    if(nation.equals(config.nation) || (isGlobalOption && hasServerListJson)){
                         index = i;
                         break;
                     }
                 }
-                if(index >= serverConfigs.size() - 1){
+                if(i >= serverConfigs.size()){
                     break;
                 }
             }
+
             serverConfig = serverConfigs.get(index);
             Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
             if(!pair.first){
@@ -741,17 +745,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             result = ServerConfig.createDefaultServerList(getResources());
         }
         return result;
-    }
-
-    public static boolean ping(String ipAddress) {
-        int  timeOut =  3000 ;  //超时应该在3钞以上
-        boolean status = false;     // 当返回值是true时，说明host是可用的，false则不可。
-        try {
-            status = InetAddress.getByName(ipAddress).isReachable(timeOut);
-        } catch (IOException e) {
-            ShadowsocksApplication.handleException(e);
-        }
-        return status;
     }
 
     public static Pair<Boolean, Long> isPortOpen(final String ip, final int port, final int timeout) {
