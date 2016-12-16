@@ -272,18 +272,21 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
-        try {
-            mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
-        } catch (RemoteException e) {
-            ShadowsocksApplication.handleException(e);
-        }
         mShadowsocksService = null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(mShadowsocksService != null){
+            try {
+                mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
         unbindService(this);
+
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
