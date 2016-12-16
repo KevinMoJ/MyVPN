@@ -188,7 +188,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
                         String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
                         String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-                        int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_NATION, 0);
+                        int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
                         mConnectingConfig = new ServerConfig(vpnName, server, flag, nation, signal);
                     } else {
                         if (mSharedPreference != null) {
@@ -197,7 +197,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                     .apply();
                         }
                     }
-                    ConnectionTestService.testConnection(this);
+                    ConnectionTestService.testConnection(this, mConnectingConfig.name);
                     showRateUsFragment();
                     break;
                 case STOPPING:
@@ -669,10 +669,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
                 if(!pair.first){
-                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                    GAHelper.sendTimingEvent(this, "连接前测试失败", serverConfig.name, pair.second);
                     serverConfig = null;
                 }else {
-                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                    GAHelper.sendTimingEvent(this, "连接前测试成功", serverConfig.name, pair.second);
                 }
             }
         }

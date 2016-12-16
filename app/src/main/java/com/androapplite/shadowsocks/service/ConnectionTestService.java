@@ -22,6 +22,7 @@ import okhttp3.Response;
  * helper methods.
  */
 public class ConnectionTestService extends IntentService {
+    private static final String SERVER_NAME = "SERVER_NAME";
 
     public ConnectionTestService() {
         super("ConnectionTestService");
@@ -34,14 +35,16 @@ public class ConnectionTestService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void testConnection(Context context) {
+    public static void testConnection(Context context, String serverName) {
         Intent intent = new Intent(context, ConnectionTestService.class);
+        intent.putExtra(SERVER_NAME, serverName);
         context.startService(intent);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+            String serverName = intent.getStringExtra(SERVER_NAME);
             OkHttpClient client = new OkHttpClient();
             String url = "http://www.bing.com/";
             Request request = new Request.Builder()
@@ -52,10 +55,10 @@ public class ConnectionTestService extends IntentService {
             try {
                 response = client.newCall(request).execute();
                 long t2 = System.currentTimeMillis();
-                GAHelper.sendTimingEvent(this, "连接测试", "成功", t2-t1);
+                GAHelper.sendTimingEvent(this, "连接后测试成功", serverName, t2-t1);
             } catch (IOException e) {
                 long t2 = System.currentTimeMillis();
-                GAHelper.sendTimingEvent(this, "连接测试", "失败", t2-t1);
+                GAHelper.sendTimingEvent(this, "连接后测试失败", serverName, t2-t1);
                 ShadowsocksApplication.handleException(e);
             }finally {
                 if(response != null) {
