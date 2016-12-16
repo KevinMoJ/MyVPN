@@ -61,9 +61,16 @@ import java.lang.System;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
@@ -635,40 +642,66 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private ServerConfig findVPNServer(){
-        ServerConfig serverConfig = null;
-        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
-            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-            int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_NATION, 0);
-            if(vpnName != null && server != null && flag != null && nation != null) {
-                serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
-            }
-        }
-        ArrayList<ServerConfig> serverConfigs = loadServerList();
-        if(serverConfig != null && !serverConfigs.contains(serverConfig)){
-            serverConfig = null;
+        OkHttpClient client =  new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("107.191.46.208", 7777)))
+                .build();
+
+//        RequestBody requestBody = new FormBody.Builder().build();
+        String url = "http://www.google.com";
+        Request request = new Request.Builder()
+                .url(url)
+//                .post(requestBody)
+                .build();
+        long t1 = System.currentTimeMillis();
+        try {
+            client.newCall(request).execute();
+            long t2 = System.currentTimeMillis();
+            GAHelper.sendTimingEvent(this, "连接前测试", "成功", t2-t1);
+        } catch (IOException e) {
+            long t2 = System.currentTimeMillis();
+            GAHelper.sendTimingEvent(this, "连接前测试", "失败", t2-t1);
+            ShadowsocksApplication.handleException(e);
         }
 
-        if(serverConfig == null){
-            final String global = getString(R.string.vpn_nation_opt);
-            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
-            int index = 0;
-            if(nation.equals(global)){
-                index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
-            }else{
-                Assert.assertTrue(serverConfigs.size() > 1);
-                for(int i = index + 1; i < serverConfigs.size(); i++){
-                    ServerConfig config = serverConfigs.get(i);
-                    if(nation.equals(config.nation)){
-                        index = i;
-                        break;
-                    }
-                }
-            }
-            serverConfig = serverConfigs.get(index);
-        }
+        ServerConfig serverConfig = null;
+
+        serverConfig = new ServerConfig("france", "107.191.46.208", "ic_flag_fr", "France", 3);
+//        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
+//            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+//            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+//            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+//            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+//            int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_NATION, 0);
+//            if(vpnName != null && server != null && flag != null && nation != null) {
+//                serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+//            }
+//        }
+//        ArrayList<ServerConfig> serverConfigs = loadServerList();
+//        if(serverConfig != null && !serverConfigs.contains(serverConfig)){
+//            serverConfig = null;
+//        }
+//
+//        if(serverConfig == null){
+//            final String global = getString(R.string.vpn_nation_opt);
+//            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+//            int index = 0;
+//            if(nation.equals(global)){
+//                index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
+//            }else{
+//                Assert.assertTrue(serverConfigs.size() > 1);
+//                for(int i = index + 1; i < serverConfigs.size(); i++){
+//                    ServerConfig config = serverConfigs.get(i);
+//                    if(nation.equals(config.nation)){
+//                        index = i;
+//                        break;
+//                    }
+//                }
+//            }
+//            serverConfig = serverConfigs.get(index);
+//        }
         return serverConfig;
     }
 
