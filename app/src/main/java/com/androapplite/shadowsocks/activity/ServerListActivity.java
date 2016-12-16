@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ServerListActivity extends BaseShadowsocksActivity implements
         SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener{
@@ -35,6 +37,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     private SharedPreferences mPreferences;
     private ArrayList<String> mNations;
     private ArrayList<String> mFlags;
+    private HashMap<String, Integer> mSignalResIds;
     private ListView mListView;
     private String mNation;
     private int mSelectedIndex;
@@ -61,6 +64,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
         mNations = new ArrayList<>();
         mFlags = new ArrayList<>();
+        mSignalResIds = new HashMap<>();
         mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
@@ -72,6 +76,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 if(!mNations.contains(serverConfig.nation)){
                     mNations.add(serverConfig.nation);
                     mFlags.add(serverConfig.flag);
+                    mSignalResIds.put(serverConfig.nation, serverConfig.signal);
                 }
             }
         }
@@ -149,6 +154,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 holder.mFlagImageView = (ImageView)view.findViewById(R.id.vpn_icon);
                 holder.mNationTextView = (TextView)view.findViewById(R.id.vpn_name);
                 holder.mItemView = view.findViewById(R.id.vpn_server_list_item);
+                holder.mSignalImageView =(ImageView)view.findViewById(R.id.signal);
                 view.setTag(holder);
             }
             String flag = mFlags.get(position);
@@ -162,6 +168,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             }else{
                 holder.mItemView.setSelected(false);
             }
+            holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
             return view;
         }
 
@@ -169,6 +176,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             ImageView mFlagImageView;
             TextView mNationTextView;
             View mItemView;
+            ImageView mSignalImageView;
         }
     }
 
