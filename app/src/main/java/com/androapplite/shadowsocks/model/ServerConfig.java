@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.model;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.support.annotation.DrawableRes;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -113,6 +114,10 @@ public class ServerConfig {
 
     public int getResourceId(Context context){
         return context.getResources().getIdentifier(flag, "drawable", context.getPackageName());
+    }
+
+    public int getSignalResId(){
+        return SINAL_IMAGES[signal];
     }
 
 }

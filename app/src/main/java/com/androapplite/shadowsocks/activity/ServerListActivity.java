@@ -76,7 +76,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 if(!mNations.contains(serverConfig.nation)){
                     mNations.add(serverConfig.nation);
                     mFlags.add(serverConfig.flag);
-                    mSignalResIds.put(serverConfig.nation, serverConfig.signal);
+                    mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
                 }
             }
         }
