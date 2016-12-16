@@ -66,6 +66,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
@@ -680,44 +681,48 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 serverConfig = null;
             }else{
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
-                if(!pair.first){
-                    GAHelper.sendTimingEvent(this, "连接前测试失败", serverConfig.name, pair.second);
+                if(pair.first){
+                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                }else{
+                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
                     serverConfig = null;
-                }else {
-                    GAHelper.sendTimingEvent(this, "连接前测试成功", serverConfig.name, pair.second);
                 }
+
             }
         }
-        final String global = getString(R.string.vpn_nation_opt);
-        final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
-        boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
-        final boolean isGlobalOption = nation.equals(global);
-        int index = 0;
-        while (serverConfig == null){
-            if(isGlobalOption && !hasServerListJson){
-                index =  (int) (Math.random() * (serverConfigs.size() -1) + 1);
+        if(serverConfig == null){
+            final String global = getString(R.string.vpn_nation_opt);
+            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+            final boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
+            final boolean isGlobalOption = nation.equals(global);
+            ArrayList<ServerConfig> filteredConfigs = null;
+            if(isGlobalOption){
+                filteredConfigs = serverConfigs;
+                filteredConfigs.remove(0);
             }else{
-                Assert.assertTrue(serverConfigs.size() > 1);
-                int i;
-                for(i = index + 1; i < serverConfigs.size(); i++){
-                    ServerConfig config = serverConfigs.get(i);
-                    if(nation.equals(config.nation) || (isGlobalOption && hasServerListJson)){
-                        index = i;
-                        break;
+                filteredConfigs = new ArrayList<>();
+                for(ServerConfig config:serverConfigs){
+                    if(nation.equals(config.nation)){
+                        filteredConfigs.add(config);
                     }
                 }
-                if(i >= serverConfigs.size()){
+            }
+            if(!hasServerListJson){
+                Collections.shuffle(filteredConfigs);
+            }
+            int i;
+            for(i=0; i<filteredConfigs.size(); i++){
+                serverConfig = filteredConfigs.get(i);
+                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+                if(pair.first){
+                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
                     break;
+                }else{
+                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
                 }
             }
-
-            serverConfig = serverConfigs.get(index);
-            Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
-            if(!pair.first){
-                GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+            if(i >= filteredConfigs.size()){
                 serverConfig = null;
-            }else {
-                GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
             }
         }
         return serverConfig;
@@ -788,12 +793,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onConnectButtonClick() {
         if(mShadowsocksService != null) {
-//            if (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR) {
-            if(!mIsConnecting){
+            if (!mIsConnecting && (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR)) {
                 if(checkNetworkConnectivity()) {
                     connectVpnServerAsync();
                 }
                 GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
+
             } else {
                 DisconnectFragment disconnectFragment = new DisconnectFragment();
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
