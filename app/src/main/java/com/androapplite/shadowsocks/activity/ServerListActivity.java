@@ -41,6 +41,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     private ListView mListView;
     private String mNation;
     private int mSelectedIndex;
+    private boolean mHasServerJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,8 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         parseServerList();
 
         ServerListFetcherService.fetchServerListAsync(this);
+
+        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
     }
 
     private void parseServerList() {
@@ -123,6 +126,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     case Action.SERVER_LIST_FETCH_FINISH:
                         mSwipeRefreshLayout.setRefreshing(false);
                         parseServerList();
+                        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).contains(SharedPreferenceKey.SERVER_LIST);
                         ((BaseAdapter)mListView.getAdapter()).notifyDataSetChanged();
                         break;
                 }
@@ -174,7 +178,12 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             }else{
                 holder.mItemView.setSelected(false);
             }
-            holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
+            if(mHasServerJson) {
+                holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
+                holder.mSignalImageView.setVisibility(View.VISIBLE);
+            }else{
+                holder.mSignalImageView.setVisibility(View.INVISIBLE);
+            }
             return view;
         }
 
