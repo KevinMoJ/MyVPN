@@ -1,10 +1,16 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -20,7 +26,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsockServiceHelper;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -30,8 +39,15 @@ import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import yyf.shadowsocks.IShadowsocksService;
+import yyf.shadowsocks.IShadowsocksServiceCallback;
+import yyf.shadowsocks.utils.Constants;
+
 public class ServerListActivity extends BaseShadowsocksActivity implements
-        SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener{
+        SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
+        ServiceConnection, DialogInterface.OnClickListener{
+    private IShadowsocksService mShadowsocksService;
+
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SharedPreferences mPreferences;
@@ -42,6 +58,8 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     private String mNation;
     private int mSelectedIndex;
     private boolean mHasServerJson;
+    private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +82,11 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         initForegroundBroadcastReceiver();
 
         parseServerList();
-
-        ServerListFetcherService.fetchServerListAsync(this);
+        ShadowsockServiceHelper.bindService(this, this);
+        mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
 
         mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
+        GAHelper.sendScreenView(this, "服务器列表屏幕");
     }
 
     private void parseServerList() {
@@ -101,14 +120,32 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             finish();
             return true;
         }else if(itemId == R.id.menu_repair){
-            mSwipeRefreshLayout.setRefreshing(true);
-            ServerListFetcherService.fetchServerListAsync(this);
+            if(mShadowsocksService != null){
+                try {
+                    int s = mShadowsocksService.getState();
+                    Constants.State state = Constants.State.values()[s];
+                    if(state == Constants.State.CONNECTED){
+                        new AlertDialog.Builder(this)
+                                .setTitle(R.string.disconnect_to_refresh)
+                                .setPositiveButton(R.string.disconnect, this)
+                                .setNegativeButton(android.R.string.cancel, this)
+                                .show();
+                    }else{
+                        mSwipeRefreshLayout.setRefreshing(true);
+                        ServerListFetcherService.fetchServerListAsync(this);
+                    }
+                    GAHelper.sendEvent(this, "刷新服务器列表", "菜单", state.name());
+                } catch (RemoteException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onRefresh() {
+
         ServerListFetcherService.fetchServerListAsync(this);
     }
 
@@ -214,5 +251,59 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 .apply();
         setResult(RESULT_OK);
         finish();
+        GAHelper.sendEvent(this, "选择国家", nation);
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
+
+        try {
+            mShadowsocksService.registerCallback(mShadowsocksServiceCallbackBinder);
+            int s = mShadowsocksService.getState();
+            Constants.State state = Constants.State.values()[s];
+            if(state == Constants.State.INIT || state == Constants.State.STOPPED || state == Constants.State.ERROR){
+                ServerListFetcherService.fetchServerListAsync(this);
+            }
+        } catch (RemoteException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        try {
+            mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
+        } catch (RemoteException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+        mShadowsocksService = null;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(this);
+    }
+
+    private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
+        return new IShadowsocksServiceCallback.Stub(){
+            @Override
+            public void stateChanged(int state, String msg) throws RemoteException {
+                Constants.State s = Constants.State.values()[state];
+                if(s == Constants.State.INIT || s == Constants.State.STOPPED || s == Constants.State.ERROR){
+                    ServerListFetcherService.fetchServerListAsync(ServerListActivity.this);
+                }
+            }
+
+            @Override
+            public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
+            }
+        };
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        Toast.makeText(this, "which " + which, Toast.LENGTH_SHORT).show();
     }
 }
