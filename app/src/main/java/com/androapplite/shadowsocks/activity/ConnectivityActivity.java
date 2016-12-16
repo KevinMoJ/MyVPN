@@ -32,6 +32,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,6 +58,7 @@ import com.facebook.appevents.AppEventsLogger;
 import junit.framework.Assert;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.System;
 import java.net.ConnectException;
 import java.net.InetAddress;
@@ -642,30 +644,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private ServerConfig findVPNServer(){
-        OkHttpClient client =  new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("107.191.46.208", 7777)))
-                .build();
-
-//        RequestBody requestBody = new FormBody.Builder().build();
-        String url = "http://www.google.com";
-        Request request = new Request.Builder()
-                .url(url)
-//                .post(requestBody)
-                .build();
-        long t1 = System.currentTimeMillis();
-        try {
-            client.newCall(request).execute();
-            long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "连接前测试", "成功", t2-t1);
-        } catch (IOException e) {
-            long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "连接前测试", "失败", t2-t1);
-            ShadowsocksApplication.handleException(e);
-        }
-
+        Pair<Boolean, Long> pair = isPortOpen("107.191.46.208", 40010, 15000);
+        Log.d("测试连接", pair.first.toString() + " " + pair.second.toString());
         ServerConfig serverConfig = null;
 
         serverConfig = new ServerConfig("france", "107.191.46.208", "ic_flag_fr", "France", 3);
@@ -752,19 +732,29 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return status;
     }
 
-    public static boolean isPortOpen(final String ip, final int port, final int timeout) {
+    public static Pair<Boolean, Long> isPortOpen(final String ip, final int port, final int timeout) {
+        Socket socket = null;
+        OutputStreamWriter osw;
+        boolean result = false;
+        long t = System.currentTimeMillis();
+        long duration = 0;
         try {
-            Socket socket = new Socket();
+            socket = new Socket();
             socket.connect(new InetSocketAddress(ip, port), timeout);
-            socket.close();
-            return true;
-        } catch(ConnectException ce){
-            ShadowsocksApplication.handleException(ce);
-            return false;
+            osw = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+            osw.write(ip, 0, ip.length());
+            result = true;
         } catch (Exception ex) {
             ShadowsocksApplication.handleException(ex);
-            return false;
+        }finally {
+            duration = System.currentTimeMillis() - t;
+            try {
+                socket.close();
+            } catch (IOException e) {
+                ShadowsocksApplication.handleException(e);
+            }
         }
+        return new Pair<>(result, duration);
     }
 
     @Override
