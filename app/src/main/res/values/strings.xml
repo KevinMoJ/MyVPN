@@ -48,16 +48,16 @@
     <string name="no_internet">There is no internet connection.</string>
 
     <string name="vpn_name_opt">Global</string>
-    <string name="vpn_name_fr">France</string>
-    <string name="vpn_name_jp">Japan</string>
-    <string name="vpn_name_uk">UK</string>
-    <string name="vpn_name_mia_us">Mia, US</string>
-    <string name="vpn_name_la_us">LA, US</string>
-    <string name="vpn_name_au" translatable="false">Australla</string>
-    <string name="vpn_name_da_us" translatable="false">DA, US</string>
-    <string name="vpn_name_de" translatable="false">Germany</string>
-    <string name="vpn_name_sg" translatable="false">Singapore</string>
-    <string name="vpn_name_nl" translatable="false">Netherlands</string>
+    <string name="vpn_name_fr">Pairs</string>
+    <string name="vpn_name_jp">Tokyo</string>
+    <string name="vpn_name_uk">London</string>
+    <string name="vpn_name_mia_us">Miami</string>
+    <string name="vpn_name_la_us">Los Angeles</string>
+    <string name="vpn_name_au">Sydney</string>
+    <string name="vpn_name_da_us" >Dallas</string>
+    <string name="vpn_name_de" >Frankfurt</string>
+    <string name="vpn_name_sg" >Singapore</string>
+    <string name="vpn_name_nl" >Amsterdam</string>
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
     <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>
