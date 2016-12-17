@@ -12,6 +12,7 @@
         android:src="@drawable/new_user_guide_1"
         android:id="@+id/user_guide_image"
         android:layout_centerInParent="true"
+        android:paddingTop="40dp"
         />
 
     <LinearLayout
@@ -39,7 +40,6 @@
             android:textSize="@dimen/large_text"
             android:gravity="center_horizontal"
             android:id="@+id/user_guide_explain"
-            android:layout_marginBottom="@dimen/twice_margin"
             android:layout_marginTop="@dimen/standard_margin"
 
             />
