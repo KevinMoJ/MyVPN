@@ -120,33 +120,36 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             finish();
             return true;
         }else if(itemId == R.id.menu_repair){
-            if(mShadowsocksService != null){
-                try {
-                    int s = mShadowsocksService.getState();
-                    Constants.State state = Constants.State.values()[s];
-                    if(state == Constants.State.CONNECTED){
-                        new AlertDialog.Builder(this)
-                                .setTitle(R.string.disconnect_to_refresh)
-                                .setPositiveButton(R.string.disconnect, this)
-                                .setNegativeButton(android.R.string.cancel, this)
-                                .show();
-                    }else{
-                        mSwipeRefreshLayout.setRefreshing(true);
-                        ServerListFetcherService.fetchServerListAsync(this);
-                    }
-                    GAHelper.sendEvent(this, "刷新服务器列表", "菜单", state.name());
-                } catch (RemoteException e) {
-                    ShadowsocksApplication.handleException(e);
-                }
-            }
+            disconnectToRefresh("菜单");
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void disconnectToRefresh(String position) {
+        if(mShadowsocksService != null){
+            try {
+                int s = mShadowsocksService.getState();
+                Constants.State state = Constants.State.values()[s];
+                if(state == Constants.State.CONNECTED){
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.disconnect_to_refresh)
+                            .setPositiveButton(R.string.disconnect, this)
+                            .setNegativeButton(android.R.string.cancel, this)
+                            .show();
+                }else{
+                    mSwipeRefreshLayout.setRefreshing(true);
+                    ServerListFetcherService.fetchServerListAsync(this);
+                }
+                GAHelper.sendEvent(this, "刷新服务器列表", position, state.name());
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
+    }
+
     @Override
     public void onRefresh() {
-
-        ServerListFetcherService.fetchServerListAsync(this);
+        disconnectToRefresh("下拉刷新");
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -307,6 +310,19 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        Toast.makeText(this, "which " + which, Toast.LENGTH_SHORT).show();
+        if(which == DialogInterface.BUTTON_POSITIVE){
+            if(mShadowsocksService != null){
+                try {
+                    mShadowsocksService.stop();
+                } catch (RemoteException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+                mSwipeRefreshLayout.setRefreshing(true);
+            }
+            GAHelper.sendEvent(this, "刷新服务器列表", "断开");
+        }else if(which == DialogInterface.BUTTON_NEGATIVE){
+            mSwipeRefreshLayout.setRefreshing(false);
+            GAHelper.sendEvent(this, "刷新服务器列表", "取消");
+        }
     }
 }
