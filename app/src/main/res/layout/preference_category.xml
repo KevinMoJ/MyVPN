@@ -18,10 +18,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:paddingLeft="@dimen/standard_margin"
-    android:paddingRight="@dimen/standard_margin"
+    android:paddingLeft="@dimen/half_standard_margin"
+    android:paddingRight="@dimen/half_standard_margin"
     android:paddingTop="@dimen/standard_margin"
     android:paddingBottom="0dp"
     android:textColor="@color/secondary_black_text"
-    android:textSize="@dimen/small_text"
+    android:textSize="@dimen/medium_text"
     />

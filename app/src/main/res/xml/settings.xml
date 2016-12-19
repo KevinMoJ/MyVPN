@@ -7,7 +7,6 @@
         <SwitchPreference
             android:title="@string/auto_connect"
             android:key="auto_connect"
-            android:layout="@layout/preference_switch"
             />
     </PreferenceCategory>
     <Preference android:selectable="false"
@@ -19,12 +18,10 @@
             android:title="@string/notification"
             android:key="notification"
             android:defaultValue="true"
-            android:layout="@layout/preference_switch"
             />
         <Preference
             android:title="@string/about"
             android:key="about"
-            android:layout="@layout/preference_common"
             />
     </PreferenceCategory>
 

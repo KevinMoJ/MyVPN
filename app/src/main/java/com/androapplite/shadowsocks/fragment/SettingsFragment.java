@@ -2,9 +2,11 @@ package com.androapplite.shadowsocks.fragment;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.v4.app.Fragment;
 import android.widget.ListView;
@@ -28,7 +30,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getPreferenceManager().setSharedPreferencesName(DefaultSharedPrefeencesUtil.PREFERENCE_NAME);
+        final PreferenceManager preferenceManager = getPreferenceManager();
+        preferenceManager.setSharedPreferencesName(DefaultSharedPrefeencesUtil.PREFERENCE_NAME);
+        preferenceManager.setSharedPreferencesMode(Context.MODE_PRIVATE);
         addPreferencesFromResource(R.xml.settings);
 
         Preference aboutPreference = findPreference("about");
