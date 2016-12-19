@@ -5,8 +5,9 @@
         android:title="@string/connection"
         android:layout="@layout/preference_category">
         <SwitchPreference
-            android:title="@string/auto_connect"
+            android:title="@string/auto_connect_title"
             android:key="auto_connect"
+            android:summary="@string/auto_connect"
             />
     </PreferenceCategory>
     <Preference android:selectable="false"
