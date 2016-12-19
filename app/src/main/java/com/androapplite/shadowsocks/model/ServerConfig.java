@@ -97,7 +97,8 @@ public class ServerConfig {
                     nameList.add(name);
                 }
 
-                arrayList = new ArrayList<>(cityArray.length());
+                arrayList = new ArrayList<>(cityArray.length() + 1);
+                arrayList.add(addGlobalConfig(context.getResources()));
                 for(int i=0; i<cityArray.length(); i++){
                     String city = cityArray.optString(i);
                     String ip = ipArray.optString(i);

@@ -85,7 +85,13 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         ShadowsockServiceHelper.bindService(this, this);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
 
-        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
+        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getString(SharedPreferenceKey.SERVER_LIST, null);
+        if(serverList != null && serverList.length() > 2){
+            mHasServerJson = true;
+        }else{
+            mHasServerJson = false;
+        }
+//        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
         GAHelper.sendScreenView(this, "服务器列表屏幕");
     }
 
@@ -166,7 +172,13 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     case Action.SERVER_LIST_FETCH_FINISH:
                         mSwipeRefreshLayout.setRefreshing(false);
                         parseServerList();
-                        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).contains(SharedPreferenceKey.SERVER_LIST);
+//                        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).contains(SharedPreferenceKey.SERVER_LIST);
+                        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.SERVER_LIST, null);
+                        if(serverList != null && serverList.length() > 2){
+                            mHasServerJson = true;
+                        }else{
+                            mHasServerJson = false;
+                        }
                         ((BaseAdapter)mListView.getAdapter()).notifyDataSetChanged();
                         break;
                 }
