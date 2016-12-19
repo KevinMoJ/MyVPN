@@ -40,7 +40,8 @@ public class ServerListFetcherService extends IntentService {
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
             OkHttpClient client = new OkHttpClient();
 
-            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
+            String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+//            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
             Request request = new Request.Builder()
                     .url(url)
                     .build();
