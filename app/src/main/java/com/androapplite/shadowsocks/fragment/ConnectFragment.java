@@ -145,7 +145,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectButton.setVisibility(View.INVISIBLE);
 
         mProgressBar.setVisibility(View.VISIBLE);
-        int max = 120000;
+        int max = 60000;
         mProgressBar.setMax(max);
         ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 0, mProgressBar.getMax());
         progressAnimator.setDuration(max);
@@ -233,6 +233,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mElapseTextView.setVisibility(View.INVISIBLE);
             Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
             mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
+        }
+    }
+
+    public void addProgress(int millisecond){
+        if(mProgressBar != null) {
+            mProgressBar.setProgress(mProgressBar.getProgress() + millisecond);
         }
     }
 }
