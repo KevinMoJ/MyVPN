@@ -29,8 +29,9 @@
             android:text="@string/user_guide_1"
             android:textColor="@color/secondary_black_text"
             android:textSize="@dimen/large_text"
-            android:layout_marginTop="@dimen/standard_margin"
             android:id="@+id/user_guide_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:fontFamily="sans-serif-light"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -40,8 +41,9 @@
             android:textSize="@dimen/large_text"
             android:gravity="center_horizontal"
             android:id="@+id/user_guide_explain"
-            android:layout_marginTop="@dimen/standard_margin"
-
+            android:layout_marginTop="@dimen/margin_4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:fontFamily="sans-serif-light"
             />
     </LinearLayout>
 
