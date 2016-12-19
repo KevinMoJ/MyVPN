@@ -31,20 +31,20 @@ public class ServerConfig {
             R.drawable.server_signal_4
     };
 
-    public ServerConfig(JSONObject json){
-        try{
-            name = json.optString("name", null);
-            server = json.optString("server", null);
-            flag = json.optString("flag", null);
-            nation = json.optString("nation", null);
-            signal = json.optInt("signal", 0);
-            if(signal < 0 || signal > SINAL_IMAGES.length){
-                signal = 0;
-            }
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
-        }
-    }
+//    public ServerConfig(JSONObject json){
+//        try{
+//            name = json.optString("name", null);
+//            server = json.optString("server", null);
+//            flag = json.optString("flag", null);
+//            nation = json.optString("nation", null);
+//            signal = json.optInt("signal", 0);
+//            if(signal < 0 || signal > SINAL_IMAGES.length){
+//                signal = 0;
+//            }
+//        }catch (Exception e){
+//            ShadowsocksApplication.handleException(e);
+//        }
+//    }
 
     private static ServerConfig addGlobalConfig(Resources resources){
         String name = resources.getString(R.string.vpn_name_opt);
@@ -79,16 +79,49 @@ public class ServerConfig {
     public static ArrayList<ServerConfig> createServerList(Context context, String jsonArrayString){
         ArrayList<ServerConfig> arrayList = null;
         try{
-            JSONArray jsonArray = new JSONArray(jsonArrayString);
-            if(jsonArray.length() > 0){
-                arrayList = new ArrayList<>(jsonArray.length() + 1);
-                arrayList.add(addGlobalConfig(context.getResources()));
-                for(int i=0; i< jsonArray.length(); i++){
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    ServerConfig serverConfig = new ServerConfig(jsonObject);
+            JSONObject jsonObject = new JSONObject(jsonArrayString);
+            JSONArray cityArray = jsonObject.optJSONArray("city");
+            JSONArray ipArray = jsonObject.optJSONArray("ip");
+            JSONArray signalArray = jsonObject.optJSONArray("signal");
+
+
+            if(cityArray != null && ipArray != null && signalArray != null){
+                Resources resources = context.getResources();
+                TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
+                TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
+                TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
+
+                ArrayList<String> nameList = new ArrayList<>(names.length());
+                for(int i=0; i<names.length(); i++){
+                    String name = names.getString(i);
+                    nameList.add(name);
+                }
+
+                arrayList = new ArrayList<>(cityArray.length());
+                for(int i=0; i<cityArray.length(); i++){
+                    String city = cityArray.optString(i);
+                    String ip = ipArray.optString(i);
+                    int signal = signalArray.optInt(i);
+                    int index = nameList.indexOf(city);
+                    String nation = nations.getString(index);
+                    String icon = icons.getString(index);
+                    //String name, String server, String flag, String nation, int signal
+                    ServerConfig serverConfig = new ServerConfig(city, ip, icon, nation, signal);
                     arrayList.add(serverConfig);
                 }
             }
+
+
+//            JSONArray jsonArray = new JSONArray(jsonArrayString);
+//            if(jsonArray.length() > 0){
+//                arrayList = new ArrayList<>(jsonArray.length() + 1);
+//                arrayList.add(addGlobalConfig(context.getResources()));
+//                for(int i=0; i< jsonArray.length(); i++){
+//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                    ServerConfig serverConfig = new ServerConfig(jsonObject);
+//                    arrayList.add(serverConfig);
+//                }
+//            }
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
