@@ -106,6 +106,7 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
                 }else{
                     view.setSelected(false);
                 }
+                view.setClickable(false);
             }
         }
         mClickedStartButtonId = v.getId();
