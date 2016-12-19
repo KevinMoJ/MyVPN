@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -734,18 +735,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             final String globalFlag = getResources().getResourceEntryName(R.drawable.ic_flag_global);
             final String flagKey = mNewState == Constants.State.CONNECTED ? SharedPreferenceKey.CONNECTING_VPN_FLAG : SharedPreferenceKey.VPN_FLAG;
             final String flag = mSharedPreference.getString(flagKey, globalFlag);
-            final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
-                @Override
-                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                    mMenu.findItem(R.id.action_flag).setIcon(resource);
-                }
-            };
-            if (flag.startsWith("http")) {
-                Glide.with(this).load(flag).into(target);
-            } else {
-                int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
-                Glide.with(this).load(resId).into(target);
-            }
+            int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
+//            Drawable drawable = getResources().getDrawable(resId);
+            mMenu.findItem(R.id.action_flag).setIcon(resId);
+//            final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
+//                @Override
+//                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+//                    mMenu.findItem(R.id.action_flag).setIcon(resource);
+//                }
+//            };
+//            if (flag.startsWith("http")) {
+//                Glide.with(this).load(flag).into(target);
+//            } else {
+//                int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
+//                Glide.with(this).load(resId).into(target);
+//            }
         }
     }
 
