@@ -101,14 +101,15 @@ public class ServerConfig {
                 arrayList.add(addGlobalConfig(context.getResources()));
                 for(int i=0; i<cityArray.length(); i++){
                     String city = cityArray.optString(i);
-                    String ip = ipArray.optString(i);
-                    int signal = signalArray.optInt(i);
                     int index = nameList.indexOf(city);
-                    String nation = nations.getString(index);
-                    String icon = icons.getString(index);
-                    //String name, String server, String flag, String nation, int signal
-                    ServerConfig serverConfig = new ServerConfig(city, ip, icon, nation, signal);
-                    arrayList.add(serverConfig);
+                    if(index > -1) {
+                        String ip = ipArray.optString(i);
+                        int signal = signalArray.optInt(i);
+                        String nation = nations.getString(index);
+                        String icon = resources.getResourceEntryName(icons.getResourceId(index, R.drawable.ic_flag_global));
+                        ServerConfig serverConfig = new ServerConfig(city, ip, icon, nation, signal);
+                        arrayList.add(serverConfig);
+                    }
                 }
             }
 
