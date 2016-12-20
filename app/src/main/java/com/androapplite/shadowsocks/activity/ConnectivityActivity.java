@@ -651,7 +651,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
 
             }else if(requestCode == OPEN_SERVER_LIST){
-                connectVpnServerAsync();
+                ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+                if(connectivityManager != null){
+                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                    if(networkInfo != null && networkInfo.isAvailable()){
+                        connectVpnServerAsync();
+                    }
+                }
+
             }
         }
     }
