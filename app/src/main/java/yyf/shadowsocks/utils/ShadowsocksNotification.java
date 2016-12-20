@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
@@ -47,6 +48,8 @@ public class ShadowsocksNotification {
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_large_icon))
+                .setColor(mService.getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(mService.getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
