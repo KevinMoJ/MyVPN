@@ -12,12 +12,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enjoy Speed Vpn?"
+        android:text="@string/like_us"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="We need your 5-STAR encouragement to improve it!"
+        android:text="@string/five_star_encouragement"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:layout_marginTop="@dimen/standard_margin"
         />

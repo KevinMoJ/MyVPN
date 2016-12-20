@@ -80,4 +80,7 @@
     <string name="connect_success_tip">"Теперь вы можете разблокировать Youtube, Facebook и т.д."</string>
     <string name="disconnect_to_refresh">"Отключить VPN обновить?"</string>
     <string name="start_using">"Начало работы с"</string>
+
+    <string name="like_us_question">как мы?</string>
+    <string name="five_star_encouragement">Нам нужна ваша 5-звездочный поддержку, чтобы улучшить его!</string>
 </resources>

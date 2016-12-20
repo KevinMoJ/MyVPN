@@ -99,6 +99,8 @@
     <string name="like_us">Like us</string>
     <string name="feedback">Feedback</string>
 
+    <string name="like_us_question">Like us?</string>
+    <string name="five_star_encouragement">We need your 5-STAR encouragement to improve it!</string>
     <string name="connecting_tip">VPN is connectiong. Please try it later!</string>
     <string name="stopping_tip">VPN is stopping. Please try it later!</string>
     <string name="timeout_tip">Connection timeout. Please retry!</string>
