@@ -547,6 +547,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     if(mConnectFragment != null){
                         mConnectFragment.setConnectResult(Constants.State.ERROR);
                     }
+                    mIsConnecting = false;
                 }
             }
         }.execute(this);
