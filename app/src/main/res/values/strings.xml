@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Speed VPN</string>
+    <string name="app_name" translatable="false">Speed VPN</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="connect_success">You are connected!</string>
@@ -19,18 +19,9 @@
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="tap_to_connect_explain">Press the blue button to connect!</string>
-    <string name="please_wait">Please wait...</string>
-    <plurals name="bytes">
-        <item quantity="one">Byte</item>
-        <item quantity="other">Bytes</item>
-    </plurals>
     <string name="more">More</string>
     <string name="connection_failed">Connection failed</string>
     <string name="connection_failed_explain">A fatal error occured, try to reboot phone.</string>
-    <string name="traffic_used">Used:</string>
-    <string name="traffic_available">Available:</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -39,7 +30,6 @@
     <string name="action_choose_server">Choose server</string>
     <string name="retry">Retry</string>
     <string name="stopping">Stopping</string>
-    <string name="stoped">Stoped</string>
     <string name="no_network">No network</string>
     <string name="no_internet_message">There is no internet connection. Do you want to turn WiFi on?</string>
     <string name="not_available_internet">The current internet connection is not available. Do you want to turn WiFi on?</string>
@@ -47,17 +37,17 @@
     <string name="close">close</string>
     <string name="no_internet">There is no internet connection.</string>
 
-    <string name="vpn_name_opt">Global</string>
-    <string name="vpn_name_fr">Pairs</string>
-    <string name="vpn_name_jp">Tokyo</string>
-    <string name="vpn_name_uk">London</string>
-    <string name="vpn_name_mia_us">Miami</string>
-    <string name="vpn_name_la_us">Los Angeles</string>
-    <string name="vpn_name_au">Sydney</string>
-    <string name="vpn_name_da_us" >Dallas</string>
-    <string name="vpn_name_de" >Frankfurt</string>
-    <string name="vpn_name_sg" >Singapore</string>
-    <string name="vpn_name_nl" >Amsterdam</string>
+    <string name="vpn_name_opt" translatable="false">Global</string>
+    <string name="vpn_name_fr" translatable="false">Pairs</string>
+    <string name="vpn_name_jp" translatable="false">Tokyo</string>
+    <string name="vpn_name_uk" translatable="false">London</string>
+    <string name="vpn_name_mia_us" translatable="false">Miami</string>
+    <string name="vpn_name_la_us" translatable="false">Los Angeles</string>
+    <string name="vpn_name_au" translatable="false">Sydney</string>
+    <string name="vpn_name_da_us" translatable="false">Dallas</string>
+    <string name="vpn_name_de" translatable="false">Frankfurt</string>
+    <string name="vpn_name_sg" translatable="false">Singapore</string>
+    <string name="vpn_name_nl" translatable="false">Amsterdam</string>
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
     <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>

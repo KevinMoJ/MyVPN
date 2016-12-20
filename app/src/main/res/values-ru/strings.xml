@@ -1,0 +1,121 @@
+<resources>
+    <string name="app_name">"Скорость VPN"</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="connect_success">"Вы подключены!"</string>
+    <string name="share">"Поделиться"</string>
+    <string name="rate_us">"Оцените нас"</string>
+    <string name="contact_us">"Свяжитесь с нами"</string>
+    <string name="about">"Около"</string>
+    <string name="user_guide_1">"Защитите вашу частную жизнь,"</string>
+    <string name="user_guide_1_2">"анонимно просматривать без отслеживания"</string>
+    <string name="user_guide_2">"Разблокировать гео-ограниченным содержанием,"</string>
+    <string name="user_guide_2_2">"Обход блокировки сайтов и приложений"</string>
+    <string name="user_guide_3">"Быстрое соединение,"</string>
+    <string name="user_guide_3_2">"совершенно бесплатно, простой в использовании"</string>
+    <string name="tap_to_connect">"Нажмите для подключения"</string>
+    <string name="connect">"подключать"</string>
+    <string name="connecting">"соединительный"</string>
+    <string name="connected">"Связанный"</string>
+    <string name="disconnected">"Отключен"</string>
+    <string name="tap_to_connect_explain">"Нажмите синюю кнопку для подключения!"</string>
+    <string name="please_wait">"Пожалуйста, подождите..."</string>
+    <plurals name="bytes">
+        <item quantity="one">"Байт"</item>
+        <item quantity="other">"Б"</item>
+    </plurals>
+    <string name="more">"Больше"</string>
+    <string name="connection_failed">"Ошибка подключения"</string>
+    <string name="connection_failed_explain">"Фатальная ошибка, попробуйте перезагрузить телефон."</string>
+    <string name="traffic_used">"Используемый:"</string>
+    <string name="traffic_available">"Доступный:"</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">"Привет пустой фрагмент"</string>
+
+    <string name="navigation_drawer_open">"Открыть панель навигации"</string>
+    <string name="navigation_drawer_close">"Закрыть панель навигации"</string>
+
+    <string name="action_settings">"настройки"</string>
+    <string name="action_choose_server">"Выберите сервер"</string>
+    <string name="retry">"Повторить попытку"</string>
+    <string name="stopping">"остановка"</string>
+    <string name="stoped">"Stoped"</string>
+    <string name="no_network">"Нет сети"</string>
+    <string name="no_internet_message">"Там нет подключения к интернету. Вы хотите, чтобы включить Wi-Fi на ли?"</string>
+    <string name="not_available_internet">"текущее Интернет-соединение не доступно. Вы хотите, чтобы включить Wi-Fi на ли?"</string>
+    <string name="failed_to_open_wifi_setting">"Не удалось открыть панель настроек Wi-Fi, пожалуйста, включите Wi-Fi на."</string>
+    <string name="close">"Закрыть"</string>
+    <string name="no_internet">"Там нет подключения к интернету."</string>
+
+    <string name="vpn_name_opt">"Глобальный"</string>
+    <string name="vpn_name_fr">"Пары"</string>
+    <string name="vpn_name_jp">"Токио"</string>
+    <string name="vpn_name_uk">"Лондон"</string>
+    <string name="vpn_name_mia_us">"Майами"</string>
+    <string name="vpn_name_la_us">"Лос-Анджелес"</string>
+    <string name="vpn_name_au">"Сидней"</string>
+    <string name="vpn_name_da_us">"Даллас"</string>
+    <string name="vpn_name_de">"Франкфурт-на"</string>
+    <string name="vpn_name_sg">"Сингапур"</string>
+    <string name="vpn_name_nl">"Амстердам"</string>
+
+    <string name="vpn_server_opt" translatable="false">"opt.vpnnest.com"</string>
+    <string name="vpn_server_fr" translatable="false">"v7.vpnnest.com"</string>
+    <string name="vpn_server_jp" translatable="false">"v6.vpnnest.com"</string>
+    <string name="vpn_server_uk" translatable="false">"v4.vpnnest.com"</string>
+    <string name="vpn_server_mia_us" translatable="false">"v3.vpnnest.com"</string>
+    <string name="vpn_server_la_us" translatable="false">"v5.vpnnest.com"</string>
+    <string name="vpn_server_au" translatable="false">"v8.vpnnest.com"</string>
+    <string name="vpn_server_da_us" translatable="false">"v9.vpnnest.com"</string>
+    <string name="vpn_server_de" translatable="false">"v10.vpnnest.com"</string>
+    <string name="vpn_server_sg" translatable="false">"v11.vpnnest.com"</string>
+    <string name="vpn_server_nl" translatable="false">"v12.vpnnest.com"</string>
+
+    <string name="vpn_nation_opt">"Выбранный быстрый сервер"</string>
+    <string name="vpn_nation_fr">"Франция"</string>
+    <string name="vpn_nation_jp">"Япония"</string>
+    <string name="vpn_nation_uk">"United Kindom"</string>
+    <string name="vpn_nation_mia_us">"Соединенные Штаты"</string>
+    <string name="vpn_nation_la_us">"Соединенные Штаты"</string>
+    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_da_us">"Соединенные Штаты"</string>
+    <string name="vpn_nation_de">"Германия"</string>
+    <string name="vpn_nation_sg">"Сингапур"</string>
+    <string name="vpn_nation_nl">"Нидерланды"</string>
+
+    <string name="change_proxy_tip">"Пожалуйста, измените прокси, когда соединение выключено."</string>
+    <string name="not_start_vpn">"VPN-соединение не запускается. Пожалуйста, попробуйте еще раз."</string>
+    <string name="not_open_vpn_popup">"Не удалось открыть окно. Пожалуйста, попробуйте еще раз."</string>
+
+    <string name="facebook_app_id" translatable="false">"504824046367667"</string>
+
+    <string name="server_list">"Расположение сервера"</string>
+    <string name="repair">"РЕМОНТ"</string>
+
+    <string name="facebook">"facebook"</string>
+    <string name="bluetooth">"блютуз"</string>
+    <string name="scan_qr_code_download">"Сканирование QR-кода \ ndownload на Google Play"</string>
+
+    <string name="connection">"подключение"</string>
+    <string name="auto_connect">"Подключение VPN, когда начинается"</string>
+    <string name="auto_connect_title">"Auto Connect"</string>
+    <string name="information">"Информация"</string>
+    <string name="notification">"уведомление"</string>
+    <string name="settings">"настройки"</string>
+
+    <string name="time_elapse">"00:00"</string>
+
+    <string name="tell_your_friends">"Расскажи своим друзьям"</string>
+    <string name="like_us">"Как мы"</string>
+    <string name="feedback">"Обратная связь"</string>
+
+    <string name="connecting_tip">"VPN является Подключение Подключение. Пожалуйста, попробуйте позже!"</string>
+    <string name="stopping_tip">"VPN останавливается. Пожалуйста, попробуйте позже!"</string>
+    <string name="timeout_tip">"Время соединения вышло. Пожалуйста, повторите попытку!"</string>
+
+    <string name="disconnect">"Отключить"</string>
+    <string name="disconnect_dialog_title">"Вы хотите отключить?"</string>
+    <string name="connect_success_tip">"Теперь вы можете разблокировать Youtube, Facebook и т.д."</string>
+    <string name="disconnect_to_refresh">"Отключить VPN обновить?"</string>
+    <string name="start_using">"Начало работы с"</string>
+</resources>
