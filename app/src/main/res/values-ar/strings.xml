@@ -1,7 +1,4 @@
 <resources>
-    <string name="app_name">"سرعة VPN"</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="connect_success">"انت متصل!"</string>
     <string name="share">"شارك"</string>
     <string name="rate_us">"قيمنا"</string>
@@ -19,18 +16,9 @@
     <string name="connected">"متصل"</string>
     <string name="disconnected">"انقطع الاتصال"</string>
     <string name="tap_to_connect_explain">"اضغط على الزر الازرق للاتصال!"</string>
-    <string name="please_wait">"أرجو الإنتظار..."</string>
-    <plurals name="bytes">
-        <item quantity="one">"بايت"</item>
-        <item quantity="other">"بايت"</item>
-    </plurals>
     <string name="more">"أكثر"</string>
     <string name="connection_failed">"فشل الاتصال"</string>
     <string name="connection_failed_explain">"حدث خطأ فادح، في محاولة لإعادة تشغيل الهاتف."</string>
-    <string name="traffic_used">"مستعمل:"</string>
-    <string name="traffic_available">"متاح:"</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">"مرحبا جزء فارغ"</string>
 
     <string name="navigation_drawer_open">"فتح درج الملاحة"</string>
     <string name="navigation_drawer_close">"انهيار درج الملاحة"</string>
@@ -39,37 +27,12 @@
     <string name="action_choose_server">"اختر الخادم"</string>
     <string name="retry">"إعادة المحاولة"</string>
     <string name="stopping">"وقف"</string>
-    <string name="stoped">"توقفوا"</string>
     <string name="no_network">"لا توجد شبكة"</string>
     <string name="no_internet_message">"ليس هناك اتصال بالإنترنت. هل ترغب في إيقاف واي فاي على؟"</string>
     <string name="not_available_internet">"اتصال الإنترنت الحالي غير متوفر. هل ترغب في إيقاف واي فاي على؟"</string>
     <string name="failed_to_open_wifi_setting">"فشل في فتح وضع لوحة واي فاي، يرجى إيقاف واي فاي على."</string>
     <string name="close">"أغلق"</string>
     <string name="no_internet">"ليس هناك اتصال بالإنترنت."</string>
-
-    <string name="vpn_name_opt">"عالمي"</string>
-    <string name="vpn_name_fr">"أزواج"</string>
-    <string name="vpn_name_jp">"طوكيو"</string>
-    <string name="vpn_name_uk">"لندن"</string>
-    <string name="vpn_name_mia_us">"ميامي"</string>
-    <string name="vpn_name_la_us">"لوس أنجلوس"</string>
-    <string name="vpn_name_au">"سيدني"</string>
-    <string name="vpn_name_da_us">"دالاس"</string>
-    <string name="vpn_name_de">"فرانكفورت"</string>
-    <string name="vpn_name_sg">"سنغافورة"</string>
-    <string name="vpn_name_nl">"أمستردام"</string>
-
-    <string name="vpn_server_opt" translatable="false">"opt.vpnnest.com"</string>
-    <string name="vpn_server_fr" translatable="false">"v7.vpnnest.com"</string>
-    <string name="vpn_server_jp" translatable="false">"v6.vpnnest.com"</string>
-    <string name="vpn_server_uk" translatable="false">"v4.vpnnest.com"</string>
-    <string name="vpn_server_mia_us" translatable="false">"v3.vpnnest.com"</string>
-    <string name="vpn_server_la_us" translatable="false">"v5.vpnnest.com"</string>
-    <string name="vpn_server_au" translatable="false">"v8.vpnnest.com"</string>
-    <string name="vpn_server_da_us" translatable="false">"v9.vpnnest.com"</string>
-    <string name="vpn_server_de" translatable="false">"v10.vpnnest.com"</string>
-    <string name="vpn_server_sg" translatable="false">"v11.vpnnest.com"</string>
-    <string name="vpn_server_nl" translatable="false">"v12.vpnnest.com"</string>
 
     <string name="vpn_nation_opt">"اختيار خادم سريع"</string>
     <string name="vpn_nation_fr">"فرنسا"</string>
@@ -86,8 +49,6 @@
     <string name="change_proxy_tip">"الرجاء تغيير الوكيل عند الاتصال هو خارج."</string>
     <string name="not_start_vpn">"VPN اتصال لا تبدأ. حاول مرة اخرى."</string>
     <string name="not_open_vpn_popup">"لا يمكن فتح نافذة. حاول مرة اخرى."</string>
-
-    <string name="facebook_app_id" translatable="false">"504824046367667"</string>
 
     <string name="server_list">"خادم الموقع"</string>
     <string name="repair">"يصلح"</string>

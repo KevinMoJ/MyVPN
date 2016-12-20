@@ -1,7 +1,5 @@
 <resources>
-    <string name="app_name">"Скорость VPN"</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="connect_success">"Вы подключены!"</string>
     <string name="share">"Поделиться"</string>
     <string name="rate_us">"Оцените нас"</string>
@@ -19,18 +17,9 @@
     <string name="connected">"Связанный"</string>
     <string name="disconnected">"Отключен"</string>
     <string name="tap_to_connect_explain">"Нажмите синюю кнопку для подключения!"</string>
-    <string name="please_wait">"Пожалуйста, подождите..."</string>
-    <plurals name="bytes">
-        <item quantity="one">"Байт"</item>
-        <item quantity="other">"Б"</item>
-    </plurals>
     <string name="more">"Больше"</string>
     <string name="connection_failed">"Ошибка подключения"</string>
     <string name="connection_failed_explain">"Фатальная ошибка, попробуйте перезагрузить телефон."</string>
-    <string name="traffic_used">"Используемый:"</string>
-    <string name="traffic_available">"Доступный:"</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">"Привет пустой фрагмент"</string>
 
     <string name="navigation_drawer_open">"Открыть панель навигации"</string>
     <string name="navigation_drawer_close">"Закрыть панель навигации"</string>
@@ -39,37 +28,12 @@
     <string name="action_choose_server">"Выберите сервер"</string>
     <string name="retry">"Повторить попытку"</string>
     <string name="stopping">"остановка"</string>
-    <string name="stoped">"Stoped"</string>
     <string name="no_network">"Нет сети"</string>
     <string name="no_internet_message">"Там нет подключения к интернету. Вы хотите, чтобы включить Wi-Fi на ли?"</string>
     <string name="not_available_internet">"текущее Интернет-соединение не доступно. Вы хотите, чтобы включить Wi-Fi на ли?"</string>
     <string name="failed_to_open_wifi_setting">"Не удалось открыть панель настроек Wi-Fi, пожалуйста, включите Wi-Fi на."</string>
     <string name="close">"Закрыть"</string>
     <string name="no_internet">"Там нет подключения к интернету."</string>
-
-    <string name="vpn_name_opt">"Глобальный"</string>
-    <string name="vpn_name_fr">"Пары"</string>
-    <string name="vpn_name_jp">"Токио"</string>
-    <string name="vpn_name_uk">"Лондон"</string>
-    <string name="vpn_name_mia_us">"Майами"</string>
-    <string name="vpn_name_la_us">"Лос-Анджелес"</string>
-    <string name="vpn_name_au">"Сидней"</string>
-    <string name="vpn_name_da_us">"Даллас"</string>
-    <string name="vpn_name_de">"Франкфурт-на"</string>
-    <string name="vpn_name_sg">"Сингапур"</string>
-    <string name="vpn_name_nl">"Амстердам"</string>
-
-    <string name="vpn_server_opt" translatable="false">"opt.vpnnest.com"</string>
-    <string name="vpn_server_fr" translatable="false">"v7.vpnnest.com"</string>
-    <string name="vpn_server_jp" translatable="false">"v6.vpnnest.com"</string>
-    <string name="vpn_server_uk" translatable="false">"v4.vpnnest.com"</string>
-    <string name="vpn_server_mia_us" translatable="false">"v3.vpnnest.com"</string>
-    <string name="vpn_server_la_us" translatable="false">"v5.vpnnest.com"</string>
-    <string name="vpn_server_au" translatable="false">"v8.vpnnest.com"</string>
-    <string name="vpn_server_da_us" translatable="false">"v9.vpnnest.com"</string>
-    <string name="vpn_server_de" translatable="false">"v10.vpnnest.com"</string>
-    <string name="vpn_server_sg" translatable="false">"v11.vpnnest.com"</string>
-    <string name="vpn_server_nl" translatable="false">"v12.vpnnest.com"</string>
 
     <string name="vpn_nation_opt">"Выбранный быстрый сервер"</string>
     <string name="vpn_nation_fr">"Франция"</string>
@@ -86,8 +50,6 @@
     <string name="change_proxy_tip">"Пожалуйста, измените прокси, когда соединение выключено."</string>
     <string name="not_start_vpn">"VPN-соединение не запускается. Пожалуйста, попробуйте еще раз."</string>
     <string name="not_open_vpn_popup">"Не удалось открыть окно. Пожалуйста, попробуйте еще раз."</string>
-
-    <string name="facebook_app_id" translatable="false">"504824046367667"</string>
 
     <string name="server_list">"Расположение сервера"</string>
     <string name="repair">"РЕМОНТ"</string>
