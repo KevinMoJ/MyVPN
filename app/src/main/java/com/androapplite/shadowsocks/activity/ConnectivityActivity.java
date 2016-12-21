@@ -102,6 +102,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Constants.State mCurrentState;
     private Snackbar mNoInternetSnackbar;
     private boolean mIsConnecting;
+    private Runnable mUpdateVpnStateRunable;
+    private Runnable mShowRateUsRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,14 +146,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return new IShadowsocksServiceCallback.Stub(){
             @Override
             public void stateChanged(final int state, String msg) throws RemoteException {
-                getWindow().getDecorView().post(new Runnable() {
+                mUpdateVpnStateRunable = new Runnable() {
                     @Override
                     public void run() {
                         mNewState = Constants.State.values()[state];
                         updateConnectionState();
                         Log.d("状态", mNewState.name());
                     }
-                });
+                };
+                getWindow().getDecorView().post(mUpdateVpnStateRunable);
             }
 
             @Override
@@ -230,14 +233,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
             if(fragment == null) {
-                getWindow().getDecorView().postDelayed(new Runnable() {
+                mShowRateUsRunnable = new Runnable() {
                     @Override
                     public void run() {
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
                                 .commitAllowingStateLoss();
                     }
-                }, 2000);
+                };
+                getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
             }
         }
     }
@@ -674,6 +678,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onDestroy();
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
+        }
+        if(mUpdateVpnStateRunable != null) {
+            getWindow().getDecorView().removeCallbacks(mUpdateVpnStateRunable);
+        }
+        if(mShowRateUsRunnable != null){
+            getWindow().getDecorView().removeCallbacks(mShowRateUsRunnable);
         }
     }
 
