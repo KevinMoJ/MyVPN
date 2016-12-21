@@ -17,7 +17,6 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
-import org.apache.http.conn.util.InetAddressUtils;
 import org.xbill.DNS.AAAARecord;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.Lookup;
@@ -46,6 +45,7 @@ import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.GuardedProcess;
+import yyf.shadowsocks.utils.InetAddressUtils;
 import yyf.shadowsocks.utils.ShadowsocksNotification;
 import yyf.shadowsocks.utils.TrafficMonitor;
 import yyf.shadowsocks.utils.TrafficMonitorThread;

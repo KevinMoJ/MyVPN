@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="chn_route_full">
+    <string-array name="chn_route_full" translatable="false">
         <item>0.0.0.0/8</item>
         <item>1.0.1.0/24</item>
         <item>1.0.2.0/23</item>

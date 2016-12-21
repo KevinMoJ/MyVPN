@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="simple_route">
+    <string-array name="simple_route" translatable="false">
         <item>1.0.0.0/15</item>
         <item>1.2.0.0/16</item>
         <item>1.4.0.0/14</item>

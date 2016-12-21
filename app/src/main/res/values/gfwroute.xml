@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="gfw_route">
+    <string-array name="gfw_route" translatable="false">
         <item>1.0.0.0/23</item>
         <item>1.0.4.0/22</item>
         <item>1.0.16.0/20</item>
