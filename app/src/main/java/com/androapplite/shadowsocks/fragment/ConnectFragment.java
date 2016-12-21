@@ -193,6 +193,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mProgressBar.setTag(null);
         if(state == Constants.State.CONNECTED){
             mJaguarImageView.setImageLevel(1);
+            mJaguarImageView.requestLayout();
             mConnectButton.setImageLevel(1);
             mMessageTextView.setText(R.string.connected);
             mElapseTextView.setVisibility(View.VISIBLE);
@@ -223,11 +224,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
         }else if(state == Constants.State.STOPPED){
             mJaguarImageView.setImageLevel(0);
+            mJaguarImageView.requestLayout();
             mConnectButton.setImageLevel(0);
             mMessageTextView.setText(R.string.tap_to_connect);
             mElapseTextView.setVisibility(View.INVISIBLE);
         }else if(state == Constants.State.ERROR){
             mJaguarImageView.setImageLevel(0);
+            mJaguarImageView.requestLayout();
             mConnectButton.setImageLevel(0);
             mMessageTextView.setText(R.string.retry);
             mElapseTextView.setVisibility(View.INVISIBLE);
