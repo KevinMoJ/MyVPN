@@ -30,8 +30,8 @@ android {
         applicationId "com.androapplite.shadowsocks"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 14
-        versionName "1.6.3"
+        versionCode 16
+        versionName "1.6.5"
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持

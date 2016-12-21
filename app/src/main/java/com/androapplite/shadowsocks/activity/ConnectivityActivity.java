@@ -99,7 +99,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Handler mAdSwitchHandler;
     private Runnable mAdSwitchCallback;
 
-    public static boolean INITED = false;
     boolean showFirst = false;
 
     public static final String NAME = "ConnectivityActivity";
@@ -137,12 +136,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mTemporaryVpnSelectIndex = indexOfSelectedVPN();
 
 
-        if (!ConnectivityActivity.INITED) {
-            Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
-            Plugins.initBannerAd(ConnectivityActivity.NAME);
-            Plugins.initNgsAd(ConnectivityActivity.NAME);
-            ConnectivityActivity.INITED = true;
-        }
+        Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
+        Plugins.initBannerAd(ConnectivityActivity.NAME);
+        Plugins.initNgsAd(ConnectivityActivity.NAME);
 
         Plugins.setPluginAdListener(new PluginAdListener() {
             @Override
@@ -155,13 +151,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             public void onAdClosed(String s, AdType adType) {
                 if (adType == AdType.Ngs) {
-                    Plugins.loadNewNgsAd(NAME);
+                    try {
+                        Plugins.loadNewNgsAd(NAME);
+                    } catch (Exception ex) {
+                    }
                 }
             }
         });
 
-        Plugins.loadNewBannerAd(NAME);
-        Plugins.loadNewNgsAd(NAME);
+        ngsLoaded = false;
+
+        try {
+            Plugins.loadNewBannerAd(NAME);
+            Plugins.loadNewNgsAd(NAME);
+        } catch (Exception ex) {
+        }
+
         FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
@@ -173,13 +178,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         handler1.sendEmptyMessageDelayed(1000, 1000);
     }
 
+    private boolean startUp = false;
     private boolean ngsLoaded = false;
+    private boolean showResumeAd = false;
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 1000) {
                 if (ngsLoaded) {
-                    Plugins.adNgs(NAME, -1);
+                    try {
+                        Plugins.adNgs(NAME, -1);
+                    } catch (Exception ex) {}
                 } else {
                     handler1.sendEmptyMessageDelayed(1000, 200);
                 }
@@ -228,6 +237,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if(state == Constants.State.CONNECTING.ordinal()){
 
             }else if(state == Constants.State.CONNECTED.ordinal()){
+                try {
+                    Plugins.adNgs(NAME, -1);
+                } catch (Exception ex) {
+                }
+
+                if (!startUp) {
+                    try {
+                        Plugins.loadNewBannerAd(NAME);
+                        Plugins.loadNewNgsAd(NAME);
+                    } catch (Exception ex) {
+                    }
+                    startUp = true;
+                }
             }else if(state == Constants.State.ERROR.ordinal()){
                 restoreVpnSelectIndex();
                 changeProxyFlagIcon();
@@ -557,12 +579,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     prepareStartService();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
-                    Plugins.adNgs(NAME, -1);
+
                 } else {
                     mShadowsocksService.stop();
                     mConnectOrDisconnectStartTime = System.currentTimeMillis();
                     GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
-                    Plugins.adNgs(NAME, -1);
+                    try {
+                        Plugins.adNgs(NAME, -1);
+                    } catch (Exception ex) {
+                    }
 //                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
                 }
 
@@ -613,6 +638,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onDestroy() {
+        Plugins.onDestroy(NAME);
         super.onDestroy();
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
@@ -627,6 +653,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
 //        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
         AppEventsLogger.activateApp(this);
+
+        if (!showResumeAd) {
+            try {
+                Plugins.adNgs(NAME, -1);
+            } catch (Exception ex) {
+            }
+            showResumeAd = true;
+        } else {
+            showResumeAd = false;
+        }
     }
 
     @Override

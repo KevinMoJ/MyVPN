@@ -19,6 +19,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.smartads.Plugins;
 import com.smartads.plugin.GameApplication;
+import com.umeng.analytics.game.UMGameAgent;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -73,6 +74,9 @@ public class ShadowsocksApplication extends GameApplication {
         AppEventsLogger.activateApp(this);
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
 
+        UMGameAgent.init(this);
+        UMGameAgent.setTraceSleepTime(false);
+        UMGameAgent.setSessionContinueMillis(60000L);
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
