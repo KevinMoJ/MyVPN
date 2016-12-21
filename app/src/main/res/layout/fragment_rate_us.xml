@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/like_us"
+        android:text="@string/like_us_question"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
     <TextView
         android:layout_width="match_parent"

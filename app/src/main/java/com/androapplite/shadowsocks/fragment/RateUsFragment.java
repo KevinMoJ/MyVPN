@@ -82,6 +82,10 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
         if(animation != null){
             animation.cancel();
         }
+        Runnable fadeOutRunnable = (Runnable) getView().getTag();
+        if(fadeOutRunnable != null){
+            getView().removeCallbacks(fadeOutRunnable);
+        }
     }
 
     @Override
@@ -112,14 +116,16 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
         mClickedStartButtonId = v.getId();
         final View view = getView();
         if(view != null) {
-            view.postDelayed(new Runnable() {
+            final Runnable fadeOutRunnable = new Runnable() {
                 @Override
                 public void run() {
                     Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
                     animation.setAnimationListener(RateUsFragment.this);
                     view.startAnimation(animation);
                 }
-            }, 1000);
+            };
+            view.postDelayed(fadeOutRunnable, 1000);
+            view.setTag(fadeOutRunnable);
         }
     }
 
