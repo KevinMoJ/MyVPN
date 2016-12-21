@@ -5,20 +5,18 @@ import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -29,7 +27,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -52,15 +50,21 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.util.Log;
+import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
-import com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment;
-import com.androapplite.shadowsocks.fragment.ConnectivityFragment;
-import com.androapplite.shadowsocks.fragment.TrafficRateFragment;
+import com.androapplite.shadowsocks.fragment.ConnectFragment;
+import com.androapplite.shadowsocks.fragment.DisconnectFragment;
+import com.androapplite.shadowsocks.fragment.RateUsFragment;
+import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.smartads.Plugins;
@@ -68,36 +72,56 @@ import com.smartads.ads.AdBannerType;
 import com.smartads.ads.AdType;
 import com.smartads.plugin.PluginAdListener;
 import com.facebook.FacebookSdk;
+import com.androapplite.shadowsocks.service.ConnectionTestService;
+//import com.bumptech.glide.Glide;
+//import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+//import com.bumptech.glide.request.animation.GlideAnimation;
+//import com.bumptech.glide.request.target.SimpleTarget;
 import com.facebook.appevents.AppEventsLogger;
 
-import java.lang.System;
+import junit.framework.Assert;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.lang.System;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
-import yyf.shadowsocks.utils.TrafficMonitor;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ConnectivityFragment.OnFragmentInteractionListener{
+        ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener,
+        DisconnectFragment.OnDisconnectActionListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
     private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
-    private ConnectivityFragment mConnectivityFragment;
     private static int REQUEST_CONNECT = 1;
-    private long mConnectOrDisconnectStartTime;
-    private TrafficRateFragment mTrafficRateFragment;
-    private Snackbar mSnackbar;
-    private AlertDialog mNoInternetDialog;
+    private static int OPEN_SERVER_LIST = 2;
     private BroadcastReceiver mConnectivityReceiver;
-    private ConnectionIndicatorFragment mConnectionIndicatorFragment;
     private Menu mMenu;
-    private int mTemporaryVpnSelectIndex;
-    private boolean mShowAdSwitch;
-    private Handler mAdSwitchHandler;
-    private Runnable mAdSwitchCallback;
+    private ServerConfig mConnectingConfig;
+    private SharedPreferences mSharedPreference;
+    private ConnectFragment mConnectFragment;
+    private Constants.State mNewState;
+    private Constants.State mCurrentState;
+    private Snackbar mNoInternetSnackbar;
+    private boolean mIsConnecting;
 
     boolean showFirst = false;
 
@@ -110,31 +134,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         initNavigationView();
+        mNewState = Constants.State.INIT;
+        mCurrentState = mNewState;
+        mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        mConnectivityFragment = (ConnectivityFragment)fragmentManager.findFragmentById(R.id.connection_fragment);
-        mTrafficRateFragment = (TrafficRateFragment)fragmentManager.findFragmentById(R.id.traffic_fragment);
-        mConnectionIndicatorFragment = (ConnectionIndicatorFragment)fragmentManager.findFragmentById(R.id.connection_indicator);
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                final SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
-                if (sharedPreferences.getBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, true)) {
-                    try {
-                        showVpnServerChangePopupWindow();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.NEED_TO_SHOW_PROXY_POPUP, false).apply();
-                    } catch (RuntimeException e) {
-                        ShadowsocksApplication.handleException(e);
-                    }
-                }
-            }
-        });
-        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
-
+        initVpnFlagAndNation();
 
         Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
         Plugins.initBannerAd(ConnectivityActivity.NAME);
@@ -196,73 +204,136 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     };
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        if(fragment instanceof ConnectFragment){
+            mConnectFragment = (ConnectFragment)fragment;
+        }
+    }
+
+    private void initVpnFlagAndNation() {
+        String vpnNation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, null);
+        if (vpnNation == null) {
+            mSharedPreference.edit()
+                    .putString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt))
+                    .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
+                    .apply();
+        }
+    }
+
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
         return new IShadowsocksServiceCallback.Stub(){
             @Override
             public void stateChanged(final int state, String msg) throws RemoteException {
-                restoreVpnSelectIndex();
                 getWindow().getDecorView().post(new Runnable() {
                     @Override
                     public void run() {
-                        updateConnectionState(state);
+                        mNewState = Constants.State.values()[state];
+                        updateConnectionState();
+                        Log.d("状态", mNewState.name());
                     }
                 });
             }
 
             @Override
             public void trafficUpdated(final long txRate, final long rxRate, final long txTotal, final long rxTotal) throws RemoteException {
-                ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
-                ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
-                ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
-                ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
-                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
-                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
-                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
-                ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
-                if(mTrafficRateFragment != null){
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTrafficRateFragment.updateRate(TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate),
-                                    TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
-                        }
-                    });
-                }
+//                ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
+//                ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
+//                ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
+//                ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
+//                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
+//                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
+//                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
+//                ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
             }
         };
     }
 
-    private void updateConnectionState(int state){
-        if(mConnectivityFragment != null){
-            if(state == Constants.State.CONNECTING.ordinal()){
-
-            }else if(state == Constants.State.CONNECTED.ordinal()){
-                try {
-                    Plugins.adNgs(NAME, -1);
-                } catch (Exception ex) {
-                }
-
-                if (!startUp) {
+    private void updateConnectionState(){
+        if(mNewState != mCurrentState) {
+            mCurrentState = mNewState;
+            switch (mNewState) {
+                case INIT:
+                    break;
+                case CONNECTING:
+                    if (mSharedPreference != null) {
+                        mSharedPreference.edit()
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
+                                .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, mConnectingConfig.signal)
+                                .apply();
+                    }
+                    break;
+                case CONNECTED:
                     try {
-                        Plugins.loadNewBannerAd(NAME);
-                        Plugins.loadNewNgsAd(NAME);
+                    Plugins.adNgs(NAME, -1);
+                    } catch (Exception ex) {
+                    }
+
+                    if (!startUp) {
+                    try {
+                    Plugins.loadNewBannerAd(NAME);
+                    Plugins.loadNewNgsAd(NAME);
                     } catch (Exception ex) {
                     }
                     startUp = true;
-                }
-            }else if(state == Constants.State.ERROR.ordinal()){
-                restoreVpnSelectIndex();
-                changeProxyFlagIcon();
-            }else if(state == Constants.State.INIT.ordinal()){
-                restoreVpnSelectIndex();
-                changeProxyFlagIcon();
-            }else if(state == Constants.State.STOPPING.ordinal()){
-            }else if(state == Constants.State.STOPPED.ordinal()){
-                restoreVpnSelectIndex();
-                changeProxyFlagIcon();
+                    }
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(mNewState);
+                    }
+
+                    if (mConnectingConfig == null) {
+                        String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+                        String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+                        String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+                        String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+                        int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
+                        mConnectingConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+                    } else {
+                        if (mSharedPreference != null) {
+                            mSharedPreference.edit()
+                                    .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
+                                    .apply();
+                        }
+                    }
+                    ConnectionTestService.testConnection(this, mConnectingConfig.name);
+                    showRateUsFragment();
+                    mIsConnecting = false;
+                    break;
+                case STOPPING:
+                    break;
+                case STOPPED:
+                    mIsConnecting = false;
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(mNewState);
+                    }
+                    break;
+                case ERROR:
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(mNewState);
+                    }
+                    mIsConnecting = false;
+                    break;
             }
-            mConnectivityFragment.updateConnectionState(state);
-            mConnectionIndicatorFragment.updateConnectionState(state);
+        }
+        changeProxyFlagIcon();
+    }
+
+    private void showRateUsFragment() {
+        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
+            if(fragment == null) {
+                getWindow().getDecorView().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                                .commitAllowingStateLoss();
+                    }
+                }, 2000);
+            }
         }
     }
 
@@ -271,9 +342,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
+                try {
+                    int state = mShadowsocksService.getState();
+                    mNewState = Constants.State.values()[state];
+                } catch (RemoteException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+                updateConnectionState();
                 registerShadowsocksCallback();
-                checkVPNConnectivity();
-
+                autoConnect();
             }
 
             @Override
@@ -284,26 +361,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         };
     }
 
-    private void checkVPNConnectivity() {
-        try {
-            if(mShadowsocksService != null) {
-                updateConnectionState(mShadowsocksService.getState());
-                if(mShadowsocksService.getState() == Constants.State.CONNECTED.ordinal()) {
-                    if (mConnectOrDisconnectStartTime > 0) {
-                        long t = System.currentTimeMillis();
-                        GAHelper.sendTimingEvent(this, "VPN计时", "连接", t - mConnectOrDisconnectStartTime);
-                        mConnectOrDisconnectStartTime = 0;
-                    }
-                }else if(mShadowsocksService.getState() == Constants.State.STOPPED.ordinal()){
-                    if (mConnectOrDisconnectStartTime > 0) {
-                        long t = System.currentTimeMillis();
-                        GAHelper.sendTimingEvent(this, "VPN计时", "断开", t - mConnectOrDisconnectStartTime);
-                        mConnectOrDisconnectStartTime = 0;
-                    }
-                }
+    private void autoConnect() {
+        if(mSharedPreference != null
+                && (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR)) {
+            boolean autoConnect = mSharedPreference.getBoolean(SharedPreferenceKey.AUTO_CONNECT, false);
+            if (autoConnect) {
+                connectVpnServerAsync();
+                GAHelper.sendEvent(this, "连接VPN", "自动连接", mNewState.name());
             }
-        } catch (RemoteException e) {
-            e.printStackTrace();
         }
     }
 
@@ -316,7 +381,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                GAHelper.sendEvent(drawerView.getContext(), "菜单", "关闭");
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                GAHelper.sendEvent(drawerView.getContext(), "菜单", "打开");
+            }
+        });
         toggle.syncState();
     }
 
@@ -331,6 +407,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+
         } else {
             super.onBackPressed();
         }
@@ -341,7 +418,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.connectivity, menu);
         mMenu = menu;
-        changeProxyFlagIcon();
+        updateConnectionState();
         return true;
     }
 
@@ -354,112 +431,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
-            if(mShadowsocksService != null){
-                int state = 0;
-                try {
-                    state = mShadowsocksService.getState();
-                } catch (RemoteException e) {
-                    ShadowsocksApplication.handleException(e);
-                }
-                if(state == Constants.State.INIT.ordinal() ||
-                        state == Constants.State.STOPPED.ordinal()){
-                    showVpnServerChangePopupWindow();
-                    GAHelper.sendEvent(this, "ProxyPopup", "正确时机", String.valueOf(state));
-                }else{
-                    Snackbar.make(findViewById(R.id.coordinator), R.string.change_proxy_tip, Snackbar.LENGTH_SHORT).show();
-                    GAHelper.sendEvent(this, "ProxyPopup", "错误时机", String.valueOf(state));
-
-                }
+            if(mNewState != Constants.State.CONNECTING || mNewState != Constants.State.STOPPED) {
+                startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
+            }else if(mNewState == Constants.State.CONNECTING){
+                Snackbar.make(findViewById(R.id.coordinator), R.string.connecting_tip, Snackbar.LENGTH_SHORT).show();
+            }else{
+                Snackbar.make(findViewById(R.id.coordinator), R.string.stopping, Snackbar.LENGTH_SHORT).show();
             }
+            GAHelper.sendEvent(this, "打开服务器列表", mNewState.name());
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-    private void showVpnServerChangePopupWindow() {
-        final View popupView = getLayoutInflater().inflate(R.layout.popup_vpn_server, null);
-
-        ListView vpnServerListView = (ListView) popupView.findViewById(R.id.vpn_server_list);
-        vpnServerListView.setAdapter(new VpnServerItemAdapter());
-
-        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        popupWindow.setBackgroundDrawable(new BitmapDrawable());
-        vpnServerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                saveVpnName(position);
-                mTemporaryVpnSelectIndex = indexOfSelectedVPN();
-                changeProxyFlagIcon();
-                popupWindow.dismiss();
-            }
-        });
-
-        View toobar = findViewById(R.id.toolbar);
-        int offset = (int) getResources().getDimension(R.dimen.standard_margin);
-        try {
-            popupWindow.showAsDropDown(toobar, toobar.getWidth() - offset - popupView.getMeasuredWidth(), -offset);
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
-            Snackbar.make(findViewById(R.id.coordinator), R.string.not_open_vpn_popup, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    public class VpnServerItemAdapter extends BaseAdapter{
-        private TypedArray mServerNames;
-        private TypedArray mServerIcons;
-
-        public VpnServerItemAdapter(){
-            Resources resources = getResources();
-            mServerNames = resources.obtainTypedArray(R.array.vpn_names);
-            mServerIcons = resources.obtainTypedArray(R.array.vpn_icons);
-        }
-
-        @Override
-        public int getCount() {
-            return mServerNames.length();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mServerNames.getString(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = null;
-            ViewHolder viewHolder = null;
-            if(convertView == null) {
-                view = getLayoutInflater().inflate(R.layout.item_popup_vpn_server, null);
-                viewHolder = new ViewHolder();
-                viewHolder.vpnIconImageView = (ImageView)view.findViewById(R.id.vpn_icon);
-                viewHolder.vpnNameTextView = (TextView)view.findViewById(R.id.vpn_name);
-                view.setTag(viewHolder);
-            }else{
-                view = convertView;
-                viewHolder = (ViewHolder)view.getTag();
-            }
-            viewHolder.vpnIconImageView.setImageResource(
-                    mServerIcons.getResourceId(position, R.drawable.ic_close_24dp));
-            viewHolder.vpnNameTextView.setText(
-                    mServerNames.getResourceId(position, R.string.vpn_name_opt)
-            );
-            return view;
-        }
-
-        public class ViewHolder{
-            public ImageView vpnIconImageView;
-            public TextView vpnNameTextView;
-        }
-
-    }
-
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -479,6 +462,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         } else if (id == R.id.nav_about) {
             about();
             GAHelper.sendEvent(this, "菜单", "关于");
+        } else if(id == R.id.nav_settings){
+            startActivity(new Intent(this, SettingsActivity.class));
+            GAHelper.sendEvent(this, "菜单", "设置");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -487,14 +473,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void share(){
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getPlayStoreUrlString());
-        shareIntent.setType("text/plain");
-        try {
-            startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share)));
-        }catch(ActivityNotFoundException e){
-            ShadowsocksApplication.handleException(e);
-        }
+        startActivity(new Intent(this, ShareActivity.class));
     }
 
     @NonNull
@@ -513,8 +492,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         try {
             startActivity(goToMarket);
         } catch (ActivityNotFoundException e) {
-            startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(getPlayStoreUrlString())));
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(getPlayStoreUrlString())));
+            }catch (Exception ex){
+                ShadowsocksApplication.handleException(ex);
+            }
         }
     }
 
@@ -566,36 +549,133 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
-    @Override
-    public void onClickConnectionButton() {
-        if(mShadowsocksService != null) {
-            try {
-                final int state = mShadowsocksService.getState();
-                if (mShadowsocksService == null || state == Constants.State.INIT.ordinal()
-                        || state == Constants.State.STOPPED.ordinal()) {
-                    findVPNServer();
-                    ShadowsocksApplication.debug("select vpn", mTemporaryVpnSelectIndex + "");
-                    changeProxyFlagIcon();
-                    prepareStartService();
-                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                    GAHelper.sendEvent(this, "连接VPN", "打开", String.valueOf(state));
+    private void connectVpnServerAsync() {
+        new AsyncTask<Context, Integer, ServerConfig>() {
+            @Override
+            protected void onPreExecute() {
+                if (mConnectFragment != null) {
+                    mConnectFragment.animateConnecting();
+                    mIsConnecting = true;
+                }
+            }
 
+            @Override
+            protected ServerConfig doInBackground(Context... params) {
+                Context context = params[0];
+                ServerConfig serverConfig = null;
+                if (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED) {
+                    String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+                    String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+                    String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+                    String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+                    int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
+                    if (vpnName != null && server != null && flag != null && nation != null) {
+                        serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+                    }
+                }
+                ArrayList<ServerConfig> serverConfigs = loadServerList();
+                if (serverConfig != null) {
+                    if (!serverConfigs.contains(serverConfig)) {
+                        serverConfig = null;
+                    } else {
+                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+                        publishProgress(pair.second.intValue());
+                        if (pair.first) {
+                            GAHelper.sendTimingEvent(context, "连接测试成功", serverConfig.name, pair.second);
+                        } else {
+                            GAHelper.sendTimingEvent(context, "连接测试失败", serverConfig.name, pair.second);
+                            serverConfig = null;
+                        }
+                    }
+                }
+                if (serverConfig == null) {
+                    final String global = getString(R.string.vpn_nation_opt);
+                    final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+                    final boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
+                    final boolean isGlobalOption = nation.equals(global);
+                    ArrayList<ServerConfig> filteredConfigs = null;
+                    if (isGlobalOption) {
+                        filteredConfigs = serverConfigs;
+                        filteredConfigs.remove(0);
+                    } else {
+                        filteredConfigs = new ArrayList<>();
+                        for (ServerConfig config : serverConfigs) {
+                            if (nation.equals(config.nation)) {
+                                filteredConfigs.add(config);
+                            }
+                        }
+                    }
+                    if (!hasServerListJson) {
+                        Collections.shuffle(filteredConfigs);
+                    }
+                    int i;
+                    for (i = 0; i < filteredConfigs.size(); i++) {
+                        serverConfig = filteredConfigs.get(i);
+                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+                        publishProgress(pair.second.intValue());
+                        if (pair.first) {
+                            GAHelper.sendTimingEvent(context, "连接测试成功", serverConfig.name, pair.second);
+                            break;
+                        } else {
+                            GAHelper.sendTimingEvent(context, "连接测试失败", serverConfig.name, pair.second);
+                        }
+                    }
+                    if (i >= filteredConfigs.size()) {
+                        serverConfig = null;
+                    }
+                }
+                return serverConfig;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                if (mConnectFragment != null) {
+                    mConnectFragment.addProgress(values[0]);
+                }
+            }
+
+            @Override
+            protected void onPostExecute(ServerConfig serverConfig) {
+                if (serverConfig != null) {
+                    mConnectingConfig = serverConfig;
+                    prepareStartService();
                 } else {
-                    mShadowsocksService.stop();
-                    mConnectOrDisconnectStartTime = System.currentTimeMillis();
-                    GAHelper.sendEvent(this, "连接VPN", "关闭", String.valueOf(state));
                     try {
                         Plugins.adNgs(NAME, -1);
                     } catch (Exception ex) {
                     }
-//                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
+                    Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(Constants.State.ERROR);
+                    }
+                    mIsConnecting = false;
                 }
-
-            } catch (RemoteException e) {
-                ShadowsocksApplication.handleException(e);
             }
-        }
+        }.execute(this);
+    }
 
+
+    private void disconnectVpnServiceAsync(){
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected void onPreExecute() {
+                if(mConnectFragment != null){
+                    mConnectFragment.animateStopping();
+                }
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if(mShadowsocksService != null){
+                    try {
+                        mShadowsocksService.stop();
+                    } catch (RemoteException e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 
 
@@ -603,9 +683,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onStart() {
         super.onStart();
         registerShadowsocksCallback();
-        checkVPNConnectivity();
         checkNetworkConnectivity();
         registerConnectivityReceiver();
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
+        if(mShadowsocksService != null){
+            try {
+                mNewState = Constants.State.values()[mShadowsocksService.getState()];
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
+        updateConnectionState();
+        AppEventsLogger.activateApp(this);
 
     }
 
@@ -624,6 +713,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onStop();
         unregisterShadowsocksCallback();
         unregisterConnectivityReceiver();
+        AppEventsLogger.deactivateApp(this);
+        if(mNoInternetSnackbar != null){
+            mNoInternetSnackbar.dismiss();
+            mNoInternetSnackbar = null;
+        }
     }
 
     private void unregisterShadowsocksCallback() {
@@ -649,10 +743,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onResume() {
         Plugins.onResume(NAME, this.getApplicationContext());
         super.onResume();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
-        //todo 显示插页广告,如果有可能,两分钟内,再次打开不要显示广告
-//        ShadowsocksApplication.debug("广告开关", "显示 " + mShowAdSwitch);
-        AppEventsLogger.activateApp(this);
 
         if (!showResumeAd) {
             try {
@@ -669,103 +759,93 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onPause() {
         Plugins.onPause(NAME, this.getApplicationContext());
         super.onPause();
-        AppEventsLogger.deactivateApp(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            //Intent intent = new Intent(this, ShadowsocksVpnService.class);
-            //bindService(intent,connection,BIND_AUTO_CREATE);
-            if(mShadowsocksService != null){
-                try {
-                    Config config = new Config(findVPNServer());
-                    mShadowsocksService.start(config);
-                    ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
-//                    AdHelper.getInstance(this).showByTag(getString(R.string.tag_connect));
-                }catch(RemoteException e){
-                    ShadowsocksApplication.handleException(e);
+            if (requestCode == REQUEST_CONNECT) {
+                if (mShadowsocksService != null && mConnectingConfig != null) {
+                    Config config = new Config(mConnectingConfig.server);
+                    try {
+                        mShadowsocksService.start(config);
+                        ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
+                    } catch (RemoteException e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
                 }
-            }else{
-                ShadowsocksApplication.debug("ss-vpn", "bgServiceIsNull");
-            }
-            Plugins.adNgs(NAME, -1);
+                try {
+                    Plugins.adNgs(NAME, -1);
+                } catch (Exception ex) {
+                }
+            } else if (requestCode == OPEN_SERVER_LIST) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (connectivityManager != null) {
+                    NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isAvailable()) {
+                        connectVpnServerAsync();
+                    }
+                }
 
+            }
         }
     }
 
 
-    private void checkNetworkConnectivity(){
-        if(mNoInternetDialog != null) {
-            mNoInternetDialog.dismiss();
-        }
-        if(mSnackbar != null) {
-            mSnackbar.dismiss();
-        }
+    private boolean checkNetworkConnectivity(){
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        final View decorView = findViewById(R.id.coordinator);
+        boolean r = false;
         if(connectivityManager == null){
-            new AlertDialog.Builder(this)
-                    .setMessage(R.string.no_network)
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .show();
+            Snackbar.make(decorView, R.string.no_network, Snackbar.LENGTH_INDEFINITE).show();
             GAHelper.sendEvent(this, "网络连接","异常","没有网络服务");
         }else{
             final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             if(activeNetworkInfo == null){
-                showNoInternetDialog(R.string.no_internet_message);
+                showNoInternetSnackbar(R.string.no_internet_message);
                 GAHelper.sendEvent(this, "网络连接", "异常", "没有网络连接");
-            }else if(!activeNetworkInfo.isAvailable()){
-                showNoInternetDialog(R.string.not_available_internet);
+            }else if(!activeNetworkInfo.isConnected()){
+                showNoInternetSnackbar(R.string.not_available_internet);
                 GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
+//            }else if(activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+//                final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//                final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
+//                NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(connectionInfo.getSupplicantState());
+//                if (state == NetworkInfo.DetailedState.CONNECTED){
+//                    r = true;
+//                }else{
+//                    showNoInternetSnackbar(R.string.not_available_internet);
+//                    GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
+//                }
+            }else{
+//                NetworkInfo.State state = activeNetworkInfo.getState();
+//                NetworkInfo.DetailedState detailedState = activeNetworkInfo.getDetailedState();
+
+                r = true;
             }
         }
+        return r;
     }
 
-    private void showNoInternetDialog(@StringRes int messageId) {
-        final View rootView = getLayoutInflater().inflate(R.layout.dialog_no_internet, null);
-        mNoInternetDialog = new AlertDialog.Builder(this, R.style.TANCStyle)
-                .setView(rootView)
-                .setCancelable(false)
-                .create();
-        TextView messageTextView = (TextView)rootView.findViewById(R.id.message);
-        messageTextView.setText(messageId);
-        rootView.findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+    private void showNoInternetSnackbar(@StringRes int messageId) {
+        final View decorView = findViewById(R.id.coordinator);
+        mNoInternetSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_LONG);
+        mNoInternetSnackbar.setAction(android.R.string.yes, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mNoInternetDialog.dismiss();
                 try{
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                 }catch (ActivityNotFoundException e){
                     ShadowsocksApplication.handleException(e);
-                    showNoInternetSnackbar(R.string.failed_to_open_wifi_setting);
+                    mNoInternetSnackbar.dismiss();
+                    mNoInternetSnackbar = Snackbar.make(decorView, R.string.failed_to_open_wifi_setting, Snackbar.LENGTH_LONG);
+                    mNoInternetSnackbar.show();
                 }
-            }
-        });
-        rootView.findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mNoInternetDialog.dismiss();
-                showNoInternetSnackbar(R.string.no_internet);
-            }
-        });
-        mNoInternetDialog.show();
-    }
 
-    private void showNoInternetSnackbar(@StringRes int messageId) {
-        mSnackbar = Snackbar.make(findViewById(R.id.coordinator), messageId, Snackbar.LENGTH_INDEFINITE);
-        mSnackbar.setAction(R.string.close, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSnackbar.dismiss();
+                GAHelper.sendEvent(v.getContext(), "网络连接", "异常", "打开WIFI");
             }
         });
-        mSnackbar.show();
+        mNoInternetSnackbar.show();
     }
 
     private void initConnectivityReceiver(){
@@ -790,72 +870,177 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         unregisterReceiver(mConnectivityReceiver);
     }
 
-    public void chooseVPN(View view){
-        if(view instanceof Button){
-            Button button = (Button)view;
-            SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-            final String vpnName = button.getText().toString();
-            sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
-            GAHelper.sendEvent(this, "选择VPN", vpnName);
+//    private ServerConfig findVPNServer(){
+//        ServerConfig serverConfig = null;
+//        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
+//            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+//            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+//            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+//            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+//            int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
+//            if(vpnName != null && server != null && flag != null && nation != null) {
+//                serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+//            }
+//        }
+//        ArrayList<ServerConfig> serverConfigs = loadServerList();
+//        if(serverConfig != null){
+//            if(!serverConfigs.contains(serverConfig)){
+//                serverConfig = null;
+//            }else{
+//                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+//                if(pair.first){
+//                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+//                }else{
+//                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+//                    serverConfig = null;
+//                }
+//
+//            }
+//        }
+//        if(serverConfig == null){
+//            final String global = getString(R.string.vpn_nation_opt);
+//            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+//            final boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
+//            final boolean isGlobalOption = nation.equals(global);
+//            ArrayList<ServerConfig> filteredConfigs = null;
+//            if(isGlobalOption){
+//                filteredConfigs = serverConfigs;
+//                filteredConfigs.remove(0);
+//            }else{
+//                filteredConfigs = new ArrayList<>();
+//                for(ServerConfig config:serverConfigs){
+//                    if(nation.equals(config.nation)){
+//                        filteredConfigs.add(config);
+//                    }
+//                }
+//            }
+//            if(!hasServerListJson){
+//                Collections.shuffle(filteredConfigs);
+//            }
+//            int i;
+//            for(i=0; i<filteredConfigs.size(); i++){
+//                serverConfig = filteredConfigs.get(i);
+//                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+//                if(pair.first){
+//                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+//                    break;
+//                }else{
+//                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+//                }
+//            }
+//            if(i >= filteredConfigs.size()){
+//                serverConfig = null;
+//            }
+//        }
+//        return serverConfig;
+//    }
 
-        }
-    }
-
-    private void saveVpnName(int position){
-        Resources resources = getResources();
-        TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
-        final String vpnName = names.getString(position);
-        SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        sharedPreference.edit().putString(SharedPreferenceKey.VPN_NAME, vpnName).apply();
-        GAHelper.sendEvent(this, "选择VPN", vpnName);
-    }
-
-    private String findVPNServer(){
-        mTemporaryVpnSelectIndex = indexOfSelectedVPNWithParsingOptimizedServer();
-        TypedArray b = getResources().obtainTypedArray(R.array.vpn_servers);
-        return b.getString(mTemporaryVpnSelectIndex);
-    }
-
-    private int indexOfSelectedVPN() {
-        SharedPreferences sharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        String vpnName = sharedPreference.getString(SharedPreferenceKey.VPN_NAME, null);
-        TypedArray a = getResources().obtainTypedArray(R.array.vpn_names);
-        int i = 0;
-        if(vpnName != null){
-            for(i = 0; i < a.length(); i++){
-                if(vpnName.equals(a.getString(i))){
-                    break;
-                }
-            }
-            if(i >= a.length()){
-                i = 0;
-            }
-        }
-        return i;
-    }
-
-    private int indexOfSelectedVPNWithParsingOptimizedServer() {
-        int i = indexOfSelectedVPN();
-        if(i == 0){
-            TypedArray a = getResources().obtainTypedArray(R.array.vpn_names);
-            i = (int) (Math.random() * (a.length() - 1) + 1);
-        }
-        return i;
-    }
 
     private void changeProxyFlagIcon(){
-        TypedArray icons = getResources().obtainTypedArray(R.array.vpn_icons);
-        if(mMenu != null) {
-            if(mTemporaryVpnSelectIndex == 0){
-                mMenu.findItem(R.id.action_flag).setIcon(R.drawable.ic_flag_global_clicked);
-            }else {
-                mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
-            }
-//            mMenu.findItem(R.id.action_flag).setIcon(icons.getDrawable(mTemporaryVpnSelectIndex));
+        if(mMenu != null && mShadowsocksService != null && mSharedPreference != null){
+            final String globalFlag = getResources().getResourceEntryName(R.drawable.ic_flag_global);
+            final String flagKey = mNewState == Constants.State.CONNECTED ? SharedPreferenceKey.CONNECTING_VPN_FLAG : SharedPreferenceKey.VPN_FLAG;
+            final String flag = mSharedPreference.getString(flagKey, globalFlag);
+            int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
+//            Drawable drawable = getResources().getDrawable(resId);
+            mMenu.findItem(R.id.action_flag).setIcon(resId);
+//            final SimpleTarget<GlideDrawable> target = new SimpleTarget<GlideDrawable>() {
+//                @Override
+//                public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+//                    mMenu.findItem(R.id.action_flag).setIcon(resource);
+//                }
+//            };
+//            if (flag.startsWith("http")) {
+//                Glide.with(this).load(flag).into(target);
+//            } else {
+//                int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
+//                Glide.with(this).load(resId).into(target);
+//            }
         }
     }
 
-    private void restoreVpnSelectIndex(){
-        mTemporaryVpnSelectIndex = indexOfSelectedVPN();
+    private ArrayList<ServerConfig> loadServerList(){
+        ArrayList<ServerConfig> result = null;
+        String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+        if(serverlist != null){
+            ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
+            if(serverList != null && serverList.size() > 1){
+                result = serverList;
+            }
+        }
+        if(result == null){
+            result = ServerConfig.createDefaultServerList(getResources());
+        }
+        return result;
+    }
+
+    public static Pair<Boolean, Long> isPortOpen(final String ip, final int port, final int timeout) {
+        Socket socket = null;
+        OutputStreamWriter osw;
+        boolean result = false;
+        long t = System.currentTimeMillis();
+        long duration = 0;
+        try {
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), timeout);
+            osw = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+            osw.write(ip, 0, ip.length());
+            osw.flush();
+            result = true;
+        } catch (Exception ex) {
+            ShadowsocksApplication.handleException(ex);
+        }finally {
+            duration = System.currentTimeMillis() - t;
+            try {
+                socket.close();
+            } catch (IOException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
+        return new Pair<>(result, duration);
+    }
+
+    @Override
+    public void onConnectButtonClick() {
+        if(mShadowsocksService != null) {
+            if (!mIsConnecting && (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR)) {
+                if(checkNetworkConnectivity()) {
+                    connectVpnServerAsync();
+                }
+                GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
+
+            } else {
+                DisconnectFragment disconnectFragment = new DisconnectFragment();
+                disconnectFragment.show(getSupportFragmentManager(), "disconnect");
+            }
+        }
+
+    }
+
+    @Override
+    public void onCloseRateUs(final RateUsFragment fragment) {
+        remoeRateUsFragment(fragment);
+    }
+
+    private void remoeRateUsFragment(RateUsFragment fragment) {
+        getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
+    }
+
+    @Override
+    public void onRateUs(final RateUsFragment fragment) {
+        remoeRateUsFragment(fragment);
+        rateUs();
+    }
+
+    @Override
+    public void onCancel(DisconnectFragment disconnectFragment) {
+        GAHelper.sendEvent(this, "连接VPN", "取消关闭");
+    }
+
+    @Override
+    public void onDisconnect(DisconnectFragment disconnectFragment) {
+        disconnectVpnServiceAsync();
+        GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
     }
 }

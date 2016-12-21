@@ -38,10 +38,7 @@ public abstract class BaseService extends VpnService {
     private Timer timer;
     private Handler handler;
     protected Config config = null;
-    private Timer mHoulyUpdater;
     private long mStartTime;
-
-
 
     final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
     IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
@@ -86,6 +83,9 @@ public abstract class BaseService extends VpnService {
             return DefaultSharedPrefeencesUtil.getRxTotal(BaseService.this);
         }
 
+        public void enableNotification(boolean enable){
+            BaseService.this.enableNotification(enable);
+        }
     };
 
     @Override
@@ -93,8 +93,6 @@ public abstract class BaseService extends VpnService {
         super.onCreate();
         mTrafficMonitor = new TrafficMonitor();
         handler = new Handler(getMainLooper());
-        mHoulyUpdater = new Timer(true);
-        initHourlyUpdater();
         initLastResetMonth();
     }
 
@@ -131,28 +129,49 @@ public abstract class BaseService extends VpnService {
     }
     public void changeState(Constants.State s) {
         changeState(s, null);
-
-        if(s == Constants.State.CONNECTED){
-            mStartTime = System.currentTimeMillis();
-        }else if(s == Constants.State.STOPPED){
-            //send broadcast
-            Intent intent = new Intent(Action.STOPPED);
-            if(mStartTime != 0) {
-                long c = System.currentTimeMillis();
-                intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+        Intent intent = new Intent();
+        long c= System.currentTimeMillis();
+        switch (s){
+            case INIT:
+                intent.setAction(Action.INIT);
+                break;
+            case CONNECTING:
+                intent.setAction(Action.CONNECTING);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
+                mStartTime = c;
+                break;
+            case CONNECTED:
+                intent.setAction(Action.CONNECTED);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
+                mStartTime = c;
+                break;
+            case STOPPING:
+                intent.setAction(Action.STOPPING);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
+                mStartTime = c;
+                break;
+            case STOPPED:
+                intent.setAction(Action.STOPPED);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
                 mStartTime = 0;
-            }
-            sendBroadcast(intent);
-        }else if(s == Constants.State.ERROR){
-            //send broadcast
-            Intent intent = new Intent(Action.ERROR);
-            if(mStartTime != 0) {
-                long c = System.currentTimeMillis();
-                intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                break;
+            case ERROR:
+                intent.setAction(Action.ERROR);
+                if(mStartTime > 0){
+                    intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
+                }
                 mStartTime = 0;
-            }
-            sendBroadcast(intent);
+                break;
         }
+        sendBroadcast(intent);
     }
 
     protected void changeState(final Constants.State s,final String msg) {
@@ -251,46 +270,9 @@ public abstract class BaseService extends VpnService {
         return mTrafficMonitor;
     }
 
-    private void initHourlyUpdater(){
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                checkLastResetMonth();
-            }
-        };
-//        mHoulyUpdater.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
-        mHoulyUpdater.schedule(timerTask, TimeUnit.SECONDS.toMillis(1), TimeUnit.HOURS.toMillis(1));
-
-    }
-
-    private void checkLastResetMonth() {
-        long txTotal = DefaultSharedPrefeencesUtil.getTxTotal(this);
-        long rxTotal = DefaultSharedPrefeencesUtil.getRxTotal(this);
-        Calendar lastResetMonth = DefaultSharedPrefeencesUtil.getLastResetMonth(this);
-        Calendar currentMonth = Calendar.getInstance();
-//        if(currentMonth.getTimeInMillis() - lastResetMonth.getTimeInMillis() > 10000){
-        if(lastResetMonth.get(Calendar.MONTH) != currentMonth.get(Calendar.MONTH) ){
-            DefaultSharedPrefeencesUtil.resetTxTotalAndRxTotal(this);
-            DefaultSharedPrefeencesUtil.setLastResetMonth(this, currentMonth);
-            mTrafficMonitor.reset();
-
-            //send broadcast
-            Intent intent = new Intent(Action.RESET_TOTAL);
-            intent.putExtra(SharedPreferenceKey.TX_TOTAL, txTotal);
-            intent.putExtra(SharedPreferenceKey.RX_TOTAL, rxTotal);
-            intent.putExtra(SharedPreferenceKey.LAST_RESET_MONTH, lastResetMonth.getTimeInMillis());
-            sendBroadcast(intent);
-
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mHoulyUpdater != null){
-            mHoulyUpdater.cancel();
-            mHoulyUpdater = null;
-        }
     }
 
     private void initLastResetMonth(){
@@ -302,5 +284,6 @@ public abstract class BaseService extends VpnService {
 
     }
 
+    protected abstract void enableNotification(boolean enable);
 
 }

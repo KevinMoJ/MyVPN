@@ -22,6 +22,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_connectivity"
         app:menu="@menu/activity_connectivity_drawer"
-        app:itemIconTint="@color/colorPrimary"/>
+        app:itemIconTint="@color/nav_draw_icon"/>
 
 </android.support.v4.widget.DrawerLayout>

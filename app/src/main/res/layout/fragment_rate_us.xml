@@ -1,28 +1,67 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/standard_margin"
+    android:paddingLeft="@dimen/half_standard_margin"
+    android:paddingRight="@dimen/half_standard_margin"
     android:background="@drawable/rate_us_bg"
-    android:paddingLeft="@dimen/standard_margin"
-    android:paddingRight="@dimen/standard_margin"
+    android:elevation="2dp"
+    android:orientation="vertical"
     tools:context="com.androapplite.shadowsocks.fragment.RateUsFragment">
-    <ImageView
-        android:layout_width="160dp"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/rate_us_star"
-        android:layout_centerVertical="true"
+        android:text="@string/like_us"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/five_star_encouragement"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:layout_marginTop="@dimen/standard_margin"
         />
-
-    <Button
-        android:layout_width="70dp"
-        android:layout_height="35dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:text="@string/rate_us"
-        android:textAllCaps="false"
-        android:textColor="@color/primary_white_text"
-        android:textSize="@dimen/small_text"
-        android:background="@drawable/common_positive_button_bg"
-        android:id="@+id/rate_us_btn"/>
-
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="5"
+        android:id="@+id/star_container">
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:src="@drawable/start1"
+            />
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:src="@drawable/start2"
+            />
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:src="@drawable/start3"
+            />
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:src="@drawable/start4"
+            />
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:src="@drawable/start5"
+            android:id="@+id/rate_us_image_button"
+            />
+    </LinearLayout>
+</LinearLayout>

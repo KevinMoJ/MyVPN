@@ -50,22 +50,22 @@ public final class TrafficMonitor {
         return formatString.toString();
     }
 
-    @NonNull
-    public static final String formatTraffic(@NonNull Context context, long size){
-        double n = size;
-        int i = -1;
-        while (n >= 1000) {
-            n /= 1024;
-            i = i + 1;
-        }
-        StringBuilder formatString = new StringBuilder();
-        if(i < 0){
-            formatString.append(size).append(" ").append(context.getResources().getQuantityString(R.plurals.bytes, (int) size));
-        }else{
-            formatString.append(numberFormat.format(n)).append(" ").append(units[i]);
-        }
-        return formatString.toString();
-    }
+//    @NonNull
+//    public static final String formatTraffic(@NonNull Context context, long size){
+//        double n = size;
+//        int i = -1;
+//        while (n >= 1000) {
+//            n /= 1024;
+//            i = i + 1;
+//        }
+//        StringBuilder formatString = new StringBuilder();
+//        if(i < 0){
+//            formatString.append(size).append(" ").append(context.getResources().getQuantityString(R.plurals.bytes, (int) size));
+//        }else{
+//            formatString.append(numberFormat.format(n)).append(" ").append(units[i]);
+//        }
+//        return formatString.toString();
+//    }
 
     public boolean updateRate(){
         long now = System.currentTimeMillis();

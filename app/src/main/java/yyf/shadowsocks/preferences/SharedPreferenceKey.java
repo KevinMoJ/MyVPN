@@ -11,4 +11,6 @@ public final class SharedPreferenceKey {
     public static final String LAST_RESET_MONTH = "LAST_RESET_MONTH";
     public static final String TIMESTAMP = "TIMESTAMP";
     public static final String DURATION = "DURATION";
+    public static final String NOTIFICATION = "notification";
+
 }

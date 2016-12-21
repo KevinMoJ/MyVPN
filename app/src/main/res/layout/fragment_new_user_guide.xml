@@ -1,11 +1,9 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingTop="@dimen/user_guide_top_bottom_margin"
-    android:paddingBottom="@dimen/user_guide_top_bottom_margin"
     tools:context="com.androapplite.shadowsocks.fragment.NewUserGuideFragment">
 
     <ImageView
@@ -13,38 +11,43 @@
         android:layout_height="@dimen/user_guide_image_size"
         android:src="@drawable/new_user_guide_1"
         android:id="@+id/user_guide_image"
+        android:layout_centerInParent="true"
+        android:paddingTop="40dp"
         />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2" />
-    <TextView
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/protect_your_identify"
-        android:textColor="@color/primary_white_text"
-        android:textSize="@dimen/large_text_27"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:id="@+id/user_guide_title"
-        />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/forever_free_explain"
-        android:textColor="@color/secondary_white_text"
-        android:textSize="@dimen/medium_text"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
-        android:id="@+id/user_guide_explain"
-        android:paddingLeft="@dimen/twice_margin"
-        android:paddingRight="@dimen/twice_margin"
-        />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2" />
+        android:layout_above="@+id/user_guide_image"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_guide_1"
+            android:textColor="@color/secondary_black_text"
+            android:textSize="@dimen/large_text"
+            android:id="@+id/user_guide_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:fontFamily="sans-serif-light"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/user_guide_1_2"
+            android:textColor="@color/secondary_black_text"
+            android:textSize="@dimen/large_text"
+            android:gravity="center_horizontal"
+            android:id="@+id/user_guide_explain"
+            android:layout_marginTop="@dimen/margin_4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:fontFamily="sans-serif-light"
+            />
+    </LinearLayout>
 
-</LinearLayout>
+
+
+
+</RelativeLayout>

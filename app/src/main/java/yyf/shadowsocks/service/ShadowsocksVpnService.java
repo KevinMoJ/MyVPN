@@ -14,6 +14,8 @@ import android.util.Log;
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import org.apache.http.conn.util.InetAddressUtils;
 import org.xbill.DNS.AAAARecord;
@@ -432,6 +434,10 @@ public class ShadowsocksVpnService extends BaseService {
             if (resolved && handleConnection()) {
                 changeState(Constants.State.CONNECTED);
                 mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
+                boolean b = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.NOTIFICATION, true);
+                if(!b){
+                    mShadowsocksNotification.disableNotification();
+                }
 //                mNativeProcessMonitorThread = new NativeProcessMonitorThread(this);
 //                mNativeProcessMonitorThread.start();
             } else {
@@ -578,5 +584,17 @@ public class ShadowsocksVpnService extends BaseService {
             ShadowsocksApplication.handleException(e);
         }
         return null;
+    }
+
+    @Override
+    protected void enableNotification(boolean enable) {
+        DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this).putBoolean(SharedPreferenceKey.NOTIFICATION, enable).apply();
+        if(mShadowsocksNotification != null){
+            if(enable){
+                mShadowsocksNotification.enableNotification();
+            }else{
+                mShadowsocksNotification.disableNotification();
+            }
+        }
     }
 }

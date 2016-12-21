@@ -30,7 +30,7 @@
 
     </array>
     <array name="vpn_icons">
-        <item>@drawable/ic_flag_global_anim</item>
+        <item>@drawable/ic_flag_global</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_uk</item>
@@ -41,6 +41,20 @@
         <item>@drawable/ic_flag_de</item>
         <item>@drawable/ic_flag_sg</item>
         <item>@drawable/ic_flag_nl</item>
+    </array>
+
+    <array name="vpn_nations">
+        <item>@string/vpn_nation_opt</item>
+        <item>@string/vpn_nation_mia_us</item>
+        <item>@string/vpn_nation_la_us</item>
+        <item>@string/vpn_nation_uk</item>
+        <item>@string/vpn_nation_fr</item>
+        <item>@string/vpn_nation_jp</item>
+        <item>@string/vpn_nation_au</item>
+        <item>@string/vpn_nation_da_us</item>
+        <item>@string/vpn_nation_de</item>
+        <item>@string/vpn_nation_sg</item>
+        <item>@string/vpn_nation_nl</item>
     </array>
 
 </resources>

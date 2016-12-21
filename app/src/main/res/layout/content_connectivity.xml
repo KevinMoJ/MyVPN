@@ -8,41 +8,29 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.androapplite.shadowsocks.activity.ConnectivityActivity"
     tools:showIn="@layout/app_bar_connectivity">
-
     <fragment
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:name="com.androapplite.shadowsocks.fragment.ConnectionIndicatorFragment"
-        android:id="@+id/connection_indicator"
-        tools:layout="@layout/fragment_connection_indicator"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="@dimen/margin_4dp"
-        android:layout_marginRight="@dimen/margin_4dp"
-        />
-    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.androapplite.shadowsocks.fragment.ConnectFragment"
+        tools:layout="@layout/fragment_connect"
+        android:id="@+id/connect_fragment"/>
+    
+    <!--<fragment-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_margin="@dimen/half_standard_margin"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"-->
+        <!--tools:layout="@layout/fragment_rate_us"-->
+        <!--android:id="@+id/rate_us" />-->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_margin="@dimen/half_standard_margin"
+        android:id="@+id/rate_us_frame_layout"
         >
-        <fragment
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.androapplite.shadowsocks.fragment.ConnectivityFragment"
-            android:id="@+id/connection_fragment"
-            tools:layout="@layout/fragment_connectivity"
-            android:layout_centerHorizontal="true"/>
-        <fragment
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/half_standard_margin"
-            android:id="@+id/traffic_fragment"
-            android:name="com.androapplite.shadowsocks.fragment.TrafficRateFragment"
-            tools:layout="@layout/fragment_traffic_rate"
-            >
-        </fragment>
-    </LinearLayout>
+
+    </FrameLayout>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"

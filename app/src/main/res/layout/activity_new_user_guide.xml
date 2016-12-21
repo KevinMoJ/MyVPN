@@ -25,16 +25,17 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:text="@android:string/ok"
+            android:text="@string/start_using"
             android:textColor="@color/primary_white_text"
             android:textSize="@dimen/large_text"
             android:background="@drawable/common_positive_button_bg"
-            android:visibility="gone"
+            android:visibility="invisible"
             android:id="@+id/new_user_guide_finish_button"
             android:layout_centerInParent="true"
+            android:textAllCaps="false"
             />
     </RelativeLayout>
 </RelativeLayout>

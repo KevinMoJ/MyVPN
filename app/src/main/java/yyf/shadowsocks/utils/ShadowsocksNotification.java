@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
@@ -47,6 +48,8 @@ public class ShadowsocksNotification {
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_large_icon))
+                .setColor(mService.getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(mService.getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
@@ -62,10 +65,7 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                String txt = TrafficMonitor.formatTraffic(mService, txTotal);
-                String rxt = TrafficMonitor.formatTraffic(mService, rxTotal);
-                mBuilder.setContentText(String.format("↑%s, %s", txr, txt))
-                        .setSubText(String.format("↓%s, %s", rxr, rxt));
+                mBuilder.setContentText(String.format("Download: %s, Upload: %s", txr, rxr));
                 mService.startForeground(1, mBuilder.build());
 
             }
@@ -99,11 +99,15 @@ public class ShadowsocksNotification {
                     break;
                 case Intent.ACTION_SCREEN_ON:
                     setVisible(mKeyguardManager.inKeyguardRestrictedInputMode());
-                    mService.registerCallback(mCallback);
-                    mCallbackRegistered = true;
+                    registerCallback();
                     break;
             }
         }
+    }
+
+    private void registerCallback() {
+        mService.registerCallback(mCallback);
+        mCallbackRegistered = true;
     }
 
     private void setVisible(boolean visible){
@@ -127,6 +131,14 @@ public class ShadowsocksNotification {
             mLockReceiver = null;
         }
 
+        disableNotification();
+    }
+
+    public void enableNotification(){
+        registerCallback();
+    }
+
+    public void disableNotification(){
         unregisterCallback();
         mService.stopForeground(true);
         mNotificationManager.cancel(1);
