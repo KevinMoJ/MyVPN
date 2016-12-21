@@ -172,7 +172,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             progressAnimator.end();
         }
         progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", mProgressBar.getProgress(), mProgressBar.getMax());
-        progressAnimator.setDuration(200);
+        progressAnimator.setDuration(500);
         progressAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
