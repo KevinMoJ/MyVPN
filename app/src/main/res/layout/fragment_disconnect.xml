@@ -13,6 +13,13 @@
         android:layout_marginLeft="@dimen/standard_margin"
         android:layout_marginTop="@dimen/margin_24dp"
         />
+    <FrameLayout
+        android:id="@+id/adContainer"
+        android:layout_gravity="center"
+        android:layout_width="300dp"
+        android:layout_height="250dp">
+
+    </FrameLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

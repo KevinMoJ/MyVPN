@@ -148,6 +148,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
         Plugins.initBannerAd(ConnectivityActivity.NAME);
+        Plugins.initNativeAd(ConnectivityActivity.NAME);
         Plugins.initNgsAd(ConnectivityActivity.NAME);
 
         Plugins.setPluginAdListener(new PluginAdListener() {
@@ -155,6 +156,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             public void onReceiveAd(String s, AdType adType) {
                 if (adType == AdType.Ngs) {
                     ngsLoaded = true;
+                } else if (adType == AdType.Native) {
+                    nativeLoaded = true;
                 }
             }
 
@@ -170,8 +173,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         });
 
         ngsLoaded = false;
+        nativeLoaded = false;
 
         try {
+            int width = (int)(getResources().getDisplayMetrics().density * 300);
+            int height = (int)(getResources().getDisplayMetrics().density * 250);
+            Plugins.loadNewNativeAd(NAME, width, height);
             Plugins.loadNewBannerAd(NAME);
             Plugins.loadNewNgsAd(NAME);
         } catch (Exception ex) {
@@ -191,6 +198,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean startUp = false;
     private boolean ngsLoaded = false;
     private boolean showResumeAd = false;
+    public static boolean nativeLoaded = false;
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(Message msg) {

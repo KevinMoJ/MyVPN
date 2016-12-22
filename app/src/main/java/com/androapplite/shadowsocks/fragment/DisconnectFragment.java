@@ -11,14 +11,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.smartads.Plugins;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class DisconnectFragment extends DialogFragment implements View.OnClickListener{
     private OnDisconnectActionListener mListener;
+    private FrameLayout mAdLayout;
 
     public DisconnectFragment() {
         // Required empty public constructor
@@ -32,6 +36,15 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         View v = inflater.inflate(R.layout.fragment_disconnect, container, false);
         v.findViewById(R.id.cancel_disconnect).setOnClickListener(this);
         v.findViewById(R.id.disconnect).setOnClickListener(this);
+        mAdLayout = (FrameLayout)v.findViewById(R.id.adContainer);
+        mAdLayout.setVisibility(View.GONE);
+        if (ConnectivityActivity.nativeLoaded) {
+            try {
+                mAdLayout.addView(Plugins.adNative(ConnectivityActivity.NAME));
+                mAdLayout.setVisibility(View.VISIBLE);
+            } catch (Exception ex) {
+            }
+        }
         return  v;
     }
 
