@@ -178,7 +178,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 case INIT:
                     break;
                 case CONNECTING:
-                    if (mSharedPreference != null) {
+                    if (mSharedPreference != null && mConnectingConfig != null) {
                         mSharedPreference.edit()
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
