@@ -256,17 +256,19 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         View selectedView = parent.getChildAt(mSelectedIndex);
-        ServerListAdapter.ViewHolder holder = (ServerListAdapter.ViewHolder) selectedView.getTag();
-        holder.mItemView.setSelected(false);
+        if(selectedView != null){
+            ServerListAdapter.ViewHolder holder = (ServerListAdapter.ViewHolder) selectedView.getTag();
+            holder.mItemView.setSelected(false);
 
-        String nation = mNations.get(position);
-        String flag = mFlags.get(position);
-        mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
-                .putString(SharedPreferenceKey.VPN_FLAG, flag)
-                .apply();
-        setResult(RESULT_OK);
-        finish();
-        GAHelper.sendEvent(this, "选择国家", nation);
+            String nation = mNations.get(position);
+            String flag = mFlags.get(position);
+            mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
+                    .putString(SharedPreferenceKey.VPN_FLAG, flag)
+                    .apply();
+            setResult(RESULT_OK);
+            finish();
+            GAHelper.sendEvent(this, "选择国家", nation);
+        }
     }
 
     @Override
