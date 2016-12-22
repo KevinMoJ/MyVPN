@@ -183,6 +183,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
+                                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
                                 .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, mConnectingConfig.signal)
                                 .apply();
                     }
@@ -198,7 +199,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
                         String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
                         int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
-                        mConnectingConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+                        if(vpnName != null && server != null && flag != null && nation != null) {
+                            mConnectingConfig = new ServerConfig(vpnName, server, flag, nation, signal);
+                        }
                     } else {
                         if (mSharedPreference != null) {
                             mSharedPreference.edit()
