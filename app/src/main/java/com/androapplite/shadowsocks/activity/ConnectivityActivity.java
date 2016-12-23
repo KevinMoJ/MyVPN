@@ -17,6 +17,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -239,9 +240,23 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mShowRateUsRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                                .commitAllowingStateLoss();
+                        try {
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                                if (!ConnectivityActivity.this.isDestroyed()) {
+                                    getSupportFragmentManager().beginTransaction()
+                                            .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                                            .commitAllowingStateLoss();
+                                }
+                            } else {
+                                getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                                        .commitAllowingStateLoss();
+                            }
+                        }catch (Exception e){
+                            ShadowsocksApplication.handleException(e);
+                        }
+
                     }
                 };
                 getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
@@ -949,7 +964,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void remoeRateUsFragment(RateUsFragment fragment) {
-        getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                if (!isDestroyed()) {
+                    getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+                }
+            } else {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+            }
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
         mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
     }
 
