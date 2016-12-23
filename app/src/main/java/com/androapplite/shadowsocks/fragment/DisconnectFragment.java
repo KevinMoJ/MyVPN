@@ -71,7 +71,7 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if(mListener != null){
-            dismiss();
+            dismissAllowingStateLoss();
             switch (v.getId()){
                 case R.id.cancel_disconnect:
                     mListener.onCancel(this);
