@@ -203,17 +203,20 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 TimerTask timerTask= new TimerTask() {
                     @Override
                     public void run() {
-                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-                        final long current = System.currentTimeMillis();
-                        long start = sharedPreferences.getLong(SharedPreferenceKey.CONNECT_TIME, current);
-                        long elapse = (current - start)/1000;
-                        final String elpasedTime = DateUtils.formatElapsedTime(elapse);
-                        mElapseTextView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                mElapseTextView.setText(elpasedTime);
-                            }
-                        });
+                        final Context context = getContext();
+                        if(context != null) {
+                            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+                            final long current = System.currentTimeMillis();
+                            long start = sharedPreferences.getLong(SharedPreferenceKey.CONNECT_TIME, current);
+                            long elapse = (current - start) / 1000;
+                            final String elpasedTime = DateUtils.formatElapsedTime(elapse);
+                            mElapseTextView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mElapseTextView.setText(elpasedTime);
+                                }
+                            });
+                        }
                     }
                 };
                 timer = new Timer();
