@@ -38,13 +38,11 @@
     <string name="vpn_nation_fr">"فرنسا"</string>
     <string name="vpn_nation_jp">"اليابان"</string>
     <string name="vpn_nation_uk">"المملكة المتحدة"</string>
-    <string name="vpn_nation_mia_us">"الولايات المتحدة"</string>
-    <string name="vpn_nation_la_us">"الولايات المتحدة"</string>
     <string name="vpn_nation_au">"Australla"</string>
-    <string name="vpn_nation_da_us">"الولايات المتحدة"</string>
     <string name="vpn_nation_de">"ألمانيا"</string>
     <string name="vpn_nation_sg">"سنغافورة"</string>
     <string name="vpn_nation_nl">"هولندا"</string>
+    <string name="vpn_nation_us">الولايات المتحدة</string>
 
     <string name="change_proxy_tip">"الرجاء تغيير الوكيل عند الاتصال هو خارج."</string>
     <string name="not_start_vpn">"VPN اتصال لا تبدأ. حاول مرة اخرى."</string>
