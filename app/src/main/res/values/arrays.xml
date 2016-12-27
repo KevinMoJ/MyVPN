@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--yyf.shadowsocks-->
-    <string-array name="enc_method_entry">
+    <string-array name="enc_method_entry" translatable="false">
         <item>TABLE</item>
         <item>RC4</item>
         <item>RC4-MD5</item>
@@ -21,7 +21,7 @@
         <item>CHACHA20</item>
     </string-array>
 
-    <string-array name="enc_method_value">
+    <string-array name="enc_method_value" translatable="false">
         <item>table</item>
         <item>rc4</item>
         <item>rc4-md5</item>
@@ -41,19 +41,19 @@
         <item>chacha20</item>
     </string-array>
 
-    <string-array name="route_entry">
+    <string-array name="route_entry" translatable="false">
         <item>All</item>
         <item>Bypass LAN</item>
         <item>Bypass LAN &amp; China</item>
     </string-array>
 
-    <string-array name="route_value">
+    <string-array name="route_value" translatable="false">
         <item>all</item>
         <item>bypass-lan</item>
         <item>bypass-china</item>
     </string-array>
 
-    <string-array name="private_route">
+    <string-array name="private_route" translatable="false">
         <item>0.0.0.0/8</item>
         <item>10.0.0.0/8</item>
         <item>100.64.0.0/10</item>
@@ -70,7 +70,7 @@
         <item>224.0.0.0/3</item>
     </string-array>
 
-    <string-array name="bypass_private_route">
+    <string-array name="bypass_private_route" translatable="false">
         <item>1.0.0.0/8</item>
         <item>2.0.0.0/7</item>
         <item>4.0.0.0/6</item>

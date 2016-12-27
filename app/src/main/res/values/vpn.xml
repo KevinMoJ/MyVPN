@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--我自己的-->
-    <array name="vpn_names">
+    <array name="vpn_names" translatable="false">
         <item>@string/vpn_name_opt</item>
         <item>@string/vpn_name_mia_us</item>
         <item>@string/vpn_name_la_us</item>
@@ -19,7 +19,7 @@
         <item>@string/vpn_name_ny_us</item>
         <item>@string/vpn_name_sv_us</item>
     </array>
-    <array name="vpn_servers">
+    <array name="vpn_servers" translatable="false">
         <item>@string/vpn_server_opt</item>
         <item>@string/vpn_server_mia_us</item>
         <item>@string/vpn_server_la_us</item>
@@ -33,7 +33,7 @@
         <item>@string/vpn_server_nl</item>
     </array>
 
-    <array name="vpn_icons">
+    <array name="vpn_icons" translatable="false">
         <item>@drawable/ic_flag_global</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_us</item>
@@ -52,7 +52,7 @@
         <item>@drawable/ic_flag_us</item>
     </array>
 
-    <array name="vpn_nations">
+    <array name="vpn_nations" translatable="false">
         <item>@string/vpn_nation_opt</item>
         <item>@string/vpn_nation_us</item>
         <item>@string/vpn_nation_us</item>

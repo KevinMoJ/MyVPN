@@ -39,13 +39,11 @@
     <string name="vpn_nation_fr">"Франция"</string>
     <string name="vpn_nation_jp">"Япония"</string>
     <string name="vpn_nation_uk">"United Kindom"</string>
-    <string name="vpn_nation_mia_us">"Соединенные Штаты"</string>
-    <string name="vpn_nation_la_us">"Соединенные Штаты"</string>
     <string name="vpn_nation_au">"Australla"</string>
-    <string name="vpn_nation_da_us">"Соединенные Штаты"</string>
     <string name="vpn_nation_de">"Германия"</string>
     <string name="vpn_nation_sg">"Сингапур"</string>
     <string name="vpn_nation_nl">"Нидерланды"</string>
+    <string name="vpn_nation_us">"Соединенные Штаты"</string>
 
     <string name="change_proxy_tip">"Пожалуйста, измените прокси, когда соединение выключено."</string>
     <string name="not_start_vpn">"VPN-соединение не запускается. Пожалуйста, попробуйте еще раз."</string>
