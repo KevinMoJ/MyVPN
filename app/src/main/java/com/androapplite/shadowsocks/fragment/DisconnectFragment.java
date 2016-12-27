@@ -8,11 +8,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,5 +91,14 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(STYLE_NO_TITLE);
         return dialog;
+    }
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        try {
+            manager.beginTransaction().add(this, tag).commitAllowingStateLoss();
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
     }
 }
