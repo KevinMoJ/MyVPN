@@ -138,7 +138,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mSharedPreference.edit()
                     .putString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt))
                     .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
-                    .apply();
+                    .commit();
 
         }
     }
@@ -186,7 +186,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
                                 .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
                                 .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, mConnectingConfig.signal)
-                                .apply();
+                                .commit();
                     }
                     break;
                 case CONNECTED:
@@ -207,11 +207,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         if (mSharedPreference != null) {
                             mSharedPreference.edit()
                                     .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
-                                    .apply();
+                                    .commit();
                         }
                     }
-                    ConnectionTestService.testConnection(this, mConnectingConfig.name);
-                    showRateUsFragment();
+                    if(mConnectFragment != null ) {
+                        ConnectionTestService.testConnection(this, mConnectingConfig.name);
+                        showRateUsFragment();
+                    }
                     mIsConnecting = false;
                     break;
                 case STOPPING:
@@ -953,6 +955,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             } else {
                 DisconnectFragment disconnectFragment = new DisconnectFragment();
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
+
             }
         }
 
@@ -975,7 +978,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
-        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
+        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).commit();
     }
 
     @Override
