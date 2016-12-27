@@ -48,6 +48,15 @@
     <string name="vpn_name_de" translatable="false">Frankfurt</string>
     <string name="vpn_name_sg" translatable="false">Singapore</string>
     <string name="vpn_name_nl" translatable="false">Amsterdam</string>
+    <string name="vpn_name_chi_us" translatable="false">Chicago</string>
+    <string name="vpn_name_sea_us" translatable="false">Seattle</string>
+    <string name="vpn_name_alt_us" translatable="false">Atlanta</string>
+    <string name="vpn_name_ny_us" translatable="false">New York</string>
+    <string name="vpn_name_sv_us" translatable="false">Silicon Valley</string>
+    <string name="vpn_name_sj_us" translatable="false">San Jose</string>
+    <string name="vpn_name_pho_us" translatable="false">Phoenix</string>
+    <string name="vpn_name_buf_us" translatable="false">Buffalo</string>
+
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
     <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>
@@ -65,13 +74,11 @@
     <string name="vpn_nation_fr">France</string>
     <string name="vpn_nation_jp">Japan</string>
     <string name="vpn_nation_uk">United Kindom</string>
-    <string name="vpn_nation_mia_us">United States</string>
-    <string name="vpn_nation_la_us">United States</string>
     <string name="vpn_nation_au">Australla</string>
-    <string name="vpn_nation_da_us">United States</string>
     <string name="vpn_nation_de">Germany</string>
     <string name="vpn_nation_sg">Singapore</string>
     <string name="vpn_nation_nl">Netherlands</string>
+    <string name="vpn_nation_us">United States</string>
 
     <string name="change_proxy_tip">Please change proxy when the connection is off.</string>
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>

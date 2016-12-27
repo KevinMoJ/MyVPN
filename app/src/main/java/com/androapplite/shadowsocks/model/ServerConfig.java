@@ -136,7 +136,7 @@ public class ServerConfig {
         TypedArray servers = resources.obtainTypedArray(R.array.vpn_servers);
         TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
         ArrayList<ServerConfig> arrayList = new ArrayList<>(names.length());
-        for(int i=0; i<names.length(); i++){
+        for(int i=0; i<servers.length(); i++){
             String name = names.getString(i);
             String server = servers.getString(i);
             String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_bluetooth_24dp));
