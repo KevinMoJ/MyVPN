@@ -313,7 +313,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                     .commit();
                         }
                     }
-                    if(mConnectFragment != null ) {
+                    if(mConnectFragment != null && mConnectingConfig != null ) {
                         ConnectionTestService.testConnection(this, mConnectingConfig.name);
                         showRateUsFragment();
                     }
