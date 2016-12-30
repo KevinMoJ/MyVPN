@@ -20,9 +20,14 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Headers;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.http.RealResponseBody;
+import okio.GzipSource;
+import okio.Okio;
 
 /**
  * Created by jim on 16/11/7.
@@ -41,16 +46,20 @@ public class ServerListFetcherService extends IntentService {
             hasStart = true;
             SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
+
             OkHttpClient client = new OkHttpClient.Builder()
                             .connectTimeout(15, TimeUnit.SECONDS)
                             .readTimeout(15, TimeUnit.SECONDS)
                             .writeTimeout(15, TimeUnit.SECONDS)
+                            .addInterceptor(new LoggingInterceptor())
+                            .addInterceptor(new UnzippingInterceptor())
                             .build();
 
-            String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
-//            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
+//            String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
             Request request = new Request.Builder()
                     .url(url)
+                    .addHeader("Accept-Encoding", "gzip")
                     .build();
 
 
@@ -83,6 +92,47 @@ public class ServerListFetcherService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.SERVER_LIST_FETCH_FINISH));
     }
 
+    static class LoggingInterceptor implements Interceptor {
+        @Override public Response intercept(Chain chain) throws IOException {
+            Request request = chain.request();
 
+            long t1 = System.nanoTime();
+            Log.d("OkHttp", String.format("Sending request %s on %s%n%s",
+                    request.url(), chain.connection(), request.headers()));
+
+            Response response = chain.proceed(request);
+
+            long t2 = System.nanoTime();
+            Log.d("OkHttp", String.format("Received response for %s in %.1fms%n%s",
+                    response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+
+            return response;
+        }
+    }
+
+    static class UnzippingInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Response response = chain.proceed(chain.request());
+            return unzip(response);
+        }
+
+        private Response unzip(final Response response) throws IOException {
+
+            if (response.body() == null || !"gzip".equals(response.header("Content-Encoding"))) {
+                return response;
+            }
+
+            GzipSource responseBody = new GzipSource(response.body().source());
+            Headers strippedHeaders = response.headers().newBuilder()
+                    .removeAll("Content-Encoding")
+                    .removeAll("Content-Length")
+                    .build();
+            return response.newBuilder()
+                    .headers(strippedHeaders)
+                    .body(new RealResponseBody(strippedHeaders, Okio.buffer(responseBody)))
+                    .build();
+        }
+    }
 
 }
