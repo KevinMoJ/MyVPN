@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -46,14 +48,18 @@ public class ServerListFetcherService extends IntentService {
             hasStart = true;
             SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
+            Cache cache = new Cache(getCacheDir(), 1024 * 1024);
+            final OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(15, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .cache(cache)
+                    .addInterceptor(new UnzippingInterceptor());
 
-            OkHttpClient client = new OkHttpClient.Builder()
-                            .connectTimeout(15, TimeUnit.SECONDS)
-                            .readTimeout(15, TimeUnit.SECONDS)
-                            .writeTimeout(15, TimeUnit.SECONDS)
-                            .addInterceptor(new LoggingInterceptor())
-                            .addInterceptor(new UnzippingInterceptor())
-                            .build();
+            if(BuildConfig.DEBUG){
+                builder.addInterceptor(new LoggingInterceptor());
+            }
+            OkHttpClient client = builder.build();
 
 //            String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
             String url = "http://192.168.31.29:8080/VPNServerList/fsl";
