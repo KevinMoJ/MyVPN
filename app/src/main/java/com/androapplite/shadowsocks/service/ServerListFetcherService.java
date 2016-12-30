@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -40,7 +41,11 @@ public class ServerListFetcherService extends IntentService {
             hasStart = true;
             SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
-            OkHttpClient client = new OkHttpClient();
+            OkHttpClient client = new OkHttpClient.Builder()
+                            .connectTimeout(15, TimeUnit.SECONDS)
+                            .readTimeout(15, TimeUnit.SECONDS)
+                            .writeTimeout(15, TimeUnit.SECONDS)
+                            .build();
 
             String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
 //            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
