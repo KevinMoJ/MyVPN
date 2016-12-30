@@ -28,6 +28,7 @@ import okhttp3.Response;
  */
 
 public class ServerListFetcherService extends IntentService {
+    private boolean hasStart;
 
     public ServerListFetcherService(){
         super("ServletListFetcher");
@@ -35,7 +36,8 @@ public class ServerListFetcherService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if(intent != null){
+        if(intent != null && !hasStart){
+            hasStart = true;
             SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
             OkHttpClient client = new OkHttpClient();
@@ -62,6 +64,7 @@ public class ServerListFetcherService extends IntentService {
                 ShadowsocksApplication.handleException(e);
             }
             broadcastServerListFetchFinish();
+            hasStart = false;
         }
 
     }
