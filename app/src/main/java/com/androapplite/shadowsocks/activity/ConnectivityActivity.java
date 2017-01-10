@@ -496,7 +496,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             prepareStartService();
                             if(mSharedPreference != null){
                                 String flag = mSharedPreference.getString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global));
-                                GAHelper.sendEvent(ConnectivityActivity.this, "尝试连接", flag);
+                                String connectingFlag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global));
+                                GAHelper.sendEvent(ConnectivityActivity.this, "尝试连接", flag, connectingFlag);
                             }
                         }else {
                             Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
