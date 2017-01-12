@@ -19,20 +19,20 @@ repositories {
 android {
     signingConfigs {
         config {
-            keyAlias 'shadowsocks'
+            keyAlias 'com.h2o.vpn'
             keyPassword '123456'
             storeFile file('shadowsocks.jks')
             storePassword '123456'
         }
     }
     compileSdkVersion 22
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
     defaultConfig {
-        applicationId "com.androapplite.shadowsocks"
+        applicationId "com.h2o.vpn"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 22
-        versionName "2.0.5"
+        versionCode 1
+        versionName "1.0.0"
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
