@@ -30,6 +30,10 @@
         android:layout_gravity="center"
         android:background="@drawable/connect_btn"
         android:id="@+id/connect_button"
+        android:text="@string/connect"
+        android:textSize="@dimen/small_text"
+        android:textColor="@color/secondary_black_text"
+        android:textAllCaps="false"
         />
 
 </FrameLayout>
