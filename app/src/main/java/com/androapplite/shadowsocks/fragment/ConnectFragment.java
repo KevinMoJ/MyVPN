@@ -18,6 +18,8 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -47,7 +49,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 //    private boolean mIsSuccess;
 //    private TextView mMessageTextView;
 //    private TextView mElapseTextView;
-
+    private Button mConnectButton;
+    private ImageView mLoadingView;
+    private Animation rotateAnimation;
 
 
     public ConnectFragment() {
@@ -67,13 +71,29 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 //        mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);
 //        mMessageTextView = (TextView)view.findViewById(R.id.message);
 //        mElapseTextView = (TextView)view.findViewById(R.id.elapse);
+        mConnectButton = (Button)view.findViewById(R.id.connect_button);
+        mConnectButton.setOnClickListener(this);
+        mLoadingView = (ImageView)view.findViewById(R.id.loading);
         return view;
     }
 
     @Override
     public void onClick(View v) {
-        if(mListener != null){
-            mListener.onConnectButtonClick();
+//        if(mListener != null){
+//            mListener.onConnectButtonClick();
+//        }
+
+
+        switch (v.getId()){
+            case R.id.connect_button:
+                if(rotateAnimation == null) {
+                    rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+                    mLoadingView.startAnimation(rotateAnimation);
+                }else{
+                    mLoadingView.clearAnimation();
+                    rotateAnimation = null;
+                }
+                break;
         }
 
     }

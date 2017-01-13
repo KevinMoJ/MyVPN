@@ -16,6 +16,7 @@
         android:tint="@color/button_green"
         android:layout_gravity="center"
         android:layout_marginLeft="45dp"
+        android:id="@+id/loading"
         />
     <View
         android:layout_width="180dp"
@@ -28,6 +29,7 @@
         android:layout_height="72dp"
         android:layout_gravity="center"
         android:background="@drawable/connect_btn"
+        android:id="@+id/connect_button"
         />
 
 </FrameLayout>
