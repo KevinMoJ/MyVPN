@@ -138,6 +138,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         startAnimation();
         mConnectButton.setText(R.string.disconnect);
         mMessageTextView.setText(R.string.connecting);
+        mLoadingView.setColorFilter(getResources().getColor(R.color.animation_color));
 //        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
 //        if(showDisconnectDelayRunnable == null){
 //            showDisconnectDelayRunnable = new Runnable() {
@@ -182,6 +183,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 stopFinish();
                 break;
             case ERROR:
+                error();
                 break;
         }
 
@@ -189,71 +191,19 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void connectFinish(){
         mLoadingView.clearAnimation();
+        mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
     }
 
     private void stopFinish(){
         mLoadingView.clearAnimation();
+        mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
     }
 
-    
-//    private void stopAnimation(Constants.State state){
-//        mJaguarImageView.setVisibility(View.VISIBLE);
-//        mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
-//        AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
-//        animationDrawable.stop();
-//        mConnectButton.setVisibility(View.VISIBLE);
-//        mProgressBar.setVisibility(View.INVISIBLE);
-//        mProgressBar.setTag(null);
-//        if(state == Constants.State.CONNECTED){
-//            mJaguarImageView.setImageLevel(1);
-//            mJaguarImageView.requestLayout();
-//            mConnectButton.setImageLevel(1);
-//            mMessageTextView.setText(R.string.connected);
-//            mElapseTextView.setVisibility(View.VISIBLE);
-//            mElapseTextView.setText(R.string.time_elapse);
-//            Timer timer = (Timer) mElapseTextView.getTag();
-//            if(timer == null){
-//                TimerTask timerTask= new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        final Context context = getContext();
-//                        if(context != null) {
-//                            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-//                            final long current = System.currentTimeMillis();
-//                            long start = sharedPreferences.getLong(SharedPreferenceKey.CONNECT_TIME, current);
-//                            long elapse = (current - start) / 1000;
-//                            final String elpasedTime = DateUtils.formatElapsedTime(elapse);
-//                            mElapseTextView.post(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    mElapseTextView.setText(elpasedTime);
-//                                }
-//                            });
-//                        }
-//                    }
-//                };
-//                timer = new Timer();
-//                timer.schedule(timerTask, 1000, 1000);
-//                mElapseTextView.setTag(timer);
-//            }
-//            Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-//            mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
-//        }else if(state == Constants.State.STOPPED){
-//            mJaguarImageView.setImageLevel(0);
-//            mJaguarImageView.requestLayout();
-//            mConnectButton.setImageLevel(0);
-//            mMessageTextView.setText(R.string.tap_to_connect);
-//            mElapseTextView.setVisibility(View.INVISIBLE);
-//        }else if(state == Constants.State.ERROR){
-//            mJaguarImageView.setImageLevel(0);
-//            mJaguarImageView.requestLayout();
-//            mConnectButton.setImageLevel(0);
-//            mMessageTextView.setText(R.string.retry);
-//            mElapseTextView.setVisibility(View.INVISIBLE);
-//            Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-//            mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
-//        }
-//    }
+    private void error(){
+        mLoadingView.clearAnimation();
+        mLoadingView.setColorFilter(getResources().getColor(R.color.error_color));
+
+    }
 
     public void addProgress(int millisecond){
 //        if(mProgressBar != null) {

@@ -1,8 +1,7 @@
 <resources>
 
     <style name="AppTheme" parent="AppThemeBase" >
-        <item name="android:windowBackground">@color/activity_background</item>
-        <item name="android:windowContentOverlay">@null</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">
