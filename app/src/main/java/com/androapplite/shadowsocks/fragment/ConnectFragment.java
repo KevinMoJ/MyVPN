@@ -47,11 +47,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 //    private ImageButton mConnectButton;
 //    private ProgressBar mProgressBar;
 //    private boolean mIsSuccess;
-//    private TextView mMessageTextView;
+    private TextView mMessageTextView;
 //    private TextView mElapseTextView;
     private Button mConnectButton;
     private ImageView mLoadingView;
-    private Animation rotateAnimation;
 
 
     public ConnectFragment() {
@@ -69,7 +68,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 //        mJaguarImageView = (ImageView)view.findViewById(R.id.jaguar_image_view);
 //        mJaguarAnimationImageView = (ImageView)view.findViewById(R.id.jaguar_animation_image_view);
 //        mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);
-//        mMessageTextView = (TextView)view.findViewById(R.id.message);
+        mMessageTextView = (TextView)view.findViewById(R.id.message);
 //        mElapseTextView = (TextView)view.findViewById(R.id.elapse);
         mConnectButton = (Button)view.findViewById(R.id.connect_button);
         mConnectButton.setOnClickListener(this);
@@ -79,22 +78,22 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-//        if(mListener != null){
-//            mListener.onConnectButtonClick();
-//        }
-
-
-        switch (v.getId()){
-            case R.id.connect_button:
-                if(rotateAnimation == null) {
-                    rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
-                    mLoadingView.startAnimation(rotateAnimation);
-                }else{
-                    mLoadingView.clearAnimation();
-                    rotateAnimation = null;
-                }
-                break;
+        if(mListener != null){
+            mListener.onConnectButtonClick();
         }
+
+
+//        switch (v.getId()){
+//            case R.id.connect_button:
+//                if(rotateAnimation == null) {
+//                    rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+//                    mLoadingView.startAnimation(rotateAnimation);
+//                }else{
+//                    mLoadingView.clearAnimation();
+//                    rotateAnimation = null;
+//                }
+//                break;
+//        }
 
     }
 
@@ -122,28 +121,23 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        ObjectAnimator progressAnimator = (ObjectAnimator) mProgressBar.getTag();
-//        if(progressAnimator != null) {
-//            progressAnimator.removeAllListeners();
-//            progressAnimator.end();
-//        }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mLoadingView.clearAnimation();
 //        Timer timer = (Timer) mElapseTextView.getTag();
 //        if(timer != null){
 //            timer.cancel();
 //            timer.purge();
 //            mElapseTextView.setTag(null);
 //        }
-//        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-//        mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
-//        mConnectButton.setTag(null);
-//    }
+
+    }
 
     public void animateConnecting(){
-//        startAnimation();
-//        mMessageTextView.setText(R.string.connecting);
+        startAnimation();
+        mConnectButton.setText(R.string.disconnect);
+        mMessageTextView.setText(R.string.connecting);
 //        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
 //        if(showDisconnectDelayRunnable == null){
 //            showDisconnectDelayRunnable = new Runnable() {
@@ -159,51 +153,48 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     }
 
-//    private void startAnimation(){
-//        mJaguarImageView.setVisibility(View.INVISIBLE);
-//        mJaguarAnimationImageView.setVisibility(View.VISIBLE);
-//        AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
-//        animationDrawable.start();
-//        mConnectButton.setVisibility(View.INVISIBLE);
-//
-//        mProgressBar.setVisibility(View.VISIBLE);
-//        int max = 60000;
-//        mProgressBar.setMax(max);
-//        ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 0, mProgressBar.getMax());
-//        progressAnimator.setDuration(max);
-//        progressAnimator.start();
-//        mProgressBar.setTag(progressAnimator);
-//        mMessageTextView.setText(R.string.connecting);
-//        mElapseTextView.setVisibility(View.INVISIBLE);
-//        Timer timer = (Timer) mElapseTextView.getTag();
-//        if(timer != null){
-//            timer.cancel();
-//            mElapseTextView.setTag(null);
-//        }
-//    }
+    private void startAnimation(){
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+        mLoadingView.startAnimation(animation);
+    }
 
 
     public void animateStopping(){
-//        startAnimation();
-//        mMessageTextView.setText(R.string.stopping);
+        startAnimation();
+        mConnectButton.setText(R.string.connect);
+        mMessageTextView.setText(R.string.stopping);
     }
 
     public void setConnectResult(final Constants.State state){
-//        ObjectAnimator progressAnimator = (ObjectAnimator) mProgressBar.getTag();
-//        if(progressAnimator != null) {
-//            progressAnimator.end();
-//        }
-//        progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", mProgressBar.getProgress(), mProgressBar.getMax());
-//        progressAnimator.setDuration(500);
-//        progressAnimator.addListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                stopAnimation(state);
-//            }
-//        });
-//        progressAnimator.start();
-//        mProgressBar.setTag(progressAnimator);
+        switch (state){
+            case INIT:
+                break;
+            case CONNECTING:
+                animateConnecting();
+                break;
+            case CONNECTED:
+                connectFinish();
+                break;
+            case STOPPING:
+                animateStopping();
+                break;
+            case STOPPED:
+                stopFinish();
+                break;
+            case ERROR:
+                break;
+        }
+
     }
+
+    private void connectFinish(){
+        mLoadingView.clearAnimation();
+    }
+
+    private void stopFinish(){
+        mLoadingView.clearAnimation();
+    }
+
     
 //    private void stopAnimation(Constants.State state){
 //        mJaguarImageView.setVisibility(View.VISIBLE);

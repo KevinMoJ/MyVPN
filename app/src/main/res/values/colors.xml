@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0F9D58</color>
-    <color name="colorPrimaryDark">#0C7944</color>
-    <color name="colorAccent">@color/colorPrimary</color>
+    <color name="colorPrimary">#3B414F</color>
+    <color name="colorPrimaryDark">@android:color/black</color>
+    <color name="colorAccent">#41C7EE</color>
     <color name="splash_bg_start">#109D59</color>
     <color name="splash_bg_end">#10CAA1</color>
     <color name="primary_white_text">@android:color/white</color>
@@ -21,10 +21,12 @@
     <color name="available">#568735</color>
     <color name="message_green_color">#5ED2AD</color>
     <color name="message_red_color">#EA624D</color>
+
     <color name="connect_error_red">#E93E26</color>
     <color name="stop_yellow">#F0A734</color>
     <color name="disconnect_red">#e93d25</color>
     <color name="progress">#17D478</color>
     <color name="rate_us_bg">#F7FBFB</color>
     <color name="nav_draw_icon">#747D87</color>
+    <!-- -->
 </resources>

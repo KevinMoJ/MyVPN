@@ -112,7 +112,7 @@
     <string name="stopping_tip">VPN is stopping. Please try it later!</string>
     <string name="timeout_tip">Connection timeout. Please retry!</string>
 
-    <string name="disconnect">disconnect</string>
+    <string name="disconnect">Disconnect</string>
     <string name="disconnect_dialog_title">Do you want to disconnect?</string>
     <string name="connect_success_tip">Now you can unblock Youtube, Facebook etc.</string>
     <string name="disconnect_to_refresh">Disconnect vpn to refresh?</string>
