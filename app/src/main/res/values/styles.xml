@@ -10,7 +10,8 @@
         <item name="actionOverflowButtonStyle">@style/OverFlow</item>
     </style>
 
-    <style name="AppTheme" parent="AppThemeBase" />
+    <style name="AppTheme" parent="AppThemeBase">
+    </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

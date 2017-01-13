@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:drawable="@drawable/btn_connect"
-        android:maxLevel="0" />
+        android:state_pressed="true"
+        android:drawable="@drawable/connect_btn_pressed"
+         />
     <item
-        android:drawable="@drawable/btn_disconnect"
-        android:maxLevel="1" />
-</level-list>
+        android:drawable="@drawable/connect_btn_normal"
+         />
+</selector>
