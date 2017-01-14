@@ -16,22 +16,23 @@
         android:id="@+id/connect_fragment"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/twice_margin"/>
-    
-    <!--<fragment-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_margin="@dimen/half_standard_margin"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:name="com.androapplite.shadowsocks.fragment.RateUsFragment"-->
-        <!--tools:layout="@layout/fragment_rate_us"-->
-        <!--android:id="@+id/rate_us" />-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/half_standard_margin"
         android:id="@+id/rate_us_frame_layout"
         >
-
     </FrameLayout>
+    <Button
+        android:layout_width="290dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/connect_fragment"
+        android:backgroundTint="@color/button_bg_color"
+        android:text="@string/buy_vip_btn"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_white_text"
+        />
 
     <FrameLayout
         android:layout_width="match_parent"
