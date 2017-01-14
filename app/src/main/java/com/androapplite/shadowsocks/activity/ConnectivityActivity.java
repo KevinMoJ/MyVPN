@@ -58,6 +58,7 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 //import com.bumptech.glide.request.animation.GlideAnimation;
 //import com.bumptech.glide.request.target.SimpleTarget;
+import com.androapplite.shadowsocks.service.TimeCountDownService;
 import com.facebook.appevents.AppEventsLogger;
 
 import junit.framework.Assert;
@@ -215,6 +216,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         showRateUsFragment();
                     }
                     mIsConnecting = false;
+                    TimeCountDownService.isAvailable(this);
+                    TimeCountDownService.start(this);
                     break;
                 case STOPPING:
                     break;
