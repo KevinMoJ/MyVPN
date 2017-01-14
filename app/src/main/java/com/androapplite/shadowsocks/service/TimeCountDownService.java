@@ -30,6 +30,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     private TimeUpReceiver mTimeUpReceiver;
     private DisconnectReceiver mDisconnectReceiver;
     private Timer mTimeTickTimer;
+    private IShadowsocksService mShadowsocksService;
 
 
     public TimeCountDownService() {
@@ -76,9 +77,12 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     public void onDestroy() {
         super.onDestroy();
         mTimeTickTimer.cancel();
+        mTimeTickTimer.purge();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mTimeUpReceiver);
         unregisterReceiver(mDisconnectReceiver);
-        unbindService(this);
+        if(mShadowsocksService != null) {
+            unbindService(this);
+        }
     }
 
     private class TimeCountDownTask extends TimerTask{
@@ -113,9 +117,9 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        IShadowsocksService iShadowsocksService = IShadowsocksService.Stub.asInterface(service);
+        mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
         try {
-            iShadowsocksService.stop();
+            mShadowsocksService.stop();
         } catch (RemoteException e) {
             ShadowsocksApplication.handleException(e);
         }
@@ -131,7 +135,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
         if(!DateUtils.isToday(lastGrantTime)){
             sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
-                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 60)
+                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600)
                                     .commit();
         }
         int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);

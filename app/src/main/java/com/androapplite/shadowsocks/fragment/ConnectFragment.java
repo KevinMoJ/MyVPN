@@ -1,18 +1,10 @@
 package com.androapplite.shadowsocks.fragment;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.AnimationDrawable;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.animation.AnimatorListenerCompat;
-import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -21,19 +13,15 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
-import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.RunnableFuture;
 
 import yyf.shadowsocks.utils.Constants;
 
@@ -41,16 +29,11 @@ import yyf.shadowsocks.utils.Constants;
  * A simple {@link Fragment} subclass.
  */
 public class ConnectFragment extends Fragment implements View.OnClickListener{
-//    private ImageView mJaguarImageView;
-//    private ImageView mJaguarAnimationImageView;
     private OnConnectActionListener mListener;
-//    private ImageButton mConnectButton;
-//    private ProgressBar mProgressBar;
-//    private boolean mIsSuccess;
     private TextView mMessageTextView;
-//    private TextView mElapseTextView;
     private Button mConnectButton;
     private ImageView mLoadingView;
+    private Timer mCountDownTimer;
 
 
     public ConnectFragment() {
@@ -63,13 +46,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_connect, container, false);
-//        mConnectButton = (ImageButton) view.findViewById(R.id.connect_button);
-//        mConnectButton.setOnClickListener(this);
-//        mJaguarImageView = (ImageView)view.findViewById(R.id.jaguar_image_view);
-//        mJaguarAnimationImageView = (ImageView)view.findViewById(R.id.jaguar_animation_image_view);
-//        mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);
         mMessageTextView = (TextView)view.findViewById(R.id.message);
-//        mElapseTextView = (TextView)view.findViewById(R.id.elapse);
         mConnectButton = (Button)view.findViewById(R.id.connect_button);
         mConnectButton.setOnClickListener(this);
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
@@ -81,20 +58,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         if(mListener != null){
             mListener.onConnectButtonClick();
         }
-
-
-//        switch (v.getId()){
-//            case R.id.connect_button:
-//                if(rotateAnimation == null) {
-//                    rotateAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
-//                    mLoadingView.startAnimation(rotateAnimation);
-//                }else{
-//                    mLoadingView.clearAnimation();
-//                    rotateAnimation = null;
-//                }
-//                break;
-//        }
-
     }
 
     public interface OnConnectActionListener{
@@ -125,12 +88,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void onDetach() {
         super.onDetach();
         mLoadingView.clearAnimation();
-//        Timer timer = (Timer) mElapseTextView.getTag();
-//        if(timer != null){
-//            timer.cancel();
-//            timer.purge();
-//            mElapseTextView.setTag(null);
-//        }
+        if(mCountDownTimer != null){
+            mCountDownTimer.cancel();
+            mCountDownTimer.purge();
+        }
 
     }
 
@@ -139,19 +100,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectButton.setText(R.string.disconnect);
         mMessageTextView.setText(R.string.connecting);
         mLoadingView.setColorFilter(getResources().getColor(R.color.animation_color));
-//        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-//        if(showDisconnectDelayRunnable == null){
-//            showDisconnectDelayRunnable = new Runnable() {
-//                @Override
-//                public void run() {
-//                    mConnectButton.setVisibility(View.VISIBLE);
-//                    mConnectButton.setImageLevel(1);
-//                }
-//            };
-//            mConnectButton.setTag(showDisconnectDelayRunnable);
-//        }
-//        mConnectButton.postDelayed(showDisconnectDelayRunnable, 20000);
-
     }
 
     private void startAnimation(){
@@ -192,6 +140,23 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void connectFinish(){
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
+        mCountDownTimer = new Timer();
+        mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
+    }
+
+    private class CountDownTimerTask extends TimerTask{
+        @Override
+        public void run() {
+            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            mMessageTextView.post(new Runnable() {
+                @Override
+                public void run() {
+                    mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+
+                }
+            });
+        }
     }
 
     private void stopFinish(){
