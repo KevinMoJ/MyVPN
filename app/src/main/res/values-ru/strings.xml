@@ -81,4 +81,6 @@
 
     <string name="like_us_question">как мы?</string>
     <string name="five_star_encouragement">Нам нужна ваша 5-звездочный поддержку, чтобы улучшить его!</string>
+    <!-- -->
+    <string name="buy_vip_btn">Купить VIP, объявление бесплатно, неограниченное</string>
 </resources>
