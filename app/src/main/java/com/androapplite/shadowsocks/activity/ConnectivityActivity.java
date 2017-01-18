@@ -129,6 +129,34 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
         initVpnFlagAndNation();
+        initForegroundBroadcastIntentFilter();
+        initForegroundBroadcastReceiver();
+    }
+
+    private void initForegroundBroadcastIntentFilter(){
+        mForgroundReceiverIntentFilter = new IntentFilter();
+        mForgroundReceiverIntentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
+    }
+
+    private void initForegroundBroadcastReceiver(){
+        mForgroundReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch(action){
+                    case Action.SERVER_LIST_FETCH_FINISH:
+                        if(mFetchServerListProgressDialog != null){
+                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+                                mFetchServerListProgressDialog.setOnDismissListener(null);
+                                Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
+                            }
+                            mFetchServerListProgressDialog.dismiss();
+                            mFetchServerListProgressDialog = null;
+                        }
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -645,6 +673,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         if(mConnectingTimeoutHandler != null){
             mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
+        }
+        if(mFetchServerListProgressDialog != null){
+            mFetchServerListProgressDialog.dismiss();
+            mFetchServerListProgressDialog = null;
         }
     }
 
