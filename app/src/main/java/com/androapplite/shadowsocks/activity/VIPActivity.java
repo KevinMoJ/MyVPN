@@ -5,6 +5,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.RadioGroup;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
@@ -170,5 +172,11 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
         } catch (IabHelper.IabAsyncInProgressException e) {
             complain("Error querying inventory. Another async operation in progress.");
         }
+    }
+
+    public void buyVip(View v){
+        RadioGroup radioGroup = (RadioGroup)findViewById(R.id.payment_group);
+        int i = radioGroup.getCheckedRadioButtonId();
+        Log.d(TAG, "选择 " + i);
     }
 }

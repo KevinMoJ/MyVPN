@@ -19,6 +19,6 @@ public final class SharedPreferenceKey {
     public static final String CONNECT_TIME = "CONNECT_TIME";
     public static final String TIME_COUNT_DOWN = "TIME_COUNT_DOWN";
     public static final String LAST_GRANT_TIME = "LAST_GRANT_TIME";
-
+    public static final String EXPIRED_DATE = "EXPIRED_DATE";
 
 }

@@ -107,14 +107,16 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         if(serverListJson != null){
             serverConfigs = ServerConfig.createServerList(this, serverListJson);
         }
-        if(serverConfigs == null || serverConfigs.isEmpty()){
-            serverConfigs = ServerConfig.createDefaultServerList(getResources());
-        }
-        for(ServerConfig serverConfig:serverConfigs){
-            if(!mNations.contains(serverConfig.nation)){
-                mNations.add(serverConfig.nation);
-                mFlags.add(serverConfig.flag);
-                mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
+//        if(serverConfigs == null || serverConfigs.isEmpty()){
+//            serverConfigs = ServerConfig.createDefaultServerList(getResources());
+//        }
+        if(serverConfigs != null && !serverConfigs.isEmpty()) {
+            for (ServerConfig serverConfig : serverConfigs) {
+                if (!mNations.contains(serverConfig.nation)) {
+                    mNations.add(serverConfig.nation);
+                    mFlags.add(serverConfig.flag);
+                    mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
+                }
             }
         }
     }
