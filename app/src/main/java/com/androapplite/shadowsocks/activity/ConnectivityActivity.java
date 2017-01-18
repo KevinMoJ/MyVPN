@@ -255,30 +255,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mIsConnecting = false;
                     TimeCountDownService.isAvailable(this);
                     TimeCountDownService.start(this);
-                    if(mConnectingTimeoutHandler != null) {
-                        mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
-                        mConnectingTimeoutHandler = null;
-                    }
+                    clearConnectingTimeout();
                     break;
                 case STOPPING:
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
+                    clearConnectingTimeout();
                     break;
                 case STOPPED:
                     mIsConnecting = false;
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
+                    clearConnectingTimeout();
                     break;
                 case ERROR:
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
-                    if(mConnectingTimeoutHandler != null) {
-                        mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
-                        mConnectingTimeoutHandler = null;
-                    }
+                    clearConnectingTimeout();
                     mIsConnecting = false;
                     break;
             }
@@ -671,12 +667,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mShowRateUsRunnable != null){
             getWindow().getDecorView().removeCallbacks(mShowRateUsRunnable);
         }
-        if(mConnectingTimeoutHandler != null){
-            mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
-        }
+        clearConnectingTimeout();
         if(mFetchServerListProgressDialog != null){
             mFetchServerListProgressDialog.dismiss();
             mFetchServerListProgressDialog = null;
+        }
+    }
+
+    private void clearConnectingTimeout() {
+        if(mConnectingTimeoutHandler != null && mConnectingTimeoutRunnable != null){
+            mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
+            mConnectingTimeoutHandler = null;
+            mConnectingTimeoutRunnable = null;
         }
     }
 
