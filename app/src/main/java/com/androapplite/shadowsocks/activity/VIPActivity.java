@@ -1,29 +1,42 @@
 package com.androapplite.shadowsocks.activity;
 
 import android.content.IntentFilter;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
+import com.androapplite.shadowsocks.util.IabException;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 
-public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiver.IabBroadcastListener {
+public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiver.IabBroadcastListener
+{
     private IabHelper mHelper;
     private IabBroadcastReceiver mBroadcastReceiver;
     private static final String TAG = "VIPActivity";
+    private static final String MONTH_1 = "1_month";
+    private static final String MONTH_3 = "3_month";
+    private static final String MONTH_6 = "6_month";
+    private static final String MONTH_12 = "12_month";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vip);
+
+        RadioButton month3 = (RadioButton) findViewById(R.id.month_3);
+        month3.setChecked(true);
 
         String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqiGgwJ4lRgcxm6Me89gDA06hxa6ai7osITKPN4hX/+pJydF1KokAPr54Me0RDmhhKS/bAHqdjqma6NQWx0aHd5uOM6rRaXWhMBFIEdRFSi6WFcNUytinDRD1e7MhOdOyguAYIxiPnVCn0SlHCYioILCuNh55s/7jsFgStGj0qCkZHX+gW46Sei7XPUatMkXHatYHoJpyqvwJr24pIok6+kQOTSarNvScaMlP3Dj8hTDSRQ5PsQeN18ystKvEVW6g8e+gCHef/PwqSOkfr49cbbsMaYhjnddbUn423BI++wR56N3KMIpJkAjw5X4wlyD1HfP3QK4Dez1gLpwHdsUxLQIDAQAB";
 
@@ -87,47 +100,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
              * verifyDeveloperPayload().
              */
 
-            // Do we have the premium upgrade?
-//            Purchase premiumPurchase = inventory.getPurchase("sku");
-//            mIsPremium = (premiumPurchase != null && verifyDeveloperPayload(premiumPurchase));
-//            Log.d(TAG, "User is " + (mIsPremium ? "PREMIUM" : "NOT PREMIUM"));
-
-            // First find out which subscription is auto renewing
-//            Purchase gasMonthly = inventory.getPurchase(SKU_INFINITE_GAS_MONTHLY);
-//            Purchase gasYearly = inventory.getPurchase(SKU_INFINITE_GAS_YEARLY);
-//            if (gasMonthly != null && gasMonthly.isAutoRenewing()) {
-//                mInfiniteGasSku = SKU_INFINITE_GAS_MONTHLY;
-//                mAutoRenewEnabled = true;
-//            } else if (gasYearly != null && gasYearly.isAutoRenewing()) {
-//                mInfiniteGasSku = SKU_INFINITE_GAS_YEARLY;
-//                mAutoRenewEnabled = true;
-//            } else {
-//                mInfiniteGasSku = "";
-//                mAutoRenewEnabled = false;
-//            }
-//
-//            // The user is subscribed if either subscription exists, even if neither is auto
-//            // renewing
-//            mSubscribedToInfiniteGas = (gasMonthly != null && verifyDeveloperPayload(gasMonthly))
-//                    || (gasYearly != null && verifyDeveloperPayload(gasYearly));
-//            Log.d(TAG, "User " + (mSubscribedToInfiniteGas ? "HAS" : "DOES NOT HAVE")
-//                    + " infinite gas subscription.");
-//            if (mSubscribedToInfiniteGas) mTank = TANK_MAX;
-//
-//            // Check for gas delivery -- if we own gas, we should fill up the tank immediately
-//            Purchase gasPurchase = inventory.getPurchase(SKU_GAS);
-//            if (gasPurchase != null && verifyDeveloperPayload(gasPurchase)) {
-//                Log.d(TAG, "We have gas. Consuming it.");
-//                try {
-//                    mHelper.consumeAsync(inventory.getPurchase(SKU_GAS), mConsumeFinishedListener);
-//                } catch (IabAsyncInProgressException e) {
-//                    complain("Error consuming gas. Another async operation in progress.");
-//                }
-//                return;
-//            }
-//
-//            updateUi();
-//            setWaitScreen(false);
             Log.d(TAG, "Initial inventory query finished; enabling main UI.");
         }
     };
@@ -176,7 +148,139 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
 
     public void buyVip(View v){
         RadioGroup radioGroup = (RadioGroup)findViewById(R.id.payment_group);
-        int i = radioGroup.getCheckedRadioButtonId();
-        Log.d(TAG, "选择 " + i);
+        int id = radioGroup.getCheckedRadioButtonId();
+        switch (id){
+            case R.id.month_1:
+                purchaseVip(MONTH_1);
+                break;
+            case R.id.month_3:
+                purchaseVip(MONTH_3);
+                break;
+            case R.id.month_6:
+//                purchaseVip(MONTH_6);
+                consumePurchase(getPurchase(MONTH_12));
+                break;
+            case R.id.month_12:
+                purchaseVip(MONTH_12);
+                break;
+        }
     }
+
+
+    private void purchaseVip(String sku){
+        try {
+            mHelper.launchPurchaseFlow(this, sku, 1001, mPurchaseFinishedListener, "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+//    // Callback for when a purchase is finished
+//    @Override
+//    public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+//        Log.d(TAG, "Purchase finished: " + result + ", purchase: " + purchase);
+//
+//        // if we were disposed of in the meantime, quit.
+//        if (mHelper == null) return;
+//
+//        if (result.isFailure()) {
+//            complain("Error purchasing: " + result);
+//            return;
+//        }
+//
+//        try {
+//            mHelper.consumeAsync(purchase, m);
+//        } catch (IabHelper.IabAsyncInProgressException e) {
+//            ShadowsocksApplication.handleException(e);
+//        }
+//        Log.d(TAG, purchase.toString());
+//        Toast.makeText(this, purchase.toString(),Toast.LENGTH_SHORT).show();
+//    }
+//
+//    @Override
+//    public void onConsumeFinished(Purchase purchase, IabResult result) {
+//        if (result.isFailure()) {
+//            complain("Error purchasing: " + result);
+//            return;
+//        }
+//        String sku = purchase.getSku();
+//        switch (sku){
+//            case MONTH_1:
+//                break;
+//            case MONTH_3:
+//                break;
+//            case MONTH_6:
+//                break;
+//            case MONTH_12:
+//                break;
+//        }
+//        Log.d(TAG, purchase.toString());
+//        Toast.makeText(this, purchase.toString(),Toast.LENGTH_SHORT).show();
+//
+//    }
+
+    private Purchase getPurchase(String sku){
+        try {
+            Inventory inventory = mHelper.queryInventory();
+            Purchase purchase = inventory.getPurchase(sku);
+            return purchase;
+        } catch (IabException e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    private void consumePurchase(Purchase purchase){
+        try {
+            mHelper.consumeAsync(purchase, mConsumeFinishedListener);
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
+        @Override
+        public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+            Log.d(TAG, "Purchase finished: " + result + ", purchase: " + purchase);
+
+            // if we were disposed of in the meantime, quit.
+            if (mHelper == null) return;
+
+            if (result.isFailure()) {
+                complain("Error purchasing: " + result);
+                return;
+            }
+
+            try {
+                mHelper.consumeAsync(purchase, mConsumeFinishedListener);
+            } catch (IabHelper.IabAsyncInProgressException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+            Log.d(TAG, purchase.toString());
+            Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    IabHelper.OnConsumeFinishedListener mConsumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
+        @Override
+        public void onConsumeFinished(Purchase purchase, IabResult result) {
+            if (result.isFailure()) {
+                complain("Error purchasing: " + result);
+                return;
+            }
+            String sku = purchase.getSku();
+            switch (sku){
+                case MONTH_1:
+                    break;
+                case MONTH_3:
+                    break;
+                case MONTH_6:
+                    break;
+                case MONTH_12:
+                    break;
+            }
+            Log.d(TAG, purchase.toString());
+            Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
+        }
+    };
 }

@@ -20,6 +20,7 @@
             android:text="1 month VIP (5 USD)"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
+            android:id="@+id/month_1"
             />
         <RadioButton
             android:layout_width="match_parent"
@@ -27,7 +28,7 @@
             android:text="3 months VIP (14 USD)"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
-            android:checked="true"
+            android:id="@+id/month_3"
             />
         <RadioButton
             android:layout_width="match_parent"
@@ -35,6 +36,7 @@
             android:text="6 months VIP (27 USD)"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
+            android:id="@+id/month_6"
             />
         <RadioButton
             android:layout_width="match_parent"
@@ -42,7 +44,7 @@
             android:text="12 months VIP (52 USD)"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
-
+            android:id="@+id/month_12"
             />
     </RadioGroup>
     <Button
