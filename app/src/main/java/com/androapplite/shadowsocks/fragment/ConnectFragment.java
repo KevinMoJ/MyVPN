@@ -117,6 +117,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void setConnectResult(final Constants.State state){
         switch (state){
             case INIT:
+                init();
                 break;
             case CONNECTING:
                 animateConnecting();
@@ -135,6 +136,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 break;
         }
 
+    }
+
+    private void init(){
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
     }
 
     private void connectFinish(){
@@ -162,6 +169,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void stopFinish(){
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
     }
 
     private void error(){

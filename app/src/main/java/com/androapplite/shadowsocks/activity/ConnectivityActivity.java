@@ -184,6 +184,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mCurrentState = mNewState;
             switch (mNewState) {
                 case INIT:
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(mNewState);
+                    }
                     break;
                 case CONNECTING:
                     if (mSharedPreference != null && mConnectingConfig != null) {
@@ -224,10 +227,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mIsConnecting = false;
                     TimeCountDownService.isAvailable(this);
                     TimeCountDownService.start(this);
-                    mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
-                    mConnectingTimeoutHandler = null;
+                    if(mConnectingTimeoutHandler != null) {
+                        mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
+                        mConnectingTimeoutHandler = null;
+                    }
                     break;
                 case STOPPING:
+                    if (mConnectFragment != null) {
+                        mConnectFragment.setConnectResult(mNewState);
+                    }
                     break;
                 case STOPPED:
                     mIsConnecting = false;
@@ -238,6 +246,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 case ERROR:
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
+                    }
+                    if(mConnectingTimeoutHandler != null) {
+                        mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
+                        mConnectingTimeoutHandler = null;
                     }
                     mIsConnecting = false;
                     break;
