@@ -921,4 +921,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         disconnectVpnServiceAsync();
         GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
     }
+
+    public void startBuyVipActivity(View v){
+        startActivity(new Intent(this, VIPActivity.class));
+    }
 }
