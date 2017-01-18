@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
@@ -157,8 +158,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
                 purchaseVip(MONTH_3);
                 break;
             case R.id.month_6:
-//                purchaseVip(MONTH_6);
-                consumePurchase(getPurchase(MONTH_12));
+                purchaseVip(MONTH_6);
                 break;
             case R.id.month_12:
                 purchaseVip(MONTH_12);
@@ -283,4 +283,21 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
             Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
+        if (mHelper == null) return;
+
+        // Pass on the activity result to the helper for handling
+        if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
+            // not handled, so handle it ourselves (here's where you'd
+            // perform any handling of activity results not related to in-app
+            // billing...
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+        else {
+            Log.d(TAG, "onActivityResult handled by IABUtil.");
+        }
+    }
 }
