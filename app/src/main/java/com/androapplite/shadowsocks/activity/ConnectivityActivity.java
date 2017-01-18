@@ -386,18 +386,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (id == R.id.nav_rate_us) {
             rateUs();
             GAHelper.sendEvent(this, "菜单", "给我们打分");
-        } else if (id == R.id.nav_share) {
-            share();
-            GAHelper.sendEvent(this, "抽屉", "分享");
+//        } else if (id == R.id.nav_share) {
+//            share();
+//            GAHelper.sendEvent(this, "抽屉", "分享");
         } else if (id == R.id.nav_contact_us) {
             contactUs();
             GAHelper.sendEvent(this, "菜单", "联系我们");
         } else if (id == R.id.nav_about) {
             about();
             GAHelper.sendEvent(this, "菜单", "关于");
-        } else if(id == R.id.nav_settings){
-            startActivity(new Intent(this, SettingsActivity.class));
-            GAHelper.sendEvent(this, "菜单", "设置");
+//        } else if(id == R.id.nav_settings){
+//            startActivity(new Intent(this, SettingsActivity.class));
+//            GAHelper.sendEvent(this, "菜单", "设置");
+        } else if(id == R.id.nav_buy_vip){
+            startActivity(new Intent(this, VIPActivity.class));
+            GAHelper.sendEvent(this, "菜单", "VIP");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
