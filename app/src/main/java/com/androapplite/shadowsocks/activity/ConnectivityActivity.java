@@ -48,6 +48,7 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
@@ -253,8 +254,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         showRateUsFragment();
                     }
                     mIsConnecting = false;
-                    TimeCountDownService.isAvailable(this);
-                    TimeCountDownService.start(this);
+                    if(!VIPUtil.isVIP(mSharedPreference)) {
+                        TimeCountDownService.isAvailable(this);
+                        TimeCountDownService.start(this);
+                    }
                     clearConnectingTimeout();
                     break;
                 case STOPPING:

@@ -85,4 +85,5 @@
     <string name="buy_vip">شراء كبار الشخصيات</string>
     <string name="fetch_server_list">قائمة الخادم جلب</string>
     <string name="fetch_server_list_failed">قائمة الخادم جلب المهلة!</string>
+    <string name="u_r_vip">كنت كبار الشخصيات!</string>
 </resources>

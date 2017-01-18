@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
@@ -50,6 +51,15 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectButton = (Button)view.findViewById(R.id.connect_button);
         mConnectButton.setOnClickListener(this);
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
+
+        if(!VIPUtil.isVIP(getContext())) {
+            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        }else{
+            mMessageTextView.setText(R.string.u_r_vip);
+        }
+
         return view;
     }
 
@@ -139,16 +149,22 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
 
     private void init(){
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        if(!VIPUtil.isVIP(getContext())) {
+            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        }
     }
 
     private void connectFinish(){
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
-        mCountDownTimer = new Timer();
-        mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
+        if(!VIPUtil.isVIP(getContext())) {
+            mCountDownTimer = new Timer();
+            mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
+        }else{
+            mMessageTextView.setText(R.string.connected);
+        }
     }
 
     private class CountDownTimerTask extends TimerTask{
@@ -169,20 +185,18 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void stopFinish(){
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        if(!VIPUtil.isVIP(getContext())) {
+            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        }else{
+            mMessageTextView.setText(R.string.u_r_vip);
+        }
     }
 
     private void error(){
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.error_color));
 
-    }
-
-    public void addProgress(int millisecond){
-//        if(mProgressBar != null) {
-//            mProgressBar.setProgress(mProgressBar.getProgress() + millisecond);
-//        }
     }
 }

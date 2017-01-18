@@ -82,8 +82,9 @@
     <string name="like_us_question">как мы?</string>
     <string name="five_star_encouragement">Нам нужна ваша 5-звездочный поддержку, чтобы улучшить его!</string>
     <!-- -->
-    <string name="buy_vip_btn">Купить VIP, объявление бесплатно, неограниченное</string>
-    <string name="buy_vip">купить VIP</string>
+    <string name="buy_vip_btn">Купить вип, объявление бесплатно, неограниченное</string>
+    <string name="buy_vip">Купить вип</string>
     <string name="fetch_server_list">Список серверов выборка</string>
     <string name="fetch_server_list_failed">Получение данных сервера список тайм-аут!</string>
+    <string name="u_r_vip">Вы вип!</string>
 </resources>
