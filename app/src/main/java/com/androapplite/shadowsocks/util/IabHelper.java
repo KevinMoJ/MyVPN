@@ -942,10 +942,10 @@ public class IabHelper {
 
         do {
             logDebug("Calling getPurchases with continuation token: " + continueToken);
-//            Bundle ownedItems = mService.getPurchases(3, mContext.getPackageName(),
-//                    itemType, continueToken);
-            Bundle ownedItems = mService.getPurchases(3, "com.androapplite.shadowsocks",
+            Bundle ownedItems = mService.getPurchases(3, mContext.getPackageName(),
                     itemType, continueToken);
+//            Bundle ownedItems = mService.getPurchases(3, "com.androapplite.shadowsocks",
+//                    itemType, continueToken);
 
             int response = getResponseCodeFromBundle(ownedItems);
             logDebug("Owned items response: " + String.valueOf(response));
