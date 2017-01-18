@@ -67,5 +67,6 @@
         android:layout_below="@id/buy_vip"
         android:text="VIP is expired on"
         android:textColor="@color/primary_white_text"
-        android:layout_marginTop="@dimen/standard_margin"/>
+        android:layout_marginTop="@dimen/standard_margin"
+        android:id="@+id/exipre_date"/>
 </RelativeLayout>

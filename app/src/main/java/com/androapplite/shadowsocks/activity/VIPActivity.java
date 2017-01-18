@@ -2,24 +2,34 @@ package com.androapplite.shadowsocks.activity;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabException;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiver.IabBroadcastListener
 {
@@ -30,6 +40,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
     private static final String MONTH_3 = "3_month";
     private static final String MONTH_6 = "6_month";
     private static final String MONTH_12 = "12_month";
+    private SharedPreferences mSharedPreference;
+    private TextView mExipreDateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +50,16 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
 
         RadioButton month3 = (RadioButton) findViewById(R.id.month_3);
         month3.setChecked(true);
+
+        mExipreDateTextView = (TextView) findViewById(R.id.exipre_date);
+        mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
+        long expiredDate = mSharedPreference.getLong(SharedPreferenceKey.EXPIRED_DATE, 0);
+        if(expiredDate >= 0){
+            mExipreDateTextView.setVisibility(View.VISIBLE);
+            mExipreDateTextView.setText("VIP is expired on " + new SimpleDateFormat().format(new Date(expiredDate)));
+        }else{
+            mExipreDateTextView.setVisibility(View.INVISIBLE);
+        }
 
         String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqiGgwJ4lRgcxm6Me89gDA06hxa6ai7osITKPN4hX/+pJydF1KokAPr54Me0RDmhhKS/bAHqdjqma6NQWx0aHd5uOM6rRaXWhMBFIEdRFSi6WFcNUytinDRD1e7MhOdOyguAYIxiPnVCn0SlHCYioILCuNh55s/7jsFgStGj0qCkZHX+gW46Sei7XPUatMkXHatYHoJpyqvwJr24pIok6+kQOTSarNvScaMlP3Dj8hTDSRQ5PsQeN18ystKvEVW6g8e+gCHef/PwqSOkfr49cbbsMaYhjnddbUn423BI++wR56N3KMIpJkAjw5X4wlyD1HfP3QK4Dez1gLpwHdsUxLQIDAQAB";
 
@@ -257,7 +279,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
                 ShadowsocksApplication.handleException(e);
             }
             Log.d(TAG, purchase.toString());
-            Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
+//            Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -268,19 +290,38 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
                 complain("Error purchasing: " + result);
                 return;
             }
+
+            long expireDate = mSharedPreference.getLong(SharedPreferenceKey.EXPIRED_DATE, 0);
+            Calendar calendar = Calendar.getInstance();
+            if(expireDate > calendar.getTimeInMillis()){
+                calendar.setTimeInMillis(expireDate);
+            }
             String sku = purchase.getSku();
             switch (sku){
                 case MONTH_1:
+                    calendar.add(Calendar.MONTH, 1);
                     break;
                 case MONTH_3:
+                    calendar.add(Calendar.MONTH, 3);
                     break;
                 case MONTH_6:
+                    calendar.add(Calendar.MONTH, 6);
                     break;
                 case MONTH_12:
+                    calendar.add(Calendar.MONTH, 12);
                     break;
             }
+            expireDate = calendar.getTimeInMillis();
+            mSharedPreference.edit()
+                    .putLong(SharedPreferenceKey.EXPIRED_DATE, expireDate)
+                    .remove(SharedPreferenceKey.SERVER_LIST)
+                    .commit();
+
+            mExipreDateTextView.setVisibility(View.VISIBLE);
+            mExipreDateTextView.setText("VIP is expired on " + new SimpleDateFormat().format(calendar.getTime()));
+
             Log.d(TAG, purchase.toString());
-            Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
+//            Toast.makeText(VIPActivity.this, purchase.toString(),Toast.LENGTH_SHORT).show();
         }
     };
 
