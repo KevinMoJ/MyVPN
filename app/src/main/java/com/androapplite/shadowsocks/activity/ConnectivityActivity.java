@@ -224,6 +224,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mIsConnecting = false;
                     TimeCountDownService.isAvailable(this);
                     TimeCountDownService.start(this);
+                    mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
+                    mConnectingTimeoutHandler = null;
                     break;
                 case STOPPING:
                     break;
@@ -628,6 +630,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         if(mShowRateUsRunnable != null){
             getWindow().getDecorView().removeCallbacks(mShowRateUsRunnable);
+        }
+        if(mConnectingTimeoutHandler != null){
+            mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
         }
     }
 
