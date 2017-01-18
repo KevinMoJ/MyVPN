@@ -1,10 +1,12 @@
 package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -58,6 +60,7 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 //import com.bumptech.glide.request.animation.GlideAnimation;
 //import com.bumptech.glide.request.target.SimpleTarget;
+import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
 import com.facebook.appevents.AppEventsLogger;
 
@@ -106,6 +109,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean mIsConnecting;
     private Runnable mUpdateVpnStateRunable;
     private Runnable mShowRateUsRunnable;
+    private ProgressDialog mFetchServerListProgressDialog;
+    private Handler mConnectingTimeoutHandler;
+    private Runnable mConnectingTimeoutRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -486,10 +492,42 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void connectVpnServerAsync() {
+        if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+            connectVpnServerAsyncCore();
+        }else{
+            mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
+            ServerListFetcherService.fetchServerListAsync(this);
+            mFetchServerListProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    connectVpnServerAsyncCore();
+                }
+            });
+        }
+    }
+
+    private void connectVpnServerAsyncCore(){
         if(mConnectFragment != null){
             mConnectFragment.animateConnecting();
             mIsConnecting = true;
         }
+        mConnectingTimeoutHandler = new Handler();
+        mConnectingTimeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(mShadowsocksService != null){
+                    try {
+                        mShadowsocksService.stop();
+                    } catch (RemoteException e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
+                mConnectingTimeoutHandler = null;
+                mConnectingTimeoutRunnable = null;
+                Snackbar.make(findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
+            }
+        };
+        mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -500,11 +538,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         if(serverConfig != null) {
                             mConnectingConfig = serverConfig;
                             prepareStartService();
-                            if(mSharedPreference != null){
-                                String flag = mSharedPreference.getString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global));
-                                String connectingFlag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global));
-                                GAHelper.sendEvent(ConnectivityActivity.this, "尝试连接", flag, connectingFlag);
-                            }
                         }else {
                             Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
                             if(mConnectFragment != null){
@@ -516,8 +549,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 });
             }
         }).start();
-
     }
+
 
     private void disconnectVpnServiceAsync(){
         if(mConnectFragment != null){
