@@ -12,18 +12,34 @@
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/payment_group">
+        android:id="@+id/payment_group"
+        >
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="aaaa"
+            android:text="1 month VIP (5 USD)"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
             />
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="aaaa"
+            android:text="3 months VIP (14 USD)"
+            android:textSize="@dimen/large_text"
+            android:textColor="@color/primary_white_text"
+            android:checked="true"
+            />
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="6 months VIP (27 USD)"
+            android:textSize="@dimen/large_text"
+            android:textColor="@color/primary_white_text"
+            />
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="12 months VIP (52 USD)"
             android:textSize="@dimen/large_text"
             android:textColor="@color/primary_white_text"
 
@@ -39,5 +55,14 @@
         android:textAllCaps="false"
         android:textColor="@color/primary_white_text"
         android:layout_marginTop="@dimen/standard_margin"
+        android:id="@+id/buy_vip"
         />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buy_vip"
+        android:text="VIP is expired on"
+        android:textColor="@color/primary_white_text"
+        android:layout_marginTop="@dimen/standard_margin"/>
 </RelativeLayout>
