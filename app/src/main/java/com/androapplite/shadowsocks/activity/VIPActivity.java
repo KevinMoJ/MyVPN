@@ -23,7 +23,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastReceiv
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vip);
 
-        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr/HCpmwW+jdTIGpJ1AAlQizVh1C1Y4wNXnb3ncidfpwfQKWgrOdENY6TN083JCSnncV9ttOSZr+fW7b/FJcgzmbkY7vF9MZGhkraNBU1iPYb8ALxgQugV1sihtYsrmtjWr8Tw6lIVa4BBYz7pxLZr5n6LMKEEEAWPzwNqHW/kiBEULqqNlp0wXUlDgcCaFIBgjWfumrkZAuAFWwJzES/vKgwT4zV2PHAzEhyc8GO4OhzHVTgMPYluWbJsac1uQlDB7Re8KdyzV36ImBnQVZ47gqRwG/gaQEuoReB9f7D0trjoQoyRSQsv2J9gskZ7mDTweaHmv2ARFaUZi0yWUsH4QIDAQAB";
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqiGgwJ4lRgcxm6Me89gDA06hxa6ai7osITKPN4hX/+pJydF1KokAPr54Me0RDmhhKS/bAHqdjqma6NQWx0aHd5uOM6rRaXWhMBFIEdRFSi6WFcNUytinDRD1e7MhOdOyguAYIxiPnVCn0SlHCYioILCuNh55s/7jsFgStGj0qCkZHX+gW46Sei7XPUatMkXHatYHoJpyqvwJr24pIok6+kQOTSarNvScaMlP3Dj8hTDSRQ5PsQeN18ystKvEVW6g8e+gCHef/PwqSOkfr49cbbsMaYhjnddbUn423BI++wR56N3KMIpJkAjw5X4wlyD1HfP3QK4Dez1gLpwHdsUxLQIDAQAB";
 
         // compute your public key and store it in base64EncodedPublicKey
         mHelper = new IabHelper(this, base64EncodedPublicKey);
