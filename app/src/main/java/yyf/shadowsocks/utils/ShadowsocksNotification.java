@@ -48,7 +48,7 @@ public class ShadowsocksNotification {
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.mipmap.ic_launcher))
+                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large))
                 .setColor(mService.getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(mService.getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
