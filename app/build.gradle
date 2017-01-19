@@ -19,7 +19,7 @@ repositories {
 android {
     signingConfigs {
         config {
-            keyAlias 'com.h2o.vpn'
+            keyAlias 'shadowsocks'
             keyPassword '123456'
             storeFile file('shadowsocks.jks')
             storePassword '123456'
@@ -28,7 +28,7 @@ android {
     compileSdkVersion 22
     buildToolsVersion "23.0.3"
     defaultConfig {
-        applicationId "com.h2o.vpn"
+        applicationId "com.androapplite.vpn3"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -46,7 +46,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
-            debuggable true
+            debuggable false
         }
     }
     productFlavors {
