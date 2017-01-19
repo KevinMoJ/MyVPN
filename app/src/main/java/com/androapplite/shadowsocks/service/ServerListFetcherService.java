@@ -11,6 +11,7 @@ import android.util.Log;
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -61,7 +62,12 @@ public class ServerListFetcherService extends IntentService {
             }
             OkHttpClient client = builder.build();
 
-            String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+            String url = null;
+            if(VIPUtil.isVIP(this)){
+                url = "http://c.vpnnest.com:8090/VPNServerList/fsl";
+            }else{
+                url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+            }
 //            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
             Request request = new Request.Builder()
                     .url(url)
