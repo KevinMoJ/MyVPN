@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3B414F</color>
+    <color name="colorPrimary">#76C5E4</color>
     <color name="colorPrimaryDark">@android:color/black</color>
     <color name="colorAccent">#41C7EE</color>
     <color name="splash_bg_start">#109D59</color>
@@ -15,7 +15,7 @@
     <color name="grey_cc">#cccccc</color>
     <color name="grey_ee">#EEEEEE</color>
     <color name="button_green">#92cf68</color>
-    <color name="activity_background">#475263</color>
+    <color name="activity_background">@color/colorPrimary</color>
     <color name="connect_button_error">#f58559</color>
     <color name="usage">#fa6567</color>
     <color name="available">#568735</color>
