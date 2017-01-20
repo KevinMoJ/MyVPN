@@ -135,7 +135,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
         if(!DateUtils.isToday(lastGrantTime)){
             sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
-                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600)
+                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200)
                                     .commit();
         }
         int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);

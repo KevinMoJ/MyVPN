@@ -10,7 +10,7 @@
         <item name="colorControlNormal">@color/colorAccent</item>
         <item name="colorControlActivated">@color/colorAccent</item>
         <item name="actionOverflowButtonStyle">@style/OverFlow</item>
-        <item name="android:windowBackground">@color/activity_background</item>
+        <item name="android:windowBackground">@null</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
