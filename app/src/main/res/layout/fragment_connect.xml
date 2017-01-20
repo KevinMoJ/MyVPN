@@ -40,7 +40,7 @@
         android:textSize="@dimen/large_text"
         android:gravity="center"
         android:text=""
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/primary_white_text"
         android:id="@id/message"/>
 
 </LinearLayout>
