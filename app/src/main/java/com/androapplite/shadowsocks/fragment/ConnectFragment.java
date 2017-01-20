@@ -109,7 +109,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         startAnimation();
         mConnectButton.setText(R.string.disconnect);
         mMessageTextView.setText(R.string.connecting);
-        mLoadingView.setColorFilter(getResources().getColor(R.color.animation_color));
+        mLoadingView.setImageLevel(0);
     }
 
     private void startAnimation(){
@@ -122,6 +122,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         startAnimation();
         mConnectButton.setText(R.string.connect);
         mMessageTextView.setText(R.string.stopping);
+        mLoadingView.setImageLevel(0);
     }
 
     public void setConnectResult(final Constants.State state){
@@ -158,7 +159,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void connectFinish(){
         mLoadingView.clearAnimation();
-        mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
         if(!VIPUtil.isVIP(getContext())) {
             mCountDownTimer = new Timer();
             mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
@@ -184,7 +184,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void stopFinish(){
         mLoadingView.clearAnimation();
-        mLoadingView.setColorFilter(getResources().getColor(R.color.connect_color));
         if(!VIPUtil.isVIP(getContext())) {
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
             final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
@@ -197,6 +196,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void error(){
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.error_color));
-
+        mLoadingView.setImageLevel(1);
     }
 }

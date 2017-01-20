@@ -29,8 +29,8 @@
     <color name="rate_us_bg">#F7FBFB</color>
     <color name="nav_draw_icon">#747D87</color>
     <!-- -->
-    <color name="connect_color">#17D478</color>
-    <color name="error_color">#E93D25</color>
-    <color name="animation_color">#F0A734</color>
     <color name="button_bg_color">#DD5E5D</color>
+    <color name="connect_btn_color">#40ffffff</color>
+
+
 </resources>

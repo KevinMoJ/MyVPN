@@ -2,9 +2,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_pressed="true"
-        android:drawable="@drawable/connect_btn_pressed"
-         />
-    <item
-        android:drawable="@drawable/connect_btn_normal"
-         />
+         >
+        <shape android:shape="oval" >
+            <solid android:color="@color/connect_btn_color" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval" >
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
 </selector>
