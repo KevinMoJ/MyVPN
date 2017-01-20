@@ -159,7 +159,7 @@
             <!-- </intent-filter> -->
         </activity>
         <activity android:name=".activity.WatchVideoDialogActivity"
-            android:theme="@style/Theme.AppCompat.Dialog">
+            android:theme="@style/Theme.MyDialog">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
