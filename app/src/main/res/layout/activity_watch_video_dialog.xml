@@ -76,6 +76,7 @@
             android:text="go"
             android:textColor="@color/secondary_black_text"
             android:layout_marginBottom="@dimen/margin_24dp"
+            android:onClick="watchVideo"
             />
 
     </LinearLayout>
