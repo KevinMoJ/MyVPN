@@ -13,4 +13,70 @@
         android:src="@drawable/dialog_header"
         android:adjustViewBounds="true"
         android:background="@drawable/dialog_upper"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/dialog_lower">
+        <ImageView
+            android:layout_width="53dp"
+            android:layout_height="53dp"
+            android:src="@drawable/ic_report_problem_black_24dp"
+            android:tint="@color/dialog_red"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/standard_margin"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/margin_24dp"
+            android:paddingRight="@dimen/margin_24dp">
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/dialog_red_spot"
+                android:layout_marginRight="@dimen/corner_8dp"
+                android:layout_marginTop="6dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/round_shape"
+                android:text="Connection time will be used up."
+                android:textColor="@color/dialog_red"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/margin_24dp"
+            android:paddingRight="@dimen/margin_24dp"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/standard_margin">
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/dialog_red_spot"
+                android:layout_marginRight="@dimen/corner_8dp"
+                android:layout_marginTop="6dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/round_shape"
+                android:text="Watching video ads can bring you extra 1 hour connection time."
+                />
+        </LinearLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_24dp"
+            android:layout_marginRight="@dimen/margin_24dp"
+            android:background="@drawable/common_button"
+            android:text="go"
+            android:textColor="@color/secondary_black_text"
+            android:layout_marginBottom="@dimen/margin_24dp"
+            />
+
+    </LinearLayout>
 </LinearLayout>

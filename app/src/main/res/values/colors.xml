@@ -31,6 +31,9 @@
     <!-- -->
     <color name="button_bg_color">#DD5E5D</color>
     <color name="connect_btn_color">#40ffffff</color>
+    <color name="dialog_red">#ED4363</color>
+    <color name="button_normal">#53e9e9</color>
+    <color name="button_pressed">#59dcdc</color>
 
 
 </resources>
