@@ -98,9 +98,8 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             }
 
             if(countDown == 600 || countDown == 300){
-                Intent intent = new Intent(TimeCountDownService.this, WatchVideoADDialogActivity.class);
-                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);            }
+                WatchVideoADDialogActivity.showTimeWillBeUsedUpDialog(TimeCountDownService.this);
+            }
 //            Log.d("倒计时", countDown + "");
         }
     }
@@ -119,6 +118,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     }
 
     private void stopVPNConnection() {
+        WatchVideoADDialogActivity.showTimeUsedUpDialog(TimeCountDownService.this);
         ShadowsockServiceHelper.bindService(this, this);
     }
 

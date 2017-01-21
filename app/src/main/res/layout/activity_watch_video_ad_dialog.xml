@@ -44,7 +44,8 @@
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/round_shape"
                 android:text="@string/dialog_time_will_use_up"
-                android:textColor="@color/dialog_red"/>
+                android:textColor="@color/dialog_red"
+                android:id="@+id/remainder"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
