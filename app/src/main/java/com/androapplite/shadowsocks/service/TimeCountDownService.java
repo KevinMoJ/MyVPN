@@ -26,6 +26,8 @@ import java.util.TimerTask;
 
 import yyf.shadowsocks.IShadowsocksService;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class TimeCountDownService extends Service implements ServiceConnection{
     private SharedPreferences mSharedPreference;
     private TimeUpReceiver mTimeUpReceiver;
@@ -97,8 +99,9 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             }
 
             if(countDown == 600 || countDown == 300){
-                startActivity(new Intent(TimeCountDownService.this, WatchVideoDialogActivity.class));
-            }
+                Intent intent = new Intent(TimeCountDownService.this, WatchVideoDialogActivity.class);
+                intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);            }
 //            Log.d("倒计时", countDown + "");
         }
     }
