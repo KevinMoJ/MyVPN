@@ -976,7 +976,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
     }
 
-    public void startBuyVipActivity(View v){
-        startActivity(new Intent(this, VIPActivity.class));
+    public void watchVideoAd(View v){
+        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
+        sendBroadcast(intent);
     }
 }

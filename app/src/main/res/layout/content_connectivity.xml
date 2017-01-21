@@ -25,16 +25,18 @@
         >
     </FrameLayout>
     <Button
-        android:layout_width="290dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/connect_fragment"
-        android:backgroundTint="@color/button_bg_color"
-        android:text="@string/buy_vip_btn"
+        android:background="@color/button_bg_color"
+        android:text="@string/watch_video_ad"
         android:textAllCaps="false"
         android:textColor="@color/primary_white_text"
-        android:onClick="startBuyVipActivity"
-        android:visibility="gone"
+        android:onClick="watchVideoAd"
+        android:layout_marginLeft="@dimen/margin_24dp"
+        android:layout_marginRight="@dimen/margin_24dp"
+        android:layout_marginTop="@dimen/standard_margin"
         />
 
     <FrameLayout

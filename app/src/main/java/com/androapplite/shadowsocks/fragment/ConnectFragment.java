@@ -198,4 +198,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mLoadingView.setColorFilter(getResources().getColor(R.color.error_color));
         mLoadingView.setImageLevel(1);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+    }
 }

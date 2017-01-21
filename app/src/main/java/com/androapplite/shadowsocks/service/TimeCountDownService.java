@@ -141,8 +141,10 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
         if(!DateUtils.isToday(lastGrantTime)){
+            int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            countDown += 7200;
             sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
-                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200)
+                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown)
                                     .commit();
         }
         int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);

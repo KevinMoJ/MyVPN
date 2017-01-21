@@ -90,6 +90,8 @@
     <string name="dialog_time_will_use_up">Время соединения будет израсходован.</string>
     <string name="dialog_watch_video">Просмотр видео объявлений может принести вам дополнительное время подключения 1 час.</string>
     <string name="watch_video">смотреть видео</string>
-    <string name="notification_with_time">Скачать: %1$s, Загрузка: %2$s, остаются: %3$s</string>
+    <!--<string name="notification_with_time">Скачать: %1$s, Загрузка: %2$s, остаются: %3$s</string>-->
     <string name="notification_no_time">Скачать: %1$s, Загрузка: %2$s</string>
+    <string name="watch_video_ad">Смотрите видео рекламу, получить больше времени подключения</string>
+
 </resources>

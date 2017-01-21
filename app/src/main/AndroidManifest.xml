@@ -158,15 +158,26 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".activity.WatchVideoADDialogActivity"
+        <activity
+            android:name=".activity.WatchVideoADDialogActivity"
             android:theme="@style/Theme.MyDialog">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
 
+        <receiver
+            android:name=".broadcast.WatchVideoADCallbackReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.VIDEO_AD_FINISH" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
