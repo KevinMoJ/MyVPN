@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/round_shape"
-                android:text="Connection time will be used up."
+                android:text="@string/dialog_time_will_use_up"
                 android:textColor="@color/dialog_red"/>
         </LinearLayout>
         <LinearLayout
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/round_shape"
-                android:text="Watching video ads can bring you extra 1 hour connection time."
+                android:text="@string/dialog_watch_video"
                 />
         </LinearLayout>
         <Button
@@ -73,7 +73,7 @@
             android:layout_marginLeft="@dimen/margin_24dp"
             android:layout_marginRight="@dimen/margin_24dp"
             android:background="@drawable/common_button"
-            android:text="go"
+            android:text="@string/watch_video"
             android:textColor="@color/secondary_black_text"
             android:layout_marginBottom="@dimen/margin_24dp"
             android:onClick="watchVideo"

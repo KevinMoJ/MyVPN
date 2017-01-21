@@ -86,4 +86,7 @@
     <string name="fetch_server_list">قائمة الخادم جلب</string>
     <string name="fetch_server_list_failed">قائمة الخادم جلب المهلة!</string>
     <string name="u_r_vip">كنت كبار الشخصيات!</string>
+    <string name="dialog_time_will_use_up">وسوف تستخدم وقت الاتصال ما يصل.</string>
+    <string name="dialog_watch_video">يمكن مشاهدة إعلانات الفيديو تجلب لك الوقت الاضافي اتصال 1 ساعة.</string>
+    <string name="watch_video">شاهد الفيديو</string>
 </resources>

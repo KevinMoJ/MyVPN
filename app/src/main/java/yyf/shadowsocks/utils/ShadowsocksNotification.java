@@ -8,13 +8,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.DateUtils;
+import android.util.TimeUtils;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.service.BaseService;
@@ -35,6 +40,7 @@ public class ShadowsocksNotification {
     private final NotificationCompat.Builder mBuilder;
     private BroadcastReceiver mLockReceiver;
     private boolean mCallbackRegistered;
+    private SharedPreferences mSharedPreferences;
 
     public ShadowsocksNotification(BaseService baseService, String profileName){
         mService = baseService;
@@ -42,6 +48,9 @@ public class ShadowsocksNotification {
         mNotificationManager = (NotificationManager)mService.getSystemService(Context.NOTIFICATION_SERVICE);
         mProfileName = profileName;
         mIsVisible = true;
+
+        mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mService);
+
 
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
@@ -65,7 +74,14 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentText(String.format("Download: %s, Upload: %s", txr, rxr));
+                mBuilder.setContentTitle(mService.getResources().getString(R.string.app_name));
+                final int countDown = mSharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+                if(countDown > 0){
+//                    mBuilder.setContentTitle(String.format("Download: %s, Upload: %s", txr, rxr));
+//                    mBuilder.setContentText("Remain: " + DateUtils.formatElapsedTime(countDown));
+                }else{
+                    mBuilder.setContentText(null);
+                }
                 mService.startForeground(1, mBuilder.build());
 
             }

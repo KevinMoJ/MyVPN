@@ -87,4 +87,7 @@
     <string name="fetch_server_list">Список серверов выборка</string>
     <string name="fetch_server_list_failed">Получение данных сервера список тайм-аут!</string>
     <string name="u_r_vip">Вы вип!</string>
+    <string name="dialog_time_will_use_up">Время соединения будет израсходован.</string>
+    <string name="dialog_watch_video">Просмотр видео объявлений может принести вам дополнительное время подключения 1 час.</string>
+    <string name="watch_video">смотреть видео</string>
 </resources>
