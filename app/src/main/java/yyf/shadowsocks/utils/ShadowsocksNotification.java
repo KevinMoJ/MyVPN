@@ -40,7 +40,6 @@ public class ShadowsocksNotification {
     private final NotificationCompat.Builder mBuilder;
     private BroadcastReceiver mLockReceiver;
     private boolean mCallbackRegistered;
-    private SharedPreferences mSharedPreferences;
 
     public ShadowsocksNotification(BaseService baseService, String profileName){
         mService = baseService;
@@ -48,9 +47,6 @@ public class ShadowsocksNotification {
         mNotificationManager = (NotificationManager)mService.getSystemService(Context.NOTIFICATION_SERVICE);
         mProfileName = profileName;
         mIsVisible = true;
-
-        mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mService);
-
 
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
@@ -74,14 +70,15 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentTitle(mService.getResources().getString(R.string.app_name));
-                final int countDown = mSharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-                if(countDown > 0){
-//                    mBuilder.setContentTitle(String.format("Download: %s, Upload: %s", txr, rxr));
-//                    mBuilder.setContentText("Remain: " + DateUtils.formatElapsedTime(countDown));
-                }else{
-                    mBuilder.setContentText(null);
-                }
+                mBuilder.setContentTitle(mService.getString(R.string.app_name));
+
+                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
+//                if(countDown > 0){
+//                    mBuilder.setSubText("Remain " + DateUtils.formatElapsedTime(countDown));
+////                    mBuilder.setContentText(String.format(mService.getString(R.string.notification_with_time), rxr, txr, DateUtils.formatElapsedTime(countDown)));
+//                }else{
+////                    mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
+//                }
                 mService.startForeground(1, mBuilder.build());
 
             }

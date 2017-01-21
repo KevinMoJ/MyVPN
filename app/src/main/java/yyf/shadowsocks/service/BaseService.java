@@ -211,6 +211,10 @@ public abstract class BaseService extends VpnService {
                         if(mTrafficMonitor.updateRate()){
                             updateTrafficRate();
                         }
+//                        mTrafficMonitor.updateRate();
+//                        if(state.equals(Constants.State.CONNECTED)) {
+//                            updateTrafficRate();
+//                        }
                     }
                 };
                 timer = new Timer(true);
