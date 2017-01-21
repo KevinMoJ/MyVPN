@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.WatchVideoDialogActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -93,6 +94,10 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                 mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown - 1).commit();
             }else {
                 sendTimeUpBroadcast();
+            }
+
+            if(countDown == 600 || countDown == 300){
+                startActivity(new Intent(TimeCountDownService.this, WatchVideoDialogActivity.class));
             }
 //            Log.d("倒计时", countDown + "");
         }
