@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/connect_fragment"
-        android:background="@color/button_bg_color"
+        android:background="@drawable/ad_button"
         android:text="@string/watch_video_ad"
         android:textAllCaps="false"
         android:textColor="@color/primary_white_text"

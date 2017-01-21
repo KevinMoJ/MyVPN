@@ -43,6 +43,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
@@ -978,6 +979,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     public void watchVideoAd(View v){
         //todo 播视频广告
+        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
 //        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //        sendBroadcast(intent);
     }
