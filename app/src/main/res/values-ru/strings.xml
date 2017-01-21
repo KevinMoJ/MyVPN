@@ -38,8 +38,8 @@
     <string name="vpn_nation_opt">"Выбранный быстрый сервер"</string>
     <string name="vpn_nation_fr">"Франция"</string>
     <string name="vpn_nation_jp">"Япония"</string>
-    <string name="vpn_nation_uk">"United Kindom"</string>
-    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_uk">"Великобритания"</string>
+    <string name="vpn_nation_au">"Австралия"</string>
     <string name="vpn_nation_de">"Германия"</string>
     <string name="vpn_nation_sg">"Сингапур"</string>
     <string name="vpn_nation_nl">"Нидерланды"</string>
@@ -54,7 +54,7 @@
 
     <string name="facebook">"facebook"</string>
     <string name="bluetooth">"блютуз"</string>
-    <string name="scan_qr_code_download">"Сканирование QR-кода \ ndownload на Google Play"</string>
+    <string name="scan_qr_code_download">"Сканировать QR-код скачать на Google Play"</string>
 
     <string name="connection">"подключение"</string>
     <string name="auto_connect">"Подключение VPN, когда начинается"</string>
@@ -90,4 +90,6 @@
     <string name="dialog_time_will_use_up">Время соединения будет израсходован.</string>
     <string name="dialog_watch_video">Просмотр видео объявлений может принести вам дополнительное время подключения 1 час.</string>
     <string name="watch_video">смотреть видео</string>
+    <string name="notification_with_time">Скачать: %1$s, Загрузка: %2$s, остаются: %3$s</string>
+    <string name="notification_no_time">Скачать: %1$s, Загрузка: %2$s</string>
 </resources>

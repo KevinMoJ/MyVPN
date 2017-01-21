@@ -127,4 +127,7 @@
     <string name="dialog_time_will_use_up">Connection time will be used up.</string>
     <string name="dialog_watch_video">Watching video ads can bring you extra 1 hour connection time.</string>
     <string name="watch_video">go</string>
+    <string name="notification_with_time">Download: %1$s, upload: %2$s, remain: %3$s</string>
+    <string name="notification_no_time">Download: %1$s, upload: %2$s</string>
+
 </resources>

@@ -38,7 +38,7 @@
     <string name="vpn_nation_fr">"فرنسا"</string>
     <string name="vpn_nation_jp">"اليابان"</string>
     <string name="vpn_nation_uk">"المملكة المتحدة"</string>
-    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_au">"أستراليا"</string>
     <string name="vpn_nation_de">"ألمانيا"</string>
     <string name="vpn_nation_sg">"سنغافورة"</string>
     <string name="vpn_nation_nl">"هولندا"</string>
@@ -53,7 +53,7 @@
 
     <string name="facebook">"فيس بوك"</string>
     <string name="bluetooth">"بلوتوث"</string>
-    <string name="scan_qr_code_download">"مسح رمز الاستجابة السريعة \ ndownload في Google Play"</string>
+    <string name="scan_qr_code_download">مسح رمز الاستجابة السريعة، تحميل في Google Play</string>
 
     <string name="connection">"صلة"</string>
     <string name="auto_connect">"ربط عندما يبدأ VPN"</string>
@@ -68,8 +68,8 @@
     <string name="like_us">"مثلنا"</string>
     <string name="feedback">"ردود الفعل"</string>
 
-    <string name="connecting_tip">"VPN وconnectiong. يرجى المحاولة في وقت لاحق!"</string>
-    <string name="stopping_tip">"VPN غير توقف. يرجى المحاولة في وقت لاحق!"</string>
+    <string name="connecting_tip">VPN يتم الاتصال. يرجى المحاولة في وقت لاحق!</string>
+    <string name="stopping_tip">VPN غير توقف. يرجى المحاولة في وقت لاحق!</string>
     <string name="timeout_tip">"انتهى وقت محاولة الاتصال. الرجاء اعادة المحاولة!"</string>
 
     <string name="disconnect">"قطع الاتصال"</string>
@@ -89,4 +89,6 @@
     <string name="dialog_time_will_use_up">وسوف تستخدم وقت الاتصال ما يصل.</string>
     <string name="dialog_watch_video">يمكن مشاهدة إعلانات الفيديو تجلب لك الوقت الاضافي اتصال 1 ساعة.</string>
     <string name="watch_video">شاهد الفيديو</string>
+    <string name="notification_with_time">التحميل: %1$s تحميل: %2$s باقية: %3$s</string>
+    <string name="notification_no_time">التحميل: %1$s تحميل: %2$s</string>
 </resources>
