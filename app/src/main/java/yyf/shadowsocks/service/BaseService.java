@@ -39,6 +39,7 @@ public abstract class BaseService extends VpnService {
     private Handler handler;
     protected Config config = null;
     private long mStartTime;
+    private int remain;
 
     final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
     IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
@@ -67,6 +68,7 @@ public abstract class BaseService extends VpnService {
             if(state != Constants.State.STOPPING){
                 stopRunner();
             }
+            remain = 0;
         }
 
         public void start(Config config) {
@@ -85,6 +87,10 @@ public abstract class BaseService extends VpnService {
 
         public void enableNotification(boolean enable){
             BaseService.this.enableNotification(enable);
+        }
+
+        public void setRemainTime(int remain){
+            BaseService.this.remain = remain;
         }
     };
 
@@ -208,13 +214,14 @@ public abstract class BaseService extends VpnService {
                 TimerTask task = new TimerTask() {
                     @Override
                     public void run() {
-                        if(mTrafficMonitor.updateRate()){
-                            updateTrafficRate();
-                        }
-//                        mTrafficMonitor.updateRate();
-//                        if(state.equals(Constants.State.CONNECTED)) {
+//                        if(mTrafficMonitor.updateRate()){
 //                            updateTrafficRate();
 //                        }
+                        mTrafficMonitor.updateRate();
+                        remain -= 1;
+                        if(state.equals(Constants.State.CONNECTED)) {
+                            updateTrafficRate();
+                        }
                     }
                 };
                 timer = new Timer(true);
@@ -289,5 +296,9 @@ public abstract class BaseService extends VpnService {
     }
 
     protected abstract void enableNotification(boolean enable);
+
+    public int getRemain(){
+        return remain;
+    }
 
 }

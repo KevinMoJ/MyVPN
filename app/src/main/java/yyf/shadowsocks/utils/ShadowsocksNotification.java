@@ -73,12 +73,10 @@ public class ShadowsocksNotification {
                 mBuilder.setContentTitle(mService.getString(R.string.app_name));
 
                 mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
-//                if(countDown > 0){
-//                    mBuilder.setSubText("Remain " + DateUtils.formatElapsedTime(countDown));
-////                    mBuilder.setContentText(String.format(mService.getString(R.string.notification_with_time), rxr, txr, DateUtils.formatElapsedTime(countDown)));
-//                }else{
-////                    mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
-//                }
+                int remain = mService.getRemain();
+                if(remain > 0) {
+                    mBuilder.setSubText(String.format(mService.getString(R.string.notitication_remain), DateUtils.formatElapsedTime(remain)));
+                }
                 mService.startForeground(1, mBuilder.build());
 
             }

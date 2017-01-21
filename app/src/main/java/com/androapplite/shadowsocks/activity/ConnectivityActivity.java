@@ -260,6 +260,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         TimeCountDownService.start(this);
                     }
                     clearConnectingTimeout();
+                    if(mShadowsocksService != null && mShadowsocksService != null){
+                        int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+                        try {
+                            mShadowsocksService.setRemainTime(remain);
+                        } catch (RemoteException e) {
+                            ShadowsocksApplication.handleException(e);
+                        }
+                    }
+
                     break;
                 case STOPPING:
                     if (mConnectFragment != null) {

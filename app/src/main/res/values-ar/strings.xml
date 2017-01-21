@@ -92,5 +92,5 @@
     <!--<string name="notification_with_time">التحميل: %1$s تحميل: %2$s باقية: %3$s</string>-->
     <string name="notification_no_time">التحميل: %1$s تحميل: %2$s</string>
     <string name="watch_video_ad">مشاهدة إعلانات الفيديو، الحصول على المزيد من وقت الاتصال</string>
-
+    <string name="notitication_remain">يبقى: %1$s</string>
 </resources>
