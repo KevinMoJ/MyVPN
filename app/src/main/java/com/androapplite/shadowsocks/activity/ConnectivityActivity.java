@@ -977,7 +977,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     public void watchVideoAd(View v){
-        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-        sendBroadcast(intent);
+        //todo 播视频广告
+//        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
+//        sendBroadcast(intent);
     }
 }
