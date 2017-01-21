@@ -12,11 +12,10 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.WatchVideoDialogActivity;
+import com.androapplite.shadowsocks.activity.WatchVideoADDialogActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -99,7 +98,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             }
 
             if(countDown == 600 || countDown == 300){
-                Intent intent = new Intent(TimeCountDownService.this, WatchVideoDialogActivity.class);
+                Intent intent = new Intent(TimeCountDownService.this, WatchVideoADDialogActivity.class);
                 intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);            }
 //            Log.d("倒计时", countDown + "");

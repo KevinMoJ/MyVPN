@@ -3,17 +3,16 @@ package com.androapplite.shadowsocks.activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.R;
 
-public class WatchVideoDialogActivity extends AppCompatActivity {
+public class WatchVideoADDialogActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_watch_video_dialog);
+        setContentView(R.layout.activity_watch_video_ad_dialog);
 //        setFinishOnTouchOutside(false);
     }
 
