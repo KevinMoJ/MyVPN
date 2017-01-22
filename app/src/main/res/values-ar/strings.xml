@@ -38,7 +38,7 @@
     <string name="vpn_nation_fr">"فرنسا"</string>
     <string name="vpn_nation_jp">"اليابان"</string>
     <string name="vpn_nation_uk">"المملكة المتحدة"</string>
-    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_au">"أستراليا"</string>
     <string name="vpn_nation_de">"ألمانيا"</string>
     <string name="vpn_nation_sg">"سنغافورة"</string>
     <string name="vpn_nation_nl">"هولندا"</string>
@@ -53,7 +53,7 @@
 
     <string name="facebook">"فيس بوك"</string>
     <string name="bluetooth">"بلوتوث"</string>
-    <string name="scan_qr_code_download">"مسح رمز الاستجابة السريعة \ ndownload في Google Play"</string>
+    <string name="scan_qr_code_download">"مسح رمز الاستجابة السريعة، تحميل في Google Play"</string>
 
     <string name="connection">"صلة"</string>
     <string name="auto_connect">"ربط عندما يبدأ VPN"</string>
@@ -79,4 +79,5 @@
     <string name="start_using">"ابدأ بإستخدام"</string>
     <string name="like_us_question">مثلنا؟</string>
     <string name="five_star_encouragement">نحن في حاجة الى دعمكم 5 نجوم التشجيع على تحسين ذلك!</string>
+    <string name="notification_no_time">التحميل: %1$s تحميل: %2$s</string>
 </resources>

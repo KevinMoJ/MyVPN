@@ -65,7 +65,7 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentText(String.format("Download: %s, Upload: %s", txr, rxr));
+                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
                 mService.startForeground(1, mBuilder.build());
 
             }
