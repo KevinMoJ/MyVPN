@@ -791,6 +791,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         }
         return new Pair<>(result, duration);
+//        return new Pair<>(true, 150L);
     }
 
     @Override
