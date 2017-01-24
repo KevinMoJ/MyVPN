@@ -11,13 +11,12 @@ import android.net.VpnService;
 import android.os.*;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.BuildConfig;
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.BuildConfig;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
-import org.apache.http.conn.util.InetAddressUtils;
 import org.xbill.DNS.AAAARecord;
 import org.xbill.DNS.ARecord;
 import org.xbill.DNS.Lookup;
@@ -46,6 +45,7 @@ import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
 import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.GuardedProcess;
+import yyf.shadowsocks.utils.InetAddressUtils;
 import yyf.shadowsocks.utils.ShadowsocksNotification;
 import yyf.shadowsocks.utils.TrafficMonitor;
 import yyf.shadowsocks.utils.TrafficMonitorThread;

@@ -1,6 +1,6 @@
 package yyf.shadowsocks.preferences;
 
-import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.vpn3.BuildConfig;
 
 /**
  * Created by jim on 16/4/27.

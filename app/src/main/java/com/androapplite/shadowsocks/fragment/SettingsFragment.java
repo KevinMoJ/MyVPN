@@ -11,7 +11,7 @@ import android.preference.SwitchPreference;
 import android.support.v4.app.Fragment;
 import android.widget.ListView;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 

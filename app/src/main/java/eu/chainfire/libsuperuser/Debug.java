@@ -19,7 +19,7 @@ package eu.chainfire.libsuperuser;
 import android.os.Looper;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.vpn3.BuildConfig;
 
 
 /**

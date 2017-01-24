@@ -16,7 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -195,7 +195,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void error(){
         mLoadingView.clearAnimation();
-        mLoadingView.setColorFilter(getResources().getColor(R.color.error_color));
+        mLoadingView.setColorFilter(getResources().getColor(R.color.connect_error_red));
         mLoadingView.setImageLevel(1);
     }
 

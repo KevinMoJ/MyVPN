@@ -25,7 +25,7 @@ android {
             storePassword '123456'
         }
     }
-    compileSdkVersion 22
+    compileSdkVersion 23
     buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "com.androapplite.vpn3"
@@ -56,16 +56,16 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/dnsjava-2.1.7.jar')
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:design:22.2.1'
-    compile 'com.google.android.gms:play-services-analytics:10.0.1'
-    compile 'com.google.android.gms:play-services-ads:10.0.1'
-    compile 'com.facebook.android:audience-network-sdk:4.8.2'
-    compile 'com.facebook.android:facebook-android-sdk:4.8.2'
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:support-v4:23.2.0'
+    compile 'com.android.support:design:23.2.0'
+    compile 'com.google.android.gms:play-services-analytics:9.2.0'
+    compile 'com.google.android.gms:play-services-ads:9.2.0'
+    compile 'com.facebook.android:audience-network-sdk:4.8.1'
+//    compile 'com.facebook.android:facebook-android-sdk:4.8.1'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.joooonho:selectableroundedimageview:1.0.1'
 //    compile 'com.github.bumptech.glide:glide:3.7.0'

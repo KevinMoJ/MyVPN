@@ -21,7 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
 import com.androapplite.shadowsocks.fragment.PagerIndicatorFragment;

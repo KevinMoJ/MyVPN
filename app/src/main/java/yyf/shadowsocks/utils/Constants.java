@@ -1,6 +1,7 @@
 package yyf.shadowsocks.utils;
 
-import com.androapplite.shadowsocks.BuildConfig;
+
+import com.androapplite.vpn3.BuildConfig;
 
 /**
  * Created by yyf on 2015/6/18.

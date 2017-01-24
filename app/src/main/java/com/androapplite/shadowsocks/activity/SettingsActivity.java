@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.fragment.SettingsFragment;

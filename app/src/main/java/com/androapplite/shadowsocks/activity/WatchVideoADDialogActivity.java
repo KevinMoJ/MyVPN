@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
 

@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.VIPUtil;

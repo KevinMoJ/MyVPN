@@ -11,10 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.widget.ShareDialog;
 
 import java.io.File;
 
@@ -31,15 +29,15 @@ public class ShareActivity extends AppCompatActivity {
 
     }
 
-    public void shareByFacebook(View view){
-        ShareLinkContent content = new ShareLinkContent.Builder()
-                .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.androapplite.shadowsocks&referrer=utm_source%3Dclient%26utm_medium%3Dfacebook"))
-                .build();
-
-        ShareDialog shareDialog = new ShareDialog(this);
-        shareDialog.show(content);
-        GAHelper.sendEvent(this, "分享屏幕", "facebook分享");
-    }
+//    public void shareByFacebook(View view){
+//        ShareLinkContent content = new ShareLinkContent.Builder()
+//                .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.androapplite.shadowsocks&referrer=utm_source%3Dclient%26utm_medium%3Dfacebook"))
+//                .build();
+//
+//        ShareDialog shareDialog = new ShareDialog(this);
+//        shareDialog.show(content);
+//        GAHelper.sendEvent(this, "分享屏幕", "facebook分享");
+//    }
 
     public void shareByBluetooth(View view){
         ApplicationInfo app = getApplication().getApplicationInfo();

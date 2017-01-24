@@ -5,7 +5,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.annotation.DrawableRes;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 import org.json.JSONArray;

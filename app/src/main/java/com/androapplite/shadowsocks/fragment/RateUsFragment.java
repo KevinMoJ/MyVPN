@@ -15,7 +15,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 
 /**
  * A simple {@link Fragment} subclass.

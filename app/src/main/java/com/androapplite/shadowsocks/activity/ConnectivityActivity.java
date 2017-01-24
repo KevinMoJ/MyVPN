@@ -40,13 +40,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.VIPUtil;
@@ -64,7 +67,13 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.request.target.SimpleTarget;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
-import com.facebook.appevents.AppEventsLogger;
+import com.smartads.Plugins;
+import com.smartads.ads.AdType;
+import com.smartads.plugin.PluginAdListener;
+import com.vungle.publisher.AdConfig;
+import com.vungle.publisher.EventListener;
+import com.vungle.publisher.Orientation;
+import com.vungle.publisher.VunglePub;
 
 import junit.framework.Assert;
 
@@ -114,6 +123,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ProgressDialog mFetchServerListProgressDialog;
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
+    private VunglePub vunglePub;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +143,119 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initVpnFlagAndNation();
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
+
+        Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
+        Plugins.initBannerAd(ConnectivityActivity.NAME);
+        Plugins.initNativeAd(ConnectivityActivity.NAME);
+        Plugins.initNgsAd(ConnectivityActivity.NAME);
+
+        Plugins.setPluginAdListener(new PluginAdListener() {
+            @Override
+            public void onReceiveAd(String s, AdType adType) {
+                if (adType == AdType.Ngs) {
+                    ngsLoaded = true;
+                } else if (adType == AdType.Native) {
+                    nativeLoaded = true;
+                }
+            }
+
+            @Override
+            public void onAdClosed(String s, AdType adType) {
+                if (adType == AdType.Ngs) {
+                    try {
+                        Plugins.loadNewNgsAd(NAME);
+                    } catch (Exception ex) {
+                    }
+                    if (!watchedVideoFinish) {
+                        watchedVideoFinish = true;
+                        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
+                        sendBroadcast(intent);
+                    }
+                }
+            }
+        });
+
+        ngsLoaded = false;
+        nativeLoaded = false;
+
+        try {
+            int width = (int)(getResources().getDisplayMetrics().density * 300);
+            int height = (int)(getResources().getDisplayMetrics().density * 250);
+            Plugins.loadNewNativeAd(NAME, width, height);
+            Plugins.loadNewBannerAd(NAME);
+            Plugins.loadNewNgsAd(NAME);
+        } catch (Exception ex) {
+        }
+
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(Plugins.adBanner(NAME), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        handler1.sendEmptyMessageDelayed(1000, 1000);
+        vunglePub = VunglePub.getInstance();
+        vunglePub.init(this, "5883318328ba136f4e00021a");
+
+        final AdConfig globalAdConfig = vunglePub.getGlobalAdConfig();
+        globalAdConfig.setSoundEnabled(true);
+        globalAdConfig.setBackButtonImmediatelyEnabled(false);
+        globalAdConfig.setOrientation(Orientation.autoRotate);
+
+        vunglePub.addEventListeners(new EventListener() {
+            @Override
+            public void onAdEnd(boolean b) {
+                if (!watchedVideoFinish) {
+                    watchedVideoFinish = true;
+                    Intent intent = new Intent(Action.VIDEO_AD_FINISH);
+                    sendBroadcast(intent);
+                }
+            }
+
+            @Override
+            public void onAdStart() {
+            }
+
+            @Override
+            public void onAdUnavailable(String s) {
+            }
+
+            @Override
+            public void onAdPlayableChanged(boolean b) {
+                if (b) {
+                    videoAvailble = true;
+                }
+            }
+
+            @Override
+            public void onVideoView(boolean b, int i, int i1) {
+            }
+        });
     }
+
+    public static final String NAME = "MainActivity";
+    private boolean startUp = false;
+    private boolean ngsLoaded = false;
+    private boolean watchedVideoFinish = true;
+    private boolean videoAvailble = false;
+    private boolean showResumeAd = false;
+    public static boolean nativeLoaded = false;
+    private Handler handler1 = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1000) {
+                if (ngsLoaded) {
+                    try {
+                        Plugins.adNgs(NAME, -1);
+                    } catch (Exception ex) {}
+                } else {
+                    handler1.sendEmptyMessageDelayed(1000, 200);
+                }
+            }
+        }
+    };
 
     private void initForegroundBroadcastIntentFilter(){
         mForgroundReceiverIntentFilter = new IntentFilter();
@@ -230,6 +352,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     break;
                 case CONNECTED:
+                    try {
+                        Plugins.adNgs(NAME, -1);
+                    } catch (Exception ex) {
+                    }
+
+                    if (!startUp) {
+                        try {
+                            Plugins.loadNewBannerAd(NAME);
+                            Plugins.loadNewNgsAd(NAME);
+                        } catch (Exception ex) {
+                        }
+                        startUp = true;
+                    }
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
@@ -632,7 +767,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         }
         updateConnectionState();
-        AppEventsLogger.activateApp(this);
 
     }
 
@@ -651,7 +785,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onStop();
         unregisterShadowsocksCallback();
         unregisterConnectivityReceiver();
-        AppEventsLogger.deactivateApp(this);
         if(mNoInternetSnackbar != null){
             mNoInternetSnackbar.dismiss();
             mNoInternetSnackbar = null;
@@ -669,7 +802,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     @Override
+    protected void onResume() {
+        vunglePub.onResume();
+        Plugins.onResume(NAME, this.getApplicationContext());
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        vunglePub.onPause();
+        Plugins.onPause(NAME, this.getApplicationContext());
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
+        Plugins.onDestroy(NAME);
         super.onDestroy();
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
@@ -708,7 +856,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         ShadowsocksApplication.handleException(e);
                     }
                 }
-
+                try {
+                    Plugins.adNgs(NAME, -1);
+                } catch (Exception ex) {
+                }
             }else if(requestCode == OPEN_SERVER_LIST){
                 ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
                 if(connectivityManager != null){
@@ -988,7 +1139,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     public void watchVideoAd(View v){
         //todo 播视频广告
-        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
+        if (vunglePub.isAdPlayable()) {
+            watchedVideoFinish = false;
+            vunglePub.playAd();
+        } else {
+            try {
+                if (ngsLoaded) {
+                    watchedVideoFinish = false;
+                    Plugins.adNgs(NAME, -1);
+                }
+            } catch (Exception ex) {
+            }
+        }
+        if (watchedVideoFinish) {
+            Toast.makeText(this, "No Video Available", Toast.LENGTH_SHORT).show();
+        }
+//        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
 //        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //        sendBroadcast(intent);
     }

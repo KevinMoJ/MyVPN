@@ -3,7 +3,7 @@ package yyf.shadowsocks.utils;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 
 import java.text.DecimalFormat;
 import java.util.Formatter;

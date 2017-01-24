@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 
 /**
  * A simple {@link Fragment} subclass.

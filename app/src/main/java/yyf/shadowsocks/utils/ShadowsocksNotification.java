@@ -16,7 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.TimeUtils;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;

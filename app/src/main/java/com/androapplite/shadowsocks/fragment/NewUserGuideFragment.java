@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.R;
+import com.androapplite.vpn3.R;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

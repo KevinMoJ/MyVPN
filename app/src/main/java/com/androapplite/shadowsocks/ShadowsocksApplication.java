@@ -8,21 +8,23 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
+import com.androapplite.vpn3.BuildConfig;
+import com.androapplite.vpn3.R;
 import com.crashlytics.android.Crashlytics;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.smartads.plugin.GameApplication;
+import com.umeng.analytics.game.UMGameAgent;
 
 import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends Application {
+public class ShadowsocksApplication extends GameApplication {
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
@@ -66,10 +68,11 @@ public class ShadowsocksApplication extends Application {
 //        mHelper = new IabHelper(this, base64EncodedPublicKey);
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
         // Initialize the SDK before executing any other operations,
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
 
+        UMGameAgent.init(this);
+        UMGameAgent.setTraceSleepTime(false);
+        UMGameAgent.setSessionContinueMillis(60000L);
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){

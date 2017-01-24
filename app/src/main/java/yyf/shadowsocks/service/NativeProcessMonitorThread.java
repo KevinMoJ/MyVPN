@@ -1,6 +1,6 @@
 package yyf.shadowsocks.service;
 
-import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 
 import java.util.List;
