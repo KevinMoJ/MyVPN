@@ -761,9 +761,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 result = serverList;
             }
         }
-        if(result == null){
-            result = ServerConfig.createDefaultServerList(getResources());
-        }
+//        if(result == null){
+//            result = ServerConfig.createDefaultServerList(getResources());
+//        }
         return result;
     }
 
