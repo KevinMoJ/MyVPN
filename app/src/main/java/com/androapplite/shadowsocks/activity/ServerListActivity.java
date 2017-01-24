@@ -110,7 +110,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 //        if(serverConfigs == null || serverConfigs.isEmpty()){
 //            serverConfigs = ServerConfig.createDefaultServerList(getResources());
 //        }
-        if(serverConfigs != null) {
+        if(serverConfigs != null && !serverConfigs.isEmpty()) {
             for (ServerConfig serverConfig : serverConfigs) {
                 if (!mNations.contains(serverConfig.nation)) {
                     mNations.add(serverConfig.nation);

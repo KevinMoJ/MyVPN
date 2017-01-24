@@ -1,10 +1,12 @@
 package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -17,6 +19,7 @@ import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.Settings;
@@ -53,6 +56,7 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 //import com.bumptech.glide.request.animation.GlideAnimation;
 //import com.bumptech.glide.request.target.SimpleTarget;
+import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.facebook.appevents.AppEventsLogger;
 
 import java.io.IOException;
@@ -62,6 +66,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
@@ -89,6 +94,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean mIsConnecting;
     private Runnable mUpdateVpnStateRunable;
     private Runnable mShowRateUsRunnable;
+    private ProgressDialog mFetchServerListProgressDialog;
+    private Handler mConnectingTimeoutHandler;
+    private Runnable mConnectingTimeoutRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +114,34 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
         initVpnFlagAndNation();
+        initForegroundBroadcastIntentFilter();
+        initForegroundBroadcastReceiver();
+    }
+
+    private void initForegroundBroadcastIntentFilter(){
+        mForgroundReceiverIntentFilter = new IntentFilter();
+        mForgroundReceiverIntentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
+    }
+
+    private void initForegroundBroadcastReceiver(){
+        mForgroundReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                switch(action){
+                    case Action.SERVER_LIST_FETCH_FINISH:
+                        if(mFetchServerListProgressDialog != null){
+                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+                                mFetchServerListProgressDialog.setOnDismissListener(null);
+                                Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
+                            }
+                            mFetchServerListProgressDialog.dismiss();
+                            mFetchServerListProgressDialog = null;
+                        }
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -181,6 +217,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                     .commit();
                         }
                     }
+                    clearConnectingTimeout();
                     if(mConnectFragment != null && mConnectingConfig != null ) {
                         ConnectionTestService.testConnection(this, mConnectingConfig.name);
                         showRateUsFragment();
@@ -188,17 +225,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mIsConnecting = false;
                     break;
                 case STOPPING:
+                    clearConnectingTimeout();
                     break;
                 case STOPPED:
                     mIsConnecting = false;
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
+                    clearConnectingTimeout();
                     break;
                 case ERROR:
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
+                    clearConnectingTimeout();
                     mIsConnecting = false;
                     break;
             }
@@ -451,10 +491,42 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void connectVpnServerAsync() {
+        if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+            connectVpnServerAsyncCore();
+        }else{
+            mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
+            ServerListFetcherService.fetchServerListAsync(this);
+            mFetchServerListProgressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    connectVpnServerAsyncCore();
+                }
+            });
+        }
+    }
+
+    private void connectVpnServerAsyncCore(){
         if(mConnectFragment != null){
             mConnectFragment.animateConnecting();
             mIsConnecting = true;
         }
+        mConnectingTimeoutHandler = new Handler();
+        mConnectingTimeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(mShadowsocksService != null){
+                    try {
+                        mShadowsocksService.stop();
+                    } catch (RemoteException e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
+                mConnectingTimeoutHandler = null;
+                mConnectingTimeoutRunnable = null;
+                Snackbar.make(findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
+            }
+        };
+        mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -465,11 +537,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         if(serverConfig != null) {
                             mConnectingConfig = serverConfig;
                             prepareStartService();
-                            if(mSharedPreference != null){
-                                String flag = mSharedPreference.getString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global));
-                                String connectingFlag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global));
-                                GAHelper.sendEvent(ConnectivityActivity.this, "尝试连接", flag, connectingFlag);
-                            }
                         }else {
                             Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
                             if(mConnectFragment != null){
@@ -481,8 +548,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 });
             }
         }).start();
-
     }
+
 
     private void disconnectVpnServiceAsync(){
         if(mConnectFragment != null){
@@ -561,6 +628,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         if(mShowRateUsRunnable != null){
             getWindow().getDecorView().removeCallbacks(mShowRateUsRunnable);
+        }
+        clearConnectingTimeout();
+        if(mFetchServerListProgressDialog != null){
+            mFetchServerListProgressDialog.dismiss();
+            mFetchServerListProgressDialog = null;
+        }
+    }
+
+    private void clearConnectingTimeout() {
+        if(mConnectingTimeoutHandler != null && mConnectingTimeoutRunnable != null){
+            mConnectingTimeoutHandler.removeCallbacks(mConnectingTimeoutRunnable);
+            mConnectingTimeoutHandler = null;
+            mConnectingTimeoutRunnable = null;
         }
     }
 
