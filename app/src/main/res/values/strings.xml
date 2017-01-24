@@ -84,7 +84,7 @@
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>
     <string name="not_open_vpn_popup">Could not open window. Please try again.</string>
 
-    <string name="facebook_app_id" translatable="false">504824046367667</string>
+    <string name="facebook_app_id" translatable="false">1207655049289960</string>
 
     <string name="server_list">Server Location</string>
     <string name="repair">REPAIR</string>
