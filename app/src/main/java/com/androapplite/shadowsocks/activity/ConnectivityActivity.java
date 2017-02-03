@@ -377,7 +377,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_flag) {
-            if(mNewState != Constants.State.CONNECTING || mNewState != Constants.State.STOPPING) {
+            if(mNewState != Constants.State.CONNECTING && mNewState != Constants.State.STOPPING) {
                 startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
             }else if(mNewState == Constants.State.CONNECTING){
                 Snackbar.make(findViewById(R.id.coordinator), R.string.connecting_tip, Snackbar.LENGTH_SHORT).show();
