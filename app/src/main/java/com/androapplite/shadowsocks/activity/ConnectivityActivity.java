@@ -66,6 +66,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
@@ -97,6 +98,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ProgressDialog mFetchServerListProgressDialog;
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
+    private HashSet<ServerConfig> mErrorServers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +118,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initVpnFlagAndNation();
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
+        mErrorServers = new HashSet<>();
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -223,6 +226,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         showRateUsFragment();
                     }
                     mIsConnecting = false;
+                    mErrorServers.clear();
                     break;
                 case STOPPING:
                     clearConnectingTimeout();
@@ -240,6 +244,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     clearConnectingTimeout();
                     mIsConnecting = false;
+                    mErrorServers.add(mConnectingConfig);
                     break;
             }
         }
@@ -538,7 +543,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             mConnectingConfig = serverConfig;
                             prepareStartService();
                         }else {
-                            Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
                             if(mConnectFragment != null){
                                 mConnectFragment.setConnectResult(Constants.State.ERROR);
                             }
@@ -793,6 +798,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             int i;
             for(i=0; i<filteredConfigs.size(); i++){
                 serverConfig = filteredConfigs.get(i);
+                if(mErrorServers.contains(serverConfig)) continue;
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                 if(pair.first){
                     GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
