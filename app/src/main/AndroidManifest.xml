@@ -18,6 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+
         <!-- 参数修改片段 -->
         <meta-data
             android:name="UMENG_APPKEY"

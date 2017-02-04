@@ -11,6 +11,8 @@ import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -53,6 +55,8 @@ public class ShadowsocksApplication extends GameApplication {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
         if (BuildConfig.DEBUG) {
             //谷歌插页广告导致资源泄露
 //            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
