@@ -156,6 +156,7 @@ public class ServerConfig {
                 .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, flag)
                 .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, nation)
                 .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, signal)
+                .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT,port)
                 .commit();
     }
 
@@ -165,7 +166,7 @@ public class ServerConfig {
         String flag = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
         String nation = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
         int signal = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
-        int port = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, DEFAULT_PORT);
+        int port = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_PORT, DEFAULT_PORT);
         if(vpnName != null && server != null && flag != null && nation != null){
             return new ServerConfig(vpnName, server, flag, nation, signal, port);
         }else{
