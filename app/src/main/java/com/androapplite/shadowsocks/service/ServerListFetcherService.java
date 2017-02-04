@@ -62,13 +62,14 @@ public class ServerListFetcherService extends IntentService {
             }
             OkHttpClient client = builder.build();
 
-            String url = null;
-            if(VIPUtil.isVIP(this)){
-                url = "http://c.vpnnest.com:8090/VPNServerList/fsl";
-            }else{
-                url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
-            }
+//            String url = null;
+//            if(VIPUtil.isVIP(this)){
+//                url = "http://c.vpnnest.com:8090/VPNServerList/fsl";
+//            }else{
+//                url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+//            }
 //            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
+            String url =  "http://c.vpnnest.com:8030/VPNServerList/fsl";
             Request request = new Request.Builder()
                     .url(url)
                     .addHeader("Accept-Encoding", "gzip")
