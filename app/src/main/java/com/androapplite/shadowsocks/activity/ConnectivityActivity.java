@@ -581,7 +581,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             mConnectingConfig = serverConfig;
                             prepareStartService();
                         }else {
-                            Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_LONG).show();
+                            Snackbar.make(findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
                             if(mConnectFragment != null){
                                 mConnectFragment.setConnectResult(Constants.State.ERROR);
                             }
