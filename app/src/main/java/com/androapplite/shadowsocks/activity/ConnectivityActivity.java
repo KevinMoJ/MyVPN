@@ -220,13 +220,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     break;
                 case CONNECTING:
                     if (mSharedPreference != null && mConnectingConfig != null) {
-                        mSharedPreference.edit()
-                                .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, mConnectingConfig.name)
-                                .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, mConnectingConfig.server)
-                                .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, mConnectingConfig.flag)
-                                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, mConnectingConfig.nation)
-                                .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, mConnectingConfig.signal)
-                                .commit();
+                        mConnectingConfig.saveInSharedPreference(mSharedPreference);
                     }
                     break;
                 case CONNECTED:
@@ -235,14 +229,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
 
                     if (mConnectingConfig == null) {
-                        String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-                        String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-                        String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-                        String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-                        int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
-                        if(vpnName != null && server != null && flag != null && nation != null) {
-                            mConnectingConfig = new ServerConfig(vpnName, server, flag, nation, signal);
-                        }
+                        mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
                     } else {
                         if (mSharedPreference != null) {
                             mSharedPreference.edit()
@@ -704,7 +691,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (resultCode == RESULT_OK) {
             if(requestCode == REQUEST_CONNECT){
                 if(mShadowsocksService != null && mConnectingConfig != null){
-                    Config config = new Config(mConnectingConfig.server);
+                    Config config = new Config(mConnectingConfig.server, mConnectingConfig.port);
                     try {
                         mShadowsocksService.start(config);
                         ShadowsocksApplication.debug("ss-vpn", "bgService.StartVpn");
@@ -808,21 +795,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ServerConfig findVPNServer(){
         ServerConfig serverConfig = null;
         if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
-            String vpnName = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-            String server = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-            String flag = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-            String nation = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-            int signal = mSharedPreference.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
-            if(vpnName != null && server != null && flag != null && nation != null) {
-                serverConfig = new ServerConfig(vpnName, server, flag, nation, signal);
-            }
+            serverConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
         }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         if(serverConfig != null){
             if(!serverConfigs.contains(serverConfig)){
                 serverConfig = null;
             }else{
-                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                 if(pair.first){
                     GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
                 }else{
@@ -855,7 +835,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             int i;
             for(i=0; i<filteredConfigs.size(); i++){
                 serverConfig = filteredConfigs.get(i);
-                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, 40010, 15000);
+                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                 if(pair.first){
                     GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
                     break;
