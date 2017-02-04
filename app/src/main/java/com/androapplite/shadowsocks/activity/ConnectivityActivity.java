@@ -762,7 +762,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         if(serverConfig != null){
-            if(!serverConfigs.contains(serverConfig)){
+            if(!serverConfigs.contains(serverConfig) ||
+                    mErrorServers.contains(serverConfig)){
                 serverConfig = null;
             }else{
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
