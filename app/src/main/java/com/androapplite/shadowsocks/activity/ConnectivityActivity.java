@@ -78,6 +78,7 @@ import java.net.Proxy;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
@@ -114,6 +115,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ProgressDialog mFetchServerListProgressDialog;
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
+    private HashSet<ServerConfig> mErrorServers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +135,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initVpnFlagAndNation();
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
+        mErrorServers = new HashSet<>();
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -255,7 +258,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             ShadowsocksApplication.handleException(e);
                         }
                     }
-
+                    mErrorServers.clear();
                     break;
                 case STOPPING:
                     if (mConnectFragment != null) {
@@ -276,6 +279,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     clearConnectingTimeout();
                     mIsConnecting = false;
+                    mErrorServers.add(mConnectingConfig);
                     break;
             }
         }
@@ -799,7 +803,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         if(serverConfig != null){
-            if(!serverConfigs.contains(serverConfig)){
+            if(!serverConfigs.contains(serverConfig) ||
+                    mErrorServers.contains(serverConfig)){
                 serverConfig = null;
             }else{
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
@@ -835,6 +840,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             int i;
             for(i=0; i<filteredConfigs.size(); i++){
                 serverConfig = filteredConfigs.get(i);
+                if(mErrorServers.contains(serverConfig)) continue;
                 Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                 if(pair.first){
                     GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
