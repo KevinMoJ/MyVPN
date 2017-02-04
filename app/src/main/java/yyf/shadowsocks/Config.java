@@ -13,7 +13,7 @@ public class Config implements Parcelable {
     public boolean isUdpDns = false;
 
     public String profileName = "US Server";
-    private String proxy = "hub.vpnnest.com";
+    private String proxy = "";
     private String sitekey = "vpnnest!@#123d";
 
     private int remotePort = 40010;
@@ -37,12 +37,17 @@ public class Config implements Parcelable {
         }
     };
 
-    public Config() {
+//    public Config() {
+//
+//    }
+//
+//    public Config(String proxy){
+//        this.proxy = proxy;
+//    }
 
-    }
-
-    public Config(String proxy){
+    public Config(String proxy, int port){
         this.proxy = proxy;
+        remotePort = port;
     }
 
     public Config(boolean isGlobalProxy, boolean isGFWList, boolean isBypassApps,
@@ -120,6 +125,7 @@ public class Config implements Parcelable {
     public int getRemotePort(){
         return remotePort;
     }
+
 
 
 }

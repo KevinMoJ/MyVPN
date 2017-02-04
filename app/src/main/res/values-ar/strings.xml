@@ -94,4 +94,5 @@
     <string name="watch_video_ad">مشاهدة إعلانات الفيديو، الحصول على المزيد من وقت الاتصال</string>
     <string name="notitication_remain">يبقى: %1$s</string>
     <string name="dialog_time_use_up">ويستخدم وقت الاتصال حتى!</string>
+    <string name="server_not_available">ملقم VPN غير متوفر في الوقت الحالي. يرجى المحاولة في وقت لاحق!</string>
 </resources>

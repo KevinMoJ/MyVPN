@@ -131,4 +131,5 @@
     <string name="watch_video_ad">Watch video ads, get more connection time</string>
     <string name="notitication_remain">Remain: %1$s</string>
     <string name="dialog_time_use_up">Connection time is used up!</string>
+    <string name="server_not_available">The VPN server is not available right now. Plase try it later!</string>
 </resources>

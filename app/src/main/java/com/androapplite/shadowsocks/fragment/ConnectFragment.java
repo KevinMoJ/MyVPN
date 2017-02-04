@@ -101,6 +101,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         if(mCountDownTimer != null){
             mCountDownTimer.cancel();
             mCountDownTimer.purge();
+            mCountDownTimer = null;
         }
 
     }
@@ -126,25 +127,27 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
 
     public void setConnectResult(final Constants.State state){
-        switch (state){
-            case INIT:
-                init();
-                break;
-            case CONNECTING:
-                animateConnecting();
-                break;
-            case CONNECTED:
-                connectFinish();
-                break;
-            case STOPPING:
-                animateStopping();
-                break;
-            case STOPPED:
-                stopFinish();
-                break;
-            case ERROR:
-                error();
-                break;
+        if(isVisible()) {
+            switch (state) {
+                case INIT:
+                    init();
+                    break;
+                case CONNECTING:
+                    animateConnecting();
+                    break;
+                case CONNECTED:
+                    connectFinish();
+                    break;
+                case STOPPING:
+                    animateStopping();
+                    break;
+                case STOPPED:
+                    stopFinish();
+                    break;
+                case ERROR:
+                    error();
+                    break;
+            }
         }
 
     }
@@ -170,15 +173,19 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private class CountDownTimerTask extends TimerTask{
         @Override
         public void run() {
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
-            mMessageTextView.post(new Runnable() {
-                @Override
-                public void run() {
-                    mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
 
-                }
-            });
+            final Context context = getContext();
+            if(isVisible() && context != null) {
+                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+                final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+                mMessageTextView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+
+                    }
+                });
+            }
         }
     }
 

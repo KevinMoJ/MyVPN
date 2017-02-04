@@ -95,5 +95,6 @@
     <string name="watch_video_ad">Смотрите видео рекламу, получить больше времени подключения</string>
     <string name="notitication_remain">Времени осталось: %1$s</string>
     <string name="dialog_time_use_up">Время подключения используется вверх!</string>
+    <string name="server_not_available">Сервер VPN не доступна прямо сейчас. Пожалуйста, попробуйте позже!</string>
 
 </resources>
