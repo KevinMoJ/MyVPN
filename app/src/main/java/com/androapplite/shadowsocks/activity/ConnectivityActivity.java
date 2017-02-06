@@ -677,6 +677,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         clearConnectingTimeout();
         if(mFetchServerListProgressDialog != null){
+            mFetchServerListProgressDialog.setOnDismissListener(null);
             mFetchServerListProgressDialog.dismiss();
             mFetchServerListProgressDialog = null;
         }
@@ -798,59 +799,63 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     private ServerConfig findVPNServer(){
         ServerConfig serverConfig = null;
-        if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
-            serverConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
-        }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
-        if(serverConfig != null){
-            if(!serverConfigs.contains(serverConfig) ||
-                    mErrorServers.contains(serverConfig)){
-                serverConfig = null;
-            }else{
-                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
-                if(pair.first){
-                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
-                }else{
-                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
-                    serverConfig = null;
-                }
-
+        if(serverConfigs != null && !serverConfigs.isEmpty()) {
+            if(mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED){
+                serverConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
             }
-        }
-        if(serverConfig == null){
-            final String global = getString(R.string.vpn_nation_opt);
-            final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
-            final boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
-            final boolean isGlobalOption = nation.equals(global);
-            ArrayList<ServerConfig> filteredConfigs = null;
-            if(isGlobalOption){
-                filteredConfigs = serverConfigs;
-                filteredConfigs.remove(0);
-            }else{
-                filteredConfigs = new ArrayList<>();
-                for(ServerConfig config:serverConfigs){
-                    if(nation.equals(config.nation)){
-                        filteredConfigs.add(config);
+
+            if (serverConfig != null) {
+                if (!serverConfigs.contains(serverConfig) ||
+                        mErrorServers.contains(serverConfig)) {
+                    serverConfig = null;
+                } else {
+                    Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
+                    if (pair.first) {
+                        GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                    } else {
+                        GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                        serverConfig = null;
+                    }
+
+                }
+            }
+
+            if (serverConfig == null) {
+                final String global = getString(R.string.vpn_nation_opt);
+                final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
+                final boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
+                final boolean isGlobalOption = nation.equals(global);
+                ArrayList<ServerConfig> filteredConfigs = null;
+                if (isGlobalOption) {
+                    filteredConfigs = serverConfigs;
+                    filteredConfigs.remove(0);
+                } else {
+                    filteredConfigs = new ArrayList<>();
+                    for (ServerConfig config : serverConfigs) {
+                        if (nation.equals(config.nation)) {
+                            filteredConfigs.add(config);
+                        }
                     }
                 }
-            }
-            if(!hasServerListJson){
-                Collections.shuffle(filteredConfigs);
-            }
-            int i;
-            for(i=0; i<filteredConfigs.size(); i++){
-                serverConfig = filteredConfigs.get(i);
-                if(mErrorServers.contains(serverConfig)) continue;
-                Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
-                if(pair.first){
-                    GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
-                    break;
-                }else{
-                    GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                if (!hasServerListJson) {
+                    Collections.shuffle(filteredConfigs);
                 }
-            }
-            if(i >= filteredConfigs.size()){
-                serverConfig = null;
+                int i;
+                for (i = 0; i < filteredConfigs.size(); i++) {
+                    serverConfig = filteredConfigs.get(i);
+                    if (mErrorServers.contains(serverConfig)) continue;
+                    Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
+                    if (pair.first) {
+                        GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                        break;
+                    } else {
+                        GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                    }
+                }
+                if (i >= filteredConfigs.size()) {
+                    serverConfig = null;
+                }
             }
         }
         return serverConfig;
