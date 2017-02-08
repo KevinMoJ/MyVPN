@@ -987,4 +987,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //        sendBroadcast(intent);
     }
+
+    public void openCheckInAcivity(View v){
+        startActivity(new Intent(this, CheckInActivity.class));
+    }
 }

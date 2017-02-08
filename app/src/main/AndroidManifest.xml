@@ -23,16 +23,16 @@
             android:name=".activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.FullScreen">
-
-             <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
-             </intent-filter>
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.NewUserGuideActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen"></activity>
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" />
 
         <service
             android:name="yyf.shadowsocks.service.ShadowsocksVpnService"
@@ -88,7 +88,7 @@
         <activity
             android:name=".activity.ConnectivityActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".service.ServerListFetcherService" />
         <service
@@ -98,7 +98,7 @@
         <activity
             android:name=".activity.ServerListActivity"
             android:label="@string/server_list" />
-        <activity android:name=".activity.ShareActivity"></activity>
+        <activity android:name=".activity.ShareActivity" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -110,14 +110,14 @@
             android:authorities="com.facebook.app.FacebookContentProvider${applicationId}"
             android:exported="true" />
 
-        <activity android:name=".activity.SettingsActivity"></activity>
+        <activity android:name=".activity.SettingsActivity" />
 
         <service
             android:name=".service.TimeCountDownService"
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name=".activity.VIPActivity"></activity>
+        <activity android:name=".activity.VIPActivity" />
         <activity
             android:name=".activity.WatchVideoADDialogActivity"
             android:theme="@style/Theme.MyDialog">
@@ -142,11 +142,13 @@
         <activity
             android:name=".activity.CommonAlertActivity"
             android:theme="@style/Theme.MyDialog">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
 
         <receiver
@@ -156,8 +158,11 @@
             <intent-filter>
                 <action android:name="android.net.wifi.supplicant.STATE_CHANGE" />
             </intent-filter>
-
         </receiver>
+
+        <activity android:name=".activity.CheckInActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            ></activity>
     </application>
 
 </manifest>
