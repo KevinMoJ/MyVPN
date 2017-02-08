@@ -34,6 +34,6 @@
     <color name="dialog_red">#ED4363</color>
     <color name="button_normal">#53e9e9</color>
     <color name="button_pressed">#59dcdc</color>
-
-
+    <color name="button_normal_light">#53E9E8</color>
+    <color name="dialog_title">#3484CC</color>
 </resources>

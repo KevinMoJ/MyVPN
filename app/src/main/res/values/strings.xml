@@ -124,8 +124,10 @@
     <string name="fetch_server_list">Fetching server list</string>
     <string name="fetch_server_list_failed">Fetching server list timeout!</string>
     <string name="u_r_vip">You are VIP!</string>
+    <!--dialog -->
     <string name="dialog_time_will_use_up">Connection time will be used up.</string>
     <string name="dialog_watch_video">Watching video ads can bring you extra 1 hour connection time.</string>
+    <!--dialog 注意多语言 -->
     <string name="watch_video">go</string>
     <string name="notification_no_time">Download: %1$s, upload: %2$s</string>
     <string name="watch_video_ad">Watch video ads, get more connection time</string>
