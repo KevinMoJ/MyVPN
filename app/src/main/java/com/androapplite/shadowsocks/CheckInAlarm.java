@@ -86,7 +86,9 @@ public final class CheckInAlarm {
         }
     }
 
-    public static boolean isCheckInToday(Context context){
-        return false;
+    public static boolean alreadyCheckInToday(Context context){
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+        long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
+        return DateUtils.isToday(lastGrantTime);
     }
 }

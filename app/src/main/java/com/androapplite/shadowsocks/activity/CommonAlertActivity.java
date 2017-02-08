@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.service.TimeCountDownService;
 
 public class CommonAlertActivity extends AppCompatActivity {
     public static final int WIFI_DETECT = 1;
@@ -73,9 +76,44 @@ public class CommonAlertActivity extends AppCompatActivity {
     }
 
     public static void showAlert(Context context, int type){
-        Intent intent = new Intent(context, CommonAlertActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(ALERT_TYPE, type);
-        context.startActivity(intent);
+        boolean shouldShowAlert = false;
+        switch (type){
+            case WIFI_DETECT:
+                if(!isVPNConnected(context)){
+                    shouldShowAlert = true;
+                }
+                break;
+            case CHECK_IN:
+                if(!CheckInAlarm.alreadyCheckInToday(context)){
+                    shouldShowAlert = true;
+                }
+                break;
+            case TIME_UP:
+                shouldShowAlert = true;
+                break;
+            case APP_PRIVACY:
+                if(!isVPNConnected(context)){
+                    shouldShowAlert = true;
+                }
+                break;
+        }
+
+        if(shouldShowAlert) {
+            Intent intent = new Intent(context, CommonAlertActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(ALERT_TYPE, type);
+            context.startActivity(intent);
+        }
+
+    }
+
+    private static boolean isVPNConnected(Context context){
+        ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (TimeCountDownService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
