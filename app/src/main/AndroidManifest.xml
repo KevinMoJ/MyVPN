@@ -110,7 +110,9 @@
             android:authorities="com.facebook.app.FacebookContentProvider${applicationId}"
             android:exported="true" />
 
-        <activity android:name=".activity.SettingsActivity" />
+        <activity android:name=".activity.SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
 
         <service
             android:name=".service.TimeCountDownService"

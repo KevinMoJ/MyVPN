@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+        android:title="WIFI Detect Alert"
+        android:key="wifi_detect"
+        android:summary="show an alert when wifi is connected"
+        android:defaultValue="true"
+        />
+    <SwitchPreference
+        android:title="APP Detect Alert"
+        android:key="app_detect"
+        android:summary="show an alert when certain app is open"
+        android:defaultValue="true"
+        />
+    <SwitchPreference
+        android:title="Time Insufficient Alert"
+        android:key="time_insufficient"
+        android:summary="show an alert when connecion time is insufficient"
+        android:defaultValue="true"
+        />
+    <SwitchPreference
+        android:title="Check In Alert"
+        android:key="check_in"
+        android:summary="show an alert when you don't check in today"
+        android:defaultValue="true"
+        />
+</PreferenceScreen>
