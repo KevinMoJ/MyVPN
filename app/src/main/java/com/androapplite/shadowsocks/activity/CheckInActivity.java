@@ -3,12 +3,16 @@ package com.androapplite.shadowsocks.activity;
 import android.app.AlarmManager;
 import android.content.SharedPreferences;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -22,6 +26,11 @@ public class CheckInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_in);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         LinearLayout checkin = (LinearLayout)findViewById(R.id.checkin);
         mSmileImages = new ArrayList<>(checkin.getChildCount());
         for(int i=0; i<checkin.getChildCount(); i++){
@@ -37,6 +46,15 @@ public class CheckInActivity extends AppCompatActivity {
 
         TextView checkinSummaryTextView = (TextView)findViewById(R.id.checkin_summary);
         checkinSummaryTextView.setText(String.format("You have checked in continuously for %d day(s).", continousCheckIn));
+        GAHelper.sendScreenView(this, "签到屏幕");
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
