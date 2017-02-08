@@ -168,9 +168,18 @@
             android:name=".broadcast.CheckInAlarmReceiver"
             android:enabled="true"
             android:exported="false">
-            <!--<intent-filter>-->
-                <!--<action android:name="${applicationId}.CHECK_IN_ALARM" />-->
-            <!--</intent-filter>-->
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="${applicationId}.CHECK_IN_ALARM" /> -->
+            <!-- </intent-filter> -->
+        </receiver>
+        <receiver
+            android:name=".broadcast.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
         </receiver>
     </application>
 
