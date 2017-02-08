@@ -88,22 +88,27 @@ public class CommonAlertActivity extends AppCompatActivity {
         switch (type){
             case WIFI_DETECT:
                 lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_WIFI_ALERT, 0);
-                if(!isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
+                if(sharedPreferences.getBoolean("wifi_detect", true) &&
+                        !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
                     shouldShowAlert = true;
                     sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
                 }
                 break;
             case CHECK_IN:
-                if(!CheckInAlarm.alreadyCheckInToday(context)){
+                if(sharedPreferences.getBoolean("check_in", true) &&
+                        !CheckInAlarm.alreadyCheckInToday(context)){
                     shouldShowAlert = true;
                 }
                 break;
             case TIME_UP:
-                shouldShowAlert = true;
+                if(sharedPreferences.getBoolean("time_insufficient", true)) {
+                    shouldShowAlert = true;
+                }
                 break;
             case APP_PRIVACY:
                 lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_APP_ALERT, 0);
-                if(!isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(2)){
+                if(sharedPreferences.getBoolean("app_detect", true) &&
+                        !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(2)){
                     shouldShowAlert = true;
                 }
                 break;
