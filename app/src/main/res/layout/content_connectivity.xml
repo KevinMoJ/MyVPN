@@ -40,13 +40,13 @@
         />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="68dp"
+        android:layout_height="68dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="48dp"
         android:layout_marginRight="48dp"
-        android:src="@drawable/check_in_button"
+        android:background="@drawable/check_in_button"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:onClick="openCheckInAcivity"/>
     <FrameLayout
