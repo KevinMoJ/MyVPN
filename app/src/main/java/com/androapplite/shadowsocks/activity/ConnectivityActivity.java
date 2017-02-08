@@ -381,7 +381,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     mIsConnecting = false;
                     if(!VIPUtil.isVIP(mSharedPreference)) {
-                        TimeCountDownService.isAvailable(this);
+//                        TimeCountDownService.isAvailable(this);
                         TimeCountDownService.start(this);
                     }
                     clearConnectingTimeout();
@@ -578,9 +578,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         } else if (id == R.id.nav_about) {
             about();
             GAHelper.sendEvent(this, "菜单", "关于");
-//        } else if(id == R.id.nav_settings){
-//            startActivity(new Intent(this, SettingsActivity.class));
-//            GAHelper.sendEvent(this, "菜单", "设置");
+        } else if(id == R.id.nav_settings){
+            startActivity(new Intent(this, SettingsActivity.class));
+            GAHelper.sendEvent(this, "菜单", "设置");
         } else if(id == R.id.nav_buy_vip){
             startActivity(new Intent(this, VIPActivity.class));
             GAHelper.sendEvent(this, "菜单", "VIP");
@@ -754,7 +754,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             try {
                 mNewState = Constants.State.values()[mShadowsocksService.getState()];
                 if(mSharedPreference != null) {
-                    int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+                    int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
                     mShadowsocksService.setRemainTime(remain);
                 }
             } catch (RemoteException e) {
@@ -1152,5 +1152,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
 //        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //        sendBroadcast(intent);
+    }
+
+    public void openCheckInAcivity(View v){
+        startActivity(new Intent(this, CheckInActivity.class));
     }
 }

@@ -11,4 +11,5 @@ public final class Action {
     public static final String SERVER_LIST_FETCH_FINISH = BuildConfig.APPLICATION_ID + ".SERVER_LIST_FETCH_FINISH";
     public static final String TIME_UP = BuildConfig.APPLICATION_ID + ".TIME_UP";
     public static final String VIDEO_AD_FINISH = BuildConfig.APPLICATION_ID + ".VIDEO_AD_FINISH";
+//    public static final String CHECK_IN_ALARM = BuildConfig.APPLICATION_ID + ".CHECK_IN_ALARM";
 }

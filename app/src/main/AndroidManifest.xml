@@ -3,10 +3,8 @@
     package="com.androapplite.vpn3">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
@@ -65,15 +63,7 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.NewUserGuideActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" />
 
         <service
             android:name="yyf.shadowsocks.service.ShadowsocksVpnService"
@@ -129,15 +119,7 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.ConnectivityActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name="com.androapplite.shadowsocks.service.ServerListFetcherService" />
         <service
@@ -147,48 +129,28 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.ServerListActivity"
             android:label="@string/server_list" />
-        <activity android:name="com.androapplite.shadowsocks.activity.ShareActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-        <!--<activity-->
-            <!--android:name="com.facebook.FacebookActivity"-->
-            <!--android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"-->
-            <!--android:label="@string/app_name"-->
-            <!--android:theme="@android:style/Theme.Translucent.NoTitleBar" />-->
+        <activity android:name="com.androapplite.shadowsocks.activity.ShareActivity" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--<provider-->
             <!--android:name="com.facebook.FacebookContentProvider"-->
             <!--android:authorities="com.facebook.app.FacebookContentProvider${applicationId}"-->
             <!--android:exported="true" />-->
 
-        <activity android:name="com.androapplite.shadowsocks.activity.SettingsActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+        <activity android:name="com.androapplite.shadowsocks.activity.SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
 
         <service
             android:name="com.androapplite.shadowsocks.service.TimeCountDownService"
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+        <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity" />
         <activity
             android:name="com.androapplite.shadowsocks.activity.WatchVideoADDialogActivity"
             android:theme="@style/Theme.MyDialog">
@@ -209,6 +171,54 @@
                 <action android:name="${applicationId}.VIDEO_AD_FINISH" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.CommonAlertActivity"
+            android:theme="@style/Theme.MyDialog">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+
+        <receiver
+            android:name="com.androapplite.shadowsocks.broadcast.WIFIDetectReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.wifi.supplicant.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.CheckInActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver
+            android:name="com.androapplite.shadowsocks.broadcast.CheckInAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="${applicationId}.CHECK_IN_ALARM" /> -->
+            <!-- </intent-filter> -->
+        </receiver>
+        <receiver
+            android:name="com.androapplite.shadowsocks.broadcast.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.androapplite.shadowsocks.service.AppCheckService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

@@ -15,6 +15,7 @@ import android.text.format.DateUtils;
 
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.CommonAlertActivity;
 import com.androapplite.shadowsocks.activity.WatchVideoADDialogActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -97,8 +98,8 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                 sendTimeUpBroadcast();
             }
 
-            if(countDown == 600 || countDown == 300){
-                WatchVideoADDialogActivity.showTimeWillBeUsedUpDialog(TimeCountDownService.this);
+            if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
+                CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
             }
 //            Log.d("倒计时", countDown + "");
         }
@@ -137,19 +138,19 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     }
 
-    public static boolean isAvailable(Context context){
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-        long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
-        if(!DateUtils.isToday(lastGrantTime)){
-            int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-            countDown += 7200;
-            sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
-                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown)
-                                    .commit();
-        }
-        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        return countDown > 0;
-    }
+//    public static boolean isAvailable(Context context){
+//        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+//        long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
+//        if(!DateUtils.isToday(lastGrantTime)){
+//            int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+//            countDown += 3600;
+//            sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
+//                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown)
+//                                    .commit();
+//        }
+//        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+//        return countDown > 0;
+//    }
 
     public static void start(Context context){
         context.startService(new Intent(context, TimeCountDownService.class));

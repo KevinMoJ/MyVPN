@@ -34,6 +34,8 @@
     <color name="dialog_red">#ED4363</color>
     <color name="button_normal">#53e9e9</color>
     <color name="button_pressed">#59dcdc</color>
-
-
+    <color name="button_normal_light">#53E9E8</color>
+    <color name="dialog_title">#3484CC</color>
+    <color name="checkin_header">#7DB8E0</color>
+    <color name="checkin_body">#52B0DB</color>
 </resources>

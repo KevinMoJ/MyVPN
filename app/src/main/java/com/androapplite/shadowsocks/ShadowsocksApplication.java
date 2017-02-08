@@ -1,7 +1,9 @@
 package com.androapplite.shadowsocks;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -26,10 +28,11 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends GameApplication {
+public class ShadowsocksApplication extends GameApplication implements Application.ActivityLifecycleCallbacks {
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
+    private int mRunningActivityNum;
 
     @NonNull
     public Tracker getTracker(){
@@ -77,6 +80,9 @@ public class ShadowsocksApplication extends GameApplication {
         UMGameAgent.init(this);
         UMGameAgent.setTraceSleepTime(false);
         UMGameAgent.setSessionContinueMillis(60000L);
+
+        CheckInAlarm.startCheckInAlarm(this);
+        registerActivityLifecycleCallbacks(this);
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -93,4 +99,41 @@ public class ShadowsocksApplication extends GameApplication {
         }
     }
 
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+        mRunningActivityNum++;
+
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+        mRunningActivityNum--;
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+    }
+
+    public int getRunningActivityCount(){
+        return mRunningActivityNum;
+    }
 }

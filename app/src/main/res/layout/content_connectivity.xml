@@ -39,6 +39,16 @@
         android:layout_marginTop="@dimen/standard_margin"
         />
 
+    <ImageButton
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="48dp"
+        android:layout_marginRight="48dp"
+        android:background="@drawable/check_in_button"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:onClick="openCheckInAcivity"/>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
