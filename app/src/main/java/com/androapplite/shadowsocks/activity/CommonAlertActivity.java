@@ -38,6 +38,8 @@ public class CommonAlertActivity extends AppCompatActivity {
                 break;
             case TIME_UP:
                 alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
+                alertTitle.setText("Time Insufficient");
+                remainder.setText("You are running out of VPN connection time. Would you like to earn connection time by watching video ads?");
                 break;
             case APP_PRIVACY:
                 alertIcon.setImageResource(R.drawable.ic_android_black_24dp);

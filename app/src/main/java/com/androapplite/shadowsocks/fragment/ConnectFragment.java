@@ -54,7 +54,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
         if(!VIPUtil.isVIP(getContext())) {
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
             mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         }else{
             mMessageTextView.setText(R.string.u_r_vip);
@@ -155,7 +155,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void init(){
         if(!VIPUtil.isVIP(getContext())) {
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
             mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         }
     }
@@ -177,7 +177,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             final Context context = getContext();
             if(isVisible() && context != null) {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-                final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+                final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
                 mMessageTextView.post(new Runnable() {
                     @Override
                     public void run() {
@@ -193,7 +193,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mLoadingView.clearAnimation();
         if(!VIPUtil.isVIP(getContext())) {
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
             mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         }else{
             mMessageTextView.setText(R.string.u_r_vip);
@@ -210,7 +210,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void onResume() {
         super.onResume();
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
     }
 }

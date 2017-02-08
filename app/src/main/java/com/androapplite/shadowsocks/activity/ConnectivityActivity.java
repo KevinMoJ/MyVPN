@@ -619,7 +619,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             try {
                 mNewState = Constants.State.values()[mShadowsocksService.getState()];
                 if(mSharedPreference != null) {
-                    int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 7200);
+                    int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
                     mShadowsocksService.setRemainTime(remain);
                 }
             } catch (RemoteException e) {
