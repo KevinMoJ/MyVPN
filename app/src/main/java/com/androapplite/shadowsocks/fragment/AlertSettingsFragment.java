@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.vpn3.R;
 
 /**
  * Created by jim on 17/2/9.

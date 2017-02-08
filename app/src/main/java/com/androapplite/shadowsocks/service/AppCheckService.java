@@ -8,10 +8,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import com.androapplite.shadowsocks.BuildConfig;
-import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.CommonAlertActivity;
+import com.androapplite.vpn3.R;
 
 import java.util.Timer;
 
