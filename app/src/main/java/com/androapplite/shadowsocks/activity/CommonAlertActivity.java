@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,7 +13,11 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
+
+import java.util.concurrent.TimeUnit;
 
 public class CommonAlertActivity extends AppCompatActivity {
     public static final int WIFI_DETECT = 1;
@@ -77,10 +82,15 @@ public class CommonAlertActivity extends AppCompatActivity {
 
     public static void showAlert(Context context, int type){
         boolean shouldShowAlert = false;
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+        long lastAlert;
+        long current = System.currentTimeMillis();
         switch (type){
             case WIFI_DETECT:
-                if(!isVPNConnected(context)){
+                lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_WIFI_ALERT, 0);
+                if(!isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
                     shouldShowAlert = true;
+                    sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
                 }
                 break;
             case CHECK_IN:
@@ -92,7 +102,8 @@ public class CommonAlertActivity extends AppCompatActivity {
                 shouldShowAlert = true;
                 break;
             case APP_PRIVACY:
-                if(!isVPNConnected(context)){
+                lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_APP_ALERT, 0);
+                if(!isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(2)){
                     shouldShowAlert = true;
                 }
                 break;
