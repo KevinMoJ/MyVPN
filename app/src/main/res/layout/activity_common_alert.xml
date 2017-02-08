@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/ic_android_black_24dp"
-            android:id="@+id/alert_icon"/>
+            android:id="@+id/alert_icon"
+            android:tint="@android:color/white"/>
     </FrameLayout>
     <TextView
         android:layout_width="wrap_content"
@@ -27,7 +28,8 @@
         android:textSize="@dimen/large_text"
         android:textColor="@color/dialog_title"
         android:layout_marginTop="@dimen/half_standard_margin"
-        android:layout_marginBottom="@dimen/half_standard_margin"/>
+        android:layout_marginBottom="@dimen/half_standard_margin"
+        android:id="@+id/alert_title"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

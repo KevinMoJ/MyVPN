@@ -25,10 +25,13 @@ public class CommonAlertActivity extends AppCompatActivity {
         setContentView(R.layout.activity_common_alert);
         ImageView alertIcon = (ImageView)findViewById(R.id.alert_icon);
         TextView remainder = (TextView)findViewById(R.id.remainder);
+        TextView alertTitle = (TextView)findViewById(R.id.alert_title);
         int type = getIntent().getIntExtra(ALERT_TYPE, 0);
         switch (type){
             case WIFI_DETECT:
                 alertIcon.setImageResource(R.drawable.ic_perm_scan_wifi_black_24dp);
+                alertTitle.setText("WIFI Detection");
+                remainder.setText("Your WIFI connection may not be safe. Would you like to trun on VPN to protect your privacy?");
                 break;
             case CHECK_IN:
                 alertIcon.setImageResource(R.drawable.ic_date_range_black_24dp);
@@ -65,6 +68,7 @@ public class CommonAlertActivity extends AppCompatActivity {
 
     public static void showAlert(Context context, int type){
         Intent intent = new Intent(context, CommonAlertActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(ALERT_TYPE, type);
         context.startActivity(intent);
     }

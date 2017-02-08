@@ -9,6 +9,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.activity.CommonAlertActivity;
+
 public class WIFIDetectReceiver extends BroadcastReceiver {
     public WIFIDetectReceiver() {
     }
@@ -30,6 +32,7 @@ public class WIFIDetectReceiver extends BroadcastReceiver {
         {
             SupplicantState state = (SupplicantState) intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
             if(state == SupplicantState.COMPLETED){
+                CommonAlertActivity.showAlert(context, CommonAlertActivity.WIFI_DETECT);
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
