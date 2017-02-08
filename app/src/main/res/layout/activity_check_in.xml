@@ -44,7 +44,8 @@
             android:gravity="center"
             android:layout_marginTop="@dimen/standard_margin"
             android:layout_marginBottom="@dimen/twice_margin"
-            android:textColor="@color/primary_white_text"/>
+            android:textColor="@color/primary_white_text"
+            android:id="@+id/checkin_summary"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
