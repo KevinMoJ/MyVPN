@@ -69,7 +69,7 @@ public class ShadowsocksApplication extends Application {
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
-
+        CheckInAlarm.startCheckInAlarm(this);
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){

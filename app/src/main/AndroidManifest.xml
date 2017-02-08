@@ -160,9 +160,18 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activity.CheckInActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            ></activity>
+        <activity
+            android:name=".activity.CheckInActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver
+            android:name=".broadcast.CheckInAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <!--<intent-filter>-->
+                <!--<action android:name="${applicationId}.CHECK_IN_ALARM" />-->
+            <!--</intent-filter>-->
+        </receiver>
     </application>
 
 </manifest>
