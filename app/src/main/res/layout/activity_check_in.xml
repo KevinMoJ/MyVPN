@@ -63,7 +63,8 @@
                 android:orientation="horizontal"
                 android:background="@drawable/checkin_body_bg"
                 android:paddingTop="@dimen/half_standard_margin"
-                android:paddingBottom="@dimen/half_standard_margin">
+                android:paddingBottom="@dimen/half_standard_margin"
+                android:id="@+id/checkin">
                 <!--1-->
                 <LinearLayout
                     android:layout_width="0dp"
