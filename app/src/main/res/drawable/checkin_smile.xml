@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:maxLevel="0">
+        <shape android:shape="oval">
+            <solid android:color="@color/dhi_white_text" />
+        </shape>
+    </item>
+    <item android:drawable="@drawable/smile" android:maxLevel="1" />
+</level-list>
