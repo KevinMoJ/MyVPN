@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
@@ -63,6 +64,7 @@ public class CommonAlertActivity extends AppCompatActivity {
         int type = getIntent().getIntExtra(ALERT_TYPE, 0);
         switch (type){
             case WIFI_DETECT:
+
                 break;
             case CHECK_IN:
                 break;
@@ -71,13 +73,18 @@ public class CommonAlertActivity extends AppCompatActivity {
             case APP_PRIVACY:
                 break;
         }
+        ShadowsocksApplication application = (ShadowsocksApplication)getApplication();
+        if(application.getRunningActivityCount() < 2) {
+            startActivity(new Intent(this, SplashActivity.class));
+        }
         finish();
-        Toast.makeText(this, "yes", Toast.LENGTH_SHORT).show();
+
+//        Toast.makeText(this, "yes", Toast.LENGTH_SHORT).show();
     }
 
     public void no(View v){
         finish();
-        Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
     }
 
     public static void showAlert(Context context, int type){
@@ -87,12 +94,13 @@ public class CommonAlertActivity extends AppCompatActivity {
         long current = System.currentTimeMillis();
         switch (type){
             case WIFI_DETECT:
-                lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_WIFI_ALERT, 0);
-                if(sharedPreferences.getBoolean("wifi_detect", true) &&
-                        !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
-                    shouldShowAlert = true;
-                    sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
-                }
+//                lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_WIFI_ALERT, 0);
+//                if(sharedPreferences.getBoolean("wifi_detect", true) &&
+//                        !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
+//                    shouldShowAlert = true;
+//                    sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
+//                }
+                shouldShowAlert = true;
                 break;
             case CHECK_IN:
                 if(sharedPreferences.getBoolean("check_in", true) &&
