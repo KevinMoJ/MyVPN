@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 
+import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -42,6 +43,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         GAHelper.sendScreenView(this, "启动屏幕");
 
         ShadowsockServiceHelper.bindService(this, this);
+        CheckInAlarm.checkIn(this);
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {

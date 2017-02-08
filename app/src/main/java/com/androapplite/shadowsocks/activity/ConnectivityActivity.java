@@ -246,7 +246,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     mIsConnecting = false;
                     if(!VIPUtil.isVIP(mSharedPreference)) {
-                        TimeCountDownService.isAvailable(this);
+//                        TimeCountDownService.isAvailable(this);
                         TimeCountDownService.start(this);
                     }
                     clearConnectingTimeout();

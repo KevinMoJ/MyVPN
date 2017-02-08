@@ -138,19 +138,19 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     }
 
-    public static boolean isAvailable(Context context){
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-        long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
-        if(!DateUtils.isToday(lastGrantTime)){
-            int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-            countDown += 3600;
-            sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
-                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown)
-                                    .commit();
-        }
-        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        return countDown > 0;
-    }
+//    public static boolean isAvailable(Context context){
+//        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+//        long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
+//        if(!DateUtils.isToday(lastGrantTime)){
+//            int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+//            countDown += 3600;
+//            sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
+//                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown)
+//                                    .commit();
+//        }
+//        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+//        return countDown > 0;
+//    }
 
     public static void start(Context context){
         context.startService(new Intent(context, TimeCountDownService.class));

@@ -35,6 +35,8 @@ public class CommonAlertActivity extends AppCompatActivity {
                 break;
             case CHECK_IN:
                 alertIcon.setImageResource(R.drawable.ic_date_range_black_24dp);
+                alertTitle.setText("Check In");
+                remainder.setText("You don't check in today. Would you like to check in?");
                 break;
             case TIME_UP:
                 alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
