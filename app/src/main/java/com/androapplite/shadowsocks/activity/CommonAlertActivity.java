@@ -45,6 +45,8 @@ public class CommonAlertActivity extends AppCompatActivity {
                 break;
             case APP_PRIVACY:
                 alertIcon.setImageResource(R.drawable.ic_android_black_24dp);
+                alertTitle.setText("App Detection");
+                remainder.setText("Would you like to trun on VPN to unblock the app or protect your privacy?");
                 break;
         }
     }

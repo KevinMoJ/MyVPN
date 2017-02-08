@@ -134,4 +134,5 @@
     <string name="notitication_remain">Remain: %1$s</string>
     <string name="dialog_time_use_up">Connection time is used up!</string>
     <string name="server_not_available">The VPN server is not available right now. Plase try it later!</string>
+    <string name="private_app" translatable="false">";com.android.mms;com.tencent.mm;com.android.contacts;com.miui.gallery;com.android.gallery3d;com.sec.android.gallery3d;com.whatsapp;com.facebook.katana;jp.naver.line.android;com.instagram.android;com.twitter.android;com.kakao.talk;com.google.android.apps.plus;com.google.android.contacts;com.google.android.dialer;com.google.android.apps.photos;com.google.android.apps.messaging;com.android.chrome;com.google.android.talk;"</string>
 </resources>
