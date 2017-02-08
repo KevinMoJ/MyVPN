@@ -34,7 +34,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new AlertSettingsFragment())
+                .replace(R.id.content, new AlertSettingsFragment())
                 .commit();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
