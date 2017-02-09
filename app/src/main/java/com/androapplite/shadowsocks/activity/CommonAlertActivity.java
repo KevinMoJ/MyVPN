@@ -94,13 +94,13 @@ public class CommonAlertActivity extends AppCompatActivity {
         long current = System.currentTimeMillis();
         switch (type){
             case WIFI_DETECT:
-//                lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_WIFI_ALERT, 0);
-//                if(sharedPreferences.getBoolean("wifi_detect", true) &&
-//                        !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
-//                    shouldShowAlert = true;
-//                    sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
-//                }
-                shouldShowAlert = true;
+                lastAlert = sharedPreferences.getLong(SharedPreferenceKey.LAST_WIFI_ALERT, 0);
+                if(sharedPreferences.getBoolean("wifi_detect", true) &&
+                        !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(1)){
+                    shouldShowAlert = true;
+                    sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
+                }
+//                shouldShowAlert = true;
                 break;
             case CHECK_IN:
                 if(sharedPreferences.getBoolean("check_in", true) &&
