@@ -230,7 +230,7 @@ public class ShadowsocksVpnService extends BaseService {
         }  TODO 添加 ipv6 支持 */
 
 
-        builder.addRoute("8.8.0.0", 16);
+//        builder.addRoute("8.8.0.0", 16);
         builder.addRoute("0.0.0.0", 0);
 
 //        String  list[];
