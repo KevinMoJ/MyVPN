@@ -250,7 +250,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         TimeCountDownService.start(this);
                     }
                     clearConnectingTimeout();
-                    if(mShadowsocksService != null && mShadowsocksService != null){
+                    if(mShadowsocksService != null && mSharedPreference != null){
                         int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
                         try {
                             mShadowsocksService.setRemainTime(remain);
@@ -325,6 +325,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 try {
                     int state = mShadowsocksService.getState();
                     mNewState = Constants.State.values()[state];
+                    updateConnectionState();
                 } catch (RemoteException e) {
                     ShadowsocksApplication.handleException(e);
                 }
