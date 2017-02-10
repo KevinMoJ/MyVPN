@@ -7,11 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.*;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.BuildConfig;
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -431,19 +435,42 @@ public class ShadowsocksVpnService extends BaseService {
             }
 
             ShadowsocksApplication.debug("ss-vpn", "resolved:" + resolved);
-            if (resolved && handleConnection()) {
-                changeState(Constants.State.CONNECTED);
-                mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
-                boolean b = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.NOTIFICATION, true);
-                if(!b){
-                    mShadowsocksNotification.disableNotification();
+            if(resolved){
+                if(handleConnection()){
+                    changeState(Constants.State.CONNECTED);
+                    mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
+                    boolean b = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.NOTIFICATION, true);
+                    if(!b){
+                        mShadowsocksNotification.disableNotification();
+                    }
+                }else{
+                    String network = getConnectivityStateString();
+                    GAHelper.sendEvent(this, "State.Error", "无法创建", network + " " + config.getProxy());
+                    stopRunnerForError();
                 }
-//                mNativeProcessMonitorThread = new NativeProcessMonitorThread(this);
-//                mNativeProcessMonitorThread.start();
-            } else {
+            }else{
+                String network = getConnectivityStateString();
+                GAHelper.sendEvent(this, "State.Error", "DNS解析错误", network + " " + config.getProxy());
                 stopRunnerForError();
             }
         }
+    }
+
+    @NonNull
+    private String getConnectivityStateString() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        String network = "不知道";
+        if(connectivityManager != null){
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if(networkInfo != null){
+                network = networkInfo.getTypeName() + " 连接" + networkInfo.isConnected();
+            }else{
+                network = "没有可用网络";
+            }
+        }else{
+            network = "没有连接服务";
+        }
+        return network;
     }
 
     public boolean handleConnection() {
