@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -35,7 +36,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private Button mConnectButton;
     private ImageView mLoadingView;
     private Timer mCountDownTimer;
-
+    private Handler mUpdateStateHandler;
+    private Runnable mUpdateStateDelayedRunable;
 
     public ConnectFragment() {
         // Required empty public constructor
@@ -59,7 +61,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         }else{
             mMessageTextView.setText(R.string.u_r_vip);
         }
-
         return view;
     }
 
@@ -148,6 +149,18 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                     error();
                     break;
             }
+        }else if(mUpdateStateHandler == null){
+            mUpdateStateHandler = new Handler();
+            mUpdateStateDelayedRunable = new Runnable() {
+                @Override
+                public void run() {
+                    setConnectResult(state);
+                    mUpdateStateHandler.removeCallbacks(mUpdateStateDelayedRunable);
+                    mUpdateStateHandler = null;
+                    mUpdateStateDelayedRunable = null;
+                }
+            };
+            mUpdateStateHandler.postDelayed(mUpdateStateDelayedRunable, 100);
         }
 
     }
@@ -168,6 +181,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         }else{
             mMessageTextView.setText(R.string.connected);
         }
+        mConnectButton.setText(R.string.disconnect);
     }
 
     private class CountDownTimerTask extends TimerTask{
@@ -212,5 +226,15 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
         final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(mUpdateStateHandler != null){
+            mUpdateStateHandler.removeCallbacks(mUpdateStateDelayedRunable);
+            mUpdateStateHandler = null;
+            mUpdateStateDelayedRunable = null;
+        }
     }
 }
