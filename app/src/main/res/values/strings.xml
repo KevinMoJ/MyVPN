@@ -118,4 +118,7 @@
     <string name="disconnect_to_refresh">Disconnect vpn to refresh?</string>
     <string name="start_using">Start Using</string>
     <string name="notification_no_time">Download: %1$s, upload: %2$s</string>
+    <string name="fetch_server_list">Fetching server list</string>
+    <string name="fetch_server_list_failed">Fetching server list timeout!</string>
+    <string name="server_not_available">The VPN server is not available right now. Plase try it later!</string>
 </resources>

@@ -1,12 +1,15 @@
 package com.androapplite.shadowsocks.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.annotation.DrawableRes;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,6 +26,7 @@ public class ServerConfig {
     public String flag;
     public String nation;
     public int signal;
+    public int port;
 
     public static final int[] SINAL_IMAGES = {
             R.drawable.server_signal_1,
@@ -31,20 +35,7 @@ public class ServerConfig {
             R.drawable.server_signal_4
     };
 
-//    public ServerConfig(JSONObject json){
-//        try{
-//            name = json.optString("name", null);
-//            server = json.optString("server", null);
-//            flag = json.optString("flag", null);
-//            nation = json.optString("nation", null);
-//            signal = json.optInt("signal", 0);
-//            if(signal < 0 || signal > SINAL_IMAGES.length){
-//                signal = 0;
-//            }
-//        }catch (Exception e){
-//            ShadowsocksApplication.handleException(e);
-//        }
-//    }
+    private static final int DEFAULT_PORT = 40010;
 
     private static ServerConfig addGlobalConfig(Resources resources){
         String name = resources.getString(R.string.vpn_name_opt);
@@ -55,12 +46,19 @@ public class ServerConfig {
     }
 
     public ServerConfig(String name, String server, String flag, String nation, int signal){
+        this(name, server, flag, nation, signal, DEFAULT_PORT);
+    }
+
+    public ServerConfig(String name, String server, String flag, String nation, int signal, int port){
         this.name = name;
         this.server = server;
         this.flag = flag;
         this.nation = nation;
         this.signal = signal;
+        this.port = port;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -83,6 +81,7 @@ public class ServerConfig {
             JSONArray cityArray = jsonObject.optJSONArray("city");
             JSONArray ipArray = jsonObject.optJSONArray("ip");
             JSONArray signalArray = jsonObject.optJSONArray("signal");
+            JSONArray portArray = jsonObject.optJSONArray("port");
 
 
             if(cityArray != null && ipArray != null && signalArray != null){
@@ -103,27 +102,22 @@ public class ServerConfig {
                     String city = cityArray.optString(i);
                     int index = nameList.indexOf(city);
                     if(index > -1) {
-                        String ip = ipArray.optString(i);
-                        int signal = signalArray.optInt(i);
                         String nation = nations.getString(index);
                         String icon = resources.getResourceEntryName(icons.getResourceId(index, R.drawable.ic_flag_global));
-                        ServerConfig serverConfig = new ServerConfig(city, ip, icon, nation, signal);
+                        String ip = ipArray.optString(i);
+                        int signal = signalArray.optInt(i);
+                        ServerConfig serverConfig = null;
+                        if(portArray != null){
+                            int port = portArray.optInt(i);
+                            serverConfig = new ServerConfig(city, ip, icon, nation, signal, port);
+                        }else {
+                            serverConfig = new ServerConfig(city, ip, icon, nation, signal);
+                        }
                         arrayList.add(serverConfig);
                     }
                 }
             }
 
-
-//            JSONArray jsonArray = new JSONArray(jsonArrayString);
-//            if(jsonArray.length() > 0){
-//                arrayList = new ArrayList<>(jsonArray.length() + 1);
-//                arrayList.add(addGlobalConfig(context.getResources()));
-//                for(int i=0; i< jsonArray.length(); i++){
-//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                    ServerConfig serverConfig = new ServerConfig(jsonObject);
-//                    arrayList.add(serverConfig);
-//                }
-//            }
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
@@ -155,4 +149,29 @@ public class ServerConfig {
         return SINAL_IMAGES[signal];
     }
 
+    public void saveInSharedPreference(SharedPreferences sharedPreferences) {
+        sharedPreferences.edit()
+                .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, name)
+                .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, server)
+                .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, flag)
+                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, nation)
+                .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, signal)
+                .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT,port)
+                .commit();
+    }
+
+    public static ServerConfig loadFromSharedPreference(SharedPreferences sharedPreferences){
+        String vpnName = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+        String server = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+        String flag = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+        String nation = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+        int signal = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
+        int port = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_PORT, DEFAULT_PORT);
+        if(vpnName != null && server != null && flag != null && nation != null){
+            return new ServerConfig(vpnName, server, flag, nation, signal, port);
+        }else{
+            return null;
+        }
+
+    }
 }
