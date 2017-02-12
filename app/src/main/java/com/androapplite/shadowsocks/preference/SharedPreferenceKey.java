@@ -22,9 +22,9 @@ public final class SharedPreferenceKey {
     public static final String EXPIRED_DATE = "EXPIRED_DATE";
     public static final String CONNECTING_VPN_PORT = "CONNECTING_VPN_PORT";
     public static final String CONITNUOUSE_CHECK_IN = "CONITNUOUSE_CHECK_IN";
-    public static final String CHECK_IN_7_DAYS = "CHECK_IN_7_DAYS";
     public static final String LAST_WIFI_ALERT = "LAST_WIFI_ALERT";
     public static final String LAST_APP_ALERT = "LAST_APP_ALERT";
+    public static final String CONNECT_ERROR_COUNT = "CONNECT_ERROR_COUNT";
 
 
 }

@@ -3,8 +3,11 @@ package com.androapplite.shadowsocks.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import yyf.shadowsocks.broadcast.Action;
 
@@ -17,6 +20,8 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
         if(intent != null) {
             String action = intent.getAction();
             long duration = intent.getLongExtra(yyf.shadowsocks.preferences.SharedPreferenceKey.DURATION, 0);
+            SharedPreferences sharedPreferences;
+            int errorCount;
             switch (action){
                 case Action.INIT:
                     break;
@@ -27,7 +32,10 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     }
                     break;
                 case Action.CONNECTED:
-                    GAHelper.sendEvent(context, "VPN状态", "连接成功");
+                    sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+                    errorCount = sharedPreferences.getInt(SharedPreferenceKey.CONNECT_ERROR_COUNT, 0);
+                    GAHelper.sendEvent(context, "VPN状态", "连接成功", "连续错误" + errorCount);
+                    sharedPreferences.edit().remove(SharedPreferenceKey.CONNECT_ERROR_COUNT).commit();
                     if(duration > 0){
                         GAHelper.sendTimingEvent(context, "VPN计时", "连接", duration);
                     }
@@ -45,7 +53,10 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     }
                     break;
                 case Action.ERROR:
-                    GAHelper.sendEvent(context, "VPN状态", "错误");
+                    sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+                    errorCount = sharedPreferences.getInt(SharedPreferenceKey.CONNECT_ERROR_COUNT, 1);
+                    GAHelper.sendEvent(context, "VPN状态", "错误", String.valueOf(errorCount));
+                    sharedPreferences.edit().putInt(SharedPreferenceKey.CONNECT_ERROR_COUNT, errorCount + 1).commit();
                     if(duration > 0){
                         GAHelper.sendTimingEvent(context, "VPN计时", "错误", duration);
                     }
