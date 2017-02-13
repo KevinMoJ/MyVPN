@@ -41,12 +41,14 @@ public class WatchVideoADDialogActivity extends AppCompatActivity {
     public static void showTimeWillBeUsedUpDialog(Context context){
         Intent intent = new Intent(context, WatchVideoADDialogActivity.class);
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         context.startActivity(intent);
     }
 
     public static void showTimeUsedUpDialog(Context context){
         Intent intent = new Intent(context, WatchVideoADDialogActivity.class);
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra(TIME_USE_UP, true);
         context.startActivity(intent);
     }

@@ -125,6 +125,7 @@ public class CommonAlertActivity extends AppCompatActivity {
         if(shouldShowAlert) {
             Intent intent = new Intent(context, CommonAlertActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.putExtra(ALERT_TYPE, type);
             context.startActivity(intent);
         }
