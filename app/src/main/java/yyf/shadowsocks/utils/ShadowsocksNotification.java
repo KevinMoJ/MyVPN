@@ -2,6 +2,7 @@ package yyf.shadowsocks.utils;
 
 import android.app.KeyguardManager;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -14,6 +15,7 @@ import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.TimeUtils;
 
 import com.androapplite.vpn3.R;
@@ -51,7 +53,6 @@ public class ShadowsocksNotification {
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
         mBuilder = new NotificationCompat.Builder(mService)
-                .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large))
                 .setColor(mService.getResources().getColor(R.color.colorPrimary))
@@ -77,7 +78,8 @@ public class ShadowsocksNotification {
                 if(remain > 0) {
                     mBuilder.setSubText(String.format(mService.getString(R.string.notitication_remain), DateUtils.formatElapsedTime(remain)));
                 }
-                mService.startForeground(1, mBuilder.build());
+                final Notification notification = mBuilder.build();
+                mService.startForeground(1, notification);
 
             }
         };
