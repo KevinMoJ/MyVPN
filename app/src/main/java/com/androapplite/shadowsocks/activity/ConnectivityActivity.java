@@ -251,7 +251,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if (msg.what == 1000) {
                 if (ngsLoaded) {
                     try {
-                        Plugins.adNgs(NAME, -1);
+                        if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                            Plugins.adNgs(NAME, -1);
+                        }
                     } catch (Exception ex) {}
                 } else {
                     handler1.sendEmptyMessageDelayed(1000, 200);
@@ -350,7 +352,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     break;
                 case CONNECTED:
                     try {
-                        Plugins.adNgs(NAME, -1);
+                        if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                            Plugins.adNgs(NAME, -1);
+                        }
                     } catch (Exception ex) {
                     }
 
@@ -854,7 +858,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                 }
                 try {
-                    Plugins.adNgs(NAME, -1);
+                    if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                        Plugins.adNgs(NAME, -1);
+                    }
                 } catch (Exception ex) {
                 }
             }else if(requestCode == OPEN_SERVER_LIST){
@@ -1142,7 +1148,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             try {
                 if (ngsLoaded) {
                     watchedVideoFinish = false;
-                    Plugins.adNgs(NAME, -1);
+                    if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                        Plugins.adNgs(NAME, -1);
+                    }
                 }
             } catch (Exception ex) {
             }
