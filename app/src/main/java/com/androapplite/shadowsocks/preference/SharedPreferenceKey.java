@@ -25,6 +25,6 @@ public final class SharedPreferenceKey {
     public static final String LAST_WIFI_ALERT = "LAST_WIFI_ALERT";
     public static final String LAST_APP_ALERT = "LAST_APP_ALERT";
     public static final String CONNECT_ERROR_COUNT = "CONNECT_ERROR_COUNT";
-
+    public static final String FIRST_CONNECT_SUCCESS = "FIRST_CONNECT_SUCCESS";
 
 }

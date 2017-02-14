@@ -35,7 +35,10 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
                     errorCount = sharedPreferences.getInt(SharedPreferenceKey.CONNECT_ERROR_COUNT, 0);
                     GAHelper.sendEvent(context, "VPN状态", "连接成功", "连续错误" + errorCount);
-                    sharedPreferences.edit().remove(SharedPreferenceKey.CONNECT_ERROR_COUNT).commit();
+                    sharedPreferences.edit()
+                            .putBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, true)
+                            .remove(SharedPreferenceKey.CONNECT_ERROR_COUNT)
+                            .commit();
                     if(duration > 0){
                         GAHelper.sendTimingEvent(context, "VPN计时", "连接", duration);
                     }
