@@ -118,6 +118,7 @@ public class CommonAlertActivity extends AppCompatActivity {
                 if(sharedPreferences.getBoolean("app_detect", true) &&
                         !isVPNConnected(context) && current - lastAlert > TimeUnit.HOURS.toMillis(2)){
                     shouldShowAlert = true;
+                    sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_APP_ALERT, current).commit();
                 }
                 break;
         }
