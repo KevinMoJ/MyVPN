@@ -170,8 +170,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     if (!watchedVideoFinish) {
                         watchedVideoFinish = true;
-                        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-                        sendBroadcast(intent);
+
+                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
+                        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+                        countDown += 3600;
+                        sharedPreferences.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
+//                        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
+//                        sendBroadcast(intent);
                     }
                 }
             }
@@ -211,8 +216,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             public void onAdEnd(boolean b) {
                 if (!watchedVideoFinish) {
                     watchedVideoFinish = true;
-                    Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-                    sendBroadcast(intent);
+
+                    SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
+                    int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+                    countDown += 3600;
+                    sharedPreferences.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
+
+//                    Intent intent = new Intent(Action.VIDEO_AD_FINISH);
+//                    sendBroadcast(intent);
                 }
             }
 
@@ -1150,6 +1161,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     watchedVideoFinish = false;
                     if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
                         Plugins.adNgs(NAME, -1);
+                        ngsLoaded = false;
                     }
                 }
             } catch (Exception ex) {
