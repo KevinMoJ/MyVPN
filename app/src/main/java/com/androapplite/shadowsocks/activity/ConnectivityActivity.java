@@ -49,6 +49,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -170,11 +171,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     if (!watchedVideoFinish) {
                         watchedVideoFinish = true;
-
-                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
-                        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-                        countDown += 3600;
-                        sharedPreferences.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
+                        WatchVideoADCallbackReceiver.increaseCountDown(ConnectivityActivity.this);
 //                        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //                        sendBroadcast(intent);
                     }
@@ -216,12 +213,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             public void onAdEnd(boolean b) {
                 if (!watchedVideoFinish) {
                     watchedVideoFinish = true;
-
-                    SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this);
-                    int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-                    countDown += 3600;
-                    sharedPreferences.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
-
+                    WatchVideoADCallbackReceiver.increaseCountDown(ConnectivityActivity.this);
 //                    Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //                    sendBroadcast(intent);
                 }
