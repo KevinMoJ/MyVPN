@@ -128,7 +128,11 @@ public class CommonAlertActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.putExtra(ALERT_TYPE, type);
-            context.startActivity(intent);
+            try {
+                context.startActivity(intent);
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
+            }
         }
 
     }
