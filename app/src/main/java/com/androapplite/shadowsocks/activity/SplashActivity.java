@@ -18,6 +18,7 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.service.VpnStatusMonitorService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +43,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         GAHelper.sendScreenView(this, "启动屏幕");
 
         ShadowsockServiceHelper.bindService(this, this);
+        VpnStatusMonitorService.startService(this);
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {

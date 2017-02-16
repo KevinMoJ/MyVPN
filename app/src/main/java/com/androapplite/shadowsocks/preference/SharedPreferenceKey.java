@@ -20,4 +20,5 @@ public final class SharedPreferenceKey {
     public static final String CONNECTING_VPN_PORT = "CONNECTING_VPN_PORT";
     public static final String CONNECT_ERROR_COUNT = "CONNECT_ERROR_COUNT";
     public static final String FIRST_CONNECT_SUCCESS = "FIRST_CONNECT_SUCCESS";
+    public static final String UUID = "UUID";
 }
