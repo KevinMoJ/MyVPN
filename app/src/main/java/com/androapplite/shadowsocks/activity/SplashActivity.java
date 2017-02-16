@@ -43,7 +43,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         GAHelper.sendScreenView(this, "启动屏幕");
 
         ShadowsockServiceHelper.bindService(this, this);
-        VpnStatusMonitorService.startService(this);
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
