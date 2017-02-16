@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -31,6 +32,7 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
     private IShadowsocksService mVpnService;
     private boolean mHasRate;
     private long mStartMilli;
+    private long mInitialMilli;
 
 
     public VpnStatusMonitorService() {
@@ -53,8 +55,9 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
             sharedPreferences.edit().putString(SharedPreferenceKey.UUID, mUuid).commit();
         }
         ShadowsockServiceHelper.bindService(this, this);
-        mHasRate = false;
+        mHasRate = true;
         mStartMilli = System.currentTimeMillis();
+        mInitialMilli = mStartMilli;
     }
 
     @Override
@@ -63,9 +66,9 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
         long current = System.currentTimeMillis();
         long spanSecond = (current - mStartMilli)/1000;
         if(mHasRate){
-            Log.d("vpn 状态", "速度时长 " + spanSecond);
+            GAHelper.sendEvent(this, "VPN速度状态", mUuid, "有速度 " + spanSecond);
         }else{
-            Log.d("vpn 状态", "没速度时长 " + spanSecond);
+            GAHelper.sendEvent(this, "VPN速度状态", mUuid, "无速度 " + spanSecond);
         }
         removeNoRateDetectHandler();
         if(mVpnService != null) {
@@ -118,7 +121,7 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
                     long spanSecond = (current - mStartMilli)/1000;
                     mStartMilli = current;
                     mHasRate = true;
-                    Log.d("vpn 状态", "没速度时长 " + spanSecond);
+                    GAHelper.sendEvent(VpnStatusMonitorService.this, "VPN速度状态", mUuid, "无速度 " + spanSecond);
                 }else {
                     removeNoRateDetectHandler();
                 }
@@ -132,11 +135,11 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
     private Runnable mNoRateDetectRunnable = new Runnable() {
         @Override
         public void run() {
-            if(mHasRate == true){
+            if(mHasRate == true && mStartMilli > mInitialMilli){
                 long current = System.currentTimeMillis() - ONE_MINUTE;
                 long spanSecond = (current - mStartMilli)/1000;
                 mStartMilli = current;
-                Log.d("vpn 状态", "速度时长 " + spanSecond);
+                GAHelper.sendEvent(VpnStatusMonitorService.this, "VPN速度状态", mUuid, "有速度 " + spanSecond);
             }
             mHasRate = false;
         }
