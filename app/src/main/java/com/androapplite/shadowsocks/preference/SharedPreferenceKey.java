@@ -26,5 +26,6 @@ public final class SharedPreferenceKey {
     public static final String LAST_APP_ALERT = "LAST_APP_ALERT";
     public static final String CONNECT_ERROR_COUNT = "CONNECT_ERROR_COUNT";
     public static final String FIRST_CONNECT_SUCCESS = "FIRST_CONNECT_SUCCESS";
+    public static final String EXTENT_1H_ALERT = "EXTENT_1H_ALERT";
 
 }

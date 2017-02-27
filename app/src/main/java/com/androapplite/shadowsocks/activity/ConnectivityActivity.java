@@ -43,6 +43,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
@@ -136,6 +137,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
         mErrorServers = new HashSet<>();
+        boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
+        if(extent1hAlert){
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setMessage("Vpn connection is extented")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .create();
+            alertDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+            alertDialog.show();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
+        }
     }
 
     private void initForegroundBroadcastIntentFilter(){

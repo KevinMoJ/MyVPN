@@ -78,6 +78,8 @@ public class CommonAlertActivity extends AppCompatActivity {
             case APP_PRIVACY:
                 break;
             case EXENT_1_HOUR:
+                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, true).commit();
                 TimeCountDownService.start(this);
                 break;
         }
