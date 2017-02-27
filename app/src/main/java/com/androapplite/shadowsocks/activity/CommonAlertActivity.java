@@ -25,6 +25,7 @@ public class CommonAlertActivity extends AppCompatActivity {
     public static final int CHECK_IN = 2;
     public static final int TIME_UP = 3;
     public static final int APP_PRIVACY = 4;
+    public static final int EXENT_1_HOUR = 5;
     private static final String ALERT_TYPE = "ALERT_TYPE";
 
 
@@ -57,6 +58,11 @@ public class CommonAlertActivity extends AppCompatActivity {
                 alertTitle.setText("App Detection");
                 remainder.setText("Would you like to trun on VPN to unblock the app or protect your privacy?");
                 break;
+            case EXENT_1_HOUR:
+                alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
+                alertTitle.setText("VPN will be stopped");
+                remainder.setText("VPN connection only lasts 1 hour once. Would you like to extent 1 hour, if remaining time permits?");
+                break;
         }
     }
 
@@ -64,7 +70,6 @@ public class CommonAlertActivity extends AppCompatActivity {
         int type = getIntent().getIntExtra(ALERT_TYPE, 0);
         switch (type){
             case WIFI_DETECT:
-
                 break;
             case CHECK_IN:
                 break;
@@ -78,13 +83,10 @@ public class CommonAlertActivity extends AppCompatActivity {
             startActivity(new Intent(this, SplashActivity.class));
         }
         finish();
-
-//        Toast.makeText(this, "yes", Toast.LENGTH_SHORT).show();
     }
 
     public void no(View v){
         finish();
-//        Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
     }
 
     public static void showAlert(Context context, int type){
@@ -100,7 +102,6 @@ public class CommonAlertActivity extends AppCompatActivity {
                     shouldShowAlert = true;
                     sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_WIFI_ALERT, current).commit();
                 }
-//                shouldShowAlert = true;
                 break;
             case CHECK_IN:
                 if(sharedPreferences.getBoolean("check_in", true) &&
@@ -120,6 +121,9 @@ public class CommonAlertActivity extends AppCompatActivity {
                     shouldShowAlert = true;
                     sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_APP_ALERT, current).commit();
                 }
+                break;
+            case EXENT_1_HOUR:
+                shouldShowAlert = true;
                 break;
         }
 

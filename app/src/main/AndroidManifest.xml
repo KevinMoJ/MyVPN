@@ -146,6 +146,7 @@
             android:name=".activity.CommonAlertActivity"
             android:theme="@style/Theme.MyDialog"
             android:exported="true"
+            android:launchMode="singleTop"
             >
 
             <!-- <intent-filter> -->
