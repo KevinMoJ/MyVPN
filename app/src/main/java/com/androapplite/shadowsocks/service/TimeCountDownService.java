@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -34,7 +35,8 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     private DisconnectReceiver mDisconnectReceiver;
     private Timer mTimeTickTimer;
     private IShadowsocksService mShadowsocksService;
-
+    private int m1hCountDown;
+    private static final String KEEP_CONNECT = "KEEP_CONNECT";
 
     public TimeCountDownService() {
     }
@@ -52,6 +54,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         registerTimeTickTimer();
         registerTimeUpBroadcast();
         registerDisconnectReceiver();
+        m1hCountDown = 0;
     }
 
     private void registerTimeTickTimer(){
@@ -94,14 +97,23 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
             if(countDown > 0) {
                 mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown - 1).commit();
+
+                if(--m1hCountDown <= 0){
+                    sendTimeUpBroadcast();
+                }
+                Log.d("m1hCountDown", m1hCountDown + " ");
+                if(countDown > m1hCountDown){
+                    if(m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
+                        //提示用户延长一小时
+                    }
+                }else{
+                    if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
+                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
+                    }
+                }
             }else {
                 sendTimeUpBroadcast();
             }
-
-            if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
-                CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
-            }
-//            Log.d("倒计时", countDown + "");
         }
     }
 
@@ -138,19 +150,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     }
 
-//    public static boolean isAvailable(Context context){
-//        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-//        long lastGrantTime = sharedPreferences.getLong(SharedPreferenceKey.LAST_GRANT_TIME, 0);
-//        if(!DateUtils.isToday(lastGrantTime)){
-//            int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-//            countDown += 3600;
-//            sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_GRANT_TIME, System.currentTimeMillis())
-//                                    .putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown)
-//                                    .commit();
-//        }
-//        int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-//        return countDown > 0;
-//    }
 
     public static void start(Context context){
         context.startService(new Intent(context, TimeCountDownService.class));
@@ -161,5 +160,12 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         public void onReceive(Context context, Intent intent) {
             stopSelf();
         }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        m1hCountDown += countDown > 3600 ? 3600 : countDown;
+        return super.onStartCommand(intent, flags, startId);
     }
 }
