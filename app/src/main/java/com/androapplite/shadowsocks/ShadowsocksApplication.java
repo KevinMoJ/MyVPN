@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.crashlytics.android.Crashlytics;
@@ -17,8 +18,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.smartads.Plugins;
-import com.smartads.plugin.GameApplication;
 import com.umeng.analytics.game.UMGameAgent;
 
 import io.fabric.sdk.android.Fabric;
@@ -26,7 +25,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends GameApplication {
+public class ShadowsocksApplication extends Application {
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
@@ -74,9 +73,7 @@ public class ShadowsocksApplication extends GameApplication {
         AppEventsLogger.activateApp(this);
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
 
-        UMGameAgent.init(this);
-        UMGameAgent.setTraceSleepTime(false);
-        UMGameAgent.setSessionContinueMillis(60000L);
+        AdAppHelper.getInstance(getApplicationContext()).init();
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){

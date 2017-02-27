@@ -60,6 +60,7 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
@@ -67,10 +68,6 @@ import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.smartads.Plugins;
-import com.smartads.ads.AdBannerType;
-import com.smartads.ads.AdType;
-import com.smartads.plugin.PluginAdListener;
 import com.facebook.FacebookSdk;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.Glide;
@@ -79,6 +76,7 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.request.target.SimpleTarget;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.facebook.appevents.AppEventsLogger;
+import com.umeng.analytics.game.UMGameAgent;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -121,8 +119,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Runnable mConnectingTimeoutRunnable;
     private HashSet<ServerConfig> mErrorServers;
 
-    boolean showFirst = false;
-
     public static final String NAME = "ConnectivityActivity";
 
     @Override
@@ -142,48 +138,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initConnectivityReceiver();
         initVpnFlagAndNation();
 
-        Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
-        Plugins.initBannerAd(ConnectivityActivity.NAME);
-        Plugins.initNativeAd(ConnectivityActivity.NAME);
-        Plugins.initNgsAd(ConnectivityActivity.NAME);
-
-        Plugins.setPluginAdListener(new PluginAdListener() {
-            @Override
-            public void onReceiveAd(String s, AdType adType) {
-                if (adType == AdType.Ngs) {
-                    ngsLoaded = true;
-                } else if (adType == AdType.Native) {
-                    nativeLoaded = true;
-                }
-            }
-
-            @Override
-            public void onAdClosed(String s, AdType adType) {
-                if (adType == AdType.Ngs) {
-                    try {
-                        Plugins.loadNewNgsAd(NAME);
-                    } catch (Exception ex) {
-                    }
-                }
-            }
-        });
-
-        ngsLoaded = false;
-        nativeLoaded = false;
-
-        try {
-            int width = (int)(getResources().getDisplayMetrics().density * 300);
-            int height = (int)(getResources().getDisplayMetrics().density * 250);
-            Plugins.loadNewNativeAd(NAME, width, height);
-            Plugins.loadNewBannerAd(NAME);
-            Plugins.loadNewNgsAd(NAME);
-        } catch (Exception ex) {
-        }
+        GAHelper.sendEvent(this, "广告", "屏幕浏览", "首页");
+        UMGameAgent.onEvent(getApplicationContext(), "shouye");
+        AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
+        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
+        AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
 
         FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
-            container.addView(Plugins.adBanner(NAME), params);
+            container.addView(AdAppHelper.getInstance(getApplicationContext()).getBanner(), params);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -221,17 +185,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private boolean startUp = false;
-    private boolean ngsLoaded = false;
     private boolean showResumeAd = false;
-    public static boolean nativeLoaded = false;
+    private boolean hasShowResumeAd = false;
     private Handler handler1 = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 1000) {
-                if (ngsLoaded) {
+                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded() && !hasShowResumeAd) {
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            Plugins.adNgs(NAME, -1);
+                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+                            showResumeAd = true;
                         }
                     } catch (Exception ex) {}
                 } else {
@@ -302,18 +266,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 case CONNECTED:
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            Plugins.adNgs(NAME, -1);
+                            GAHelper.sendEvent(this, "广告", "点击功能按钮");
+                            UMGameAgent.onEvent(getApplicationContext(), "gnan");
+                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+                            showResumeAd = true;
                         }
                     } catch (Exception ex) {
                     }
 
                     if (!startUp) {
-                    try {
-                    Plugins.loadNewBannerAd(NAME);
-                    Plugins.loadNewNgsAd(NAME);
-                    } catch (Exception ex) {
-                    }
-                    startUp = true;
+                        startUp = true;
+                        AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
+                        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
+                        AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
                     }
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
@@ -731,7 +696,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onDestroy() {
-        Plugins.onDestroy(NAME);
         super.onDestroy();
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
@@ -760,17 +724,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onResume() {
-        Plugins.onResume(NAME, this.getApplicationContext());
+        AdAppHelper.getInstance(getApplicationContext()).onResume();
         super.onResume();
 
         if (!showResumeAd) {
             try {
                 if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                    Plugins.adNgs(NAME, -1);
+                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
+                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+                        hasShowResumeAd = true;
+                        showResumeAd = true;
+                    }
                 }
             } catch (Exception ex) {
             }
-            showResumeAd = true;
         } else {
             showResumeAd = false;
         }
@@ -778,7 +745,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onPause() {
-        Plugins.onPause(NAME, this.getApplicationContext());
+        AdAppHelper.getInstance(getApplicationContext()).onPause();
         super.onPause();
     }
 
@@ -797,7 +764,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 try {
                     if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                        Plugins.adNgs(NAME, -1);
+                        GAHelper.sendEvent(this, "广告", "点击功能按钮");
+                        UMGameAgent.onEvent(getApplicationContext(), "gnan");
+                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+                        showResumeAd = true;
                     }
                 } catch (Exception ex) {
                 }
