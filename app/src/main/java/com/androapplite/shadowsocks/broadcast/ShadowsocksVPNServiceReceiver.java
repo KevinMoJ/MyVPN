@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.service.VpnStatusMonitorService;
 
 import yyf.shadowsocks.broadcast.Action;
 
@@ -42,6 +43,7 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     if(duration > 0){
                         GAHelper.sendTimingEvent(context, "VPN计时", "连接", duration);
                     }
+                    VpnStatusMonitorService.startService(context);
                     break;
                 case Action.STOPPING:
                     GAHelper.sendEvent(context, "VPN状态", "开始断开");

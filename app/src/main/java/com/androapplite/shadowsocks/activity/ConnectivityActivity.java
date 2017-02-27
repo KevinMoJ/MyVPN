@@ -1030,7 +1030,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     connectVpnServerAsync();
                 }
                 GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
-
+                if(mSharedPreference != null) {
+                    String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
+                    GAHelper.sendEvent(this, "连接VPN", "选择国家", nation);
+                }
             } else {
                 DisconnectFragment disconnectFragment = new DisconnectFragment();
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
