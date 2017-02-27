@@ -77,10 +77,17 @@ public class CommonAlertActivity extends AppCompatActivity {
                 break;
             case APP_PRIVACY:
                 break;
+            case EXENT_1_HOUR:
+                TimeCountDownService.start(this);
+                break;
         }
         ShadowsocksApplication application = (ShadowsocksApplication)getApplication();
         if(application.getRunningActivityCount() < 2) {
-            startActivity(new Intent(this, SplashActivity.class));
+            try {
+                startActivity(new Intent(this, SplashActivity.class));
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
+            }
         }
         finish();
     }

@@ -96,15 +96,16 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         public void run() {
             int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
             if(countDown > 0) {
-                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown - 1).commit();
+                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, --countDown).commit();
 
                 if(--m1hCountDown <= 0){
                     sendTimeUpBroadcast();
                 }
                 Log.d("m1hCountDown", m1hCountDown + " ");
                 if(countDown > m1hCountDown){
-                    if(m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
+                    if(m1hCountDown == 2580 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
                         //提示用户延长一小时
+                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
                     }
                 }else{
                     if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
@@ -152,7 +153,11 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
 
     public static void start(Context context){
-        context.startService(new Intent(context, TimeCountDownService.class));
+        try {
+            context.startService(new Intent(context, TimeCountDownService.class));
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
     }
 
     private class DisconnectReceiver extends BroadcastReceiver{
@@ -165,7 +170,9 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        Log.d("前m1hCountDown", m1hCountDown + " ");
         m1hCountDown += countDown > 3600 ? 3600 : countDown;
+        Log.d("后m1hCountDown", m1hCountDown + " ");
         return super.onStartCommand(intent, flags, startId);
     }
 }
