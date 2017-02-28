@@ -28,7 +28,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends GameApplication implements Application.ActivityLifecycleCallbacks {
+public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks {
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
@@ -75,11 +75,7 @@ public class ShadowsocksApplication extends GameApplication implements Applicati
 //        mHelper = new IabHelper(this, base64EncodedPublicKey);
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
         // Initialize the SDK before executing any other operations,
-//        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
-
-        UMGameAgent.init(this);
-        UMGameAgent.setTraceSleepTime(false);
-        UMGameAgent.setSessionContinueMillis(60000L);
+//        FacebookSdk.setIsDebugEnabled(BuildConfig.DEB
 
         CheckInAlarm.startCheckInAlarm(this);
         registerActivityLifecycleCallbacks(this);

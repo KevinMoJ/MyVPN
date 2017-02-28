@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +27,7 @@ public class CommonAlertActivity extends AppCompatActivity {
     public static final int CHECK_IN = 2;
     public static final int TIME_UP = 3;
     public static final int APP_PRIVACY = 4;
+    public static final int EXENT_1_HOUR = 5;
     private static final String ALERT_TYPE = "ALERT_TYPE";
 
 
@@ -57,6 +60,11 @@ public class CommonAlertActivity extends AppCompatActivity {
                 alertTitle.setText("App Detection");
                 remainder.setText("Would you like to trun on VPN to unblock the app or protect your privacy?");
                 break;
+            case EXENT_1_HOUR:
+                alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
+                alertTitle.setText("VPN will be stopped");
+                remainder.setText("VPN connection only lasts 1 hour once. Would you like to extent 1 hour, if remaining time permits?");
+                break;
         }
     }
 
@@ -64,7 +72,6 @@ public class CommonAlertActivity extends AppCompatActivity {
         int type = getIntent().getIntExtra(ALERT_TYPE, 0);
         switch (type){
             case WIFI_DETECT:
-
                 break;
             case CHECK_IN:
                 break;
@@ -72,19 +79,31 @@ public class CommonAlertActivity extends AppCompatActivity {
                 break;
             case APP_PRIVACY:
                 break;
+            case EXENT_1_HOUR:
+                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, true).commit();
+                TimeCountDownService.start(this);
+                break;
         }
         ShadowsocksApplication application = (ShadowsocksApplication)getApplication();
         if(application.getRunningActivityCount() < 2) {
-            startActivity(new Intent(this, SplashActivity.class));
+            try {
+//                Intent intent = new Intent(this, SplashActivity.class);
+//                ActivityOptionsCompat options =
+//                        ActivityOptionsCompat.makeCustomAnimation(this,
+//                                R.anim.slide_bottom_in, R.anim.slide_bottom_out);
+//                ActivityCompat.startActivity(this, intent, options.toBundle());
+                startActivity(new Intent(this, SplashActivity.class));
+//                overridePendingTransition(R.anim.slide_bottom_in, android.R.anim.fade_out);
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
+            }
         }
         finish();
-
-//        Toast.makeText(this, "yes", Toast.LENGTH_SHORT).show();
     }
 
     public void no(View v){
         finish();
-//        Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
     }
 
     public static void showAlert(Context context, int type){
@@ -120,6 +139,9 @@ public class CommonAlertActivity extends AppCompatActivity {
                     shouldShowAlert = true;
                     sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_APP_ALERT, current).commit();
                 }
+                break;
+            case EXENT_1_HOUR:
+                shouldShowAlert = true;
                 break;
         }
 

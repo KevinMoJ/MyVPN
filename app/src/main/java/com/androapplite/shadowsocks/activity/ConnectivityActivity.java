@@ -46,6 +46,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
@@ -68,9 +69,6 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.request.target.SimpleTarget;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
-import com.smartads.Plugins;
-import com.smartads.ads.AdType;
-import com.smartads.plugin.PluginAdListener;
 import com.vungle.publisher.AdConfig;
 import com.vungle.publisher.EventListener;
 import com.vungle.publisher.Orientation;
@@ -239,6 +237,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
         mErrorServers = new HashSet<>();
+        boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
+        if(extent1hAlert){
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setMessage("Vpn connection is extented")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setCustomTitle(null)
+                    .create();
+            alertDialog.show();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
+        }
     }
 
     public static final String NAME = "MainActivity";
