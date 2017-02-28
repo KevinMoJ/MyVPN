@@ -138,7 +138,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastReceiver();
         mErrorServers = new HashSet<>();
         boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
-        if(extent1hAlert){
+        if(true){
             AlertDialog alertDialog = new AlertDialog.Builder(this)
                     .setMessage("Vpn connection is extented")
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -147,10 +147,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
                         }
                     })
+                    .setCustomTitle(null)
                     .create();
-            alertDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
             alertDialog.show();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
+            //mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
         }
     }
 
