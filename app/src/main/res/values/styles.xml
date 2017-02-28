@@ -61,7 +61,11 @@
     <style name="Theme.MyDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <!--<item name="android:windowAnimationStyle">@style/activityAnim</item>-->
     </style>
-
+    <!--<style name="activityAnim">-->
+        <!--<item name="android:activityOpenEnterAnimation">@anim/slide_bottom_in</item>-->
+        <!--<item name="android:activityOpenExitAnimation">@anim/slide_bottom_out</item>-->
+    <!--</style>-->
 
 </resources>

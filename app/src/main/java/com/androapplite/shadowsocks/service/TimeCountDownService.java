@@ -103,7 +103,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                     sendTimeUpBroadcast();
                 }
                 if(countDown >= m1hCountDown){
-                    if(m1hCountDown == 3530 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
+                    if(m1hCountDown == 3080 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
                         CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
                     }
                 }else{
