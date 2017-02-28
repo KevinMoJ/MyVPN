@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -86,7 +88,13 @@ public class CommonAlertActivity extends AppCompatActivity {
         ShadowsocksApplication application = (ShadowsocksApplication)getApplication();
         if(application.getRunningActivityCount() < 2) {
             try {
+//                Intent intent = new Intent(this, SplashActivity.class);
+//                ActivityOptionsCompat options =
+//                        ActivityOptionsCompat.makeCustomAnimation(this,
+//                                R.anim.slide_bottom_in, R.anim.slide_bottom_out);
+//                ActivityCompat.startActivity(this, intent, options.toBundle());
                 startActivity(new Intent(this, SplashActivity.class));
+//                overridePendingTransition(R.anim.slide_bottom_in, android.R.anim.fade_out);
             }catch (Exception e){
                 ShadowsocksApplication.handleException(e);
             }
