@@ -102,18 +102,8 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                 if(--m1hCountDown <= 0){
                     sendTimeUpBroadcast();
                 }
-                if(countDown >= m1hCountDown){
-                    if(m1hCountDown == 3080 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
-                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
-                    }
-                }else{
-                    if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
-                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
-                    }
-                }
-                //注意是小于号不是小于等于号
-//                if(countDown > m1hCountDown){
-//                    if(m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
+//                if(countDown >= m1hCountDown){
+//                    if(m1hCountDown == 3080 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
 //                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
 //                    }
 //                }else{
@@ -121,6 +111,16 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 //                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
 //                    }
 //                }
+                //注意是小于号不是小于等于号
+                if(countDown > m1hCountDown){
+                    if(m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
+                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
+                    }
+                }else{
+                    if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
+                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
+                    }
+                }
             }else {
                 sendTimeUpBroadcast();
             }
