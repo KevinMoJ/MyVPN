@@ -150,7 +150,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     .setCustomTitle(null)
                     .create();
             alertDialog.show();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
         }
     }
 
