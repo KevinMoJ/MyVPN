@@ -58,9 +58,12 @@
         <!--<item name="android:textStyle">bold</item>-->
     <!--</style>-->
 
-    <style name="Theme.MyDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="Theme.MyDialog" parent="AppTheme.NoActionBar.FullScreen">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowNoTitle">true</item>-->
         <!--<item name="android:windowAnimationStyle">@style/activityAnim</item>-->
     </style>
     <!--<style name="activityAnim">-->
