@@ -10,7 +10,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.androapplite.lisasa.applock.newapplock.utils.Analytics;
+import com.androapplite.shadowsocks.GAHelper;
 import com.umeng.analytics.game.UMGameAgent;
 import com.umeng.analytics.onlineconfig.UmengOnlineConfigureListener;
 
@@ -200,7 +200,7 @@ public class AdAppHelper {
     }
 
     private void parseNgsOrder(AdConfig.AdCtrl.NgsOrder ngsOrder, String value) {
-        String[] ngsorder = value.split("|");
+        String[] ngsorder = value.split("\\|");
         for (int i = 0; i < ngsorder.length; i++) {
             String one = ngsorder[i];
             if (one.contains("before:")) {
@@ -265,7 +265,7 @@ public class AdAppHelper {
                     break;
                 case AdType.ADMOB_FULL:
                     UMGameAgent.onEvent(context, "jzcg_admob");
-                    Analytics.getInstance(context)._sendEvent("广告", "加载成功", "Admob全屏");
+                    GAHelper.sendEvent(context, "广告", "加载成功", "Admob全屏");
                     break;
                 case AdType.FACEBOOK_BANNER:
                     break;
@@ -273,7 +273,7 @@ public class AdAppHelper {
                     break;
                 case AdType.FACEBOOK_FULL:
                     UMGameAgent.onEvent(context, "jzcg_facebook");
-                    Analytics.getInstance(context)._sendEvent("广告", "加载成功", "Facebook全屏");
+                    GAHelper.sendEvent(context, "广告", "加载成功", "Facebook全屏");
                     break;
             }
         }
@@ -287,7 +287,7 @@ public class AdAppHelper {
                     break;
                 case AdType.ADMOB_FULL:
                     UMGameAgent.onEvent(context, "cgzs_admob");
-                    Analytics.getInstance(context)._sendEvent("广告", "成功展示", "Admob全屏");
+                    GAHelper.sendEvent(context, "广告", "成功展示", "Admob全屏");
                     break;
                 case AdType.FACEBOOK_BANNER:
                     break;
@@ -295,7 +295,7 @@ public class AdAppHelper {
                     break;
                 case AdType.FACEBOOK_FULL:
                     UMGameAgent.onEvent(context, "cgzs_facebook");
-                    Analytics.getInstance(context)._sendEvent("广告", "成功展示", "Facebook全屏");
+                    GAHelper.sendEvent(context, "广告", "成功展示", "Facebook全屏");
                     break;
             }
         }
@@ -430,7 +430,7 @@ public class AdAppHelper {
         int r = random.nextInt(max);
         if (r >= (mAdConfig.ngs_ctrl.facebook + mAdConfig.ngs_ctrl.admob) && mFacebookAd.isFBNLoaded()) {
             UMGameAgent.onEvent(context, "dk_fbn");
-            Analytics.getInstance(context)._sendEvent("广告", "打开", "FacebookFBN");
+            GAHelper.sendEvent(context, "广告", "打开", "FacebookFBN");
             mFacebookAd.showFBNAd();
             int fbn_show_count = mSP.getInt("fbn_show_count", 0);
             SharedPreferences.Editor editor = mSP.edit();
@@ -438,35 +438,35 @@ public class AdAppHelper {
         } else if (r > mAdConfig.ngs_ctrl.admob && r <= (max - mAdConfig.ngs_ctrl.admob - mAdConfig.ngs_ctrl.fbn)
                 && mFacebookAd.isInterstitialLoaded()) {
             UMGameAgent.onEvent(context, "dk_facebook");
-            Analytics.getInstance(context)._sendEvent("广告", "打开", "Facebook全屏");
+            GAHelper.sendEvent(context, "广告", "打开", "Facebook全屏");
             mFacebookAd.showInterstitial();
             int facebook_show_count = mSP.getInt("facebook_show_count", 0);
             SharedPreferences.Editor editor = mSP.edit();
             editor.putInt("facebook_show_count", ++facebook_show_count).apply();
         } else if (mAdMobAd.isInterstitialLoaded()) {
             UMGameAgent.onEvent(context, "dk_admob");
-            Analytics.getInstance(context)._sendEvent("广告", "打开", "Admob全屏");
+            GAHelper.sendEvent(context, "广告", "打开", "Admob全屏");
             mAdMobAd.showInterstitial();
             int admob_show_count = mSP.getInt("admob_show_count", 0);
             SharedPreferences.Editor editor = mSP.edit();
             editor.putInt("admob_show_count", ++admob_show_count).apply();
         } else if (mFacebookAd.isInterstitialLoaded()) {
             UMGameAgent.onEvent(context, "dk_facebook");
-            Analytics.getInstance(context)._sendEvent("广告", "打开", "Facebook全屏");
+            GAHelper.sendEvent(context, "广告", "打开", "Facebook全屏");
             mFacebookAd.showInterstitial();
             int facebook_show_count = mSP.getInt("facebook_show_count", 0);
             SharedPreferences.Editor editor = mSP.edit();
             editor.putInt("facebook_show_count", ++facebook_show_count).apply();
         }  else if (mFacebookAd.isFBNLoaded()) {
             UMGameAgent.onEvent(context, "dk_fbn");
-            Analytics.getInstance(context)._sendEvent("广告", "打开", "FacebookFBN");
+            GAHelper.sendEvent(context, "广告", "打开", "FacebookFBN");
             mFacebookAd.showFBNAd();
             int fbn_show_count = mSP.getInt("fbn_show_count", 0);
             SharedPreferences.Editor editor = mSP.edit();
             editor.putInt("fbn_show_count", ++fbn_show_count).apply();
         } else {
             UMGameAgent.onEvent(context, "ad_not_ready");
-            Analytics.getInstance(context)._sendEvent("广告", "广告没有准备好");
+            GAHelper.sendEvent(context, "广告", "广告没有准备好");
             loadNewInterstitial();
         }
     }

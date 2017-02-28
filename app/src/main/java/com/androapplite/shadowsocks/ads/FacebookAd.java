@@ -10,7 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androapplite.lisasa.applock.newapplock.utils.Analytics;
+import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.vpn3.R;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdChoicesView;
 import com.facebook.ads.AdError;
@@ -21,7 +22,6 @@ import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
 import com.facebook.ads.MediaView;
 import com.facebook.ads.NativeAd;
-import com.lisasa.applock.R;
 import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class FacebookAd {
     public static int NATIVE_WIDTH = 320;
     public static int NATIVE_HEIGHT = 320;
 
-    private com.androapplite.lisasa.applock.newapplock.ads.AdListener mAdListener;
+    private com.androapplite.shadowsocks.ads.AdListener mAdListener;
 
     public FacebookAd(Context context, String bannerId, String nativeId, String interstitialId, String fbnFull) {
         this.mContext = context;
@@ -100,7 +100,7 @@ public class FacebookAd {
         }
     }
 
-    public void setAdListener(com.androapplite.lisasa.applock.newapplock.ads.AdListener listener) {
+    public void setAdListener(com.androapplite.shadowsocks.ads.AdListener listener) {
         this.mAdListener = listener;
     }
 
@@ -367,7 +367,7 @@ public class FacebookAd {
                     mFBNAd.unregisterView();
                 }
                 UMGameAgent.onEvent(mContext, "jzcg_fbn");
-                Analytics.getInstance(mContext)._sendEvent("广告", "加载成功", "FacebookBN");
+                GAHelper.sendEvent(mContext, "广告", "加载成功", "FacebookBN");
             }
 
             @Override

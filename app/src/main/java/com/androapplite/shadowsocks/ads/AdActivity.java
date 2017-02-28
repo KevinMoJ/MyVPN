@@ -9,11 +9,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androapplite.lisasa.applock.newapplock.utils.Analytics;
+import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.vpn3.R;
 import com.facebook.ads.AdChoicesView;
 import com.facebook.ads.MediaView;
 import com.facebook.ads.NativeAd;
-import com.lisasa.applock.R;
 import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class AdActivity extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         UMGameAgent.onEvent(getApplicationContext(), "cgzs_fbn");
-        Analytics.getInstance(getApplicationContext())._sendEvent("广告", "成功展示", "FacebookFBN");
+        GAHelper.sendEvent(getApplicationContext(), "广告", "成功展示", "FacebookFBN");
         try {
             initView();
         } catch (Exception ex) {

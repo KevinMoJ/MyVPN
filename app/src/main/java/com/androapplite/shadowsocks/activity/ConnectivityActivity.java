@@ -50,6 +50,8 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
+import com.androapplite.shadowsocks.ads.AdType;
 import com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -145,54 +147,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
 
-        Plugins.onEnter(ConnectivityActivity.NAME, this.getApplicationContext());
-        Plugins.initBannerAd(ConnectivityActivity.NAME);
-        Plugins.initNativeAd(ConnectivityActivity.NAME);
-        Plugins.initNgsAd(ConnectivityActivity.NAME);
-
-        Plugins.setPluginAdListener(new PluginAdListener() {
-            @Override
-            public void onReceiveAd(String s, AdType adType) {
-                if (adType == AdType.Ngs) {
-                    ngsLoaded = true;
-                } else if (adType == AdType.Native) {
-                    nativeLoaded = true;
-                }
-            }
-
-            @Override
-            public void onAdClosed(String s, AdType adType) {
-                if (adType == AdType.Ngs) {
-                    try {
-                        Plugins.loadNewNgsAd(NAME);
-                    } catch (Exception ex) {
-                    }
-                    if (!watchedVideoFinish) {
-                        watchedVideoFinish = true;
-                        WatchVideoADCallbackReceiver.increaseCountDown(ConnectivityActivity.this);
-//                        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-//                        sendBroadcast(intent);
-                    }
-                }
-            }
-        });
-
-        ngsLoaded = false;
-        nativeLoaded = false;
-
-        try {
-            int width = (int)(getResources().getDisplayMetrics().density * 300);
-            int height = (int)(getResources().getDisplayMetrics().density * 250);
-            Plugins.loadNewNativeAd(NAME, width, height);
-            Plugins.loadNewBannerAd(NAME);
-            Plugins.loadNewNgsAd(NAME);
-        } catch (Exception ex) {
-        }
+        AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
+        AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
+        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
 
         FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
-            container.addView(Plugins.adBanner(NAME), params);
+            container.addView(AdAppHelper.getInstance(getApplicationContext()).getBanner(), params);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -256,7 +218,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     public static final String NAME = "MainActivity";
     private boolean startUp = false;
-    private boolean ngsLoaded = false;
     private boolean watchedVideoFinish = true;
     private boolean videoAvailble = false;
     private boolean showResumeAd = false;
@@ -265,10 +226,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == 1000) {
-                if (ngsLoaded) {
+                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            Plugins.adNgs(NAME, -1);
+                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
                         }
                     } catch (Exception ex) {}
                 } else {
@@ -369,15 +330,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 case CONNECTED:
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            Plugins.adNgs(NAME, -1);
+                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
                         }
                     } catch (Exception ex) {
                     }
 
                     if (!startUp) {
                         try {
-                            Plugins.loadNewBannerAd(NAME);
-                            Plugins.loadNewNgsAd(NAME);
+                            AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
+                            AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
+                            AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
                         } catch (Exception ex) {
                         }
                         startUp = true;
@@ -820,20 +782,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     protected void onResume() {
         vunglePub.onResume();
-        Plugins.onResume(NAME, this.getApplicationContext());
+        AdAppHelper.getInstance(getApplicationContext()).onResume();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         vunglePub.onPause();
-        Plugins.onPause(NAME, this.getApplicationContext());
+        AdAppHelper.getInstance(getApplicationContext()).onPause();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        Plugins.onDestroy(NAME);
         super.onDestroy();
         if (mShadowsocksServiceConnection != null) {
             unbindService(mShadowsocksServiceConnection);
@@ -875,7 +836,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
                 try {
                     if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                        Plugins.adNgs(NAME, -1);
+                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
                     }
                 } catch (Exception ex) {
                 }
@@ -1164,16 +1125,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (vunglePub.isAdPlayable()) {
             watchedVideoFinish = false;
             vunglePub.playAd();
-        } else {
-            try {
-                if (ngsLoaded) {
-                    watchedVideoFinish = false;
-                    if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                        Plugins.adNgs(NAME, -1);
-                        ngsLoaded = false;
-                    }
-                }
-            } catch (Exception ex) {
+        } else if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()){
+            watchedVideoFinish = false;
+            if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+                WatchVideoADCallbackReceiver.increaseCountDown(ConnectivityActivity.this);
             }
         }
         if (watchedVideoFinish) {

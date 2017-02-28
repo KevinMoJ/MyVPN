@@ -8,6 +8,7 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
@@ -20,7 +21,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
-import com.smartads.plugin.GameApplication;
 import com.umeng.analytics.game.UMGameAgent;
 
 import io.fabric.sdk.android.Fabric;
@@ -79,6 +79,8 @@ public class ShadowsocksApplication extends Application implements Application.A
 
         CheckInAlarm.startCheckInAlarm(this);
         registerActivityLifecycleCallbacks(this);
+
+        AdAppHelper.getInstance(getApplicationContext()).init();
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){

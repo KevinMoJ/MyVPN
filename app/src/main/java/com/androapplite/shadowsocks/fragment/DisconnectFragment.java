@@ -15,9 +15,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.smartads.Plugins;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,9 +40,9 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         v.findViewById(R.id.disconnect).setOnClickListener(this);
         mAdLayout = (FrameLayout)v.findViewById(R.id.adContainer);
         mAdLayout.setVisibility(View.GONE);
-        if (ConnectivityActivity.nativeLoaded) {
+        if (AdAppHelper.getInstance(getContext()).isNativeLoaded()) {
             try {
-                mAdLayout.addView(Plugins.adNative(ConnectivityActivity.NAME));
+                mAdLayout.addView(AdAppHelper.getInstance(getContext()).getNative());
                 mAdLayout.setVisibility(View.VISIBLE);
             } catch (Exception ex) {
             }

@@ -33,7 +33,7 @@ public class AdMobAd {
     private boolean interstitialRequest;
     private long lastRequestInsterstialTime = 0;
 
-    private com.androapplite.lisasa.applock.newapplock.ads.AdListener mAdListener;
+    private com.androapplite.shadowsocks.ads.AdListener mAdListener;
 
     public static int NATIVE_WIDTH = 320;
     public static int NATIVE_HEIGHT = 320;
@@ -69,7 +69,7 @@ public class AdMobAd {
         }
     }
 
-    public void setAdListener(com.androapplite.lisasa.applock.newapplock.ads.AdListener listener) {
+    public void setAdListener(com.androapplite.shadowsocks.ads.AdListener listener) {
         this.mAdListener = listener;
     }
 
