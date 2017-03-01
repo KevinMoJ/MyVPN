@@ -98,10 +98,11 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
             if(countDown > 0) {
                 mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, --countDown).commit();
-                Log.d("countDown2", countDown + " ");
                 if(--m1hCountDown <= 0){
                     sendTimeUpBroadcast();
                 }
+                Log.d("countDown2", countDown + " " + m1hCountDown);
+
 //                if(countDown >= m1hCountDown){
 //                    if(m1hCountDown == 3080 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
 //                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
@@ -141,8 +142,14 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     }
 
     private void stopVPNConnection() {
-        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP_2);
-//        WatchVideoADDialogActivity.showTimeUsedUpDialog(TimeCountDownService.this);
+        Log.d("TimeCountDownService", "stopVPNConnection");
+
+        int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        if(countDown <= 0) {
+            CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP_2);
+        }else{
+            CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.CONNECTION_STOP);
+        }
         ShadowsockServiceHelper.bindService(this, this);
     }
 
@@ -180,7 +187,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        m1hCountDown += countDown > 3600 ? 3600 : countDown;
+        m1hCountDown += countDown > 70 ? 70 : countDown;
         return super.onStartCommand(intent, flags, startId);
     }
 }
