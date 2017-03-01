@@ -145,8 +145,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     }
 
     private void stopVPNConnection() {
-        Log.d("TimeCountDownService", "stopVPNConnection");
-
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
         if(countDown <= 0) {
             CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP_2);
@@ -190,7 +188,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        m1hCountDown += countDown > 70 ? 70 : countDown;
+        m1hCountDown += countDown > 3600 ? 3600 : countDown;
         return super.onStartCommand(intent, flags, startId);
     }
 }

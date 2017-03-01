@@ -146,7 +146,6 @@ public class CommonAlertActivity extends AppCompatActivity {
     }
 
     public static void showAlert(Context context, int type){
-        Log.d("CommonAlertActivity", "type " + type );
         boolean shouldShowAlert = false;
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         long lastAlert;
