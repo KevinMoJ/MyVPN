@@ -136,6 +136,7 @@ public class AdAppHelper {
         mAdConfig.ad_ids.admob = AdConfig.getString(kv, "admob", "");
         mAdConfig.ad_ids.admob_full = AdConfig.getString(kv, "admob_full", "");
         mAdConfig.ad_ids.admob_n = AdConfig.getString(kv, "admob_n", "");
+        mAdConfig.ad_ids.admob_en = AdConfig.getString(kv, "admob_en", "");
         mAdConfig.ad_ids.fb = AdConfig.getString(kv, "fb", "");
         mAdConfig.ad_ids.fb_f = AdConfig.getString(kv, "fb_f", "");
         mAdConfig.ad_ids.fb_n = AdConfig.getString(kv, "fb_n", "");
@@ -162,6 +163,7 @@ public class AdAppHelper {
         mAdConfig.native_ctrl.exe = AdConfig.getInt(kv, "exe", 1);
         mAdConfig.native_ctrl.admob = AdConfig.getInt(kv, "admob", 100);
         mAdConfig.native_ctrl.facebook = AdConfig.getInt(kv, "facebook", 100);
+        mAdConfig.native_ctrl.admob_en = AdConfig.getInt(kv, "admob_en", 100);
 
         kv = AdConfig.getValues(context, "ad_count_ctrl");
         mAdConfig.ad_count_ctrl.exe = AdConfig.getInt(kv, "exe", 1);
@@ -178,6 +180,8 @@ public class AdAppHelper {
         parseNgsOrder(mAdConfig.ad_ctrl.ngsorder, value);
         value = AdConfig.getString(kv, "ngsorder:admob", "");
         parseNgsOrder(mAdConfig.ad_ctrl.ngsorder_admob, value);
+        mAdConfig.ad_ctrl.home_enable = AdConfig.getInt(kv, "home_enable", 1);
+        mAdConfig.ad_ctrl.home_delay = AdConfig.getInt(kv, "home_delay", 0);
 
         mAdConfig.ad_count_ctrl.last_day = mSP.getInt("last_day", 0);
         mAdConfig.ad_count_ctrl.last_full_show_time = mSP.getLong("last_full_show_time", 0);
@@ -227,15 +231,17 @@ public class AdAppHelper {
 
     private void initAd() {
         if (mAdMobAd == null) {
-            mAdMobAd = new AdMobAd(context, mAdConfig.ad_ids.admob, mAdConfig.ad_ids.admob_n, mAdConfig.ad_ids.admob_full);
+            mAdMobAd = new AdMobAd(context, mAdConfig.ad_ids.admob, mAdConfig.ad_ids.admob_n, mAdConfig.ad_ids.admob_full, mAdConfig.ad_ids.admob_en);
             mAdMobAd.setBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.admob > 0);
             mAdMobAd.setNativeEnabled(mAdConfig.native_ctrl.exe == 1 && mAdConfig.native_ctrl.admob > 0);
+            mAdMobAd.setNativeENEnabled(mAdConfig.native_ctrl.exe == 1 && mAdConfig.native_ctrl.admob_en > 0);
             mAdMobAd.setInterstitialEnabled(mAdConfig.ngs_ctrl.exe == 1 && mAdConfig.ngs_ctrl.admob > 0);
         } else {
             mAdMobAd.setBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.admob > 0);
             mAdMobAd.setNativeEnabled(mAdConfig.native_ctrl.exe == 1 && mAdConfig.native_ctrl.admob > 0);
+            mAdMobAd.setNativeENEnabled(mAdConfig.native_ctrl.exe == 1 && mAdConfig.native_ctrl.admob_en > 0);
             mAdMobAd.setInterstitialEnabled(mAdConfig.ngs_ctrl.exe == 1 && mAdConfig.ngs_ctrl.admob > 0);
-            mAdMobAd.resetId(mAdConfig.ad_ids.admob, mAdConfig.ad_ids.admob_n, mAdConfig.ad_ids.admob_full);
+            mAdMobAd.resetId(mAdConfig.ad_ids.admob, mAdConfig.ad_ids.admob_n, mAdConfig.ad_ids.admob_full, mAdConfig.ad_ids.admob_en);
         }
 
         if (mFacebookAd == null) {
@@ -354,7 +360,23 @@ public class AdAppHelper {
             editor.commit();
         }
 
-        if (mAdConfig.native_ctrl.facebook > mAdConfig.native_ctrl.admob && mFacebookAd.isNativeLoaded()) {
+        int max = mAdConfig.native_ctrl.facebook + mAdConfig.native_ctrl.admob + mAdConfig.native_ctrl.admob_en;
+        if (max < 100) {
+            max = 100;
+        }
+        Random random = new Random();
+        int r = random.nextInt(max);
+        if (r >= (mAdConfig.native_ctrl.facebook + mAdConfig.native_ctrl.admob) && mAdMobAd.isNativeENLoaded()) {
+            View view = mAdMobAd.getNativeEN();
+            if (view != null) {
+                ViewGroup parent = (ViewGroup) view.getParent();
+                if (parent != null) {
+                    parent.removeAllViews();
+                }
+            }
+            return view;
+        } else if (r > mAdConfig.native_ctrl.admob && r <= (max - mAdConfig.native_ctrl.admob - mAdConfig.native_ctrl.admob_en)
+                && mFacebookAd.isNativeLoaded()) {
             View view = mFacebookAd.getNative();
             if (view != null) {
                 ViewGroup parent = (ViewGroup) view.getParent();
@@ -478,6 +500,7 @@ public class AdAppHelper {
 
     public void loadNewNative() {
         mAdMobAd.loadNewNativeAd();
+        mAdMobAd.loadNewNativeENAd();
         mFacebookAd.loadNewNativeAd();
     }
 

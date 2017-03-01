@@ -13,6 +13,7 @@ public class AdConfig {
         public String admob = "";
         public String admob_full = "";
         public String admob_n = "";
+        public String admob_en = "";
         public String fb = "";
         public String fb_f = "";
         public String fb_n = "";
@@ -34,6 +35,8 @@ public class AdConfig {
             public int adt;
             public int adt_type;
         }
+        public int home_enable;
+        public int home_delay;
         public NgsOrder ngsorder = new NgsOrder();
         public NgsOrder ngsorder_admob = new NgsOrder();
     }
@@ -49,6 +52,7 @@ public class AdConfig {
         public int exe;
         public int admob;
         public int facebook;
+        public int admob_en;
     }
 
     public static class AdCountCtrl {
