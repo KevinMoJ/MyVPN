@@ -137,21 +137,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
         mErrorServers = new HashSet<>();
-        boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
-        if(extent1hAlert){
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
-                    .setMessage("Vpn connection is extented")
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setCustomTitle(null)
-                    .create();
-            alertDialog.show();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
-        }
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -1011,5 +996,25 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     public void openCheckInAcivity(View v){
         startActivity(new Intent(this, CheckInActivity.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
+        if(extent1hAlert){
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setMessage("Vpn connection is extented")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setCustomTitle(null)
+                    .create();
+            alertDialog.show();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
+        }
     }
 }
