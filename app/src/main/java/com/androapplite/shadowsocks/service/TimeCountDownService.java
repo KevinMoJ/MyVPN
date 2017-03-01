@@ -71,7 +71,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     private void registerDisconnectReceiver(){
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(yyf.shadowsocks.broadcast.Action.STOPPING);
         intentFilter.addAction(yyf.shadowsocks.broadcast.Action.STOPPED);
         intentFilter.addAction(yyf.shadowsocks.broadcast.Action.ERROR);
         mDisconnectReceiver = new DisconnectReceiver();
