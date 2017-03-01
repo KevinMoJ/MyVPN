@@ -52,6 +52,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
@@ -990,8 +991,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public void watchVideoAd(View v){
         //todo 播视频广告
         Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
-//        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-//        sendBroadcast(intent);
+        WatchVideoADCallbackReceiver.increaseCountDown(this);
     }
 
     public void openCheckInAcivity(View v){
