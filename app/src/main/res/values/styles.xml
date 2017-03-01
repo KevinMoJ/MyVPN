@@ -58,7 +58,12 @@
         <!--<item name="android:textStyle">bold</item>-->
     <!--</style>-->
 
-    <style name="Theme.MyDialog" parent="AppTheme.NoActionBar">
+    <style name="Theme.MyDialog" parent="@style/Theme.AppCompat.Light.Dialog.Alert">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.MyDialog2" parent="AppTheme.NoActionBar">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>

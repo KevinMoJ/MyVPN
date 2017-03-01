@@ -24,4 +24,10 @@
         android:summary="show an alert when you don't check in today"
         android:defaultValue="true"
         />
+    <SwitchPreference
+        android:title="One Hour Extension Alert"
+        android:key="1h_extension"
+        android:summary="show an alert when connection last almost 1 hour"
+        android:defaultValue="true"
+        />
 </PreferenceScreen>

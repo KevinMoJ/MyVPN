@@ -4,10 +4,12 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -28,7 +30,14 @@ public class CommonAlertActivity extends AppCompatActivity {
     public static final int TIME_UP = 3;
     public static final int APP_PRIVACY = 4;
     public static final int EXENT_1_HOUR = 5;
+    public static final int TIME_UP_2 = 6;
+    public static final int CONNECTION_STOP = 7;
+
+
     private static final String ALERT_TYPE = "ALERT_TYPE";
+
+    private Handler mSelfDestroyHandler;
+    private Runnable mSelfDestroyRunable;
 
 
     @Override
@@ -65,7 +74,33 @@ public class CommonAlertActivity extends AppCompatActivity {
                 alertTitle.setText("VPN will be stopped");
                 remainder.setText("VPN connection only lasts 1 hour once. Would you like to extent 1 hour, if remaining time permits?");
                 break;
+            case TIME_UP_2:
+                alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
+                alertTitle.setText("Connection time is used up!");
+                remainder.setText("Watching video ads can bring you extra 1 hour connection time.");
+                break;
+            case CONNECTION_STOP:
+                alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
+                alertTitle.setText("VPN is stopped");
+                remainder.setText("VPN connection only lasts 1 hour once. Would you like to restart?");
+                break;
         }
+        mSelfDestroyRunable = new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        };
+        mSelfDestroyHandler = new Handler();
+        mSelfDestroyHandler.postDelayed(mSelfDestroyRunable, 10 * 1000);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(mSelfDestroyHandler != null && mSelfDestroyRunable != null){
+            mSelfDestroyHandler.removeCallbacks(mSelfDestroyRunable);
+        }
+        super.onDestroy();
     }
 
     public void yes(View v){
@@ -83,6 +118,10 @@ public class CommonAlertActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, true).commit();
                 TimeCountDownService.start(this);
+                break;
+            case TIME_UP_2:
+                break;
+            case CONNECTION_STOP:
                 break;
         }
         ShadowsocksApplication application = (ShadowsocksApplication)getApplication();
@@ -141,6 +180,14 @@ public class CommonAlertActivity extends AppCompatActivity {
                 }
                 break;
             case EXENT_1_HOUR:
+                if(sharedPreferences.getBoolean("1h_extension", true)) {
+                    shouldShowAlert = true;
+                }
+                break;
+            case TIME_UP_2:
+                shouldShowAlert = true;
+                break;
+            case CONNECTION_STOP:
                 shouldShowAlert = true;
                 break;
         }
