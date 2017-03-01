@@ -28,6 +28,8 @@ public class CommonAlertActivity extends AppCompatActivity {
     public static final int TIME_UP = 3;
     public static final int APP_PRIVACY = 4;
     public static final int EXENT_1_HOUR = 5;
+    public static final int TIME_UP_2 = 6;
+
     private static final String ALERT_TYPE = "ALERT_TYPE";
 
 
@@ -65,6 +67,11 @@ public class CommonAlertActivity extends AppCompatActivity {
                 alertTitle.setText("VPN will be stopped");
                 remainder.setText("VPN connection only lasts 1 hour once. Would you like to extent 1 hour, if remaining time permits?");
                 break;
+            case TIME_UP_2:
+                alertIcon.setImageResource(R.drawable.ic_schedule_black_24dp);
+                alertTitle.setText("Connection time is used up!");
+                remainder.setText("Watching video ads can bring you extra 1 hour connection time.");
+                break;
         }
     }
 
@@ -83,6 +90,8 @@ public class CommonAlertActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, true).commit();
                 TimeCountDownService.start(this);
+                break;
+            case TIME_UP_2:
                 break;
         }
         ShadowsocksApplication application = (ShadowsocksApplication)getApplication();

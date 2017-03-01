@@ -141,7 +141,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     }
 
     private void stopVPNConnection() {
-        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
+        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP_2);
 //        WatchVideoADDialogActivity.showTimeUsedUpDialog(TimeCountDownService.this);
         ShadowsockServiceHelper.bindService(this, this);
     }
