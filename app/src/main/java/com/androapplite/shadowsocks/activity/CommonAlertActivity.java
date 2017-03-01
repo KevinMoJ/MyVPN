@@ -181,7 +181,9 @@ public class CommonAlertActivity extends AppCompatActivity {
                 }
                 break;
             case EXENT_1_HOUR:
-                shouldShowAlert = true;
+                if(sharedPreferences.getBoolean("1h_extension", true)) {
+                    shouldShowAlert = true;
+                }
                 break;
             case TIME_UP_2:
                 shouldShowAlert = true;

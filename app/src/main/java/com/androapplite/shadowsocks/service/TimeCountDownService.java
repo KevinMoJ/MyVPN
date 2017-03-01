@@ -11,13 +11,11 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.CommonAlertActivity;
-import com.androapplite.shadowsocks.activity.WatchVideoADDialogActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -27,8 +25,6 @@ import java.util.TimerTask;
 
 import yyf.shadowsocks.IShadowsocksService;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
 public class TimeCountDownService extends Service implements ServiceConnection{
     private SharedPreferences mSharedPreference;
     private TimeUpReceiver mTimeUpReceiver;
@@ -36,7 +32,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     private Timer mTimeTickTimer;
     private IShadowsocksService mShadowsocksService;
     private int m1hCountDown;
-    private static final String KEEP_CONNECT = "KEEP_CONNECT";
+    private long mLastTickTime;
 
     public TimeCountDownService() {
     }
@@ -55,11 +51,12 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         registerTimeUpBroadcast();
         registerDisconnectReceiver();
         m1hCountDown = 0;
+        mLastTickTime = System.currentTimeMillis();
     }
 
     private void registerTimeTickTimer(){
         mTimeTickTimer = new Timer();
-        mTimeTickTimer.schedule(new TimeCountDownTask(), 1, 1000);
+        mTimeTickTimer.schedule(new TimeCountDownTask(), 100, 1000);
     }
 
     private void registerTimeUpBroadcast(){
@@ -95,6 +92,22 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         @Override
         public void run() {
             int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            //处理系统休眠的情况
+            long differ = System.currentTimeMillis() - mLastTickTime;
+            mLastTickTime = System.currentTimeMillis();
+            if(differ > 60 * 1000){
+                countDown -= differ;
+                if(countDown < 0){
+                    countDown = 0;
+                }
+                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
+
+                m1hCountDown -= differ;
+                if(m1hCountDown < 0){
+                    m1hCountDown = 0;
+                }
+            }
+
             if(countDown > 0) {
                 mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, --countDown).commit();
                 if(--m1hCountDown <= 0){
@@ -102,15 +115,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                 }
                 Log.d("countDown2", countDown + " " + m1hCountDown);
 
-//                if(countDown >= m1hCountDown){
-//                    if(m1hCountDown == 3080 || m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
-//                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
-//                    }
-//                }else{
-//                    if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
-//                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
-//                    }
-//                }
                 //注意是小于号不是小于等于号
                 if(countDown > m1hCountDown){
                     if(m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
