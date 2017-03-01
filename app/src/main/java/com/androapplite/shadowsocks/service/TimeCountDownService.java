@@ -93,16 +93,17 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         public void run() {
             int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
             //处理系统休眠的情况
+            Log.d("TimeCountDownService", mLastTickTime + " " + System.currentTimeMillis());
             long differ = System.currentTimeMillis() - mLastTickTime;
             mLastTickTime = System.currentTimeMillis();
             if(differ > 60 * 1000){
-                countDown -= differ;
+                countDown -= differ/1000;
                 if(countDown < 0){
                     countDown = 0;
                 }
                 mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
 
-                m1hCountDown -= differ;
+                m1hCountDown -= differ/1000;
                 if(m1hCountDown < 0){
                     m1hCountDown = 0;
                 }

@@ -58,6 +58,7 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
@@ -218,7 +219,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         }
                     } catch (Exception ex) {}
                 } else {
-                    handler1.sendEmptyMessageDelayed(1000, 200);
+//                    handler1.sendEmptyMessageDelayed(1000, 200);
                 }
             }
         }
@@ -1116,6 +1117,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
 //        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
 //        sendBroadcast(intent);
+//        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
+//        WatchVideoADCallbackReceiver.increaseCountDown(this);
     }
 
     public void openCheckInAcivity(View v){
