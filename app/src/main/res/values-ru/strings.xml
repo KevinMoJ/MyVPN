@@ -97,5 +97,5 @@
     <string name="notitication_remain">Времени осталось: %1$s</string>
     <string name="dialog_time_use_up">Время подключения используется вверх!</string>
     <string name="server_not_available">Сервер VPN не доступна прямо сейчас. Пожалуйста, попробуйте позже!</string>
-
+    <string name="notification_vpn_stop">Ваш VPN останавливается. Нажмите, чтобы открыть.</string>
 </resources>

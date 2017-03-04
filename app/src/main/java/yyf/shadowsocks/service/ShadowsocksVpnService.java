@@ -67,7 +67,6 @@ public class ShadowsocksVpnService extends BaseService {
     private NotificationManager notificationManager = null;
     private BroadcastReceiver receiver = null;
     private ShadowsocksVpnThread mShadowsocksVpnThread;
-//    private NativeProcessMonitorThread mNativeProcessMonitorThread;
 
     private GuardedProcess mSslocalProcess;
     private GuardedProcess mSstunnelProcess;
@@ -495,14 +494,7 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-//        if (mShadowsocksNotification != null) {
-//            mShadowsocksNotification.destroy();
-//            mShadowsocksNotification = null;
-//        }
-//        if(mNativeProcessMonitorThread != null){
-//            mNativeProcessMonitorThread.stopThread();
-//            mNativeProcessMonitorThread = null;
-//        }
+        mShadowsocksNotification.notifyStopConnection();
         // close connections
         if (conn != null) {
             try {
@@ -531,15 +523,7 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-//        if (mShadowsocksNotification != null) {
-//            mShadowsocksNotification.destroy();
-//            mShadowsocksNotification = null;
-//        }
-
-//        if(mNativeProcessMonitorThread != null){
-//            mNativeProcessMonitorThread.stopThread();
-//            mNativeProcessMonitorThread = null;
-//        }
+        mShadowsocksNotification.notifyStopConnection();
         // close connections
         if (conn != null) {
             try {
@@ -624,5 +608,14 @@ public class ShadowsocksVpnService extends BaseService {
                 mShadowsocksNotification.disableNotification();
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mShadowsocksNotification != null) {
+            mShadowsocksNotification.destroy();
+            mShadowsocksNotification = null;
+        }
+        super.onDestroy();
     }
 }

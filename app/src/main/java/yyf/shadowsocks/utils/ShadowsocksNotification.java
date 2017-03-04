@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.PowerManager;
@@ -58,9 +59,10 @@ public class ShadowsocksNotification {
 
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
+        final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
         mBuilder = new NotificationCompat.Builder(mService)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large))
+                .setLargeIcon(largeIcon)
                 .setColor(mService.getResources().getColor(R.color.colorPrimary))
                 .setContentTitle(mService.getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
@@ -78,9 +80,8 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentTitle(mService.getString(R.string.app_name));
-
-                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
+                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
+                        .setColor(mService.getResources().getColor(R.color.notification_small_icon_bg_connect));
                 int remain = mService.getRemain();
                 if(remain > 0) {
                     mBuilder.setSubText(String.format(mService.getString(R.string.notitication_remain), DateUtils.formatElapsedTime(remain)));
@@ -178,6 +179,18 @@ public class ShadowsocksNotification {
         } else if (view instanceof TextView) {
             remoteViews.setTextColor(view.getId(), color);
         }
+    }
+
+    public void notifyStopConnection(){
+        mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
+                .setColor(mService.getResources().getColor(R.color.notification_small_icon_bg_disconnect))
+                .setSubText(null);
+        final Notification notification = mBuilder.build();
+        RemoteViews remoteViews = notification.contentView;
+        View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+        remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+        applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
+        mService.startForeground(1, notification);
     }
 
 }
