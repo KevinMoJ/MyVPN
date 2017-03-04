@@ -56,8 +56,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 //                startActivity(new Intent(activity,
 //                        DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectivityActivity.class
 //                ));
-                startActivity(new Intent(activity,
-                        false ? NewUserGuideActivity.class : ConnectivityActivity.class
+                startActivity(new Intent(activity, ConnectivityActivity.class
                 ));
             }
         }, TimeUnit.SECONDS.toMillis(2));
