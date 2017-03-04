@@ -154,6 +154,18 @@ public abstract class BaseService extends VpnService {
                     intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
                 }
                 mStartTime = c;
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(state == Constants.State.CONNECTED){
+                            mTrafficMonitor.updateRate();
+                            remain -= 1;
+                            updateTrafficRate();
+                        }
+                    }
+                };
+                timer = new Timer(true);
+                timer.schedule(task, 1000, 1000);
                 break;
             case STOPPING:
                 intent.setAction(Action.STOPPING);
@@ -168,6 +180,8 @@ public abstract class BaseService extends VpnService {
                     intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
                 }
                 mStartTime = 0;
+                timer.cancel();
+                timer.purge();
                 break;
             case ERROR:
                 intent.setAction(Action.ERROR);
@@ -210,23 +224,6 @@ public abstract class BaseService extends VpnService {
     public void registerCallback(IShadowsocksServiceCallback callback){
         if(callback != null && callbacks.register(callback)) {
             callbacksCount += 1;
-            if (callbacksCount != 0 && timer == null) {
-                TimerTask task = new TimerTask() {
-                    @Override
-                    public void run() {
-//                        if(mTrafficMonitor.updateRate()){
-//                            updateTrafficRate();
-//                        }
-                        mTrafficMonitor.updateRate();
-                        remain -= 1;
-                        if(state.equals(Constants.State.CONNECTED)) {
-                            updateTrafficRate();
-                        }
-                    }
-                };
-                timer = new Timer(true);
-                timer.schedule(task, 1000, 1000);
-            }
             mTrafficMonitor.updateRate();
             try {
                 callback.trafficUpdated(mTrafficMonitor.txRate, mTrafficMonitor.rxRate, mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
@@ -262,19 +259,11 @@ public abstract class BaseService extends VpnService {
     public void unregisterCallback(IShadowsocksServiceCallback callback){
         if (callback != null && callbacks.unregister(callback)) {
             callbacksCount -= 1;
-            if (callbacksCount == 0 && timer != null) {
-                timer.cancel();
-                timer = null;
-            }
         }
     }
 
     public int getCallbacksCount() {
         return callbacksCount;
-    }
-
-    private void updateTrafficTotal(){
-
     }
 
     public TrafficMonitor getTrafficMonitor(){
@@ -292,7 +281,6 @@ public abstract class BaseService extends VpnService {
         if(currentMonth.before(lastResetMonth)){
             DefaultSharedPrefeencesUtil.setLastResetMonth(this, currentMonth);
         }
-
     }
 
     protected abstract void enableNotification(boolean enable);
