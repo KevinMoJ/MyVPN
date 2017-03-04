@@ -437,7 +437,9 @@ public class ShadowsocksVpnService extends BaseService {
             if(resolved){
                 if(handleConnection()){
                     changeState(Constants.State.CONNECTED);
-                    mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
+                    if(mShadowsocksNotification == null) {
+                        mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
+                    }
                     boolean b = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.NOTIFICATION, true);
                     if(!b){
                         mShadowsocksNotification.disableNotification();
@@ -493,10 +495,10 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-        if (mShadowsocksNotification != null) {
-            mShadowsocksNotification.destroy();
-            mShadowsocksNotification = null;
-        }
+//        if (mShadowsocksNotification != null) {
+//            mShadowsocksNotification.destroy();
+//            mShadowsocksNotification = null;
+//        }
 //        if(mNativeProcessMonitorThread != null){
 //            mNativeProcessMonitorThread.stopThread();
 //            mNativeProcessMonitorThread = null;
@@ -529,10 +531,10 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-        if (mShadowsocksNotification != null) {
-            mShadowsocksNotification.destroy();
-            mShadowsocksNotification = null;
-        }
+//        if (mShadowsocksNotification != null) {
+//            mShadowsocksNotification.destroy();
+//            mShadowsocksNotification = null;
+//        }
 
 //        if(mNativeProcessMonitorThread != null){
 //            mNativeProcessMonitorThread.stopThread();
