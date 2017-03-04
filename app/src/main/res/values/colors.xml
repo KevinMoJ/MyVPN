@@ -38,4 +38,13 @@
     <color name="dialog_title">#3484CC</color>
     <color name="checkin_header">#7DB8E0</color>
     <color name="checkin_body">#52B0DB</color>
+    <color name="notification_bg_connect">#5067C3</color>
+    <color name="notification_bg_disconnect">#474747</color>
+    <color name="notification_small_icon_bg_connect">#5BC94D</color>
+    <color name="notification_small_icon_bg_disconnect">#DE5E5D</color>
+    <color name="notification_small_icon_bg_about_disconnect">#53BAE0</color>
+    <color name="notification_text_about_disconnect">#FF4E4C</color>
+
+
+
 </resources>

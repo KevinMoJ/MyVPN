@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
@@ -19,7 +20,9 @@ import android.util.Log;
 import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
@@ -62,7 +65,8 @@ public class ShadowsocksNotification {
                 .setContentTitle(mService.getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
-                .setOngoing(true);
+                .setOngoing(true)
+                .setShowWhen(false);
 
         mCallback = new IShadowsocksServiceCallback.Stub(){
             @Override
@@ -84,7 +88,8 @@ public class ShadowsocksNotification {
                 final Notification notification = mBuilder.build();
                 RemoteViews remoteViews = notification.contentView;
                 View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-                remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.button_green);
+                remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_connect);
+                applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
                 mService.startForeground(1, notification);
 
             }
@@ -161,6 +166,18 @@ public class ShadowsocksNotification {
         unregisterCallback();
         mService.stopForeground(true);
         mNotificationManager.cancel(1);
+    }
+
+
+    private static void applyTextColorToRemoteViews(RemoteViews remoteViews, View view, int color) {
+        if (view instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) view;
+            for (int i = 0, count = vg.getChildCount(); i < count; i++) {
+                applyTextColorToRemoteViews(remoteViews, vg.getChildAt(i), color);
+            }
+        } else if (view instanceof TextView) {
+            remoteViews.setTextColor(view.getId(), color);
+        }
     }
 
 }
