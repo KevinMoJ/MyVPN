@@ -113,7 +113,8 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.ConnectivityActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTask"/>
 
         <service android:name="com.androapplite.shadowsocks.service.ServerListFetcherService" />
         <service
