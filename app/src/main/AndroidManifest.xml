@@ -186,15 +186,6 @@
             <!-- </intent-filter> -->
         </activity>
 
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.WIFIDetectReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.net.wifi.supplicant.STATE_CHANGE" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name="com.androapplite.shadowsocks.activity.CheckInActivity"
             android:theme="@style/AppTheme.NoActionBar" />
