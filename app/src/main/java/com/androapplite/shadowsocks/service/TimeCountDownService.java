@@ -52,6 +52,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         registerDisconnectReceiver();
         m1hCountDown = 0;
         mLastTickTime = System.currentTimeMillis();
+        ShadowsockServiceHelper.bindService(this, this);
     }
 
     private void registerTimeTickTimer(){
@@ -152,14 +153,18 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         }else{
             CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.CONNECTION_STOP);
         }
-        ShadowsockServiceHelper.bindService(this, this);
+        try {
+            mShadowsocksService.stop();
+        } catch (RemoteException e) {
+            ShadowsocksApplication.handleException(e);
+        }
     }
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
         try {
-            mShadowsocksService.stop();
+            mShadowsocksService.setRemainTime(m1hCountDown);
         } catch (RemoteException e) {
             ShadowsocksApplication.handleException(e);
         }
@@ -190,6 +195,13 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     public int onStartCommand(Intent intent, int flags, int startId) {
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
         m1hCountDown += countDown > 3600 ? 3600 : countDown;
+        if(mShadowsocksService != null){
+            try {
+                mShadowsocksService.setRemainTime(m1hCountDown);
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 }

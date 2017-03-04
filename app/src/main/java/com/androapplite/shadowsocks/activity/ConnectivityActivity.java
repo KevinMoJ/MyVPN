@@ -353,14 +353,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         TimeCountDownService.start(this);
                     }
                     clearConnectingTimeout();
-                    if(mShadowsocksService != null && mSharedPreference != null){
-                        int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-                        try {
-                            mShadowsocksService.setRemainTime(remain);
-                        } catch (RemoteException e) {
-                            ShadowsocksApplication.handleException(e);
-                        }
-                    }
                     mErrorServers.clear();
                     break;
                 case STOPPING:
@@ -722,10 +714,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mShadowsocksService != null){
             try {
                 mNewState = Constants.State.values()[mShadowsocksService.getState()];
-                if(mSharedPreference != null) {
-                    int remain = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
-                    mShadowsocksService.setRemainTime(remain);
-                }
             } catch (RemoteException e) {
                 ShadowsocksApplication.handleException(e);
             }
