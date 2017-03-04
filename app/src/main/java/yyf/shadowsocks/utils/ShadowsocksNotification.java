@@ -17,6 +17,9 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.TimeUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.RemoteViews;
 
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
@@ -79,6 +82,9 @@ public class ShadowsocksNotification {
                     mBuilder.setSubText(String.format(mService.getString(R.string.notitication_remain), DateUtils.formatElapsedTime(remain)));
                 }
                 final Notification notification = mBuilder.build();
+                RemoteViews remoteViews = notification.contentView;
+                View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+                remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.button_green);
                 mService.startForeground(1, notification);
 
             }
