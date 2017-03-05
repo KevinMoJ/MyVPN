@@ -15,6 +15,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -80,21 +82,31 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
-                        .setColor(mService.getResources().getColor(R.color.notification_small_icon_bg_connect));
+                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
                 int remain = mService.getRemain();
                 if(remain > 0) {
                     mBuilder.setSubText(String.format(mService.getString(R.string.notitication_remain), DateUtils.formatElapsedTime(remain)));
+                    if(remain > 300){
+                        mBuilder.setColor(getColor(R.color.notification_small_icon_bg_connect));
+                    }else{
+                        mBuilder.setColor(getColor(R.color.notification_small_icon_bg_about_disconnect));
+                    }
                 }
                 final Notification notification = mBuilder.build();
                 RemoteViews remoteViews = notification.contentView;
                 View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
                 remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_connect);
-                applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
+                if(remain > 300){
+                    applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
+                }else{
+                    applyTextColorToRemoteViews(remoteViews, v, getColor(R.color.notification_text_about_disconnect));
+
+                }
                 mService.startForeground(1, notification);
 
             }
         };
+
 
         mLockReceiver = new BroadcastReceiver() {
             @Override
@@ -112,6 +124,10 @@ public class ShadowsocksNotification {
         PowerManager powerManager = (PowerManager) mService.getSystemService(Context.POWER_SERVICE);
         update(powerManager.isScreenOn() ? Intent.ACTION_SCREEN_ON : Intent.ACTION_SCREEN_OFF);
 
+    }
+
+    private @ColorInt int getColor(@ColorRes int id){
+        return mService.getResources().getColor(id);
     }
 
 
@@ -192,5 +208,6 @@ public class ShadowsocksNotification {
         applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
         mService.startForeground(1, notification);
     }
+
 
 }
