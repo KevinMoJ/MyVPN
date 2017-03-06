@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.ViewPropertyAnimator;
 import android.widget.ProgressBar;
 
@@ -40,6 +41,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
     private IShadowsocksService mShadowsocksService;
     private Handler mAdLoadedCheckHandler;
     private Runnable mAdLoadedCheckRunable;
+    private ObjectAnimator mProgressbarAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +62,19 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         AppCheckService.startAppCheckService(this);
         startProgressBarAnimation();
 
+
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
+        adAppHelper.loadNewBanner();
+        adAppHelper.loadNewInterstitial();
+        adAppHelper.loadNewNative();
+
         mAdLoadedCheckRunable = new Runnable() {
             @Override
             public void run() {
-                if(AdAppHelper.getInstance(SplashActivity.this).isFullAdLoaded()){
-
+                if(adAppHelper.isFullAdLoaded()){
+                    mProgressbarAnimator.cancel();
+                    mProgressbarAnimator.setDuration(100);
+                    mProgressbarAnimator.start();
                 }else{
                     mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
                 }
@@ -77,15 +87,15 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
         PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
         PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
-        ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
-        objectAnimator.setDuration(5000);
-        objectAnimator.addListener(new AnimatorListenerAdapter() {
+        mProgressbarAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
+        mProgressbarAnimator.setDuration(5000);
+        mProgressbarAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 startNewUserGuideActivityOrConnectionActivity();
             }
         });
-        objectAnimator.start();
+        mProgressbarAnimator.start();
 
     }
 
