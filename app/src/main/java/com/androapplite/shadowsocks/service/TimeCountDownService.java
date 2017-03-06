@@ -123,7 +123,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                         CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
                     }
                 }else{
-                    if(countDown == 3601 || countDown == 1800 || countDown == 900 || countDown == 300){
+                    if(countDown == 1801 || countDown == 900 || countDown == 300){
                         CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
                     }
                 }
@@ -194,7 +194,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        m1hCountDown += countDown > 3600 ? 3600 : countDown;
+        m1hCountDown += countDown > 1800 ? 1800 : countDown;
         if(mShadowsocksService != null){
             try {
                 mShadowsocksService.setRemainTime(m1hCountDown);
