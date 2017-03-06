@@ -13,13 +13,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.view.ViewPropertyAnimator;
 import android.widget.ProgressBar;
 
 import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -35,6 +38,8 @@ import yyf.shadowsocks.utils.Constants;
 
 public class SplashActivity extends BaseShadowsocksActivity implements ServiceConnection {
     private IShadowsocksService mShadowsocksService;
+    private Handler mAdLoadedCheckHandler;
+    private Runnable mAdLoadedCheckRunable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +59,19 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         CheckInAlarm.checkIn(this);
         AppCheckService.startAppCheckService(this);
         startProgressBarAnimation();
+
+        mAdLoadedCheckRunable = new Runnable() {
+            @Override
+            public void run() {
+                if(AdAppHelper.getInstance(SplashActivity.this).isFullAdLoaded()){
+
+                }else{
+                    mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
+                }
+            }
+        };
+        mAdLoadedCheckHandler = new Handler();
+        mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
     }
     private void startProgressBarAnimation(){
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
@@ -68,6 +86,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
             }
         });
         objectAnimator.start();
+
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
@@ -109,6 +128,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
     protected void onDestroy() {
         super.onDestroy();
         unbindService(this);
+        mAdLoadedCheckHandler.removeCallbacks(mAdLoadedCheckRunable);
     }
 
     @Override
@@ -129,4 +149,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
     public void onServiceDisconnected(ComponentName name) {
         mShadowsocksService = null;
     }
+
+
 }
