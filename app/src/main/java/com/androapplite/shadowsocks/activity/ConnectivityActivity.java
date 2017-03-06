@@ -1050,16 +1050,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 if(checkNetworkConnectivity()) {
                     connectVpnServerAsync();
                 }
-                GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
+                GAHelper.sendEvent(this, "连接VPN", "连接", mNewState.name());
                 if(mSharedPreference != null) {
                     String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
-                    GAHelper.sendEvent(this, "连接VPN", "选择国家", nation);
+                    GAHelper.sendEvent(this, "选择国家", nation);
                 }
 
             } else {
                 DisconnectFragment disconnectFragment = new DisconnectFragment();
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
-
+                GAHelper.sendEvent(this, "连接VPN", "断开", mNewState.name());
             }
         }
 
@@ -1093,13 +1093,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onCancel(DisconnectFragment disconnectFragment) {
-        GAHelper.sendEvent(this, "连接VPN", "取消关闭");
+        GAHelper.sendEvent(this, "连接VPN", "断开", "取消断开");
     }
 
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         disconnectVpnServiceAsync();
-        GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
+        GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
     }
 
     public void watchVideoAd(View v){
