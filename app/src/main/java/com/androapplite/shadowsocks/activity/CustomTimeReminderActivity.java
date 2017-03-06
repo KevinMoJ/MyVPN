@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -9,7 +10,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.service.TimeCountDownService;
 import com.androapplite.vpn3.R;
 
 public class CustomTimeReminderActivity extends AppCompatActivity implements View.OnClickListener{
@@ -51,19 +55,43 @@ public class CustomTimeReminderActivity extends AppCompatActivity implements Vie
                 finish();
                 break;
             case R.id.title:
-                finish();
-                startActivity(new Intent(this, SplashActivity.class));
+                extentTimeSpan();
                 break;
             case R.id.body:
-                finish();
-                startActivity(new Intent(this, SplashActivity.class));
+                extentTimeSpan();
                 break;
         }
+    }
+
+    private void extentTimeSpan() {
+        finish();
+        ShadowsocksApplication application = (ShadowsocksApplication)getApplication();
+        if(application.getRunningActivityCount() < 2) {
+            try {
+                startActivity(new Intent(this, SplashActivity.class));
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
+            }
+        }
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, true).commit();
+        TimeCountDownService.start(this);
     }
 
     @Override
     protected void onDestroy() {
         mAutoDismissHandler.removeCallbacks(mAutoDismissRunable);
         super.onDestroy();
+    }
+
+    public static void startCustomTimeReminderActivity(Context context){
+        Intent intent = new Intent(context, CustomTimeReminderActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        try {
+            context.startActivity(intent);
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
     }
 }
