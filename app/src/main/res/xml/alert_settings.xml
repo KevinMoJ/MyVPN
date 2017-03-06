@@ -27,7 +27,18 @@
     <SwitchPreference
         android:title="One Hour Extension Alert"
         android:key="1h_extension"
-        android:summary="show an alert when connection last almost 1 hour"
+        android:summary="show an alert when connection last almost half an hour"
         android:defaultValue="true"
         />
+    <com.androapplite.shadowsocks.preference.NumberPickerPreference
+        android:title="Customize time reminder"
+        android:summary="show a reminder before time up at specific seconds"
+        android:key="customize_time_reminder"
+        />
+    <!--<Preference-->
+        <!--android:title="Customize time reminder"-->
+        <!--android:summary="show a reminder before time up at specific time"-->
+        <!--android:key="customize_time_reminder"-->
+        <!--android:defaultValue="0"-->
+        <!--/>-->
 </PreferenceScreen>
