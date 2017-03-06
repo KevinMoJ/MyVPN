@@ -1,5 +1,10 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -10,6 +15,8 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.view.ViewPropertyAnimator;
+import android.widget.ProgressBar;
 
 import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.GAHelper;
@@ -37,7 +44,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         initBackgroundReceiver();
         initBackgroundReceiverIntentFilter();
 
-        startNewUserGuideActivityOrConnectionActivity();
+//        startNewUserGuideActivityOrConnectionActivity();
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
 
@@ -46,20 +53,25 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         ShadowsockServiceHelper.bindService(this, this);
         CheckInAlarm.checkIn(this);
         AppCheckService.startAppCheckService(this);
+        startProgressBarAnimation();
+    }
+    private void startProgressBarAnimation(){
+        ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
+        PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
+        PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
+        ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
+        objectAnimator.setDuration(5000);
+        objectAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                startNewUserGuideActivityOrConnectionActivity();
+            }
+        });
+        objectAnimator.start();
     }
 
     private void startNewUserGuideActivityOrConnectionActivity() {
-        getWindow().getDecorView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Activity activity = SplashActivity.this;
-//                startActivity(new Intent(activity,
-//                        DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectivityActivity.class
-//                ));
-                startActivity(new Intent(activity, ConnectivityActivity.class
-                ));
-            }
-        }, TimeUnit.SECONDS.toMillis(2));
+        startActivity(new Intent(this, ConnectivityActivity.class));
     }
 
     private void checkAndCopyAsset() {

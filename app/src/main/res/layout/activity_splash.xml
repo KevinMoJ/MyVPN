@@ -1,31 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SplashActivity"
-    android:background="@color/colorPrimary"
+    tools:context="com.androapplite.shadowsocks.activity.SplashActivity"
+    android:background="@drawable/splash_bg"
     >
+    <View
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_centerInParent="true"
+        android:id="@+id/center" />
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:layout_width="123dp"
+        android:layout_height="10dp"
+        android:id="@+id/progress_bar"
+        style="Widget.ProgressBar.Horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/center"
+        android:layout_marginBottom="24dp"
+        android:indeterminate="false"
+        android:indeterminateOnly="false"
+        android:background="@drawable/progressbar_bg"
+        android:progress="0"
+        android:paddingTop="2dp"
+        android:paddingBottom="1dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:progressDrawable="@drawable/progressbar"
+        />
 
-    <LinearLayout
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
-        <ImageView
-            android:layout_width="144dp"
-            android:layout_height="144dp"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textSize="24sp"
-            android:textColor="@color/primary_white_text"
-            android:textAllCaps="true"
-            android:textStyle="italic"
-            />
-    </LinearLayout>
-</FrameLayout>
+        android:scaleType="fitCenter"
+        android:src="@drawable/splash_logo"
+        android:layout_above="@+id/progress_bar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        />
+
+</RelativeLayout>

@@ -65,7 +65,7 @@ public class ShadowsocksNotification {
         mBuilder = new NotificationCompat.Builder(mService)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(largeIcon)
-                .setColor(mService.getResources().getColor(R.color.colorPrimary))
+                .setColor(getColor(R.color.colorPrimary))
                 .setContentTitle(mService.getString(R.string.app_name))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
@@ -199,7 +199,7 @@ public class ShadowsocksNotification {
 
     public void notifyStopConnection(){
         mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
-                .setColor(mService.getResources().getColor(R.color.notification_small_icon_bg_disconnect))
+                .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
                 .setSubText(null);
         final Notification notification = mBuilder.build();
         RemoteViews remoteViews = notification.contentView;
