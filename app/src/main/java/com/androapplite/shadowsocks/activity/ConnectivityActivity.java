@@ -484,9 +484,24 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-
         } else {
-            super.onBackPressed();
+            new AlertDialog.Builder(this).setTitle("Exit")
+                    .setMessage("Would you like to exit VPN?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .show();
+            AdAppHelper.getInstance(this).showFullAd();
+//            super.onBackPressed();
         }
     }
 
