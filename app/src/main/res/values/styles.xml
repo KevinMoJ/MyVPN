@@ -63,19 +63,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.MyDialog2" parent="AppTheme.NoActionBar">
-        <item name="android:background">@android:color/transparent</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <!--<item name="windowActionBar">false</item>-->
-        <!--<item name="windowNoTitle">true</item>-->
-        <item name="android:windowAnimationStyle">@style/activityAnim</item>
-    </style>
-    <style name="activityAnim">
-        <item name="android:activityOpenEnterAnimation">@anim/slide_bottom_in</item>
-        <item name="android:activityOpenExitAnimation">@anim/slide_bottom_out</item>
-    </style>
-
     <style name="Theme.MyDialog3" parent="AppTheme.NoActionBar">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/transparent</item>
