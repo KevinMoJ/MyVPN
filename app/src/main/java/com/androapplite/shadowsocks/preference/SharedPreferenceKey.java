@@ -18,12 +18,7 @@ public final class SharedPreferenceKey {
     public static final String NOTIFICATION = "notification";
     public static final String CONNECT_TIME = "CONNECT_TIME";
     public static final String TIME_COUNT_DOWN = "TIME_COUNT_DOWN";
-    public static final String LAST_GRANT_TIME = "LAST_GRANT_TIME";
-    public static final String EXPIRED_DATE = "EXPIRED_DATE";
     public static final String CONNECTING_VPN_PORT = "CONNECTING_VPN_PORT";
-    public static final String CONITNUOUSE_CHECK_IN = "CONITNUOUSE_CHECK_IN";
-    public static final String LAST_WIFI_ALERT = "LAST_WIFI_ALERT";
-    public static final String LAST_APP_ALERT = "LAST_APP_ALERT";
     public static final String CONNECT_ERROR_COUNT = "CONNECT_ERROR_COUNT";
     public static final String FIRST_CONNECT_SUCCESS = "FIRST_CONNECT_SUCCESS";
     public static final String EXTENT_1H_ALERT = "EXTENT_1H_ALERT";

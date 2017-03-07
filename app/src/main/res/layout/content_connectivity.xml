@@ -29,7 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:id="@+id/ad_view_container">
+        android:id="@+id/ad_view_container"
+        android:layout_marginBottom="@dimen/standard_margin">
 <!-- todo 显示横幅广告 -->
     </FrameLayout>
 </RelativeLayout>

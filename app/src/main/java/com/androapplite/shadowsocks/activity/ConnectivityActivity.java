@@ -41,9 +41,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -127,7 +129,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
         }
+        addBottomAd(adAppHelper);
 
+        mErrorServers = new HashSet<>();
+    }
+
+    private void addBottomAd(AdAppHelper adAppHelper) {
         FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
@@ -135,8 +142,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        mErrorServers = new HashSet<>();
     }
 
     public static final String NAME = "MainActivity";
@@ -650,7 +655,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         }
         updateConnectionState();
-
     }
 
     private void registerShadowsocksCallback() {
@@ -1009,18 +1013,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onCancel(DisconnectFragment disconnectFragment) {
         GAHelper.sendEvent(this, "连接VPN", "断开", "取消断开");
+        addBottomAd(AdAppHelper.getInstance(this));
     }
 
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         disconnectVpnServiceAsync();
         GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
+        addBottomAd(AdAppHelper.getInstance(this));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        AdAppHelper.getInstance(getApplicationContext()).onResume();
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        adAppHelper.onResume();
         boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
         if(extent1hAlert){
             AlertDialog alertDialog = new AlertDialog.Builder(this)
@@ -1036,5 +1043,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             alertDialog.show();
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
         }
+    }
+
+    private void rotateAd(View v){
+        FrameLayout view = (FrameLayout)findViewById(R.id.ad_view_container);
+        float centerX = view.getWidth() / 2.0f;
+        float centerY = view.getHeight() / 2.0f;
+        Rotate3dAnimation rotate3dAnimation = new Rotate3dAnimation(this, 0, 360, centerX, centerY, 0f, false, true);
+        rotate3dAnimation.setDuration(1000);
+        rotate3dAnimation.setFillAfter(false);
+        view.startAnimation(rotate3dAnimation);
     }
 }
