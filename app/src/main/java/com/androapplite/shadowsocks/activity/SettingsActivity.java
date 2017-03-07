@@ -18,7 +18,6 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.fragment.AlertSettingsFragment;
 import com.androapplite.shadowsocks.fragment.SettingsFragment;
 
 import yyf.shadowsocks.IShadowsocksService;
@@ -33,7 +32,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         getFragmentManager().beginTransaction()
-                .replace(R.id.content, new AlertSettingsFragment())
+                .replace(R.id.content, new SettingsFragment())
                 .commit();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
