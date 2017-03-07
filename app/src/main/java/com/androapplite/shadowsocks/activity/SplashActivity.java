@@ -28,7 +28,6 @@ import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.service.AppCheckService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 
 import java.util.concurrent.TimeUnit;
@@ -56,7 +55,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         GAHelper.sendScreenView(this, "启动屏幕");
 
         ShadowsockServiceHelper.bindService(this, this);
-        AppCheckService.startAppCheckService(this);
         startProgressBarAnimation();
 
 

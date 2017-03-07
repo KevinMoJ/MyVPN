@@ -170,19 +170,6 @@
             <!-- <action android:name="${applicationId}.CHECK_IN_ALARM" /> -->
             <!-- </intent-filter> -->
         </receiver>
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.BootReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="com.androapplite.shadowsocks.service.AppCheckService"
-            android:enabled="true"
-            android:exported="false" />
 
         <activity android:name="com.androapplite.shadowsocks.activity.CustomTimeReminderActivity"
             android:theme="@style/Theme.MyDialog3">
