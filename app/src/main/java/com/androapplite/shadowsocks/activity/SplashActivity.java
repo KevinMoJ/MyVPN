@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.ViewPropertyAnimator;
 import android.widget.ProgressBar;
 
-import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
@@ -57,7 +56,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         GAHelper.sendScreenView(this, "启动屏幕");
 
         ShadowsockServiceHelper.bindService(this, this);
-        CheckInAlarm.checkIn(this);
         AppCheckService.startAppCheckService(this);
         startProgressBarAnimation();
 

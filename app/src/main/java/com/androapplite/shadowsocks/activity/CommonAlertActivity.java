@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.CheckInAlarm;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -161,10 +160,10 @@ public class CommonAlertActivity extends AppCompatActivity {
 //                shouldShowAlert = true;
                 break;
             case CHECK_IN:
-                if(sharedPreferences.getBoolean("check_in", true) &&
-                        !CheckInAlarm.alreadyCheckInToday(context)){
-                    shouldShowAlert = true;
-                }
+//                if(sharedPreferences.getBoolean("check_in", true) &&
+//                        !CheckInAlarm.alreadyCheckInToday(context)){
+//                    shouldShowAlert = true;
+//                }
                 break;
             case TIME_UP:
                 if(sharedPreferences.getBoolean("time_insufficient", true)) {

@@ -160,9 +160,6 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity
-            android:name="com.androapplite.shadowsocks.activity.CheckInActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <receiver
             android:name="com.androapplite.shadowsocks.broadcast.CheckInAlarmReceiver"

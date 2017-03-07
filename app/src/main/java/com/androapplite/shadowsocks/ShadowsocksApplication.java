@@ -80,7 +80,6 @@ public class ShadowsocksApplication extends Application implements Application.A
         // Initialize the SDK before executing any other operations,
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEB
 
-        CheckInAlarm.startCheckInAlarm(this);
         registerActivityLifecycleCallbacks(this);
 
         AdAppHelper.getInstance(getApplicationContext()).init();
