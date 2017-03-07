@@ -64,15 +64,12 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
-        adAppHelper.loadNewBanner();
         adAppHelper.loadNewInterstitial();
-        adAppHelper.loadNewNative();
 
         mAdLoadedCheckRunable = new Runnable() {
             @Override
             public void run() {
                 if(adAppHelper.isFullAdLoaded()){
-                    mProgressbarAnimator.cancel();
                     mProgressbarAnimator.setDuration(100);
                     mProgressbarAnimator.start();
                 }else{
@@ -83,6 +80,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
     }
+
     private void startProgressBarAnimation(){
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
         PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
@@ -92,16 +90,16 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mProgressbarAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                startNewUserGuideActivityOrConnectionActivity();
+                final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
+                if(adAppHelper.isFullAdLoaded()){
+                    adAppHelper.showFullAd();
+                }
             }
         });
         mProgressbarAnimator.start();
 
     }
 
-    private void startNewUserGuideActivityOrConnectionActivity() {
-        startActivity(new Intent(this, ConnectivityActivity.class));
-    }
 
     private void checkAndCopyAsset() {
         new Thread() {

@@ -6,6 +6,7 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 
 /**
  * Created by jim on 17/3/6.
@@ -62,5 +63,11 @@ public class NumberPickerPreference extends DialogPreference {
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
         return a.getInt(index, 0);
+    }
+
+    @Override
+    protected void onBindView(View view) {
+        TextView title = (TextView)view.findViewById(android.R.id.title);
+        super.onBindView(view);
     }
 }
