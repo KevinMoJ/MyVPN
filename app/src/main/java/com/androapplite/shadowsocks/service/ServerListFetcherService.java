@@ -11,7 +11,6 @@ import android.util.Log;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;

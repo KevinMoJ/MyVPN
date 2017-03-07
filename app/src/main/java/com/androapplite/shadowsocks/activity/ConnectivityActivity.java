@@ -45,7 +45,6 @@ import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
@@ -268,10 +267,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         showRateUsFragment();
                     }
                     mIsConnecting = false;
-                    if(!VIPUtil.isVIP(mSharedPreference)) {
-//                        TimeCountDownService.isAvailable(this);
-                        TimeCountDownService.start(this);
-                    }
+                    TimeCountDownService.start(this);
                     clearConnectingTimeout();
                     mErrorServers.clear();
                     break;

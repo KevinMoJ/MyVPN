@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
@@ -54,13 +53,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectButton.setOnClickListener(this);
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
 
-        if(!VIPUtil.isVIP(getContext())) {
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
-            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
-        }else{
-            mMessageTextView.setText(R.string.u_r_vip);
-        }
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         return view;
     }
 
@@ -166,21 +161,15 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
 
     private void init(){
-        if(!VIPUtil.isVIP(getContext())) {
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
-            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
-        }
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
     }
 
     private void connectFinish(){
         mLoadingView.clearAnimation();
-        if(!VIPUtil.isVIP(getContext())) {
-            mCountDownTimer = new Timer();
-            mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
-        }else{
-            mMessageTextView.setText(R.string.connected);
-        }
+        mCountDownTimer = new Timer();
+        mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
         mConnectButton.setText(R.string.disconnect);
     }
 
@@ -205,13 +194,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void stopFinish(){
         mLoadingView.clearAnimation();
-        if(!VIPUtil.isVIP(getContext())) {
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
-            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
-        }else{
-            mMessageTextView.setText(R.string.u_r_vip);
-        }
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
     }
 
     private void error(){
