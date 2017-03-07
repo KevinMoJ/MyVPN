@@ -147,15 +147,6 @@
 
         <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity" />
 
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.VIDEO_AD_FINISH" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name="com.androapplite.shadowsocks.activity.CommonAlertActivity"
             android:exported="true"

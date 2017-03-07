@@ -13,17 +13,14 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -32,7 +29,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -40,25 +36,17 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.view.Window;
-import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
-import com.androapplite.shadowsocks.ads.AdType;
-import com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.VIPUtil;
 import com.androapplite.shadowsocks.broadcast.Action;
-import com.androapplite.shadowsocks.broadcast.WatchVideoADCallbackReceiver;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
 import com.androapplite.shadowsocks.fragment.RateUsFragment;
@@ -72,31 +60,17 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.request.target.SimpleTarget;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
-import com.vungle.publisher.AdConfig;
-import com.vungle.publisher.EventListener;
-import com.vungle.publisher.Orientation;
-import com.vungle.publisher.VunglePub;
-
-import junit.framework.Assert;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.System;
-import java.net.ConnectException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
@@ -126,7 +100,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ProgressDialog mFetchServerListProgressDialog;
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
-    private VunglePub vunglePub;
     private HashSet<ServerConfig> mErrorServers;
 
     @Override
@@ -161,44 +134,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //            ex.printStackTrace();
 //        }
 
-        vunglePub = VunglePub.getInstance();
-        vunglePub.init(this, "5883318328ba136f4e00021a");
-
-        final AdConfig globalAdConfig = vunglePub.getGlobalAdConfig();
-        globalAdConfig.setSoundEnabled(true);
-        globalAdConfig.setBackButtonImmediatelyEnabled(false);
-        globalAdConfig.setOrientation(Orientation.autoRotate);
-
-        vunglePub.addEventListeners(new EventListener() {
-            @Override
-            public void onAdEnd(boolean b) {
-                if (!watchedVideoFinish) {
-                    watchedVideoFinish = true;
-                    WatchVideoADCallbackReceiver.increaseCountDown(ConnectivityActivity.this);
-//                    Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-//                    sendBroadcast(intent);
-                }
-            }
-
-            @Override
-            public void onAdStart() {
-            }
-
-            @Override
-            public void onAdUnavailable(String s) {
-            }
-
-            @Override
-            public void onAdPlayableChanged(boolean b) {
-                if (b) {
-                    videoAvailble = true;
-                }
-            }
-
-            @Override
-            public void onVideoView(boolean b, int i, int i1) {
-            }
-        });
         mErrorServers = new HashSet<>();
     }
 
@@ -755,7 +690,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     protected void onPause() {
-        vunglePub.onPause();
         AdAppHelper.getInstance(getApplicationContext()).onPause();
         super.onPause();
     }
@@ -1087,31 +1021,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
     }
 
-    public void watchVideoAd(View v){
-        //todo 播视频广告
-        if (vunglePub.isAdPlayable()) {
-            watchedVideoFinish = false;
-            vunglePub.playAd();
-        } else if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()){
-            watchedVideoFinish = false;
-            if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                WatchVideoADCallbackReceiver.increaseCountDown(ConnectivityActivity.this);
-            }
-        }
-        if (watchedVideoFinish) {
-            Toast.makeText(this, "No Video Available", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void openCheckInAcivity(View v){
-        startActivity(new Intent(this, CheckInActivity.class));
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        vunglePub.onResume();
         AdAppHelper.getInstance(getApplicationContext()).onResume();
         boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
         if(extent1hAlert){
