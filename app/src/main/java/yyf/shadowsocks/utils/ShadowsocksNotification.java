@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -51,6 +52,7 @@ public class ShadowsocksNotification {
     private final NotificationCompat.Builder mBuilder;
     private BroadcastReceiver mLockReceiver;
     private boolean mCallbackRegistered;
+    private final PendingIntent mPendingIntent;
 
     public ShadowsocksNotification(BaseService baseService, String profileName){
         mService = baseService;
@@ -59,15 +61,15 @@ public class ShadowsocksNotification {
         mProfileName = profileName;
         mIsVisible = true;
 
-        Intent intent = new Intent(mService, ConnectivityActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(Action.NOTIFICATION_OPEN);
+        mPendingIntent = PendingIntent.getBroadcast(mService, 0, intent, FLAG_UPDATE_CURRENT);
         final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
         mBuilder = new NotificationCompat.Builder(mService)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(largeIcon)
                 .setColor(getColor(R.color.colorPrimary))
                 .setContentTitle(mService.getString(R.string.app_name))
-                .setContentIntent(pendingIntent)
+                .setContentIntent(mPendingIntent)
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .setShowWhen(false);
@@ -193,6 +195,18 @@ public class ShadowsocksNotification {
         remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
         applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
         mService.startForeground(1, notification);
+
+
+//        final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
+//                .setSmallIcon(R.drawable.notification_icon)
+//                .setLargeIcon(largeIcon)
+//                .setColor(getColor(R.color.colorPrimary))
+//                .setContentTitle(mService.getString(R.string.app_name))
+//                .setContentIntent(mPendingIntent)
+//                .setFullScreenIntent(mPendingIntent, true);
+//
+//        mNotificationManager.notify(2, builder.build());
     }
 
 
