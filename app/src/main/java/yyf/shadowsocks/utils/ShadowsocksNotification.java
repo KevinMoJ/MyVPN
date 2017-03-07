@@ -82,26 +82,13 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
-                int remain = mService.getRemain();
-                if(remain > 0) {
-                    mBuilder.setSubText(String.format(mService.getString(R.string.notitication_remain), DateUtils.formatElapsedTime(remain)));
-                    if(remain > 300){
-                        mBuilder.setColor(getColor(R.color.notification_small_icon_bg_connect));
-                    }else{
-                        mBuilder.setColor(getColor(R.color.notification_small_icon_bg_about_disconnect));
-                    }
-                }
+                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
+                        .setColor(getColor(R.color.notification_small_icon_bg_connect));
                 final Notification notification = mBuilder.build();
                 RemoteViews remoteViews = notification.contentView;
                 View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
                 remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_connect);
-                if(remain > 300){
-                    applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
-                }else{
-                    applyTextColorToRemoteViews(remoteViews, v, getColor(R.color.notification_text_about_disconnect));
-
-                }
+                applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
                 mService.startForeground(1, notification);
 
             }
@@ -199,8 +186,7 @@ public class ShadowsocksNotification {
 
     public void notifyStopConnection(){
         mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
-                .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
-                .setSubText(null);
+                .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
         final Notification notification = mBuilder.build();
         RemoteViews remoteViews = notification.contentView;
         View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
