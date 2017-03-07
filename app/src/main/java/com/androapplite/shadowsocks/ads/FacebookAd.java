@@ -26,6 +26,7 @@ import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class FacebookAd {
     private Context mContext;
@@ -33,74 +34,107 @@ public class FacebookAd {
     private NativeAd mNativeAd;
     private NativeAd mFBNAd;
     private AdView mBannerView;
-    private InterstitialAd mInterstitialAd;
+    private LinearLayout mFBNBannerAdView;
+    private NativeAd mFBNBannerAd;
+//    private InterstitialAd mInterstitialAd;
     private String mBannerId;
     private String mNativeId;
     private String mInterstitialId;
     private String mFBNId;
+    private String mFBNBannerId;
 
     private boolean enableBanner;
     private boolean enableNative;
-    private boolean enableInterstitial;
+//    private boolean enableInterstitial;
     private boolean enableFBN;
+    private boolean enableFBNBanner;
 
     private boolean bannerLoaded;
     private boolean nativeLoaded;
-    private boolean interstitialLoaded;
+//    private boolean interstitialLoaded;
     private boolean fbnLoaded;
+    private boolean fbnBannerLoaded;
 
     private boolean bannerRequest;
     private boolean nativeRequest;
-    private boolean interstitialRequest;
+//    private boolean interstitialRequest;
     private boolean fbnRequest;
-    private long lastRequestInsterstialTime = 0;
+    private boolean fbnBannerRequest;
 
-    public static int NATIVE_WIDTH = 320;
-    public static int NATIVE_HEIGHT = 320;
+    private AdStateListener mAdListener;
 
-    private com.androapplite.shadowsocks.ads.AdListener mAdListener;
+    private FBInterstitialAd[] fullAds;
 
-    public FacebookAd(Context context, String bannerId, String nativeId, String interstitialId, String fbnFull) {
+    private long lastRequestNativeTime;
+    private long lastRequestFBNBannerTime;
+
+    private class FBInterstitialAd {
+        public InterstitialAd ad;
+        public String id;
+        public boolean enabled;
+        public boolean requested;
+        public boolean loaded;
+        public long lastRequestTime;
+    }
+
+    public FacebookAd(Context context, String bannerId, String nativeId, String interstitialId, String fbnFull, String fbnBanner) {
         this.mContext = context;
         this.mBannerId = bannerId;
         this.mNativeId = nativeId;
+        this.mFBNBannerId = fbnBanner;
         this.mInterstitialId = interstitialId;
+        if (!TextUtils.isEmpty(interstitialId)) {
+            String[] ids = interstitialId.split(",");
+            fullAds = new FBInterstitialAd[ids.length];
+            for (int i = 0; i < ids.length; i++) {
+                fullAds[i] = new FBInterstitialAd();
+                fullAds[i].id = ids[i];
+            }
+        }
         this.mFBNId = fbnFull;
         this.mNativeAdView = new LinearLayout(mContext);
+        this.mFBNBannerAdView = new LinearLayout(mContext);
     }
 
-    public void resetId(String bannerId, String nativeId, String interstitialId, String fbnFull) {
+    public void resetId(String bannerId, String nativeId, String interstitialId, String fbnFull, String fbnBanner) {
         if (!mBannerId.equals(bannerId)) {
             mBannerId = bannerId;
             mBannerView = null;
             bannerLoaded = false;
             bannerRequest = false;
-            loadNewBanner();
         }
         if (!mNativeId.equals(nativeId)) {
             mNativeId = nativeId;
             mNativeAdView = null;
             nativeLoaded = false;
             nativeRequest = false;
-            loadNewNativeAd();
         }
         if (!mInterstitialId.equals(interstitialId)) {
             mInterstitialId = interstitialId;
-            mInterstitialAd = null;
-            interstitialLoaded = false;
-            interstitialRequest = false;
-            loadNewInterstitial();
+            if (!TextUtils.isEmpty(interstitialId)) {
+                String[] ids = interstitialId.split(",");
+                fullAds = new FBInterstitialAd[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    fullAds[i] = new FBInterstitialAd();
+                    fullAds[i].id = ids[i];
+                }
+            }
         }
         if (!mFBNId.equals(fbnFull)) {
             mFBNId = fbnFull;
             mFBNAd = null;
             fbnLoaded = false;
             fbnRequest = false;
-            loadNewFBNAd();
+        }
+        if (!mFBNBannerId.equals(fbnBanner)) {
+            mFBNBannerId = fbnBanner;
+            mFBNBannerAd = null;
+            fbnBannerLoaded = false;
+            fbnBannerRequest = false;
         }
     }
 
-    public void setAdListener(com.androapplite.shadowsocks.ads.AdListener listener) {
+    public void setAdListener(AdStateListener listener) {
         this.mAdListener = listener;
     }
 
@@ -113,11 +147,17 @@ public class FacebookAd {
     }
 
     public void setInterstitialEnabled(boolean flag) {
-        enableInterstitial = flag;
+        for (int i = 0; i < fullAds.length; i++) {
+            fullAds[i].enabled = flag;
+        }
     }
 
     public void setFBNEnabled(boolean flag) {
         enableFBN = flag;
+    }
+
+    public void setFBNBannerEnabled(boolean flag) {
+        enableFBNBanner = flag;
     }
 
     public boolean isBannerLoaded() {
@@ -129,28 +169,65 @@ public class FacebookAd {
     }
 
     public boolean isInterstitialLoaded() {
-        return interstitialLoaded;
+        for (int i = 0; i < fullAds.length; i++) {
+            if (fullAds[i].loaded) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isFBNLoaded() {
         return fbnLoaded;
     }
 
+    public boolean isFBNBannerLoaded() {
+        return fbnBannerLoaded;
+    }
+
     public View getBanner() {
         return mBannerView;
     }
 
+    public View getBannerFBN() {
+        lastRequestFBNBannerTime = System.currentTimeMillis();
+        mFBNBannerAdView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (System.currentTimeMillis() - lastRequestFBNBannerTime > 10000) {
+                    fbnBannerLoaded = false;
+                    fbnBannerRequest = false;
+                    loadNewFBNBanner();
+                }
+            }
+        }, 10000);
+        return mFBNBannerAdView;
+    }
+
     public View getNative() {
-        nativeLoaded = false;
+        lastRequestNativeTime = System.currentTimeMillis();
+        mNativeAdView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (System.currentTimeMillis() - lastRequestNativeTime > 10000) {
+                    nativeLoaded = false;
+                    nativeRequest = false;
+                    loadNewNativeAd();
+                }
+            }
+        }, 10000);
         return mNativeAdView;
     }
 
     public void showInterstitial() {
-        interstitialLoaded = false;
-        if (mInterstitialAd.isAdLoaded()) {
-            try {
-                mInterstitialAd.show();
-            } catch (Exception ex) {
+        for (int i = 0; i < fullAds.length; i++) {
+            if (fullAds[i].ad.isAdLoaded()) {
+                try {
+                    fullAds[i].loaded = false;
+                    fullAds[i].ad.show();
+                } catch (Exception ex) {
+                }
+                break;
             }
         }
     }
@@ -201,58 +278,61 @@ public class FacebookAd {
 
     public void loadNewInterstitial() {
         long now = System.currentTimeMillis();
-        if (TextUtils.isEmpty(mInterstitialId)) return;
-        if (interstitialLoaded) return;
-        if (interstitialRequest && (now - lastRequestInsterstialTime) < 1000 * 20) return;
-        if (!enableInterstitial) return;
+        for (int i = 0; i < fullAds.length; i++) {
+            final FBInterstitialAd fullAd = fullAds[i];
+            if (TextUtils.isEmpty(fullAd.id)) continue;
+            if (fullAd.loaded) continue;
+            if (fullAd.requested && (now - fullAd.lastRequestTime) < 1000 * 20) continue;
+            if (!fullAd.enabled) continue;
 
-        interstitialRequest = true;
-        lastRequestInsterstialTime = now;
+            fullAd.requested = true;
+            fullAd.lastRequestTime = now;
 
-        if (mInterstitialAd == null) {
-            mInterstitialAd = new InterstitialAd(mContext, mInterstitialId);
-            mInterstitialAd.setAdListener(new InterstitialAdListener() {
-                @Override
-                public void onInterstitialDisplayed(Ad ad) {
-                    if (mAdListener != null) {
-                        mAdListener.onAdOpen(new AdType(AdType.FACEBOOK_FULL));
+            if (fullAd.ad == null) {
+                fullAd.ad = new InterstitialAd(mContext, fullAd.id);
+                fullAd.ad.setAdListener(new InterstitialAdListener() {
+                    @Override
+                    public void onInterstitialDisplayed(Ad ad) {
+                        if (mAdListener != null) {
+                            mAdListener.onAdOpen(new AdType(AdType.FACEBOOK_FULL));
+                        }
                     }
-                }
 
-                @Override
-                public void onInterstitialDismissed(Ad ad) {
-                    interstitialLoaded = false;
-                    interstitialRequest = false;
-                    AdAppHelper.getInstance(mContext).loadNewInterstitial();
-                }
-
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    interstitialLoaded = false;
-                    interstitialRequest = false;
-                }
-
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    interstitialLoaded = true;
-                    interstitialRequest = false;
-                    if (mAdListener != null) {
-                        mAdListener.onAdLoaded(new AdType(AdType.FACEBOOK_FULL));
+                    @Override
+                    public void onInterstitialDismissed(Ad ad) {
+                        fullAd.loaded = false;
+                        fullAd.requested = false;
+                        AdAppHelper.getInstance(mContext).loadNewInterstitial();
                     }
-                }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                }
-            });
-        }
-        try {
-            mInterstitialAd.loadAd();
-        } catch (Exception ex) {
-            mInterstitialAd = null;
-            interstitialRequest = false;
-            interstitialLoaded = false;
-            loadNewInterstitial();
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        fullAd.loaded = false;
+                        fullAd.requested = false;
+                    }
+
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        fullAd.loaded = true;
+                        fullAd.requested = false;
+                        if (mAdListener != null) {
+                            mAdListener.onAdLoaded(new AdType(AdType.FACEBOOK_FULL));
+                        }
+                    }
+
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                    }
+                });
+            }
+            try {
+                fullAd.ad.loadAd();
+            } catch (Exception ex) {
+                fullAd.ad = null;
+                fullAd.requested = false;
+                fullAd.loaded = false;
+                loadNewInterstitial();
+            }
         }
     }
 
@@ -293,7 +373,6 @@ public class FacebookAd {
                 // Inflate the Ad view.  The layout referenced should be the one you created in the last step.
                 View adView = inflater.inflate(R.layout.native_ad_layout, mNativeAdView, false);
                 mNativeAdView.addView(adView);
-                mNativeAd.registerViewForInteraction(mNativeAdView);
 
                 // Create native UI using the ad metadata.
                 ImageView nativeAdIcon = (ImageView) adView.findViewById(R.id.native_ad_icon);
@@ -302,6 +381,18 @@ public class FacebookAd {
                 TextView nativeAdSocialContext = (TextView) adView.findViewById(R.id.native_ad_social_context);
                 TextView nativeAdBody = (TextView) adView.findViewById(R.id.native_ad_body);
                 Button nativeAdCallToAction = (Button) adView.findViewById(R.id.native_ad_call_to_action);
+
+                // Register the Title and CTA button to listen for clicks.
+                List<View> clickableViews = new ArrayList<>();
+                clickableViews.add(nativeAdTitle);
+                clickableViews.add(nativeAdMedia);
+                clickableViews.add(nativeAdCallToAction);
+                AdConfig config = AdAppHelper.getInstance(mContext).getConfig();
+                int r = new Random().nextInt(100);
+                if (r < config.ad_ctrl.native_click) {
+                    mNativeAd.registerViewForInteraction(mNativeAdView, clickableViews);
+                }
+
 
                 // Set the Text.
                 nativeAdTitle.setText(mNativeAd.getAdTitle());
@@ -320,11 +411,6 @@ public class FacebookAd {
                 LinearLayout adChoicesContainer = (LinearLayout) adView.findViewById(R.id.ad_choices_container);
                 AdChoicesView adChoicesView = new AdChoicesView(mContext, mNativeAd, true);
                 adChoicesContainer.addView(adChoicesView);
-
-                // Register the Title and CTA button to listen for clicks.
-                List<View> clickableViews = new ArrayList<>();
-                clickableViews.add(nativeAdTitle);
-                clickableViews.add(nativeAdMedia);
             }
 
             @Override
@@ -334,6 +420,85 @@ public class FacebookAd {
         });
 
         mNativeAd.loadAd();
+    }
+
+    public void loadNewFBNBanner() {
+        if (TextUtils.isEmpty(mFBNBannerId)) return;
+        if (fbnBannerLoaded) return;
+        if (fbnBannerRequest) return;
+        if (!enableFBNBanner) return;
+
+        fbnBannerRequest = true;
+
+        if (mFBNBannerAd != null) {
+            mFBNBannerAd.destroy();
+        }
+        mFBNBannerAd = new NativeAd(mContext, mFBNBannerId);
+        mFBNBannerAd.setAdListener(new AdListener() {
+
+            @Override
+            public void onError(Ad ad, AdError error) {
+                if (error.getErrorCode() == 1002) {
+                }
+                fbnBannerRequest = false;
+                fbnBannerLoaded = false;
+            }
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+                // Ad loaded callback
+                fbnBannerLoaded = true;
+                fbnBannerRequest = false;
+                if (mFBNBannerAd != null) {
+                    mFBNBannerAd.unregisterView();
+                }
+
+                mFBNBannerAdView.removeAllViews();
+                // Add the Ad view into the ad container.
+                LayoutInflater inflater = LayoutInflater.from(mContext);
+                // Inflate the Ad view.  The layout referenced should be the one you created in the last step.
+                View adView = inflater.inflate(R.layout.native_banner_ad_layout, mFBNBannerAdView, false);
+                mFBNBannerAdView.addView(adView);
+
+                // Create native UI using the ad metadata.
+                ImageView nativeAdIcon = (ImageView) adView.findViewById(R.id.native_ad_icon);
+                MediaView nativeAdMedia = (MediaView) adView.findViewById(R.id.native_ad_media);
+                Button nativeAdCallToAction = (Button) adView.findViewById(R.id.native_ad_call_to_action);
+
+                // Register the Title and CTA button to listen for clicks.
+                List<View> clickableViews = new ArrayList<>();
+                clickableViews.add(nativeAdIcon);
+                clickableViews.add(nativeAdMedia);
+                clickableViews.add(nativeAdCallToAction);
+                AdConfig config = AdAppHelper.getInstance(mContext).getConfig();
+                int r = new Random().nextInt(100);
+                if (r < config.ad_ctrl.banner_click) {
+                    mFBNBannerAd.registerViewForInteraction(mFBNBannerAdView, clickableViews);
+                }
+
+                // Set the Text.
+                nativeAdCallToAction.setText(mFBNBannerAd.getAdCallToAction());
+
+                // Download and display the ad icon.
+                NativeAd.Image adIcon = mFBNBannerAd.getAdIcon();
+                NativeAd.downloadAndDisplayImage(adIcon, nativeAdIcon);
+
+                // Download and display the cover image.
+                nativeAdMedia.setNativeAd(mFBNBannerAd);
+
+                // Add the AdChoices icon
+                LinearLayout adChoicesContainer = (LinearLayout) adView.findViewById(R.id.ad_choices_container);
+                AdChoicesView adChoicesView = new AdChoicesView(mContext, mFBNBannerAd, true);
+                adChoicesContainer.addView(adChoicesView);
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                // Ad clicked callback
+            }
+        });
+
+        mFBNBannerAd.loadAd();
     }
 
     public void loadNewFBNAd() {

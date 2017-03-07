@@ -7,8 +7,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.umeng.analytics.game.UMGameAgent;
@@ -32,6 +34,9 @@ public class AdAppHelper {
 
     private AdMobAd mAdMobAd;
     private FacebookAd mFacebookAd;
+
+    private FrameLayout mBannerLayout;
+    private FrameLayout mNativeLayout;
 
     private AdConfig mAdConfig;
 
@@ -86,6 +91,10 @@ public class AdAppHelper {
     public void onPause() {
         UMGameAgent.onPause(context);
         mAdMobAd.onPause();
+    }
+
+    public AdConfig getConfig() {
+        return mAdConfig;
     }
 
     private final static int INIT_AD = 1000;
@@ -182,6 +191,11 @@ public class AdAppHelper {
         parseNgsOrder(mAdConfig.ad_ctrl.ngsorder_admob, value);
         mAdConfig.ad_ctrl.home_enable = AdConfig.getInt(kv, "home_enable", 1);
         mAdConfig.ad_ctrl.home_delay = AdConfig.getInt(kv, "home_delay", 0);
+        mAdConfig.ad_ctrl.clean_enable = AdConfig.getInt(kv, "clean_enable", 1);
+        mAdConfig.ad_ctrl.scan_enable = AdConfig.getInt(kv, "scan_enable", 1);
+        mAdConfig.ad_ctrl.banner_click = AdConfig.getInt(kv, "banner_click", 0);
+        mAdConfig.ad_ctrl.ngs_click = AdConfig.getInt(kv, "ngs_click", 0);
+        mAdConfig.ad_ctrl.native_click = AdConfig.getInt(kv, "native_click", 0);
 
         mAdConfig.ad_count_ctrl.last_day = mSP.getInt("last_day", 0);
         mAdConfig.ad_count_ctrl.last_full_show_time = mSP.getLong("last_full_show_time", 0);
@@ -230,6 +244,12 @@ public class AdAppHelper {
     }
 
     private void initAd() {
+        if (mBannerLayout == null) {
+            mBannerLayout = new FrameLayout(context);
+        }
+        if (mNativeLayout == null) {
+            mNativeLayout = new FrameLayout(context);
+        }
         if (mAdMobAd == null) {
             mAdMobAd = new AdMobAd(context, mAdConfig.ad_ids.admob, mAdConfig.ad_ids.admob_n, mAdConfig.ad_ids.admob_full, mAdConfig.ad_ids.admob_en);
             mAdMobAd.setBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.admob > 0);
@@ -245,23 +265,25 @@ public class AdAppHelper {
         }
 
         if (mFacebookAd == null) {
-            mFacebookAd = new FacebookAd(context, mAdConfig.ad_ids.fb, mAdConfig.ad_ids.fb_n, mAdConfig.ad_ids.fb_f, mAdConfig.ad_ids.fbns_full);
+            mFacebookAd = new FacebookAd(context, mAdConfig.ad_ids.fb, mAdConfig.ad_ids.fb_n, mAdConfig.ad_ids.fb_f, mAdConfig.ad_ids.fbns_full, mAdConfig.ad_ids.fbns_banner);
             mFacebookAd.setBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.facebook > 0);
             mFacebookAd.setNativeEnabled(mAdConfig.native_ctrl.exe == 1 && mAdConfig.native_ctrl.facebook > 0);
             mFacebookAd.setInterstitialEnabled(mAdConfig.ngs_ctrl.exe == 1 && mAdConfig.ngs_ctrl.facebook > 0);
             mFacebookAd.setFBNEnabled(mAdConfig.ngs_ctrl.exe == 1 && mAdConfig.ngs_ctrl.fbn > 0);
+            mFacebookAd.setFBNBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.fbn > 0);
         } else {
             mFacebookAd.setBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.facebook > 0);
             mFacebookAd.setNativeEnabled(mAdConfig.native_ctrl.exe == 1 && mAdConfig.native_ctrl.facebook > 0);
             mFacebookAd.setInterstitialEnabled(mAdConfig.ngs_ctrl.exe == 1 && mAdConfig.ngs_ctrl.facebook > 0);
             mFacebookAd.setFBNEnabled(mAdConfig.ngs_ctrl.exe == 1 && mAdConfig.ngs_ctrl.fbn > 0);
-            mFacebookAd.resetId(mAdConfig.ad_ids.fb, mAdConfig.ad_ids.fb_n, mAdConfig.ad_ids.fb_f, mAdConfig.ad_ids.fbns_full);
+            mFacebookAd.setFBNBannerEnabled(mAdConfig.banner_ctrl.exe == 1 && mAdConfig.banner_ctrl.fbn > 0);
+            mFacebookAd.resetId(mAdConfig.ad_ids.fb, mAdConfig.ad_ids.fb_n, mAdConfig.ad_ids.fb_f, mAdConfig.ad_ids.fbns_full, mAdConfig.ad_ids.fbns_banner);
         }
         mAdMobAd.setAdListener(listener);
         mFacebookAd.setAdListener(listener);
     }
 
-    private AdListener listener = new AdListener() {
+    private AdStateListener listener = new AdStateListener() {
         @Override
         public void onAdLoaded(AdType adType) {
             switch (adType.getType()) {
@@ -322,27 +344,32 @@ public class AdAppHelper {
             editor.commit();
         }
 
-        if (mAdConfig.banner_ctrl.facebook > mAdConfig.banner_ctrl.admob && mFacebookAd.isBannerLoaded()) {
-            View banner = mFacebookAd.getBanner();
-            if (banner != null) {
-                ViewGroup parent = (ViewGroup) banner.getParent();
-                if (parent != null) {
-                    parent.removeAllViews();
-                }
-                banner.setVisibility(View.VISIBLE);
-            }
-            return banner;
-        } else {
-            View banner = mAdMobAd.getBanner();
-            if (banner != null) {
-                ViewGroup parent = (ViewGroup) banner.getParent();
-                if (parent != null) {
-                    parent.removeAllViews();
-                }
-                banner.setVisibility(View.VISIBLE);
-            }
-            return banner;
+        int max = mAdConfig.banner_ctrl.facebook + mAdConfig.banner_ctrl.admob + mAdConfig.banner_ctrl.fbn;
+        if (max < 100) {
+            max = 100;
         }
+        View adView = null;
+        Random random = new Random();
+        int r = random.nextInt(max);
+        if (r >= (mAdConfig.banner_ctrl.facebook + mAdConfig.banner_ctrl.admob) && mFacebookAd.isFBNBannerLoaded()) {
+            adView = mFacebookAd.getBannerFBN();
+        } else if (r > mAdConfig.banner_ctrl.admob && r <= (max - mAdConfig.banner_ctrl.admob - mAdConfig.banner_ctrl.fbn)
+                && mFacebookAd.isBannerLoaded()) {
+            adView = mFacebookAd.getBanner();
+        } else {
+            adView = mAdMobAd.getBanner();
+        }
+
+        ViewGroup parent = (ViewGroup)mBannerLayout.getParent();
+        if (parent != null) {
+            parent.removeAllViews();
+        }
+        mBannerLayout.removeAllViews();
+        if (adView != null) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+            mBannerLayout.addView(adView, params);
+        }
+        return mBannerLayout;
     }
 
     public View getNative() {
@@ -364,41 +391,27 @@ public class AdAppHelper {
         if (max < 100) {
             max = 100;
         }
+        View adView = null;
         Random random = new Random();
         int r = random.nextInt(max);
         if (r >= (mAdConfig.native_ctrl.facebook + mAdConfig.native_ctrl.admob) && mAdMobAd.isNativeENLoaded()) {
-            View view = mAdMobAd.getNativeEN();
-            if (view != null) {
-                ViewGroup parent = (ViewGroup) view.getParent();
-                if (parent != null) {
-                    parent.removeAllViews();
-                }
-            }
-            return view;
+            adView = mAdMobAd.getNativeEN();
         } else if (r > mAdConfig.native_ctrl.admob && r <= (max - mAdConfig.native_ctrl.admob - mAdConfig.native_ctrl.admob_en)
                 && mFacebookAd.isNativeLoaded()) {
-            View view = mFacebookAd.getNative();
-            if (view != null) {
-                ViewGroup parent = (ViewGroup) view.getParent();
-                if (parent != null) {
-                    parent.removeAllViews();
-                }
-            }
-            return view;
+            adView = mFacebookAd.getNative();
         } else {
-            View view = mAdMobAd.getNative();
-            if (view != null) {
-                ViewGroup parent = (ViewGroup) view.getParent();
-                if (parent != null) {
-                    parent.removeAllViews();
-                }
-            }
-            return view;
+            adView = mAdMobAd.getNative();
         }
-    }
-
-    public boolean isNativeLoaded() {
-        return mFacebookAd.isNativeLoaded() || mAdMobAd.isNativeLoaded();
+        ViewGroup parent = (ViewGroup)mNativeLayout.getParent();
+        if (parent != null) {
+            parent.removeAllViews();
+        }
+        mNativeLayout.removeAllViews();
+        if (adView != null) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+            mNativeLayout.addView(adView, params);
+        }
+        return mNativeLayout;
     }
 
     public boolean isFullAdLoaded() {
@@ -496,6 +509,7 @@ public class AdAppHelper {
     public void loadNewBanner() {
         mAdMobAd.loadNewBanner();
         mFacebookAd.loadNewBanner();
+        mFacebookAd.loadNewFBNBanner();
     }
 
     public void loadNewNative() {

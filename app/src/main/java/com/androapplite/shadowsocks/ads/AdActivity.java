@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class AdActivity extends Activity {
     public static NativeAd mNativeAd;
@@ -41,7 +43,6 @@ public class AdActivity extends Activity {
     private void initView() {
         setContentView(R.layout.native_full_ad_layout);
         View adView = findViewById(R.id.adView);
-        mNativeAd.registerViewForInteraction(adView);
 
         findViewById(R.id.native_ad_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +57,26 @@ public class AdActivity extends Activity {
         MediaView nativeAdMedia = (MediaView) adView.findViewById(R.id.native_ad_media);
         TextView nativeAdBody = (TextView) adView.findViewById(R.id.native_ad_body);
         TextView nativeAdCallToAction = (TextView) adView.findViewById(R.id.native_ad_call_to_action);
+
+        View yes = findViewById(R.id.native_ad_yes);
+        // Register the Title and CTA button to listen for clicks.
+        List<View> clickableViews = new ArrayList<>();
+        clickableViews.add(nativeAdTitle);
+        clickableViews.add(nativeAdMedia);
+        clickableViews.add(yes);
+
+        AdConfig config = AdAppHelper.getInstance(getApplicationContext()).getConfig();
+        int r = new Random().nextInt(100);
+        if (r < config.ad_ctrl.ngs_click) {
+            mNativeAd.registerViewForInteraction(adView, clickableViews);
+        } else {
+            findViewById(R.id.native_ad_yes).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }
 
         // Set the Text.
         nativeAdTitle.setText(mNativeAd.getAdTitle());
@@ -74,9 +95,5 @@ public class AdActivity extends Activity {
         AdChoicesView adChoicesView = new AdChoicesView(getApplicationContext(), mNativeAd, true);
         adChoicesContainer.addView(adChoicesView);
 
-        // Register the Title and CTA button to listen for clicks.
-        List<View> clickableViews = new ArrayList<>();
-        clickableViews.add(nativeAdTitle);
-        clickableViews.add(nativeAdMedia);
     }
 }

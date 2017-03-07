@@ -37,6 +37,11 @@ public class AdConfig {
         }
         public int home_enable;
         public int home_delay;
+        public int clean_enable;
+        public int scan_enable;
+        public int banner_click;
+        public int ngs_click;
+        public int native_click;
         public NgsOrder ngsorder = new NgsOrder();
         public NgsOrder ngsorder_admob = new NgsOrder();
     }
