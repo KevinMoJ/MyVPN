@@ -6,4 +6,7 @@ public abstract class AdStateListener {
 
     public void onAdOpen(AdType adType) {
     }
+
+    public void onAdClosed(AdType adType) {
+    }
 }

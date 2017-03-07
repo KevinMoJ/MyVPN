@@ -283,6 +283,15 @@ public class AdAppHelper {
         mFacebookAd.setAdListener(listener);
     }
 
+    public AdStateListener getInnerListener() {
+        return listener;
+    }
+
+    private AdStateListener mOuterListener;
+    public void setListener(AdStateListener listener) {
+        this.mOuterListener = listener;
+    }
+
     private AdStateListener listener = new AdStateListener() {
         @Override
         public void onAdLoaded(AdType adType) {
@@ -303,6 +312,9 @@ public class AdAppHelper {
                     UMGameAgent.onEvent(context, "jzcg_facebook");
                     GAHelper.sendEvent(context, "广告", "加载成功", "Facebook全屏");
                     break;
+            }
+            if (mOuterListener != null) {
+                mOuterListener.onAdLoaded(adType);
             }
         }
 
@@ -325,6 +337,22 @@ public class AdAppHelper {
                     UMGameAgent.onEvent(context, "cgzs_facebook");
                     GAHelper.sendEvent(context, "广告", "成功展示", "Facebook全屏");
                     break;
+            }
+            if (mOuterListener != null) {
+                mOuterListener.onAdOpen(adType);
+            }
+        }
+
+        @Override
+        public void onAdClosed(AdType adType) {
+            switch (adType.getType()) {
+                case AdType.ADMOB_FULL:
+                case AdType.FACEBOOK_FBN:
+                case AdType.FACEBOOK_FULL:
+                    break;
+            }
+            if (mOuterListener != null) {
+                mOuterListener.onAdClosed(adType);
             }
         }
     };

@@ -40,6 +40,12 @@ public class AdActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        AdAppHelper.getInstance(getApplicationContext()).getInnerListener().onAdClosed(new AdType(AdType.FACEBOOK_FBN));
+        super.onDestroy();
+    }
+
     private void initView() {
         setContentView(R.layout.native_full_ad_layout);
         View adView = findViewById(R.id.adView);
