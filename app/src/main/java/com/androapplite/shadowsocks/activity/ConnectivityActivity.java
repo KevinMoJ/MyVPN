@@ -148,19 +148,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
 
-        AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
-        AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
-        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
-
-        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            container.addView(AdAppHelper.getInstance(getApplicationContext()).getBanner(), params);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        if(adAppHelper.isFullAdLoaded()) {
+            adAppHelper.showFullAd();
         }
 
-        handler1.sendEmptyMessageDelayed(1000, 1000);
+//        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+//        try {
+//            container.addView(adAppHelper.getBanner(), params);
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+
         vunglePub = VunglePub.getInstance();
         vunglePub.init(this, "5883318328ba136f4e00021a");
 
@@ -208,22 +208,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean videoAvailble = false;
     private boolean showResumeAd = false;
     public static boolean nativeLoaded = false;
-    private Handler handler1 = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 1000) {
-                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
-                    try {
-                        if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                        }
-                    } catch (Exception ex) {}
-                } else {
-//                    handler1.sendEmptyMessageDelayed(1000, 200);
-                }
-            }
-        }
-    };
+
 
     private void initForegroundBroadcastIntentFilter(){
         mForgroundReceiverIntentFilter = new IntentFilter();
@@ -323,7 +308,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
                     if (!startUp) {
                         try {
-                            AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
+//                            AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
                             AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
                             AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
                         } catch (Exception ex) {
@@ -1117,11 +1102,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (watchedVideoFinish) {
             Toast.makeText(this, "No Video Available", Toast.LENGTH_SHORT).show();
         }
-//        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
-//        Intent intent = new Intent(Action.VIDEO_AD_FINISH);
-//        sendBroadcast(intent);
-//        Toast.makeText(this, "视频广告", Toast.LENGTH_SHORT).show();
-//        WatchVideoADCallbackReceiver.increaseCountDown(this);
     }
 
     public void openCheckInAcivity(View v){

@@ -51,7 +51,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         initBackgroundReceiver();
         initBackgroundReceiverIntentFilter();
 
-//        startNewUserGuideActivityOrConnectionActivity();
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
 
@@ -83,17 +82,14 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 
     private void startProgressBarAnimation(){
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
-        PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
+        final PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
         PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
         mProgressbarAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
         mProgressbarAnimator.setDuration(5000);
         mProgressbarAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
-                if(adAppHelper.isFullAdLoaded()){
-                    adAppHelper.showFullAd();
-                }
+                startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
             }
         });
         mProgressbarAnimator.start();
