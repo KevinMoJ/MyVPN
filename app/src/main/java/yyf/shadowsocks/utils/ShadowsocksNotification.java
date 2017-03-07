@@ -85,14 +85,17 @@ public class ShadowsocksNotification {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
                 mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
-                        .setColor(getColor(R.color.notification_small_icon_bg_connect));
+                        .setColor(getColor(R.color.notification_small_icon_bg_connect))
+                        .setOngoing(true)
+                        .setAutoCancel(false)
+                        .setFullScreenIntent(null, false);
                 final Notification notification = mBuilder.build();
                 RemoteViews remoteViews = notification.contentView;
                 View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
                 remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_connect);
                 applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
                 mService.startForeground(1, notification);
-
+                mNotificationManager.cancel(2);
             }
         };
 
@@ -187,26 +190,47 @@ public class ShadowsocksNotification {
     }
 
     public void notifyStopConnection(){
-        mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
-                .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
-        final Notification notification = mBuilder.build();
-        RemoteViews remoteViews = notification.contentView;
-        View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-        remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
-        applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
-        mService.startForeground(1, notification);
+        int remain = mService.getRemain();
+        if(remain == 0){
+            final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
+                    .setSmallIcon(R.drawable.notification_icon)
+                    .setLargeIcon(largeIcon)
+                    .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
+                    .setContentTitle(mService.getString(R.string.app_name))
+                    .setContentIntent(mPendingIntent)
+                    .setContentText(mService.getString(R.string.notification_vpn_network_error1))
+                    .setSubText(mService.getString(R.string.notification_vpn_network_error2))
+                    .setFullScreenIntent(mPendingIntent, true)
+                    ;
+            Notification notification2 = builder.build();
+            RemoteViews remoteViews2 = notification2.contentView;
+            View v2 = LayoutInflater.from(mService).inflate(remoteViews2.getLayoutId(), null);
+            remoteViews2.setInt(v2.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+            applyTextColorToRemoteViews(remoteViews2, v2, getColor(R.color.notification_text_about_disconnect));
+            mNotificationManager.notify(2, notification2);
 
+            mBuilder.setContentText(mService.getString(R.string.notification_vpn_network_error1))
+                    .setSubText(mService.getString(R.string.notification_vpn_network_error2))
+                    .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
+                    ;
+            final Notification notification = mBuilder.build();
+            RemoteViews remoteViews = notification.contentView;
+            View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+            remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+            applyTextColorToRemoteViews(remoteViews, v, getColor(R.color.notification_text_about_disconnect));
+            mService.startForeground(1, notification);
 
-//        final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
-//                .setSmallIcon(R.drawable.notification_icon)
-//                .setLargeIcon(largeIcon)
-//                .setColor(getColor(R.color.colorPrimary))
-//                .setContentTitle(mService.getString(R.string.app_name))
-//                .setContentIntent(mPendingIntent)
-//                .setFullScreenIntent(mPendingIntent, true);
-//
-//        mNotificationManager.notify(2, builder.build());
+        }else {
+            mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
+                    .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
+            final Notification notification = mBuilder.build();
+            RemoteViews remoteViews = notification.contentView;
+            View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+            remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+            applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
+            mService.startForeground(1, notification);
+        }
     }
 
 
