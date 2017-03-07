@@ -179,8 +179,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        m1hCountDown += countDown > 1800 ? 1800 : countDown;
+        m1hCountDown += 1800;
         if(mShadowsocksService != null){
             try {
                 mShadowsocksService.setRemainTime(m1hCountDown);
