@@ -7,6 +7,7 @@ public class AdType {
     public static final int FACEBOOK_BANNER = 4;
     public static final int FACEBOOK_NATIVE = 5;
     public static final int FACEBOOK_FULL = 6;
+    public static final int FACEBOOK_FBN = 7;
 
     private int type;
     public AdType(int type) {

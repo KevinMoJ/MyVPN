@@ -303,6 +303,9 @@ public class FacebookAd {
                         fullAd.loaded = false;
                         fullAd.requested = false;
                         AdAppHelper.getInstance(mContext).loadNewInterstitial();
+                        if (mAdListener != null) {
+                            mAdListener.onAdClosed(new AdType(AdType.FACEBOOK_FULL));
+                        }
                     }
 
                     @Override
