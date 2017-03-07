@@ -47,6 +47,8 @@ import android.widget.FrameLayout;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
+import com.androapplite.shadowsocks.ads.AdStateListener;
+import com.androapplite.shadowsocks.ads.AdType;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -126,11 +128,23 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastReceiver();
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        adAppHelper.setListener(new AdStateListener() {
+            @Override
+            public void onAdClosed(AdType adType) {
+                switch (adType.getType()){
+                    case AdType.ADMOB_FULL:
+                    case AdType.FACEBOOK_FBN:
+                    case AdType.FACEBOOK_FULL:
+                        if(mCurrentState == Constants.State.CONNECTED) {
+                            rotateAd();
+                        }
+                        break;
+                }
+            }
+        });
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
         }
-        addBottomAd(adAppHelper);
-
         mErrorServers = new HashSet<>();
     }
 
@@ -655,6 +669,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         }
         updateConnectionState();
+        addBottomAd(AdAppHelper.getInstance(this));
     }
 
     private void registerShadowsocksCallback() {
@@ -1013,13 +1028,16 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onCancel(DisconnectFragment disconnectFragment) {
         GAHelper.sendEvent(this, "连接VPN", "断开", "取消断开");
-        addBottomAd(AdAppHelper.getInstance(this));
     }
 
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         disconnectVpnServiceAsync();
         GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
+    }
+
+    @Override
+    public void onDismiss(DisconnectFragment disconnectFragment) {
         addBottomAd(AdAppHelper.getInstance(this));
     }
 
@@ -1045,7 +1063,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
-    private void rotateAd(View v){
+    private void rotateAd(){
         FrameLayout view = (FrameLayout)findViewById(R.id.ad_view_container);
         float centerX = view.getWidth() / 2.0f;
         float centerY = view.getHeight() / 2.0f;
@@ -1054,4 +1072,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         rotate3dAnimation.setFillAfter(false);
         view.startAnimation(rotate3dAnimation);
     }
+
+
 }
