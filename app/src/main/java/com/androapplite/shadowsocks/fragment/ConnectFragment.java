@@ -54,7 +54,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
 
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
         mMessageTextView.setText("Use time: " + DateUtils.formatElapsedTime(countDown));
         return view;
     }
@@ -162,8 +162,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void init(){
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
-        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        mMessageTextView.setText("Use time: " + DateUtils.formatElapsedTime(countDown));
     }
 
     private void connectFinish(){
@@ -180,11 +180,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             final Context context = getContext();
             if(isVisible() && context != null) {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-                final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+                final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
                 mMessageTextView.post(new Runnable() {
                     @Override
                     public void run() {
-                        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+                        mMessageTextView.setText("Use time: " + DateUtils.formatElapsedTime(countDown));
 
                     }
                 });
@@ -195,7 +195,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void stopFinish(){
         mLoadingView.clearAnimation();
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
         mMessageTextView.setText("Use time: " + DateUtils.formatElapsedTime(countDown));
     }
 
@@ -209,7 +209,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void onResume() {
         super.onResume();
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 3600);
+        final int countDown = sharedPreferences.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
         mMessageTextView.setText("Use time: " + DateUtils.formatElapsedTime(countDown));
     }
 

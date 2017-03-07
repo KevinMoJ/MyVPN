@@ -93,32 +93,22 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         public void run() {
             int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
             //处理系统休眠的情况
-            Log.d("TimeCountDownService", mLastTickTime + " " + System.currentTimeMillis());
+//            Log.d("TimeCountDownService", mLastTickTime + " " + System.currentTimeMillis());
             long differ = System.currentTimeMillis() - mLastTickTime;
             mLastTickTime = System.currentTimeMillis();
             if(differ > 60 * 1000){
-                countDown -= differ/1000;
-                if(countDown < 0){
-                    countDown = 0;
-                }
+                countDown += differ/1000;
                 mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
 
                 m1hCountDown -= differ/1000;
                 if(m1hCountDown < 0){
                     m1hCountDown = 0;
                 }
+            }else{
+                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, ++countDown).commit();
             }
 
-            if(countDown > 0) {
-                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, --countDown).commit();
-                if(--m1hCountDown <= 0){
-                    sendTimeUpBroadcast();
-                }
-                Log.d("countDown2", countDown + " " + m1hCountDown);
-
-                //注意是小于号不是小于等于号
-
-            }else {
+            if(--m1hCountDown <= 0){
                 sendTimeUpBroadcast();
             }
         }
@@ -138,7 +128,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     }
 
     private void stopVPNConnection() {
-        int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
         try {
             mShadowsocksService.stop();
         } catch (RemoteException e) {
