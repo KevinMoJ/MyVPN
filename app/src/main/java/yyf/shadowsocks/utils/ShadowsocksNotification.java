@@ -191,7 +191,7 @@ public class ShadowsocksNotification {
 
     public void notifyStopConnection(){
         int remain = mService.getRemain();
-        if(remain == 0){
+        if(remain <= 0){
             final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
                     .setSmallIcon(R.drawable.notification_icon)
