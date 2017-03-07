@@ -107,6 +107,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
     private HashSet<ServerConfig> mErrorServers;
+    private AlertDialog mExitAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +136,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     case AdType.ADMOB_FULL:
                     case AdType.FACEBOOK_FBN:
                     case AdType.FACEBOOK_FULL:
-                        if(mCurrentState == Constants.State.CONNECTED) {
+                        if(mCurrentState == Constants.State.CONNECTED && mExitAlert == null) {
                             rotateAd();
                         }
                         break;
@@ -423,7 +424,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            new AlertDialog.Builder(this).setTitle("Exit")
+            mExitAlert = new AlertDialog.Builder(this).setTitle("Exit")
                     .setMessage("Would you like to exit VPN?")
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
@@ -437,7 +438,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
                         }
                     })
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            mExitAlert = null;
+                        }
+                    })
                     .show();
+
             AdAppHelper.getInstance(this).showFullAd();
 //            super.onBackPressed();
         }
