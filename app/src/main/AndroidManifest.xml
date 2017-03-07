@@ -145,8 +145,6 @@
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity" />
-
         <activity android:name="com.androapplite.shadowsocks.activity.CustomTimeReminderActivity"
             android:theme="@style/Theme.MyDialog3">
             <!--<intent-filter>-->
