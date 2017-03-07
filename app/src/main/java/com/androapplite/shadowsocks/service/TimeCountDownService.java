@@ -15,8 +15,6 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.CommonAlertActivity;
-import com.androapplite.shadowsocks.activity.CustomTimeReminderActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -119,20 +117,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                 Log.d("countDown2", countDown + " " + m1hCountDown);
 
                 //注意是小于号不是小于等于号
-                if(countDown > m1hCountDown){
-                    int customMinute = mSharedPreference.getInt("customize_time_reminder", 0);
-                    if(customMinute > 0){
-                        if(m1hCountDown == customMinute * 60){
-                            CustomTimeReminderActivity.startCustomTimeReminderActivity(TimeCountDownService.this);
-                        }
-                    }else if(m1hCountDown == 300 || m1hCountDown == 180 || m1hCountDown == 60){
-                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.EXENT_1_HOUR);
-                    }
-                }else{
-                    if(countDown == 1801 || countDown == 900 || countDown == 300){
-                        CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP);
-                    }
-                }
+
             }else {
                 sendTimeUpBroadcast();
             }
@@ -154,11 +139,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     private void stopVPNConnection() {
         int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
-        if(countDown <= 0) {
-            CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.TIME_UP_2);
-        }else{
-            CommonAlertActivity.showAlert(TimeCountDownService.this, CommonAlertActivity.CONNECTION_STOP);
-        }
         try {
             mShadowsocksService.stop();
         } catch (RemoteException e) {

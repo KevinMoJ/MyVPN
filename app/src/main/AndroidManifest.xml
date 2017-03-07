@@ -147,30 +147,6 @@
 
         <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity" />
 
-        <activity
-            android:name="com.androapplite.shadowsocks.activity.CommonAlertActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.MyDialog2">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.CheckInAlarmReceiver"
-            android:enabled="true"
-            android:exported="false">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="${applicationId}.CHECK_IN_ALARM" /> -->
-            <!-- </intent-filter> -->
-        </receiver>
-
         <activity android:name="com.androapplite.shadowsocks.activity.CustomTimeReminderActivity"
             android:theme="@style/Theme.MyDialog3">
             <!--<intent-filter>-->
