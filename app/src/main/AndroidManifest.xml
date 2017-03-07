@@ -166,6 +166,10 @@
                 <action android:name="${applicationId}.NOTIFICATION_OPEN" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver"
+            android:enabled="true"
+            android:exported="false"></receiver>
     </application>
 
 </manifest>

@@ -91,21 +91,21 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     private class TimeCountDownTask extends TimerTask{
         @Override
         public void run() {
-            int countDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+            long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
             //处理系统休眠的情况
 //            Log.d("TimeCountDownService", mLastTickTime + " " + System.currentTimeMillis());
             long differ = System.currentTimeMillis() - mLastTickTime;
             mLastTickTime = System.currentTimeMillis();
             if(differ > 60 * 1000){
                 countDown += differ/1000;
-                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, countDown).commit();
+                mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, countDown).commit();
 
                 m1hCountDown -= differ/1000;
                 if(m1hCountDown < 0){
                     m1hCountDown = 0;
                 }
             }else{
-                mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, ++countDown).commit();
+                mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, ++countDown).commit();
             }
 
             if(--m1hCountDown <= 0){
