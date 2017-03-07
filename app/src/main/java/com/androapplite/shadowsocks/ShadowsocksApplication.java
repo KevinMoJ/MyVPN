@@ -23,6 +23,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.umeng.analytics.game.UMGameAgent;
 
+import java.util.ArrayList;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -33,6 +35,7 @@ public class ShadowsocksApplication extends Application implements Application.A
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
     private int mRunningActivityNum;
+    private ArrayList<Activity> mActivitys;
 
     @NonNull
     public Tracker getTracker(){
@@ -81,6 +84,7 @@ public class ShadowsocksApplication extends Application implements Application.A
         registerActivityLifecycleCallbacks(this);
 
         AdAppHelper.getInstance(getApplicationContext()).init();
+        mActivitys = new ArrayList<>();
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -99,12 +103,12 @@ public class ShadowsocksApplication extends Application implements Application.A
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        mActivitys.add(activity);
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
         mRunningActivityNum++;
-
     }
 
     @Override
@@ -120,6 +124,11 @@ public class ShadowsocksApplication extends Application implements Application.A
     @Override
     public void onActivityStopped(Activity activity) {
         mRunningActivityNum--;
+        if(mRunningActivityNum == 0){
+            for(Activity activity1 : mActivitys){
+                activity1.finish();
+            }
+        }
     }
 
     @Override
@@ -129,6 +138,7 @@ public class ShadowsocksApplication extends Application implements Application.A
 
     @Override
     public void onActivityDestroyed(Activity activity) {
+        mActivitys.remove(activity);
     }
 
     public int getRunningActivityCount(){
