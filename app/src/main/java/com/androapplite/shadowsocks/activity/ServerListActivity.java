@@ -20,6 +20,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
@@ -97,6 +100,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
         GAHelper.sendScreenView(this, "服务器列表屏幕");
         addBottomAd(AdAppHelper.getInstance(this));
+
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
@@ -107,6 +111,9 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
+        container.startAnimation(animation);
     }
 
     private void parseServerList() {
