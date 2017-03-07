@@ -15,18 +15,21 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.util.SparseIntArray;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -93,6 +96,17 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
         GAHelper.sendScreenView(this, "服务器列表屏幕");
+        addBottomAd(AdAppHelper.getInstance(this));
+    }
+
+    private void addBottomAd(AdAppHelper adAppHelper) {
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(adAppHelper.getNative(), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void parseServerList() {

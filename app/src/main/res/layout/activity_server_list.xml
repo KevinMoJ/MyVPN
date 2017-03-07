@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_server_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-
+    android:orientation="vertical"
     tools:context="com.androapplite.shadowsocks.activity.ServerListActivity">
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/swipe_refresh">
         <ListView
             android:layout_width="match_parent"
@@ -18,5 +19,11 @@
             android:divider="@null"
             ></ListView>
     </android.support.v4.widget.SwipeRefreshLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ad_view_container"
+        >
 
-</RelativeLayout>
+    </FrameLayout>
+</LinearLayout>
