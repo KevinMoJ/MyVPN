@@ -36,9 +36,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
@@ -125,13 +128,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             adAppHelper.showFullAd();
         }
 
-//        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-//        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-//        try {
-//            container.addView(adAppHelper.getBanner(), params);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(adAppHelper.getNative(), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
         mErrorServers = new HashSet<>();
     }
