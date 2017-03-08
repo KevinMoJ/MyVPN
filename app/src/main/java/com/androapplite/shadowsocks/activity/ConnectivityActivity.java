@@ -256,18 +256,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     break;
                 case CONNECTED:
+                    final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+                            if(adAppHelper.isFullAdLoaded()) {
+                                adAppHelper.showFullAd();
+                            }else{
+                                rotateAd();
+                            }
                         }
                     } catch (Exception ex) {
                     }
 
                     if (!startUp) {
                         try {
-//                            AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
-                            AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
-                            AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
+                            adAppHelper.loadNewInterstitial();
+                            adAppHelper.loadNewNative();
                         } catch (Exception ex) {
                         }
                         startUp = true;
