@@ -1,5 +1,9 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -10,6 +14,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.widget.ProgressBar;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
@@ -27,6 +32,8 @@ import yyf.shadowsocks.utils.Constants;
 
 public class SplashActivity extends BaseShadowsocksActivity implements ServiceConnection {
     private IShadowsocksService mShadowsocksService;
+    private ObjectAnimator mProgressbarAnimator;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,25 +43,29 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         initBackgroundReceiver();
         initBackgroundReceiverIntentFilter();
 
-        startNewUserGuideActivityOrConnectionActivity();
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
 
         GAHelper.sendScreenView(this, "启动屏幕");
 
         ShadowsockServiceHelper.bindService(this, this);
+        startProgressBarAnimation();
     }
 
-    private void startNewUserGuideActivityOrConnectionActivity() {
-        getWindow().getDecorView().postDelayed(new Runnable() {
+    private void startProgressBarAnimation(){
+        ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
+        final PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
+        PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
+        mProgressbarAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
+        mProgressbarAnimator.setDuration(5000);
+        mProgressbarAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
-            public void run() {
-                Activity activity = SplashActivity.this;
-                startActivity(new Intent(activity,
-                        DefaultSharedPrefeencesUtil.isNewUser(activity) ? NewUserGuideActivity.class : ConnectivityActivity.class
-                ));
+            public void onAnimationEnd(Animator animation) {
+                startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
             }
-        }, TimeUnit.SECONDS.toMillis(2));
+        });
+        mProgressbarAnimator.start();
+
     }
 
     private void checkAndCopyAsset() {
