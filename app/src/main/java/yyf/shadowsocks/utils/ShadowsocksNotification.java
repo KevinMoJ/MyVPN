@@ -2,6 +2,7 @@ package yyf.shadowsocks.utils;
 
 import android.app.KeyguardManager;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -12,6 +13,8 @@ import android.graphics.BitmapFactory;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
+import android.widget.RemoteViewsService;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
@@ -43,14 +46,17 @@ public class ShadowsocksNotification {
         mProfileName = profileName;
         mIsVisible = true;
 
+        RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_connect_view);
+
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_large_icon))
-                .setColor(mService.getResources().getColor(R.color.colorPrimary))
-                .setContentTitle(mService.getString(R.string.app_name))
+//                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_large_icon))
+//                .setColor(mService.getResources().getColor(R.color.colorPrimary))
+//                .setContentTitle(mService.getString(R.string.app_name))
+                .setContent(remoteViews)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
                 .setOngoing(true);
@@ -66,7 +72,10 @@ public class ShadowsocksNotification {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
                 mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
-                mService.startForeground(1, mBuilder.build());
+
+
+                final Notification notification = mBuilder.build();
+                mService.startForeground(1, notification);
 
             }
         };
