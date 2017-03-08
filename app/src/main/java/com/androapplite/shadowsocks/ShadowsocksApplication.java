@@ -1,7 +1,9 @@
 package com.androapplite.shadowsocks;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -20,15 +22,19 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.umeng.analytics.game.UMGameAgent;
 
+import java.util.ArrayList;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends Application {
+public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks{
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
+    private int mRunningActivityNum;
+    private ArrayList<Activity> mActivitys;
 
     @NonNull
     public Tracker getTracker(){
@@ -72,8 +78,9 @@ public class ShadowsocksApplication extends Application {
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
-
+        registerActivityLifecycleCallbacks(this);
         AdAppHelper.getInstance(getApplicationContext()).init();
+        mActivitys = new ArrayList<>();
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -90,4 +97,44 @@ public class ShadowsocksApplication extends Application {
         }
     }
 
+    @Override
+    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        mActivitys.add(activity);
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+        mRunningActivityNum++;
+    }
+
+    @Override
+    public void onActivityResumed(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(Activity activity) {
+        mRunningActivityNum--;
+        if(mRunningActivityNum == 0){
+            for(Activity activity1 : mActivitys){
+                activity1.finish();
+            }
+        }
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+        mActivitys.remove(activity);
+    }
 }
