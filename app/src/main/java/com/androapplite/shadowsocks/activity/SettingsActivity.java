@@ -4,6 +4,8 @@ import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.ActionBar;
@@ -39,6 +41,9 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
+        upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+        actionBar.setHomeAsUpIndicator(upArrow);
 
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
