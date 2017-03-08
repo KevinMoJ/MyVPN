@@ -33,7 +33,7 @@
             />
         <android.support.v4.widget.ContentLoadingProgressBar
             android:layout_width="222dp"
-            android:layout_height="10dp"
+            android:layout_height="4dp"
             android:id="@+id/progress_bar"
             style="Widget.ProgressBar.Horizontal"
             android:layout_marginTop="@dimen/standard_margin"
@@ -41,8 +41,6 @@
             android:indeterminateOnly="false"
             android:progress="0"
             android:progressDrawable="@drawable/splash_progressbar"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
             />
     </LinearLayout>
 </FrameLayout>
