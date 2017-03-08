@@ -111,6 +111,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             if(--m1hCountDown <= 0){
                 sendTimeUpBroadcast();
             }
+            Log.i("CountDownService", "剩余时间 " + m1hCountDown);
         }
     }
 
