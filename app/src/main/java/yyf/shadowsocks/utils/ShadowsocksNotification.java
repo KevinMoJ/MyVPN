@@ -88,7 +88,9 @@ public class ShadowsocksNotification {
                         .setColor(getColor(R.color.notification_small_icon_bg_connect))
                         .setOngoing(true)
                         .setAutoCancel(false)
-                        .setFullScreenIntent(null, false);
+                        .setFullScreenIntent(null, false)
+                        .setSmallIcon(R.drawable.notification_icon)
+                ;
                 final Notification notification = mBuilder.build();
                 RemoteViews remoteViews = notification.contentView;
                 View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
@@ -191,10 +193,10 @@ public class ShadowsocksNotification {
 
     public void notifyStopConnection(){
         int remain = mService.getRemain();
-        if(remain <= 0){
+        if(remain <= 1){
             final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
-                    .setSmallIcon(R.drawable.notification_icon)
+                    .setSmallIcon(R.drawable.notification_explain_marker)
                     .setLargeIcon(largeIcon)
                     .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
                     .setContentTitle(mService.getString(R.string.app_name))
@@ -213,6 +215,7 @@ public class ShadowsocksNotification {
             mBuilder.setContentText(mService.getString(R.string.notification_vpn_network_error1))
                     .setSubText(mService.getString(R.string.notification_vpn_network_error2))
                     .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
+                    .setSmallIcon(R.drawable.notification_explain_marker)
                     ;
             final Notification notification = mBuilder.build();
             RemoteViews remoteViews = notification.contentView;
