@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.widget.ProgressBar;
@@ -20,6 +21,7 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
@@ -33,7 +35,8 @@ import yyf.shadowsocks.utils.Constants;
 public class SplashActivity extends BaseShadowsocksActivity implements ServiceConnection {
     private IShadowsocksService mShadowsocksService;
     private ObjectAnimator mProgressbarAnimator;
-
+    private Handler mAdLoadedCheckHandler;
+    private Runnable mAdLoadedCheckRunable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,24 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 
         ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();
+
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
+        adAppHelper.loadNewInterstitial();
+        adAppHelper.loadNewBanner();
+
+        mAdLoadedCheckRunable = new Runnable() {
+            @Override
+            public void run() {
+                if(adAppHelper.isFullAdLoaded()){
+                    mProgressbarAnimator.setDuration(100);
+                    mProgressbarAnimator.start();
+                }else{
+                    mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
+                }
+            }
+        };
+        mAdLoadedCheckHandler = new Handler();
+        mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
     }
 
     private void startProgressBarAnimation(){
@@ -103,6 +124,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
     protected void onDestroy() {
         super.onDestroy();
         unbindService(this);
+        mAdLoadedCheckHandler.removeCallbacks(mAdLoadedCheckRunable);
     }
 
     @Override
