@@ -49,7 +49,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         registerTimeTickTimer();
         registerTimeUpBroadcast();
         registerDisconnectReceiver();
-        m1hCountDown = 0;
+        m1hCountDown = 1800;
         mLastTickTime = System.currentTimeMillis();
         ShadowsockServiceHelper.bindService(this, this);
     }
@@ -169,7 +169,6 @@ public class TimeCountDownService extends Service implements ServiceConnection{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        m1hCountDown += 1800;
         if(mShadowsocksService != null){
             try {
                 mShadowsocksService.setRemainTime(m1hCountDown);
