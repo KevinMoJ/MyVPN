@@ -10,85 +10,124 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.NativeExpressAdView;
 
 public class AdMobAd {
     private Context mContext;
     private AdView mNativeAdView;
+    public NativeExpressAdView mNativeENAdView;
     private AdView mBannerView;
-    private InterstitialAd mInterstitialAd;
+//    private InterstitialAd mInterstitialAd;
     private String mBannerId;
     private String mNativeId;
+    private String mNativeENId;
     private String mInterstitialId;
 
     private boolean enableBanner;
     private boolean enableNative;
-    private boolean enableInterstitial;
+    private boolean enableNativeEN;
+//    private boolean enableInterstitial;
 
     private boolean bannerLoaded;
     private boolean nativeLoaded;
-    private boolean interstitialLoaded;
+    private boolean nativeENLoaded;
+//    private boolean interstitialLoaded;
 
     private boolean bannerRequest;
     private boolean nativeRequest;
-    private boolean interstitialRequest;
-    private long lastRequestInsterstialTime = 0;
+    private boolean nativeENRequest;
+//    private boolean interstitialRequest;
+//    private long lastRequestInsterstialTime = 0;
 
-    private com.androapplite.shadowsocks.ads.AdListener mAdListener;
+    private AdStateListener mAdListener;
 
-    public static int NATIVE_WIDTH = 320;
-    public static int NATIVE_HEIGHT = 320;
+    private AdMobInterstitialAd[] fullAds;
 
-    public AdMobAd(Context context, String bannerId, String nativeId, String interstitialId) {
+    private long lastRequestNativeENTime = 0;
+
+    private class AdMobInterstitialAd {
+        public InterstitialAd ad;
+        public String id;
+        public boolean enabled;
+        public boolean requested;
+        public boolean loaded;
+        public long lastRequestTime;
+    }
+
+    public AdMobAd(Context context, String bannerId, String nativeId, String interstitialId, String nativeENId) {
         this.mContext = context;
         this.mBannerId = bannerId;
         this.mNativeId = nativeId;
         this.mInterstitialId = interstitialId;
+        if (!TextUtils.isEmpty(interstitialId)) {
+            String[] ids = interstitialId.split(",");
+            fullAds = new AdMobInterstitialAd[ids.length];
+            for (int i = 0; i < ids.length; i++) {
+                fullAds[i] = new AdMobInterstitialAd();
+                fullAds[i].id = ids[i];
+            }
+        }
+        this.mNativeENId = nativeENId;
     }
 
-    public void resetId(String bannerId, String nativeId, String interstitialId) {
+    public void resetId(String bannerId, String nativeId, String interstitialId, String nativeENId) {
         if (!mBannerId.equals(bannerId)) {
             mBannerId = bannerId;
             mBannerView = null;
             bannerLoaded = false;
             bannerRequest = false;
-            loadNewBanner();
         }
         if (!mNativeId.equals(nativeId)) {
             mNativeId = nativeId;
             mNativeAdView = null;
             nativeLoaded = false;
             nativeRequest = false;
-            loadNewNativeAd();
         }
         if (!mInterstitialId.equals(interstitialId)) {
             mInterstitialId = interstitialId;
-            mInterstitialAd = null;
-            interstitialLoaded = false;
-            interstitialRequest = false;
-            loadNewInterstitial();
+            if (!TextUtils.isEmpty(interstitialId)) {
+                String[] ids = interstitialId.split(",");
+                fullAds = new AdMobInterstitialAd[ids.length];
+                for (int i = 0; i < ids.length; i++) {
+                    fullAds[i] = new AdMobInterstitialAd();
+                    fullAds[i].id = ids[i];
+                }
+            }
+        }
+        if (!mNativeENId.equals(nativeENId)) {
+            mNativeENId = nativeENId;
+            mNativeENAdView = null;
+            nativeENLoaded = false;
+            nativeENRequest = false;
         }
     }
 
-    public void setAdListener(com.androapplite.shadowsocks.ads.AdListener listener) {
+    public void setAdListener(AdStateListener listener) {
         this.mAdListener = listener;
     }
 
     public void onResume() {
-        if (mBannerView != null) {
-            mBannerView.resume();
-        }
-        if (mNativeAdView != null) {
-            mNativeAdView.resume();
-        }
+//        if (mBannerView != null) {
+//            mBannerView.resume();
+//        }
+//        if (mNativeAdView != null) {
+//            mNativeAdView.resume();
+//        }
+//        if (mNativeENAdView != null) {
+//            mNativeENAdView.resume();
+//        }
     }
 
     public void onPause() {
-        if (mBannerView != null) {
-            mBannerView.pause();
-        }
-        if (mNativeAdView != null) {
-            mNativeAdView.pause();
-        }
+//        if (mBannerView != null) {
+//            mBannerView.pause();
+//        }
+//        if (mNativeAdView != null) {
+//            mNativeAdView.pause();
+//        }
+//        if (mNativeENAdView != null) {
+//            mNativeENAdView.pause();
+//        }
     }
 
     public void setBannerEnabled(boolean flag) {
@@ -99,8 +138,14 @@ public class AdMobAd {
         enableNative = flag;
     }
 
+    public void setNativeENEnabled(boolean flag) {
+        enableNativeEN = flag;
+    }
+
     public void setInterstitialEnabled(boolean flag) {
-        enableInterstitial = flag;
+        for (int i = 0; i < fullAds.length; i++) {
+            fullAds[i].enabled = flag;
+        }
     }
 
     public boolean isBannerLoaded() {
@@ -111,8 +156,17 @@ public class AdMobAd {
         return nativeLoaded;
     }
 
+    public boolean isNativeENLoaded() {
+        return nativeENLoaded;
+    }
+
     public boolean isInterstitialLoaded() {
-        return interstitialLoaded;
+        for (int i = 0; i < fullAds.length; i++) {
+            if (fullAds[i].loaded) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public View getBanner() {
@@ -123,10 +177,31 @@ public class AdMobAd {
         return mNativeAdView;
     }
 
+    public View getNativeEN() {
+        lastRequestNativeENTime = System.currentTimeMillis();
+        mNativeENAdView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (System.currentTimeMillis() - lastRequestNativeENTime > 10000) {
+                    nativeENLoaded = false;
+                    nativeENRequest = false;
+                    loadNewNativeENAd();
+                }
+            }
+        }, 10000);
+        return mNativeENAdView;
+    }
+
     public void showInterstitial() {
-        interstitialLoaded = false;
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
+        for (int i = 0; i < fullAds.length; i++) {
+            if (fullAds[i].ad.isLoaded()) {
+                try {
+                    fullAds[i].loaded = false;
+                    fullAds[i].ad.show();
+                } catch (Exception ex) {
+                }
+                break;
+            }
         }
     }
 
@@ -165,50 +240,56 @@ public class AdMobAd {
 
     public void loadNewInterstitial() {
         long now = System.currentTimeMillis();
-        if (TextUtils.isEmpty(mInterstitialId)) return;
-        if (interstitialLoaded) return;
-        if (interstitialRequest && (now - lastRequestInsterstialTime) < 1000 * 20) return;
-        if (!enableInterstitial) return;
+        for (int i = 0; i < fullAds.length; i++) {
+            final AdMobInterstitialAd fullAd = fullAds[i];
+            if (TextUtils.isEmpty(fullAd.id)) continue;
+            if (fullAd.loaded) continue;
+            if (fullAd.requested && (now - fullAd.lastRequestTime) < 1000 * 20) continue;
+            if (!fullAd.enabled) continue;
 
-        interstitialRequest = true;
-        lastRequestInsterstialTime = now;
+            fullAd.requested = true;
+            fullAd.lastRequestTime = now;
 
-        if (mInterstitialAd == null) {
-            mInterstitialAd = new InterstitialAd(mContext);
-            mInterstitialAd.setAdUnitId(mInterstitialId);
-            mInterstitialAd.setAdListener(new AdListener() {
-                @Override
-                public void onAdClosed() {
-                    interstitialRequest = false;
-                    interstitialLoaded = false;
-                    AdAppHelper.getInstance(mContext).loadNewInterstitial();
-                }
-
-                @Override
-                public void onAdLoaded() {
-                    interstitialLoaded = true;
-                    interstitialRequest = false;
-                    if (mAdListener != null) {
-                        mAdListener.onAdLoaded(new AdType(AdType.ADMOB_FULL));
+            if (fullAd.ad == null) {
+                fullAd.ad = new InterstitialAd(mContext);
+                fullAd.ad.setAdUnitId(fullAd.id);
+                fullAd.ad.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdClosed() {
+                        fullAd.loaded = false;
+                        fullAd.requested = false;
+                        AdAppHelper.getInstance(mContext).loadNewInterstitial();
+                        if (mAdListener != null) {
+                            mAdListener.onAdClosed(new AdType(AdType.ADMOB_FULL));
+                        }
                     }
-                }
 
-                @Override
-                public void onAdOpened() {
-                    if (mAdListener != null) {
-                        mAdListener.onAdOpen(new AdType(AdType.ADMOB_FULL));
+                    @Override
+                    public void onAdLoaded() {
+                        fullAd.loaded = true;
+                        fullAd.requested = false;
+                        if (mAdListener != null) {
+                            mAdListener.onAdLoaded(new AdType(AdType.ADMOB_FULL));
+                        }
                     }
-                }
 
-                @Override
-                public void onAdFailedToLoad(int i) {
-                    interstitialLoaded = false;
-                    interstitialRequest = false;
-                }
-            });
+                    @Override
+                    public void onAdOpened() {
+                        if (mAdListener != null) {
+                            mAdListener.onAdOpen(new AdType(AdType.ADMOB_FULL));
+                        }
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(int i) {
+                        fullAd.loaded = false;
+                        fullAd.requested = false;
+                    }
+                });
+            }
+            AdRequest adRequest = new AdRequest.Builder().build();
+            fullAd.ad.loadAd(adRequest);
         }
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mInterstitialAd.loadAd(adRequest);
     }
 
     public void loadNewNativeAd() {
@@ -241,6 +322,38 @@ public class AdMobAd {
 
         AdRequest adRequest = new AdRequest.Builder().build();
         mNativeAdView.loadAd(adRequest);
+    }
+
+    public void loadNewNativeENAd() {
+        if (TextUtils.isEmpty(mNativeENId)) return;
+        if (nativeENLoaded) return;
+        if (nativeENRequest) return;
+        if (!enableNativeEN) return;
+
+        nativeENRequest = true;
+
+        if (mNativeENAdView == null) {
+            mNativeENAdView = new NativeExpressAdView(mContext);
+            mNativeENAdView.setAdUnitId(mNativeENId);
+            mNativeENAdView.setAdSize(new AdSize(320, 180));
+
+            mNativeENAdView.setAdListener(new AdListener() {
+                @Override
+                public void onAdFailedToLoad(int i) {
+                    nativeENRequest = false;
+                    nativeENLoaded = false;
+                }
+
+                @Override
+                public void onAdLoaded() {
+                    nativeENLoaded = true;
+                    nativeENRequest = false;
+                }
+            });
+        }
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mNativeENAdView.loadAd(adRequest);
     }
 
 }
