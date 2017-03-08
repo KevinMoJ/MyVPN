@@ -204,6 +204,7 @@ public class ShadowsocksNotification {
                     .setContentText(mService.getString(R.string.notification_vpn_network_error1))
                     .setSubText(mService.getString(R.string.notification_vpn_network_error2))
                     .setFullScreenIntent(mPendingIntent, true)
+                    .setShowWhen(false)
                     ;
             Notification notification2 = builder.build();
             RemoteViews remoteViews2 = notification2.contentView;
