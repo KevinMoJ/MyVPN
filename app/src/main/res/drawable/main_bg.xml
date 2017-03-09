@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:endColor="#3BA4D3"
-        android:startColor="#6D81CC"
-        android:angle="90"
-        />
-</shape>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#5067C4"
+                android:endColor="#54BAE0"
+                android:angle="90"
+                />
+            <size android:height="640dp" android:width="360dp" />
+        </shape>
+    </item>
+    <item>
+        <bitmap android:src="@drawable/bg_bottom" android:gravity="bottom"/>
+    </item>
+</layer-list>
