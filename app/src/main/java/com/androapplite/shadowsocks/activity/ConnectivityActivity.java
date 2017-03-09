@@ -118,6 +118,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
     private HashSet<ServerConfig> mErrorServers;
+    private AlertDialog mExitAlert;
+
 
     public static final String NAME = "ConnectivityActivity";
 
@@ -407,9 +409,31 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-
         } else {
-            super.onBackPressed();
+            mExitAlert = new AlertDialog.Builder(this).setTitle("Exit")
+                    .setMessage("Would you like to exit VPN?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            mExitAlert = null;
+                        }
+                    })
+                    .show();
+
+            AdAppHelper.getInstance(this).showFullAd();
+//            super.onBackPressed();
         }
     }
 
@@ -967,15 +991,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 if(checkNetworkConnectivity()) {
                     connectVpnServerAsync();
                 }
-                GAHelper.sendEvent(this, "连接VPN", "打开", mNewState.name());
+                GAHelper.sendEvent(this, "连接VPN", "连接", mNewState.name());
                 if(mSharedPreference != null) {
                     String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
-                    GAHelper.sendEvent(this, "连接VPN", "选择国家", nation);
+                    GAHelper.sendEvent(this, "选择国家", nation);
                 }
             } else {
                 DisconnectFragment disconnectFragment = new DisconnectFragment();
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
-
+                GAHelper.sendEvent(this, "连接VPN", "断开", mNewState.name());
             }
         }
 
@@ -1009,12 +1033,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onCancel(DisconnectFragment disconnectFragment) {
-        GAHelper.sendEvent(this, "连接VPN", "取消关闭");
+        GAHelper.sendEvent(this, "连接VPN", "断开", "取消断开");
     }
 
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         disconnectVpnServiceAsync();
-        GAHelper.sendEvent(this, "连接VPN", "关闭", mNewState.name());
+        GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
     }
+
+
 }
