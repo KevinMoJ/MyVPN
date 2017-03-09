@@ -197,7 +197,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mConnectButton.setImageLevel(1);
             mMessageTextView.setText(R.string.connected);
             mElapseTextView.setVisibility(View.VISIBLE);
-            mElapseTextView.setText(R.string.time_elapse);
+            mElapseTextView.setText(getString(R.string.use_time, "0:0"));
             Timer timer = (Timer) mElapseTextView.getTag();
             if(timer == null){
                 TimerTask timerTask= new TimerTask() {
@@ -206,14 +206,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                         final Context context = getContext();
                         if(context != null) {
                             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-                            final long current = System.currentTimeMillis();
-                            long start = sharedPreferences.getLong(SharedPreferenceKey.CONNECT_TIME, current);
-                            long elapse = (current - start) / 1000;
-                            final String elpasedTime = DateUtils.formatElapsedTime(elapse);
+                            long useTime = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
+                            final String elpasedTime = DateUtils.formatElapsedTime(useTime);
                             mElapseTextView.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mElapseTextView.setText(elpasedTime);
+                                    mElapseTextView.setText(getString(R.string.use_time, elpasedTime));
                                 }
                             });
                         }

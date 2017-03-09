@@ -179,6 +179,7 @@
                 <action android:name="${applicationId}.NOTIFICATION_OPEN" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".broadcast.ReportUseTimeReceiver" />
     </application>
 
 </manifest>

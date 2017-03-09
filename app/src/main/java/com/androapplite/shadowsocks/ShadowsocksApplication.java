@@ -1,7 +1,11 @@
 package com.androapplite.shadowsocks;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -10,6 +14,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
+import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.crashlytics.android.Crashlytics;
@@ -23,6 +28,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -81,6 +87,7 @@ public class ShadowsocksApplication extends Application implements Application.A
         registerActivityLifecycleCallbacks(this);
         AdAppHelper.getInstance(getApplicationContext()).init();
         mActivitys = new ArrayList<>();
+        reportDailyUseTime();
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -136,5 +143,20 @@ public class ShadowsocksApplication extends Application implements Application.A
     @Override
     public void onActivityDestroyed(Activity activity) {
         mActivitys.remove(activity);
+    }
+
+    public void reportDailyUseTime(){
+        Intent intent = new Intent(this, ReportUseTimeReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 24);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 }
