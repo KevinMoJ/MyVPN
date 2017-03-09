@@ -38,6 +38,7 @@ public class ShadowsocksNotification {
     private final NotificationCompat.Builder mBuilder;
     private BroadcastReceiver mLockReceiver;
     private boolean mCallbackRegistered;
+    private final RemoteViews mConnectremoteViews;
 
     public ShadowsocksNotification(BaseService baseService, String profileName){
         mService = baseService;
@@ -46,17 +47,14 @@ public class ShadowsocksNotification {
         mProfileName = profileName;
         mIsVisible = true;
 
-        RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_connect_view);
+        mConnectremoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_connect_view);
 
         Intent intent = new Intent(mService, ConnectivityActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
-//                .setLargeIcon(BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_large_icon))
-//                .setColor(mService.getResources().getColor(R.color.colorPrimary))
-//                .setContentTitle(mService.getString(R.string.app_name))
-                .setContent(remoteViews)
+                .setContent(mConnectremoteViews)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
                 .setOngoing(true);
@@ -71,9 +69,8 @@ public class ShadowsocksNotification {
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
                 String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
                 String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr));
-
-
+                mConnectremoteViews.setTextViewText(R.id.content, String.format(mService.getString(R.string.notification_no_time), rxr, txr));
+                mBuilder.setContent(mConnectremoteViews);
                 final Notification notification = mBuilder.build();
                 mService.startForeground(1, notification);
 
