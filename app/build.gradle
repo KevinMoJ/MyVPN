@@ -31,8 +31,8 @@ android {
         applicationId "com.androapplite.vpn3"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 12
-        versionName "1.1.12"
+        versionCode 13
+        versionName "1.1.13"
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
