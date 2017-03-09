@@ -8,8 +8,10 @@
                 android:endColor="#54BAE0"
                 android:angle="90"
                 />
-            <size android:height="1280dp" android:width="720dp" />
+            <size android:height="640dp" android:width="360dp" />
         </shape>
     </item>
-    <item android:gravity="bottom" android:drawable="@drawable/bg_bottom" />
+    <item>
+        <bitmap android:src="@drawable/bg_bottom" android:gravity="bottom"/>
+    </item>
 </layer-list>
