@@ -18,6 +18,7 @@ import android.widget.RemoteViewsService;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.broadcast.Action;
 
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.service.BaseService;
@@ -50,11 +51,12 @@ public class ShadowsocksNotification {
 
         mConnectremoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_connect_view);
 
-        Intent intent = new Intent(mService, ConnectivityActivity.class);
-        mPendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(Action.NOTIFICATION_OPEN);
+        mPendingIntent = PendingIntent.getBroadcast(mService, 0, intent, FLAG_UPDATE_CURRENT);
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(mPendingIntent)
                 .setContent(mConnectremoteViews)
                 .setAutoCancel(false)
                 .setOngoing(true);

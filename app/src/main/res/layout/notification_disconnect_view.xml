@@ -22,13 +22,14 @@
     <ImageView
         android:layout_width="16dp"
         android:layout_height="16dp"
+        android:padding="1dp"
         android:id="@+id/right_icon"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="40dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/notification_explain_marker"
         android:tint="@android:color/white"
-        android:background="@drawable/notification_network_error_circle"/>
+        android:background="@drawable/notification_disconnect_circle"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
