@@ -373,7 +373,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getY() == 0);
+        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getFirstVisiblePosition() == 0);
     }
 
     @Override
