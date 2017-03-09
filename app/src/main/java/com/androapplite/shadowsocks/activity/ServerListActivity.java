@@ -81,6 +81,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setEnabled(false);
 
         mListView = (ListView)findViewById(R.id.vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
@@ -368,7 +369,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getX() == 0);
+        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getFirstVisiblePosition() == 0);
     }
 
     @Override
