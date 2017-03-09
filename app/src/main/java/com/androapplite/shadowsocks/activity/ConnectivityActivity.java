@@ -140,22 +140,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         GAHelper.sendEvent(this, "广告", "屏幕浏览", "首页");
         UMGameAgent.onEvent(getApplicationContext(), "shouye");
-        AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
-        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
-        AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
-
-        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            container.addView(AdAppHelper.getInstance(getApplicationContext()).getBanner(), params);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        handler1.sendEmptyMessageDelayed(1000, 1000);
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
         mErrorServers = new HashSet<>();
+
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(adAppHelper.getBanner(), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        if(adAppHelper.isFullAdLoaded()) {
+            adAppHelper.showFullAd();
+        }
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -187,23 +186,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean startUp = false;
     private boolean showResumeAd = false;
     private boolean hasShowResumeAd = false;
-    private Handler handler1 = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 1000) {
-                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded() && !hasShowResumeAd) {
-                    try {
-                        if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ConnectivityActivity.this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                            showResumeAd = true;
-                        }
-                    } catch (Exception ex) {}
-                } else {
-                    handler1.sendEmptyMessageDelayed(1000, 200);
-                }
-            }
-        }
-    };
 
     @Override
     public void onAttachFragment(Fragment fragment) {
@@ -727,20 +709,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         AdAppHelper.getInstance(getApplicationContext()).onResume();
         super.onResume();
 
-        if (!showResumeAd) {
-            try {
-                if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
-                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                        hasShowResumeAd = true;
-                        showResumeAd = true;
-                    }
-                }
-            } catch (Exception ex) {
-            }
-        } else {
-            showResumeAd = false;
-        }
     }
 
     @Override

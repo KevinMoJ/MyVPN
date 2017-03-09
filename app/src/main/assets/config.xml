@@ -15,7 +15,7 @@
     <string name="dev_ctrl">{exe=0},{jump=1000},{dev=com.game.bubbleshooter.free,com.racergame.cityracinglite.free,com.gameone.jabbersuperjump,com.marbleage.free,com.games.solitaire.free,com.appgame7.fruitfrenzy,com.appgame7.candyfrenzy2,com.easygame.marblelegend,com.appgame7.friutslegend}</string>
     <int name="umeng_net_report_policy" value="1" />
     <string name="recommend_config">{&quot;enable&quot;:true,&quot;arr&quot;:[{&quot;imageUrl&quot;:&quot;https://s3-us-west-2.amazonaws.com/recommend-images/images/solitairev4.png&quot;,&quot;linkUrl&quot;:&quot;https://play.google.com/store/apps/details?id=com.solitaire.three.mobidev&amp;referrer=utm_source%3D2048V8%26utm_medium%3Dquit%26utm_campaign%3Dsolitaire&quot;}]}</string>
-    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:2000|adtype=1}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0}</string>
+    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:0|adtype=0}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0}</string>
     <string name="silence_done">{slen_day=3},{push=0}</string>
     <string name="resume_ctrl">{exe=1}</string>
     <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=10000},{fbn=-1}</string>
