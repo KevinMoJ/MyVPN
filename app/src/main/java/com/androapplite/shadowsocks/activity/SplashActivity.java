@@ -87,6 +87,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
             @Override
             public void onAnimationEnd(Animator animation) {
                 startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
+                finish();
             }
         });
         mProgressbarAnimator.start();

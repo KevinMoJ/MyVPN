@@ -38,6 +38,7 @@
         android:layout_above="@+id/progress_bar"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
+
         />
 
 </RelativeLayout>
