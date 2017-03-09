@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
@@ -53,7 +54,7 @@ import yyf.shadowsocks.utils.Constants;
 
 public class ServerListActivity extends BaseShadowsocksActivity implements
         SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
-        ServiceConnection, DialogInterface.OnClickListener{
+        ServiceConnection, DialogInterface.OnClickListener, AbsListView.OnScrollListener{
     private IShadowsocksService mShadowsocksService;
 
 
@@ -89,6 +90,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mListView = (ListView)findViewById(R.id.vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
         mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
 
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
@@ -367,5 +369,15 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             mSwipeRefreshLayout.setRefreshing(false);
             GAHelper.sendEvent(this, "刷新服务器列表", "取消");
         }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getY() == 0);
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
     }
 }
