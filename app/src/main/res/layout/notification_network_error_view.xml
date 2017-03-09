@@ -37,7 +37,7 @@
         android:textColor="@color/disconnect_red"
         android:textSize="16sp"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="-12dp"
+        android:layout_marginTop="-14dp"
         android:layout_marginLeft="64dp"
         android:layout_marginRight="12dp"
         />
@@ -47,12 +47,11 @@
         android:id="@+id/content"
         android:text="@string/notification_network_error"
         android:textColor="@color/disconnect_red"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:layout_marginLeft="64dp"
         android:layout_marginRight="12dp"
-        android:lineSpacingExtra="-4dp"
         />
 
 
