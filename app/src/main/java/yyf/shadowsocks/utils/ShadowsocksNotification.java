@@ -39,6 +39,7 @@ public class ShadowsocksNotification {
     private BroadcastReceiver mLockReceiver;
     private boolean mCallbackRegistered;
     private final RemoteViews mConnectremoteViews;
+    private final PendingIntent mPendingIntent;
 
     public ShadowsocksNotification(BaseService baseService, String profileName){
         mService = baseService;
@@ -50,12 +51,11 @@ public class ShadowsocksNotification {
         mConnectremoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_connect_view);
 
         Intent intent = new Intent(mService, ConnectivityActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
+        mPendingIntent = PendingIntent.getActivity(mService, 0, intent, FLAG_UPDATE_CURRENT);
         mBuilder = new NotificationCompat.Builder(mService)
                 .setWhen(0)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContent(mConnectremoteViews)
-                .setContentIntent(pendingIntent)
                 .setAutoCancel(false)
                 .setOngoing(true);
 
@@ -149,5 +149,33 @@ public class ShadowsocksNotification {
         mService.stopForeground(true);
         mNotificationManager.cancel(1);
     }
+
+    public void notifyStopConnection(){
+        int remain = mService.getRemain();
+        if(remain <= 1){
+            RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_network_error_view);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
+                    .setSmallIcon(R.drawable.notification_icon)
+                    .setContentIntent(mPendingIntent)
+                    .setContent(remoteViews)
+                    .setFullScreenIntent(mPendingIntent, true)
+                    .setShowWhen(false)
+                    .setAutoCancel(true)
+                    ;
+            Notification notification2 = builder.build();
+            mNotificationManager.notify(2, notification2);
+
+            mBuilder.setContent(remoteViews);
+            final Notification notification = mBuilder.build();
+            mService.startForeground(1, notification);
+
+        }else {
+            RemoteViews remoteViews = new RemoteViews(mService.getPackageName(), R.layout.notification_disconnect_view);
+            mBuilder.setContent(remoteViews);
+            final Notification notification = mBuilder.build();
+            mService.startForeground(1, notification);
+        }
+    }
+
 
 }

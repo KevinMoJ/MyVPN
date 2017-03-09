@@ -494,10 +494,7 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-        if (mShadowsocksNotification != null) {
-            mShadowsocksNotification.destroy();
-            mShadowsocksNotification = null;
-        }
+        mShadowsocksNotification.notifyStopConnection();
 //        if(mNativeProcessMonitorThread != null){
 //            mNativeProcessMonitorThread.stopThread();
 //            mNativeProcessMonitorThread = null;
@@ -530,11 +527,7 @@ public class ShadowsocksVpnService extends BaseService {
             mShadowsocksVpnThread.stopThread();
             mShadowsocksVpnThread = null;
         }
-        if (mShadowsocksNotification != null) {
-            mShadowsocksNotification.destroy();
-            mShadowsocksNotification = null;
-        }
-
+        mShadowsocksNotification.notifyStopConnection();
 //        if(mNativeProcessMonitorThread != null){
 //            mNativeProcessMonitorThread.stopThread();
 //            mNativeProcessMonitorThread = null;
@@ -623,5 +616,14 @@ public class ShadowsocksVpnService extends BaseService {
                 mShadowsocksNotification.disableNotification();
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mShadowsocksNotification != null) {
+            mShadowsocksNotification.destroy();
+            mShadowsocksNotification = null;
+        }
+        super.onDestroy();
     }
 }

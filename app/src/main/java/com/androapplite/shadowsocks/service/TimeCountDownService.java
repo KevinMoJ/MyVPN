@@ -49,7 +49,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         registerTimeTickTimer();
         registerTimeUpBroadcast();
         registerDisconnectReceiver();
-        m1hCountDown = 10;
+        m1hCountDown = 1800;
         mLastTickTime = System.currentTimeMillis();
         ShadowsockServiceHelper.bindService(this, this);
     }
@@ -111,7 +111,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             if(--m1hCountDown <= 0){
                 sendTimeUpBroadcast();
             }
-            Log.i("CountDownService", "剩余时间 " + m1hCountDown);
+            Log.d("CountDownService", "剩余时间 " + m1hCountDown);
         }
     }
 
