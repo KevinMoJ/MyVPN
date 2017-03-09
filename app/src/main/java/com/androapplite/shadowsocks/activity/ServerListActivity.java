@@ -11,16 +11,23 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,6 +37,7 @@ import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -45,7 +53,7 @@ import yyf.shadowsocks.utils.Constants;
 
 public class ServerListActivity extends BaseShadowsocksActivity implements
         SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
-        ServiceConnection, DialogInterface.OnClickListener{
+        ServiceConnection, DialogInterface.OnClickListener, AbsListView.OnScrollListener{
     private IShadowsocksService mShadowsocksService;
 
 
@@ -77,6 +85,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mListView = (ListView)findViewById(R.id.vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
         mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
 
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
@@ -93,6 +102,20 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
         GAHelper.sendScreenView(this, "服务器列表屏幕");
+        addBottomAd(AdAppHelper.getInstance(this));
+
+    }
+    private void addBottomAd(AdAppHelper adAppHelper) {
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(adAppHelper.getNative(), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
+        container.startAnimation(animation);
     }
 
     private void parseServerList() {
@@ -340,5 +363,16 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             mSwipeRefreshLayout.setRefreshing(false);
             GAHelper.sendEvent(this, "刷新服务器列表", "取消");
         }
+    }
+
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getX() == 0);
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
     }
 }
