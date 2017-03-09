@@ -129,10 +129,12 @@ public class TimeCountDownService extends Service implements ServiceConnection{
     }
 
     private void stopVPNConnection() {
-        try {
-            mShadowsocksService.stop();
-        } catch (RemoteException e) {
-            ShadowsocksApplication.handleException(e);
+        if(mShadowsocksService != null) {
+            try {
+                mShadowsocksService.stop();
+            } catch (RemoteException e) {
+                ShadowsocksApplication.handleException(e);
+            }
         }
     }
 
