@@ -16,4 +16,5 @@ interface IShadowsocksService {
   long getRxTotalMonthly();
 
   oneway void enableNotification(boolean enable);
+  oneway void setRemainTime(int remain);
 }

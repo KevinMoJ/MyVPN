@@ -39,6 +39,7 @@ public abstract class BaseService extends VpnService {
     private Handler handler;
     protected Config config = null;
     private long mStartTime;
+    private int remain;
 
     final RemoteCallbackList<IShadowsocksServiceCallback> callbacks = new RemoteCallbackList<IShadowsocksServiceCallback>();
     IShadowsocksService.Stub binder = new IShadowsocksService.Stub(){
@@ -67,6 +68,7 @@ public abstract class BaseService extends VpnService {
             if(state != Constants.State.STOPPING){
                 stopRunner();
             }
+            remain = 0;
         }
 
         public void start(Config config) {
@@ -85,6 +87,10 @@ public abstract class BaseService extends VpnService {
 
         public void enableNotification(boolean enable){
             BaseService.this.enableNotification(enable);
+        }
+
+        public void setRemainTime(int remain){
+            BaseService.this.remain = remain;
         }
     };
 
@@ -148,6 +154,18 @@ public abstract class BaseService extends VpnService {
                     intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
                 }
                 mStartTime = c;
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(state == Constants.State.CONNECTED){
+                            mTrafficMonitor.updateRate();
+                            remain -= 1;
+                            updateTrafficRate();
+                        }
+                    }
+                };
+                timer = new Timer(true);
+                timer.schedule(task, 1000, 1000);
                 break;
             case STOPPING:
                 intent.setAction(Action.STOPPING);
@@ -162,6 +180,8 @@ public abstract class BaseService extends VpnService {
                     intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
                 }
                 mStartTime = 0;
+                timer.cancel();
+                timer.purge();
                 break;
             case ERROR:
                 intent.setAction(Action.ERROR);
@@ -204,18 +224,6 @@ public abstract class BaseService extends VpnService {
     public void registerCallback(IShadowsocksServiceCallback callback){
         if(callback != null && callbacks.register(callback)) {
             callbacksCount += 1;
-            if (callbacksCount != 0 && timer == null) {
-                TimerTask task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(mTrafficMonitor.updateRate()){
-                            updateTrafficRate();
-                        }
-                    }
-                };
-                timer = new Timer(true);
-                timer.schedule(task, 1000, 1000);
-            }
             mTrafficMonitor.updateRate();
             try {
                 callback.trafficUpdated(mTrafficMonitor.txRate, mTrafficMonitor.rxRate, mTrafficMonitor.txTotal, mTrafficMonitor.rxTotal);
@@ -285,5 +293,10 @@ public abstract class BaseService extends VpnService {
     }
 
     protected abstract void enableNotification(boolean enable);
+
+    public int getRemain(){
+        return remain;
+    }
+
 
 }

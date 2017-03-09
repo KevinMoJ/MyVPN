@@ -71,6 +71,7 @@ import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.service.TimeCountDownService;
 import com.facebook.FacebookSdk;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.Glide;
@@ -307,6 +308,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     mIsConnecting = false;
                     mErrorServers.clear();
+                    TimeCountDownService.start(this);
                     break;
                 case STOPPING:
                     clearConnectingTimeout();
