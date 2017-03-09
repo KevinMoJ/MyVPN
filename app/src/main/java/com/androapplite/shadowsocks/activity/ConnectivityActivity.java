@@ -58,9 +58,12 @@ import android.view.View;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ads.AdAppHelper;
+import com.androapplite.shadowsocks.ads.AdStateListener;
+import com.androapplite.shadowsocks.ads.AdType;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
@@ -157,6 +160,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
         }
+        adAppHelper.setListener(new AdStateListener() {
+            @Override
+            public void onAdClosed(AdType adType) {
+                switch (adType.getType()){
+                    case AdType.ADMOB_FULL:
+                    case AdType.FACEBOOK_FBN:
+                    case AdType.FACEBOOK_FULL:
+                        if(mCurrentState == Constants.State.CONNECTED && mExitAlert == null) {
+                            rotateAd();
+                        }
+                        break;
+                }
+            }
+        });
+
     }
 
     private void initForegroundBroadcastIntentFilter(){
@@ -248,21 +266,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     break;
                 case CONNECTED:
+                    final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            GAHelper.sendEvent(this, "广告", "点击功能按钮");
-                            UMGameAgent.onEvent(getApplicationContext(), "gnan");
-                            AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                            showResumeAd = true;
+                            if(adAppHelper.isFullAdLoaded()) {
+                                GAHelper.sendEvent(this, "广告", "点击功能按钮");
+                                UMGameAgent.onEvent(getApplicationContext(), "gnan");
+                                adAppHelper.showFullAd();
+                                showResumeAd = true;
+                            }else{
+                                rotateAd();
+                            }
                         }
                     } catch (Exception ex) {
                     }
 
                     if (!startUp) {
                         startUp = true;
-                        AdAppHelper.getInstance(getApplicationContext()).loadNewInterstitial();
-                        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
-                        AdAppHelper.getInstance(getApplicationContext()).loadNewBanner();
+                        adAppHelper.loadNewInterstitial();
+                        adAppHelper.loadNewNative();
+                        adAppHelper.loadNewBanner();
                     }
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
@@ -1042,5 +1065,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
     }
 
-
+    private void rotateAd(){
+        FrameLayout view = (FrameLayout)findViewById(R.id.ad_view_container);
+        float centerX = view.getWidth() / 2.0f;
+        float centerY = view.getHeight() / 2.0f;
+        Rotate3dAnimation rotate3dAnimation = new Rotate3dAnimation(this, 0, 360, centerX, centerY, 0f, false, true);
+        rotate3dAnimation.setDuration(1000);
+        rotate3dAnimation.setFillAfter(false);
+        view.startAnimation(rotate3dAnimation);
+    }
 }
