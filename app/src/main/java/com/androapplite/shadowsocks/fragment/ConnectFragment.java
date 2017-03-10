@@ -214,7 +214,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                             mElapseTextView.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mElapseTextView.setText(getString(R.string.use_time, elpasedTime));
+                                    if(isVisible()) {
+                                        mElapseTextView.setText(getString(R.string.use_time, elpasedTime));
+                                    }
                                 }
                             });
                         }
