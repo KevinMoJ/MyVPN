@@ -56,7 +56,7 @@ public class ConnectionTestService extends IntentService {
                 response = client.newCall(request).execute();
                 long t2 = System.currentTimeMillis();
                 GAHelper.sendTimingEvent(this, "连接后测试成功", serverName, t2-t1);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 long t2 = System.currentTimeMillis();
                 GAHelper.sendTimingEvent(this, "连接后测试失败", serverName, t2-t1);
                 ShadowsocksApplication.handleException(e);
