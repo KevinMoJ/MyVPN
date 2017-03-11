@@ -12,7 +12,7 @@ public class Config implements Parcelable {
     public boolean isTrafficStat = false;
     public boolean isUdpDns = false;
 
-    public String profileName = "US Server";
+    public String profileName = "Speed VPN";
     private String proxy = "";
     private String sitekey = "vpnnest!@#123d";
 
