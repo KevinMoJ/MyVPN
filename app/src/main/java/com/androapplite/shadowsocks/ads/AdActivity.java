@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.vpn3.R;
+import com.androapplite.shadowsocks.R;
 import com.facebook.ads.AdChoicesView;
 import com.facebook.ads.MediaView;
 import com.facebook.ads.NativeAd;
@@ -67,15 +67,17 @@ public class AdActivity extends Activity {
         View yes = findViewById(R.id.native_ad_yes);
         // Register the Title and CTA button to listen for clicks.
         List<View> clickableViews = new ArrayList<>();
-        clickableViews.add(nativeAdTitle);
-        clickableViews.add(nativeAdMedia);
-        clickableViews.add(yes);
-
         AdConfig config = AdAppHelper.getInstance(getApplicationContext()).getConfig();
         int r = new Random().nextInt(100);
         if (r < config.ad_ctrl.ngs_click) {
+            clickableViews.add(nativeAdTitle);
+            clickableViews.add(nativeAdMedia);
+            clickableViews.add(yes);
             mNativeAd.registerViewForInteraction(adView, clickableViews);
         } else {
+            View ignore = adView.findViewById(R.id.ignore_btn);
+            clickableViews.add(ignore);
+            mNativeAd.registerViewForInteraction(adView, clickableViews);
             findViewById(R.id.native_ad_yes).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

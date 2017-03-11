@@ -5,6 +5,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.androapplite.shadowsocks.GAHelper;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -271,6 +272,8 @@ public class AdMobAd {
                         if (mAdListener != null) {
                             mAdListener.onAdLoaded(new AdType(AdType.ADMOB_FULL));
                         }
+                        long cost = (System.currentTimeMillis() - fullAd.lastRequestTime) / 1000;
+                        GAHelper.sendEvent(mContext, "广告", "Admob全屏加载时间", cost + "", cost);
                     }
 
                     @Override

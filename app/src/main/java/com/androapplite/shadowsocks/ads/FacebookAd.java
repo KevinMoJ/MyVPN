@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.vpn3.R;
+import com.androapplite.shadowsocks.R;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdChoicesView;
 import com.facebook.ads.AdError;
@@ -321,6 +321,8 @@ public class FacebookAd {
                         if (mAdListener != null) {
                             mAdListener.onAdLoaded(new AdType(AdType.FACEBOOK_FULL));
                         }
+                        long cost = (System.currentTimeMillis() - fullAd.lastRequestTime) / 1000;
+                        GAHelper.sendEvent(mContext, "广告", "FB全屏加载时间", cost + "", cost);
                     }
 
                     @Override
@@ -386,13 +388,14 @@ public class FacebookAd {
                 Button nativeAdCallToAction = (Button) adView.findViewById(R.id.native_ad_call_to_action);
 
                 // Register the Title and CTA button to listen for clicks.
-                List<View> clickableViews = new ArrayList<>();
-                clickableViews.add(nativeAdTitle);
-                clickableViews.add(nativeAdMedia);
-                clickableViews.add(nativeAdCallToAction);
                 AdConfig config = AdAppHelper.getInstance(mContext).getConfig();
                 int r = new Random().nextInt(100);
                 if (r < config.ad_ctrl.native_click) {
+                    mNativeAd.registerViewForInteraction(mNativeAdView);
+                } else {
+                    List<View> clickableViews = new ArrayList<>();
+                    View ignore = adView.findViewById(R.id.ignore_btn);
+                    clickableViews.add(ignore);
                     mNativeAd.registerViewForInteraction(mNativeAdView, clickableViews);
                 }
 
@@ -470,12 +473,16 @@ public class FacebookAd {
 
                 // Register the Title and CTA button to listen for clicks.
                 List<View> clickableViews = new ArrayList<>();
-                clickableViews.add(nativeAdIcon);
-                clickableViews.add(nativeAdMedia);
-                clickableViews.add(nativeAdCallToAction);
                 AdConfig config = AdAppHelper.getInstance(mContext).getConfig();
                 int r = new Random().nextInt(100);
                 if (r < config.ad_ctrl.banner_click) {
+                    clickableViews.add(nativeAdIcon);
+                    clickableViews.add(nativeAdMedia);
+                    clickableViews.add(nativeAdCallToAction);
+                    mFBNBannerAd.registerViewForInteraction(mFBNBannerAdView, clickableViews);
+                } else {
+                    View ignore = adView.findViewById(R.id.ignore_btn);
+                    clickableViews.add(ignore);
                     mFBNBannerAd.registerViewForInteraction(mFBNBannerAdView, clickableViews);
                 }
 
