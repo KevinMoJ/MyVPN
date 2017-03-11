@@ -327,6 +327,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     clearConnectingTimeout();
                     mIsConnecting = false;
                     mErrorServers.add(mConnectingConfig);
+                    GAHelper.sendEvent(this, "VPN连不上", "ERROR");
                     break;
             }
         }
