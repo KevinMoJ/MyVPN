@@ -78,12 +78,13 @@ public class ServerListFetcherService extends IntentService {
                 if(jsonString != null && !jsonString.isEmpty()){
                     editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
                 }
+                broadcastServerListFetchFinish();
             } catch (IOException e) {
                 long t2 = System.currentTimeMillis();
                 GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
                 ShadowsocksApplication.handleException(e);
+                broadcastServerListFetchError(e);
             }
-            broadcastServerListFetchFinish();
             hasStart = false;
         }
 
@@ -92,6 +93,13 @@ public class ServerListFetcherService extends IntentService {
     public static void fetchServerListAsync(Context context){
         Intent intent = new Intent(context, ServerListFetcherService.class);
         context.startService(intent);
+    }
+
+    public void broadcastServerListFetchError(Exception e){
+        final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
+        intent.putExtra("ErrMsg", e);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
     }
 
     private void broadcastServerListFetchFinish(){

@@ -124,9 +124,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private HashSet<ServerConfig> mErrorServers;
     private AlertDialog mExitAlert;
 
-
-    public static final String NAME = "ConnectivityActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,6 +191,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
                                 mFetchServerListProgressDialog.setOnDismissListener(null);
                                 Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
+                                String errMsg = intent.getStringExtra("ErrMsg");
+                                if(errMsg != null){
+                                    GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时", errMsg);
+                                }else {
+                                    GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时", "未知原因");
+                                }
                             }
                             mFetchServerListProgressDialog.dismiss();
                             mFetchServerListProgressDialog = null;
@@ -205,8 +208,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private boolean startUp = false;
-    private boolean showResumeAd = false;
-    private boolean hasShowResumeAd = false;
 
     @Override
     public void onAttachFragment(Fragment fragment) {
@@ -274,7 +275,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                 GAHelper.sendEvent(this, "广告", "点击功能按钮");
                                 UMGameAgent.onEvent(getApplicationContext(), "gnan");
                                 adAppHelper.showFullAd();
-                                showResumeAd = true;
                             }else{
                                 rotateAd();
                             }
@@ -595,6 +595,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }catch(Exception e){
             Snackbar.make(findViewById(R.id.coordinator), R.string.not_start_vpn, Snackbar.LENGTH_SHORT).show();
             ShadowsocksApplication.handleException(e);
+            GAHelper.sendEvent(this, "VPN连不上", "VPN Prepare错误", e.getMessage());
         }
     }
 
@@ -632,6 +633,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mConnectingTimeoutHandler = null;
                 mConnectingTimeoutRunnable = null;
                 Snackbar.make(findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
+                GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "VPN连接超时");
             }
         };
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
@@ -650,6 +652,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             if(mConnectFragment != null){
                                 mConnectFragment.setConnectResult(Constants.State.ERROR);
                             }
+                            GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "没有可用的服务器");
                             mIsConnecting = false;
                         }
                     }
@@ -784,7 +787,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         GAHelper.sendEvent(this, "广告", "点击功能按钮");
                         UMGameAgent.onEvent(getApplicationContext(), "gnan");
                         AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                        showResumeAd = true;
                     }
                 } catch (Exception ex) {
                 }
