@@ -11,7 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
+        <View
+            android:id="@+id/ignore_btn"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
         <com.facebook.ads.MediaView
             android:id="@+id/native_ad_media"
             android:layout_width="match_parent"
