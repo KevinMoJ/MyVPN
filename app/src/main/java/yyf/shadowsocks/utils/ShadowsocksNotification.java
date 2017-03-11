@@ -53,6 +53,7 @@ public class ShadowsocksNotification {
     private BroadcastReceiver mLockReceiver;
     private boolean mCallbackRegistered;
     private final PendingIntent mPendingIntent;
+    private View mRootView;
 
     public ShadowsocksNotification(BaseService baseService, String profileName){
         mService = baseService;
@@ -74,6 +75,10 @@ public class ShadowsocksNotification {
                 .setOngoing(true)
                 .setShowWhen(false);
 
+        final Notification notification = mBuilder.build();
+        RemoteViews remoteViews = notification.contentView;
+        mRootView = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+
         mCallback = new IShadowsocksServiceCallback.Stub(){
             @Override
             public void stateChanged(int state, String msg) throws RemoteException {
@@ -93,9 +98,9 @@ public class ShadowsocksNotification {
                 ;
                 final Notification notification = mBuilder.build();
                 RemoteViews remoteViews = notification.contentView;
-                View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-                remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_connect);
-                applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
+
+                remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
+                applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
                 mService.startForeground(1, notification);
                 mNotificationManager.cancel(2);
             }
@@ -221,9 +226,8 @@ public class ShadowsocksNotification {
                     ;
             final Notification notification = mBuilder.build();
             RemoteViews remoteViews = notification.contentView;
-            View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-            remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
-            applyTextColorToRemoteViews(remoteViews, v, getColor(R.color.notification_text_about_disconnect));
+            remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+            applyTextColorToRemoteViews(remoteViews, mRootView, getColor(R.color.notification_text_about_disconnect));
             mService.startForeground(1, notification);
 
         }else {
@@ -231,9 +235,8 @@ public class ShadowsocksNotification {
                     .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
             final Notification notification = mBuilder.build();
             RemoteViews remoteViews = notification.contentView;
-            View v = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-            remoteViews.setInt(v.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
-            applyTextColorToRemoteViews(remoteViews, v, Color.WHITE);
+            remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+            applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
             mService.startForeground(1, notification);
         }
     }
