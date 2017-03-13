@@ -97,7 +97,11 @@ public class ServerListFetcherService extends IntentService {
 
     public void broadcastServerListFetchError(Exception e){
         final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
-        intent.putExtra("ErrMsg", e.getMessage());
+        if(e.getMessage() != null) {
+            intent.putExtra("ErrMsg", e.getMessage());
+        }else{
+            intent.putExtra("ErrMsg", e.toString());
+        }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
     }
