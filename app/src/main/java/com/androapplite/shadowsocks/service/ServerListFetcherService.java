@@ -132,7 +132,7 @@ public class ServerListFetcherService extends IntentService {
                 editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
             }
             broadcastServerListFetchFinish();
-            Log.d("ServerListFetcher", "ip");
+            Log.d("ServerListFetcher", "domain");
         } catch (IOException e) {
             long t2 = System.currentTimeMillis();
             GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
@@ -148,12 +148,28 @@ public class ServerListFetcherService extends IntentService {
 
     public void broadcastServerListFetchError(Exception e, boolean isIpUrl){
         final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
-        if(e.getMessage() != null) {
+        String errMsg = e.getMessage();
+        if(errMsg != null) {
             intent.putExtra("ErrMsg", e.getMessage());
         }else{
             intent.putExtra("ErrMsg", e.toString());
         }
         intent.putExtra("IsIpUrl", isIpUrl);
+
+        if(errMsg != null){
+            if(isIpUrl) {
+                GAHelper.sendEvent(this, "取服务器列表失败", "IP", errMsg);
+            }else{
+                GAHelper.sendEvent(this, "取服务器列表失败", "Domain", errMsg);
+            }
+
+        }else {
+            if(isIpUrl) {
+                GAHelper.sendEvent(this, "取服务器列表失败", "IP", e.toString());
+            }else {
+                GAHelper.sendEvent(this, "取服务器列表失败", "Domain", e.toString());
+            }
+        }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
     }
