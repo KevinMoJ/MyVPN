@@ -192,10 +192,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                 mFetchServerListProgressDialog.setOnDismissListener(null);
                                 Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
                                 String errMsg = intent.getStringExtra("ErrMsg");
+                                boolean isIpUrl = intent.getBooleanExtra("IsIpUrl", false);
                                 if(errMsg != null){
-                                    GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时", errMsg);
+                                    if(isIpUrl) {
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时IP", errMsg);
+                                    }else{
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", errMsg);
+                                    }
+
                                 }else {
-                                    GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时", "未知原因");
+                                    if(isIpUrl) {
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时IP", "未知原因");
+                                    }else {
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", "未知原因");
+                                    }
                                 }
                             }
                             mFetchServerListProgressDialog.dismiss();
