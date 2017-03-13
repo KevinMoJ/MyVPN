@@ -635,6 +635,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mConnectingTimeoutRunnable = null;
                 Snackbar.make(findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
                 GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "VPN连接超时");
+                if(mConnectingConfig != null) {
+                    mErrorServers.add(mConnectingConfig);
+                }
             }
         };
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
