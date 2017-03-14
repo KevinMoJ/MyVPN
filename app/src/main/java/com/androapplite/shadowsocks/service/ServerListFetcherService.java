@@ -46,58 +46,132 @@ public class ServerListFetcherService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if(intent != null && !hasStart){
             hasStart = true;
-            SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-            editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
-            Cache cache = new Cache(getCacheDir(), 1024 * 1024);
-            final OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(15, TimeUnit.SECONDS)
-                    .readTimeout(15, TimeUnit.SECONDS)
-                    .writeTimeout(15, TimeUnit.SECONDS)
-                    .cache(cache)
-                    .addInterceptor(new UnzippingInterceptor());
-
-            if(BuildConfig.DEBUG){
-                builder.addInterceptor(new LoggingInterceptor());
+            if(!fetchServerListByIp()) {
+                fetchServerListByDomain();
             }
-            OkHttpClient client = builder.build();
-
-//            String url = null;
-//            if(VIPUtil.isVIP(this)){
-//                url = "http://c.vpnnest.com:8090/VPNServerList/fsl";
-//            }else{
-//                url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
-//            }
-//            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
-            String url =  "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
-            Request request = new Request.Builder()
-                    .url(url)
-                    .addHeader("Accept-Encoding", "gzip")
-                    .build();
-
-
-            long t1 = System.currentTimeMillis();
-            try {
-                Response response = client.newCall(request).execute();
-                long t2 = System.currentTimeMillis();
-                GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
-                String jsonString = response.body().string();
-                if(jsonString != null && !jsonString.isEmpty()){
-                    editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
-                }
-            } catch (IOException e) {
-                long t2 = System.currentTimeMillis();
-                GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
-                ShadowsocksApplication.handleException(e);
-            }
-            broadcastServerListFetchFinish();
             hasStart = false;
         }
 
     }
 
+    private boolean fetchServerListByIp() {
+        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
+        editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
+        Cache cache = new Cache(getCacheDir(), 1024 * 1024);
+        final OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+                .cache(cache)
+                .addInterceptor(new UnzippingInterceptor());
+
+        if(BuildConfig.DEBUG){
+            builder.addInterceptor(new LoggingInterceptor());
+        }
+        OkHttpClient client = builder.build();
+
+        String url = "http://23.20.85.166:8080/VPNServerList/fsl";
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Accept-Encoding", "gzip")
+                .build();
+
+
+        long t1 = System.currentTimeMillis();
+        try {
+            Response response = client.newCall(request).execute();
+            long t2 = System.currentTimeMillis();
+            GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
+            String jsonString = response.body().string();
+            if(jsonString != null && !jsonString.isEmpty()){
+                editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
+            }
+            broadcastServerListFetchFinish();
+            Log.d("ServerListFetcher", "ip");
+            return true;
+        } catch (IOException e) {
+            long t2 = System.currentTimeMillis();
+            GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
+            ShadowsocksApplication.handleException(e);
+            broadcastServerListFetchError(e, true);
+            return false;
+        }
+    }
+
+    private void fetchServerListByDomain() {
+        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
+        editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
+        Cache cache = new Cache(getCacheDir(), 1024 * 1024);
+        final OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .cache(cache)
+                .addInterceptor(new UnzippingInterceptor());
+
+        if(BuildConfig.DEBUG){
+            builder.addInterceptor(new LoggingInterceptor());
+        }
+        OkHttpClient client = builder.build();
+
+        String url = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
+//            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Accept-Encoding", "gzip")
+                .build();
+
+
+        long t1 = System.currentTimeMillis();
+        try {
+            Response response = client.newCall(request).execute();
+            long t2 = System.currentTimeMillis();
+            GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
+            String jsonString = response.body().string();
+            if(jsonString != null && !jsonString.isEmpty()){
+                editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
+            }
+            broadcastServerListFetchFinish();
+            Log.d("ServerListFetcher", "domain");
+        } catch (IOException e) {
+            long t2 = System.currentTimeMillis();
+            GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
+            ShadowsocksApplication.handleException(e);
+            broadcastServerListFetchError(e, false);
+        }
+    }
+
     public static void fetchServerListAsync(Context context){
         Intent intent = new Intent(context, ServerListFetcherService.class);
         context.startService(intent);
+    }
+
+    public void broadcastServerListFetchError(Exception e, boolean isIpUrl){
+        final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
+        String errMsg = e.getMessage();
+        if(errMsg != null) {
+            intent.putExtra("ErrMsg", e.getMessage());
+        }else{
+            intent.putExtra("ErrMsg", e.toString());
+        }
+        intent.putExtra("IsIpUrl", isIpUrl);
+
+        if(errMsg != null){
+            if(isIpUrl) {
+                GAHelper.sendEvent(this, "取服务器列表失败", "IP", errMsg);
+            }else{
+                GAHelper.sendEvent(this, "取服务器列表失败", "Domain", errMsg);
+            }
+
+        }else {
+            if(isIpUrl) {
+                GAHelper.sendEvent(this, "取服务器列表失败", "IP", e.toString());
+            }else {
+                GAHelper.sendEvent(this, "取服务器列表失败", "Domain", e.toString());
+            }
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
     }
 
     private void broadcastServerListFetchFinish(){
