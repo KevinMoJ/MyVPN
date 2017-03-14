@@ -30,6 +30,7 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.IShadowsocksService;
@@ -62,19 +63,33 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         adAppHelper.loadNewInterstitial();
         adAppHelper.loadNewNative();
 
-        mAdLoadedCheckRunable = new Runnable() {
-            @Override
-            public void run() {
-                if(adAppHelper.isFullAdLoaded()){
-                    mProgressbarAnimator.setDuration(100);
-                    mProgressbarAnimator.start();
-                }else{
-                    mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
-                }
-            }
-        };
+        mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
+    }
+
+    private static class AdLoadedCheckRunnable implements Runnable{
+        private WeakReference<SplashActivity> mActivityReference;
+        private AdAppHelper mAdAppHelper;
+
+        AdLoadedCheckRunnable(SplashActivity activity, AdAppHelper adAppHelper){
+            mActivityReference = new WeakReference<SplashActivity>(activity);
+            mAdAppHelper = adAppHelper;
+        }
+
+        @Override
+        public void run() {
+            SplashActivity activity = mActivityReference.get();
+            if(activity != null){
+                if(mAdAppHelper.isFullAdLoaded()){
+                    activity.mProgressbarAnimator.setDuration(100);
+                    activity.mProgressbarAnimator.start();
+                }else{
+                    activity.mAdLoadedCheckHandler.postDelayed(activity.mAdLoadedCheckRunable, 1000);
+                }
+            }
+
+        }
     }
 
     private void startProgressBarAnimation(){
