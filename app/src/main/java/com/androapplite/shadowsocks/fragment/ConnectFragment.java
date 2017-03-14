@@ -21,6 +21,7 @@ import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
+import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -146,17 +147,32 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             }
         }else if(mUpdateStateHandler == null){
             mUpdateStateHandler = new Handler();
-            mUpdateStateDelayedRunable = new Runnable() {
-                @Override
-                public void run() {
-                    setConnectResult(state);
-                    mUpdateStateHandler.removeCallbacks(mUpdateStateDelayedRunable);
-                    mUpdateStateHandler = null;
-                    mUpdateStateDelayedRunable = null;
-                }
-            };
+            mUpdateStateDelayedRunable = new UpdateStateDelayedRunable(this, state);
             mUpdateStateHandler.postDelayed(mUpdateStateDelayedRunable, 100);
         }
+
+    }
+
+    private static class UpdateStateDelayedRunable implements Runnable{
+        private WeakReference<ConnectFragment> mFragmentReference;
+        private Constants.State mState;
+
+        UpdateStateDelayedRunable(ConnectFragment fragment, Constants.State state){
+            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
+            mState = state;
+        }
+
+        @Override
+        public void run() {
+            ConnectFragment fragment = mFragmentReference.get();
+            if(fragment != null){
+                fragment.setConnectResult(mState);
+                fragment.mUpdateStateHandler.removeCallbacks(fragment.mUpdateStateDelayedRunable);
+                fragment.mUpdateStateHandler = null;
+                fragment.mUpdateStateDelayedRunable = null;
+            }
+        }
+
 
     }
 
