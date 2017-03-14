@@ -183,6 +183,24 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
                                 mFetchServerListProgressDialog.setOnDismissListener(null);
                                 Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
+
+                                String errMsg = intent.getStringExtra("ErrMsg");
+                                boolean isIpUrl = intent.getBooleanExtra("IsIpUrl", false);
+                                if(errMsg != null){
+                                    if(isIpUrl) {
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时IP", errMsg);
+                                    }else{
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", errMsg);
+                                    }
+
+                                }else {
+                                    if(isIpUrl) {
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时IP", "未知原因");
+                                    }else {
+                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", "未知原因");
+                                    }
+                                }
+
                             }
                             mFetchServerListProgressDialog.dismiss();
                             mFetchServerListProgressDialog = null;
@@ -318,6 +336,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     clearConnectingTimeout();
                     mIsConnecting = false;
                     mErrorServers.add(mConnectingConfig);
+                    GAHelper.sendEvent(this, "VPN连不上", "ERROR");
                     break;
             }
         }
@@ -588,6 +607,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }catch(Exception e){
             Snackbar.make(findViewById(R.id.coordinator), R.string.not_start_vpn, Snackbar.LENGTH_SHORT).show();
             ShadowsocksApplication.handleException(e);
+            GAHelper.sendEvent(this, "VPN连不上", "VPN Prepare错误", e.getMessage());
         }
     }
 
@@ -625,6 +645,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 mConnectingTimeoutHandler = null;
                 mConnectingTimeoutRunnable = null;
                 Snackbar.make(findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
+                GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "VPN连接超时");
+                if(mConnectingConfig != null) {
+                    mErrorServers.add(mConnectingConfig);
+                }
             }
         };
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
@@ -643,6 +667,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             if(mConnectFragment != null){
                                 mConnectFragment.setConnectResult(Constants.State.ERROR);
                             }
+                            GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "没有可用的服务器");
                             mIsConnecting = false;
                         }
                     }
