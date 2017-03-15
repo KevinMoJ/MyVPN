@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.R;
 
+import java.lang.ref.WeakReference;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RateUsFragment#newInstance} factory method to
@@ -116,16 +118,26 @@ public class RateUsFragment extends Fragment implements View.OnClickListener, An
         mClickedStartButtonId = v.getId();
         final View view = getView();
         if(view != null) {
-            final Runnable fadeOutRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    Animation animation = AnimationUtils.loadAnimation(getContext(), android.R.anim.fade_out);
-                    animation.setAnimationListener(RateUsFragment.this);
-                    view.startAnimation(animation);
-                }
-            };
+            final Runnable fadeOutRunnable = new FadeOutRunable(this);
             view.postDelayed(fadeOutRunnable, 1000);
             view.setTag(fadeOutRunnable);
+        }
+    }
+
+    private static class FadeOutRunable implements Runnable{
+        private WeakReference<RateUsFragment> mFragmentReference;
+        FadeOutRunable(RateUsFragment fragment){
+            mFragmentReference = new WeakReference<RateUsFragment>(fragment);
+        }
+
+        @Override
+        public void run() {
+            RateUsFragment fragment = mFragmentReference.get();
+            if(fragment != null){
+                Animation animation = AnimationUtils.loadAnimation(fragment.getContext(), android.R.anim.fade_out);
+                animation.setAnimationListener(fragment);
+                fragment.getView().startAnimation(animation);
+            }
         }
     }
 
