@@ -9,8 +9,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.animation.AnimatorListenerCompat;
 import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
@@ -27,6 +30,7 @@ import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,9 +47,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private OnConnectActionListener mListener;
     private ImageButton mConnectButton;
     private ProgressBar mProgressBar;
-    private boolean mIsSuccess;
     private TextView mMessageTextView;
     private TextView mElapseTextView;
+    private UpdateElapseTimeHandler mUpdateElapseTimeHandler;
 
 
     public ConnectFragment() {
@@ -108,11 +112,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             progressAnimator.removeAllListeners();
             progressAnimator.end();
         }
-        Timer timer = (Timer) mElapseTextView.getTag();
-        if(timer != null){
-            timer.cancel();
-            timer.purge();
-            mElapseTextView.setTag(null);
+        if(mUpdateElapseTimeHandler != null){
+            mUpdateElapseTimeHandler.removeCallbacksAndMessages(null);
         }
         Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
         mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
@@ -124,17 +125,27 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mMessageTextView.setText(R.string.connecting);
         Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
         if(showDisconnectDelayRunnable == null){
-            showDisconnectDelayRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    mConnectButton.setVisibility(View.VISIBLE);
-                    mConnectButton.setImageLevel(1);
-                }
-            };
+            showDisconnectDelayRunnable = new ShowDisconnectDelayRunnable(this);
             mConnectButton.setTag(showDisconnectDelayRunnable);
         }
         mConnectButton.postDelayed(showDisconnectDelayRunnable, 20000);
 
+    }
+
+    private static class ShowDisconnectDelayRunnable implements Runnable{
+        WeakReference<ConnectFragment> mFragmentReference;
+        ShowDisconnectDelayRunnable(ConnectFragment fragment){
+            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
+        }
+
+        @Override
+        public void run() {
+            ConnectFragment fragment = mFragmentReference.get();
+            if(fragment != null){
+                fragment.mConnectButton.setVisibility(View.VISIBLE);
+                fragment.mConnectButton.setImageLevel(1);
+            }
+        }
     }
 
     private void startAnimation(){
@@ -153,10 +164,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mProgressBar.setTag(progressAnimator);
         mMessageTextView.setText(R.string.connecting);
         mElapseTextView.setVisibility(View.INVISIBLE);
-        Timer timer = (Timer) mElapseTextView.getTag();
-        if(timer != null){
-            timer.cancel();
-            mElapseTextView.setTag(null);
+        if(mUpdateElapseTimeHandler != null){
+            mUpdateElapseTimeHandler.removeCallbacksAndMessages(null);
         }
     }
 
@@ -201,31 +210,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             long useTime = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
             final String elpasedTime = DateUtils.formatElapsedTime(useTime);
             mElapseTextView.setText(getString(R.string.use_time, elpasedTime));
-            Timer timer = (Timer) mElapseTextView.getTag();
-            if(timer == null){
-                TimerTask timerTask= new TimerTask() {
-                    @Override
-                    public void run() {
-                        final Context context = getContext();
-                        if(context != null) {
-                            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-                            long useTime = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
-                            final String elpasedTime = DateUtils.formatElapsedTime(useTime);
-                            mElapseTextView.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(isVisible()) {
-                                        mElapseTextView.setText(getString(R.string.use_time, elpasedTime));
-                                    }
-                                }
-                            });
-                        }
-                    }
-                };
-                timer = new Timer();
-                timer.schedule(timerTask, 1000, 1000);
-                mElapseTextView.setTag(timer);
+            if(mUpdateElapseTimeHandler == null){
+                mUpdateElapseTimeHandler = new UpdateElapseTimeHandler(this);
+                mUpdateElapseTimeHandler.sendEmptyMessageAtTime(0, 1000);
             }
+
             Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
             mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
         }else if(state == Constants.State.STOPPED){
@@ -242,6 +231,28 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mElapseTextView.setVisibility(View.INVISIBLE);
             Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
             mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
+        }
+    }
+
+
+    private static class UpdateElapseTimeHandler extends Handler{
+        private WeakReference<ConnectFragment> mFragmentReference;
+
+        UpdateElapseTimeHandler(ConnectFragment connectFragment){
+            mFragmentReference = new WeakReference<ConnectFragment>(connectFragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            ConnectFragment fragment = mFragmentReference.get();
+            if(fragment != null){
+                Context context = fragment.getContext();
+                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+                long useTime = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
+                String elapsedTime = DateUtils.formatElapsedTime(useTime);
+                fragment.mElapseTextView.setText(fragment.getString(R.string.use_time, elapsedTime));
+            }
+            sendEmptyMessageDelayed(0, 1000);
         }
     }
 
