@@ -34,6 +34,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TimeUtils;
 import android.view.Gravity;
@@ -85,6 +86,7 @@ import com.umeng.analytics.game.UMGameAgent;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.System;
+import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -238,32 +240,60 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
-        return new IShadowsocksServiceCallback.Stub(){
-            @Override
-            public void stateChanged(final int state, String msg) throws RemoteException {
-                mUpdateVpnStateRunable = new Runnable() {
-                    @Override
-                    public void run() {
-                        mNewState = Constants.State.values()[state];
-                        updateConnectionState();
-                        Log.d("状态", mNewState.name());
-                    }
-                };
-                getWindow().getDecorView().post(mUpdateVpnStateRunable);
-            }
+        return new ShadowsocksServiceCallbackStub(this);
+    }
 
-            @Override
-            public void trafficUpdated(final long txRate, final long rxRate, final long txTotal, final long rxTotal) throws RemoteException {
-//                ShadowsocksApplication.debug("traffic", "txRate: " + txRate);
-//                ShadowsocksApplication.debug("traffic", "rxRate: " + rxRate);
-//                ShadowsocksApplication.debug("traffic", "txTotal: " + txTotal);
-//                ShadowsocksApplication.debug("traffic", "rxTotal: " + rxTotal);
-//                ShadowsocksApplication.debug("traffic", "txTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getTxTotalMonthly()));
-//                ShadowsocksApplication.debug("traffic", "rxTotal old: " + TrafficMonitor.formatTraffic(ConnectivityActivity.this, mShadowsocksService.getRxTotalMonthly()));
-//                ShadowsocksApplication.debug("traffic", "txRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, txRate));
-//                ShadowsocksApplication.debug("traffic", "rxRate: " + TrafficMonitor.formatTrafficRate(ConnectivityActivity.this, rxRate));
+    private static class ShadowsocksServiceCallbackStub extends IShadowsocksServiceCallback.Stub{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+        ShadowsocksServiceCallbackStub(ConnectivityActivity activity){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+        }
+
+        @Override
+        public void stateChanged(int state, String msg) throws RemoteException {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                activity.mUpdateVpnStateRunable = new UpdateVpnStateRunnable(activity, state);
+                activity.getWindow().getDecorView().post(activity.mUpdateVpnStateRunable);
             }
-        };
+        }
+
+        @Override
+        public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
+
+        }
+    }
+
+    private static  abstract class WeakReferenceRunnable<T extends AppCompatActivity> implements Runnable{
+        protected WeakReference<T> mActivityReference;
+        WeakReferenceRunnable(T activity){
+            mActivityReference = new WeakReference<T>(activity);
+        }
+
+        @Override
+        public void run(){
+            T activity = mActivityReference.get();
+            if(activity != null){
+                runWithActivity(activity);
+            }
+        }
+
+        public abstract void runWithActivity(T activity);
+    }
+
+    private static class UpdateVpnStateRunnable extends WeakReferenceRunnable<ConnectivityActivity>{
+        private int mState;
+        UpdateVpnStateRunnable(ConnectivityActivity activity, int state){
+            super(activity);
+            mState = state;
+        }
+
+        @Override
+        public void runWithActivity(ConnectivityActivity activity) {
+            activity.mNewState = Constants.State.values()[mState];
+            activity.updateConnectionState();
+            Log.d("状态", activity.mNewState.name());
+        }
     }
 
     private void updateConnectionState(){
@@ -348,29 +378,34 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
             if(fragment == null) {
-                mShowRateUsRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                                if (!ConnectivityActivity.this.isDestroyed()) {
-                                    getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                                            .commitAllowingStateLoss();
-                                }
-                            } else {
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                                        .commitAllowingStateLoss();
-                            }
-                        }catch (Exception e){
-                            ShadowsocksApplication.handleException(e);
-                        }
-
-                    }
-                };
+                mShowRateUsRunnable = new ShowRateUsRunnable(this);
                 getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
+            }
+        }
+    }
+
+    private static class ShowRateUsRunnable extends WeakReferenceRunnable<ConnectivityActivity>{
+        ShowRateUsRunnable(ConnectivityActivity activity){
+            super(activity);
+        }
+
+        @Override
+        public void runWithActivity(ConnectivityActivity activity) {
+            try {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    if (!activity.isDestroyed()) {
+                        activity.getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                                .commitAllowingStateLoss();
+                    }
+                } else {
+                    activity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
+                            .commitAllowingStateLoss();
+                }
+            }catch (Exception e){
+                ShadowsocksApplication.handleException(e);
             }
         }
     }
@@ -631,51 +666,69 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mIsConnecting = true;
         }
         mConnectingTimeoutHandler = new Handler();
-        mConnectingTimeoutRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if(mShadowsocksService != null){
-                    try {
-                        mShadowsocksService.stop();
-                    } catch (RemoteException e) {
-                        ShadowsocksApplication.handleException(e);
-                    }
-                }
-                mConnectingTimeoutHandler = null;
-                mConnectingTimeoutRunnable = null;
-                Snackbar.make(findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
-                GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "VPN连接超时");
-                if(mConnectingConfig != null) {
-                    mErrorServers.add(mConnectingConfig);
-                }
-            }
-        };
+        mConnectingTimeoutRunnable = new ConnectingTimeoutRunnable(this);
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final ServerConfig serverConfig = findVPNServer();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(serverConfig != null) {
-                            mConnectingConfig = serverConfig;
-                            prepareStartService();
-                        }else {
-                            Snackbar.make(findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
-                            if(mConnectFragment != null){
-                                mConnectFragment.setConnectResult(Constants.State.ERROR);
-                            }
-                            GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "没有可用的服务器");
-                            mIsConnecting = false;
-                        }
-                    }
-                });
-            }
-        }).start();
+        new Thread(new ConnectRunnable(this)).start();
     }
 
+    private static class ConnectRunnable extends WeakReferenceRunnable<ConnectivityActivity>{
+        ConnectRunnable(ConnectivityActivity activity){
+            super(activity);
+        }
 
+        @Override
+        public void runWithActivity(ConnectivityActivity activity) {
+            final ServerConfig serverConfig = activity.findVPNServer();
+            activity.runOnUiThread(new ConnectVpnRunnable(activity, serverConfig));
+        }
+    }
+
+    private static class ConnectVpnRunnable extends WeakReferenceRunnable<ConnectivityActivity>{
+        private ServerConfig mServerConfig;
+        ConnectVpnRunnable(ConnectivityActivity activity, ServerConfig serverConfig){
+            super(activity);
+            mServerConfig = serverConfig;
+        }
+
+        @Override
+        public void runWithActivity(ConnectivityActivity activity) {
+            if(mServerConfig != null) {
+                activity.mConnectingConfig = mServerConfig;
+                activity.prepareStartService();
+            }else {
+                Snackbar.make(activity.findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
+                if(activity.mConnectFragment != null){
+                    activity.mConnectFragment.setConnectResult(Constants.State.ERROR);
+                }
+                GAHelper.sendEvent(activity, "VPN连不上", "没有可用的服务器");
+                activity.mIsConnecting = false;
+            }
+        }
+    }
+
+    private static class ConnectingTimeoutRunnable extends WeakReferenceRunnable<ConnectivityActivity>{
+        ConnectingTimeoutRunnable(ConnectivityActivity activity){
+            super(activity);
+        }
+
+        @Override
+        public void runWithActivity(ConnectivityActivity activity) {
+            if(activity.mShadowsocksService != null){
+                try {
+                    activity.mShadowsocksService.stop();
+                } catch (RemoteException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+            activity.mConnectingTimeoutHandler = null;
+            activity.mConnectingTimeoutRunnable = null;
+            Snackbar.make(activity.findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
+            GAHelper.sendEvent(activity, "VPN连不上", "VPN连接超时");
+            if(activity.mConnectingConfig != null) {
+                activity.mErrorServers.add(activity.mConnectingConfig);
+            }
+        }
+    }
     private void disconnectVpnServiceAsync(){
         if(mConnectFragment != null){
             mConnectFragment.animateStopping();
