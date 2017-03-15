@@ -1,0 +1,2 @@
+v2.1.2
+    把activity中的Runnable换成静态类，疑似解决内存泄露
