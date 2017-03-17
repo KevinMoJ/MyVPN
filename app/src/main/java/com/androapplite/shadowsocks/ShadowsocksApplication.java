@@ -24,8 +24,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
+
 import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
@@ -37,31 +36,11 @@ import io.fabric.sdk.android.Fabric;
  * Created by jim on 16/5/2.
  */
 public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks {
-    private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
     private int mRunningActivityNum;
     private ArrayList<Activity> mActivitys;
 
-    @NonNull
-    public Tracker getTracker(){
-        if(mTracker == null){
-            synchronized(this){
-                if(mTracker == null){
-                    final GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(this);
-                    googleAnalytics.setDryRun(BuildConfig.DEBUG);
-                    mTracker = googleAnalytics.newTracker(R.xml.ga_tracker);
-                    mTracker.enableAdvertisingIdCollection(true);
-                    mTracker.enableExceptionReporting(!BuildConfig.DEBUG);
-                    return mTracker;
-                }else{
-                    return mTracker;
-                }
-            }
-        }else{
-            return mTracker;
-        }
-    }
 
     @Override
     public void onCreate() {
