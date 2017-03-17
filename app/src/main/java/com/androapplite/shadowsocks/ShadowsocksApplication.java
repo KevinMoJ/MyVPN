@@ -6,27 +6,23 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
-import com.androapplite.vpn3.R;
+import com.bestgo.adsplugin.ads.AbstractFirebase;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
-import com.umeng.analytics.game.UMGameAgent;
-
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -66,12 +62,59 @@ public class ShadowsocksApplication extends Application implements Application.A
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEB
 
         registerActivityLifecycleCallbacks(this);
-
-        AdAppHelper.FIREBASE =
+        
+        AdAppHelper.FIREBASE = new FirebaseAdapter(this);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.init();
         mActivitys = new ArrayList<>();
         reportDailyUseTime(this);
+    }
+
+    private static class FirebaseAdapter extends AbstractFirebase{
+        private WeakReference<Context> mContextReference;
+
+        FirebaseAdapter(Context context){
+            mContextReference = new WeakReference<Context>(context);
+        }
+
+        @Override
+        public void logEvent(String key, Bundle values) {
+            Context context = mContextReference.get();
+            if(context != null){
+                FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(context);
+                analytics.logEvent(key, values);
+            }
+        }
+
+        @Override
+        public void logEvent(String key, long value) {
+            Bundle bundle = new Bundle();
+            bundle.putLong("Value", value);
+            logEvent(key, bundle);
+        }
+
+        @Override
+        public void logEvent(String key, String name, long value) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Name", name);
+            bundle.putLong("Value", value);
+            logEvent(key, bundle);
+        }
+
+        @Override
+        public void logEvent(String key, String name, String value) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Name", name);
+            bundle.putString("Value", value);
+            logEvent(key, bundle);
+        }
+
+        @Override
+        public void logEvent(String key, String value) {
+            Bundle bundle = new Bundle();
+            bundle.putString("Value", value);
+            logEvent(key, bundle);
+        }
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
