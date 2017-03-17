@@ -1,0 +1,3 @@
+[submodule "adsplugin"]
+	path = adsplugin
+	url = git@git.haizhebar.com:jikai/adsplugin.git

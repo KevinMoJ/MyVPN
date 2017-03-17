@@ -12,12 +12,12 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
@@ -67,7 +67,9 @@ public class ShadowsocksApplication extends Application implements Application.A
 
         registerActivityLifecycleCallbacks(this);
 
-        AdAppHelper.getInstance(getApplicationContext()).init();
+        AdAppHelper.FIREBASE =
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        adAppHelper.init();
         mActivitys = new ArrayList<>();
         reportDailyUseTime(this);
     }
