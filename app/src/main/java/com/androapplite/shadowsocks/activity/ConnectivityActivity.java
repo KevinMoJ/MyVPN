@@ -109,6 +109,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Runnable mConnectingTimeoutRunnable;
     private HashSet<ServerConfig> mErrorServers;
     private AlertDialog mExitAlert;
+    private BroadcastReceiver mConnectCountChangedReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +150,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             adAppHelper.showFullAd();
         }
         mErrorServers = new HashSet<>();
+        mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
@@ -202,7 +204,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                         GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", "未知原因");
                                     }
                                 }
-
+                                increaseFailedCount();
+                                if(mConnectFragment != null){
+                                    mConnectFragment.updateUI();
+                                }
                             }
                             mFetchServerListProgressDialog.dismiss();
                             mFetchServerListProgressDialog = null;
@@ -211,6 +216,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
             }
         };
+    }
+
+    private void increaseFailedCount(){
+        if(mSharedPreference != null){
+            long failed = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0) + 1;
+            mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, failed).commit();
+            GAHelper.sendEvent(this, "累计连接成功失败次数", "失败", String.valueOf(failed));
+        }
     }
 
     @Override
@@ -633,6 +646,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             Snackbar.make(findViewById(R.id.coordinator), R.string.not_start_vpn, Snackbar.LENGTH_SHORT).show();
             ShadowsocksApplication.handleException(e);
             GAHelper.sendEvent(this, "VPN连不上", "VPN Prepare错误", e.getMessage());
+            increaseFailedCount();
+            if(mConnectFragment != null){
+                mConnectFragment.updateUI();
+            }
         }
     }
 
@@ -676,6 +693,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             }
                             GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "没有可用的服务器");
                             mIsConnecting = false;
+                            increaseFailedCount();
+                            if(mConnectFragment != null){
+                                mConnectFragment.updateUI();
+                            }
                         }
                     }
                 });
@@ -708,6 +729,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 if(activity.mConnectingConfig != null) {
                     activity.mErrorServers.add(activity.mConnectingConfig);
                 }
+                activity.increaseFailedCount();
+                if(activity.mConnectFragment != null){
+                    activity.mConnectFragment.updateUI();
+                }
             }
         }
     }
@@ -733,7 +758,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         registerShadowsocksCallback();
         checkNetworkConnectivity();
         registerConnectivityReceiver();
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.CONNECTION_ACTIVITY_SHOW));
         if(mShadowsocksService != null){
             try {
                 mNewState = Constants.State.values()[mShadowsocksService.getState()];
@@ -743,6 +768,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         updateConnectionState();
         addBottomAd(AdAppHelper.getInstance(this));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mConnectCountChangedReceiver,
+                new IntentFilter(Action.CONNECT_COUNT_CHANGED));
     }
 
     private void registerShadowsocksCallback() {
@@ -764,6 +791,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mNoInternetSnackbar.dismiss();
             mNoInternetSnackbar = null;
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mConnectCountChangedReceiver);
     }
 
     private void unregisterShadowsocksCallback() {
@@ -1146,5 +1175,23 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         view.startAnimation(rotate3dAnimation);
     }
 
+
+    private static class ConnectCountChangeReceiver extends BroadcastReceiver{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+
+        ConnectCountChangeReceiver(ConnectivityActivity activity){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                if(activity.mConnectFragment != null){
+                    activity.mConnectFragment.updateUI();
+                }
+            }
+        }
+    }
 
 }

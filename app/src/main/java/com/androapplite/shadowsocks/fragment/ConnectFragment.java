@@ -2,10 +2,12 @@ package com.androapplite.shadowsocks.fragment;
 
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -38,6 +40,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private Timer mCountDownTimer;
     private Handler mUpdateStateHandler;
     private Runnable mUpdateStateDelayedRunable;
+    private TextView mSuccessConnectTextView;
+    private TextView mFailedConnectTextView;
+    private SharedPreferences mSharedPreference;
 
     public ConnectFragment() {
         // Required empty public constructor
@@ -53,11 +58,17 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectButton = (Button)view.findViewById(R.id.connect_button);
         mConnectButton.setOnClickListener(this);
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
+        mSuccessConnectTextView = (TextView)view.findViewById(R.id.success_connect);
+        mFailedConnectTextView = (TextView)view.findViewById(R.id.failed_connect);
 
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final long countDown = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
-        mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+        mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        init();
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -177,9 +188,14 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
 
     private void init(){
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final long countDown = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
+        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+
+        long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
+        mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
+
+        long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
+        mFailedConnectTextView.setText(getString(R.string.failed_connect, error));
     }
 
     private void connectFinish(){
@@ -187,6 +203,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mCountDownTimer = new Timer();
         mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
         mConnectButton.setText(R.string.disconnect);
+        long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
+        mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
     }
 
     private class CountDownTimerTask extends TimerTask{
@@ -195,8 +213,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
             final Context context = getContext();
             if(isVisible() && context != null) {
-                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-                final long countDown = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
+                final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
                 mMessageTextView.post(new Runnable() {
                     @Override
                     public void run() {
@@ -209,8 +226,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void stopFinish(){
         mLoadingView.clearAnimation();
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final long countDown = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
+        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
     }
 
@@ -218,14 +234,16 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mLoadingView.clearAnimation();
         mLoadingView.setColorFilter(getResources().getColor(R.color.connect_error_red));
         mLoadingView.setImageLevel(1);
+
+        long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
+        mFailedConnectTextView.setText(getString(R.string.failed_connect, error));
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        final long countDown = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
-        mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+        init();
     }
 
     @Override
@@ -236,5 +254,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mUpdateStateHandler = null;
             mUpdateStateDelayedRunable = null;
         }
+    }
+
+    public void updateUI(){
+        init();
     }
 }

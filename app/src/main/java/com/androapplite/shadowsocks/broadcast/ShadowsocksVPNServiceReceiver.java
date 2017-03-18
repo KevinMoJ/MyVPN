@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -42,6 +43,11 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     if(duration > 0){
                         GAHelper.sendTimingEvent(context, "VPN计时", "连接", duration);
                     }
+                    long successConnectCount = sharedPreferences.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0) + 1;
+                    sharedPreferences.edit().putLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, successConnectCount).commit();
+                    GAHelper.sendEvent(context, "累计连接成功失败次数", "成功", String.valueOf(successConnectCount));
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(com.androapplite.shadowsocks.broadcast.Action.CONNECT_COUNT_CHANGED));
+
                     break;
                 case Action.STOPPING:
                     GAHelper.sendEvent(context, "VPN状态", "开始断开");
@@ -63,6 +69,10 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     if(duration > 0){
                         GAHelper.sendTimingEvent(context, "VPN计时", "错误", duration);
                     }
+                    long failedConnectCount = sharedPreferences.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0) + 1;
+                    sharedPreferences.edit().putLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, failedConnectCount).commit();
+                    GAHelper.sendEvent(context, "累计连接成功失败次数", "失败", String.valueOf(failedConnectCount));
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(com.androapplite.shadowsocks.broadcast.Action.CONNECT_COUNT_CHANGED));
                     break;
             }
         }

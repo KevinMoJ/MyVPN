@@ -17,13 +17,13 @@ public final class SharedPreferenceKey {
     public static final String AUTO_CONNECT = "auto_connect";
     public static final String NOTIFICATION = "notification";
     public static final String CONNECT_TIME = "CONNECT_TIME";
-//    public static final String TIME_COUNT_DOWN = "TIME_COUNT_DOWN";
     public static final String CONNECTING_VPN_PORT = "CONNECTING_VPN_PORT";
     public static final String CONNECT_ERROR_COUNT = "CONNECT_ERROR_COUNT";
     public static final String FIRST_CONNECT_SUCCESS = "FIRST_CONNECT_SUCCESS";
     public static final String EXTENT_1H_ALERT = "EXTENT_1H_ALERT";
     public static final String USE_TIME = "USE_TIME";
     public static final String LAST_USE_TIME = "LAST_USE_TIME";
-
+    public static final String SUCCESS_CONNECT_COUNT = "SUCCESS_CONNECT_COUNT";
+    public static final String FAILED_CONNECT_COUNT = "FAILED_CONNECT_COUNT";
 
 }

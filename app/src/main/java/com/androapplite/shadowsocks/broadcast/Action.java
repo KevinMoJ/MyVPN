@@ -12,5 +12,6 @@ public final class Action {
     public static final String TIME_UP = BuildConfig.APPLICATION_ID + ".TIME_UP";
     public static final String NOTIFICATION_DELETE = BuildConfig.APPLICATION_ID + ".NOTIFICATION_DELETE";
     public static final String NOTIFICATION_OPEN = BuildConfig.APPLICATION_ID + ".NOTIFICATION_OPEN";
+    public static final String CONNECT_COUNT_CHANGED = BuildConfig.APPLICATION_ID + ".CONNECT_COUNT_CHANGED";
 
 }
