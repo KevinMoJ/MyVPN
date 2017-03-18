@@ -22,13 +22,13 @@ import android.view.ViewPropertyAnimator;
 import android.widget.ProgressBar;
 
 import com.androapplite.shadowsocks.GAHelper;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;

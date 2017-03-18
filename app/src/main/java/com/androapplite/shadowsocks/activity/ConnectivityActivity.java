@@ -46,9 +46,6 @@ import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
-import com.androapplite.shadowsocks.ads.AdStateListener;
-import com.androapplite.shadowsocks.ads.AdType;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -66,6 +63,9 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.request.target.SimpleTarget;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.TimeCountDownService;
+import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.bestgo.adsplugin.ads.AdStateListener;
+import com.bestgo.adsplugin.ads.AdType;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -130,7 +130,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastReceiver();
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.setListener(new AdStateListener() {
+        adAppHelper.setAdStateListener(new AdStateListener() {
             @Override
             public void onAdClosed(AdType adType) {
                 switch (adType.getType()){
@@ -144,6 +144,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
             }
         });
+
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
         }

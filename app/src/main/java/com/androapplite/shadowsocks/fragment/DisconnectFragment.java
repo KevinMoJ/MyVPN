@@ -16,9 +16,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 /**
  * A simple {@link Fragment} subclass.
