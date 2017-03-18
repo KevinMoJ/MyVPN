@@ -33,7 +33,7 @@ android {
         targetSdkVersion 22
         versionCode 16
         versionName "1.1.16"
-        multiDexEnabled true
+//        multiDexEnabled true
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
