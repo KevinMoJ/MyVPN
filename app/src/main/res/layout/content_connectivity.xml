@@ -10,7 +10,7 @@
     tools:showIn="@layout/app_bar_connectivity"
     android:background="@drawable/main_bg">
     <fragment
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.androapplite.shadowsocks.fragment.ConnectFragment"
         tools:layout="@layout/fragment_connect"
