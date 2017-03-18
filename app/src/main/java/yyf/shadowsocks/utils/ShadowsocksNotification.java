@@ -217,6 +217,7 @@ public class ShadowsocksNotification {
             remoteViews2.setInt(v2.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
             applyTextColorToRemoteViews(remoteViews2, v2, getColor(R.color.notification_text_about_disconnect));
             mNotificationManager.notify(2, notification2);
+            mNotificationManager.cancel(2);
 
             mBuilder.setContentText(mService.getString(R.string.notification_vpn_network_error1))
                     .setSubText(mService.getString(R.string.notification_vpn_network_error2))
