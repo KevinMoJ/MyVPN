@@ -1,24 +1,19 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <string name="cn_b_ctrl">{exe=1},{set=2},{admob=100},{facebook=-1},{fbn=-1}</string>
     <string name="ad_ids">{admob=ca-app-pub-5330675173640052/8168752925},{admob_full=ca-app-pub-5330675173640052/6692019724},{admob_n=ca-app-pub-5330675173640052/8168752925},{admob_en=ca-app-pub-5330675173640052/2484828121}, {fb=1207655049289960_1207657955956336},{fb_f=1207655049289960_1207659762622822},{fb_n=1207655049289960_1207656932623105},{fbns=1207655049289960_1207656932623105,1207655049289960_1207656932623105}</string>
     <int name="oc_ec" value="-1" />
-    <string name="op_push">{id=103},{type=op},{pname=com.sevenstar.findeverything},{action=market://details?id=com.sevenstar.findeverything},{title=Are you there},{message=Welcome back, play the new puzzles!}</string>
-    <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=-1},{admob_en=1000}</string>
     <long name="umeng_net_report_interval" value="0" />
     <long name="oc_mdf_t" value="1487571021000" />
-    <string name="banner_ctrl">{exe=1},{admob=10},{facebook=-1},{fbn=-1}</string>
-    <string name="cn_ngs_ctrl">{exe=1},{set=2},{admob=100},{facebook=-1},{fbn=-1}</string>
     <long name="last_test_t" value="1487584755931" />
     <long name="oc_mdf_told" value="0" />
-    <string name="dev_ctrl">{exe=0},{jump=1000},{dev=com.game.bubbleshooter.free,com.racergame.cityracinglite.free,com.gameone.jabbersuperjump,com.marbleage.free,com.games.solitaire.free,com.appgame7.fruitfrenzy,com.appgame7.candyfrenzy2,com.easygame.marblelegend,com.appgame7.friutslegend}</string>
-    <string name="gift_ctrl">{exe=0},{before=video:1},{video=100},{ngs=100}</string>
     <int name="umeng_net_report_policy" value="1" />
-    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:1000|adtype=1}, {ngsorder:admob=before:2|1:999|adt:1000|adtype=1},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0}</string>
-    <string name="silence_done">{slen_day=3},{push=0}</string>
-    <string name="resume_ctrl">{exe=1}</string>
-    <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=-1}</string>
     <long name="oc_req_i" value="600000" />
+
+    <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=10000},{admob_en=-1}</string>
+    <string name="banner_ctrl">{exe=1},{admob=10},{facebook=-1},{fbn=-1}</string>
+    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:0|adtype=0}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0},{banner_click=100},{ngs_click=100},{native_click=100},{home_delay_time=5000}</string>
+    <string name="resume_ctrl">{exe=0}</string>
+    <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=10000}</string>
 
     <string name="banner_ids">{admob=ca-app-pub-5330675173640052/8168752925},{fb=1207655049289960_1207657955956336}</string>
     <string name="admob_full_ids">{count=1},{id1=ca-app-pub-5330675173640052/6692019724,全屏}</string>
