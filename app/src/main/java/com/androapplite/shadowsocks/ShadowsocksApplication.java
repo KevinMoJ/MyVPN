@@ -183,10 +183,9 @@ public class ShadowsocksApplication extends Application implements Application.A
         alarmManager.cancel(pendingIntent);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR, 24);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
         alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 }
