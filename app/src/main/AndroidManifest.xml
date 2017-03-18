@@ -29,13 +29,7 @@
             android:value="Google" />
 
         <!-- 完全覆盖区-Start -->
-        <receiver android:name="com.androapplite.shadowsocks.ads.MonitorReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
 
-        <activity android:name="com.androapplite.shadowsocks.ads.AdActivity" />
         <activity
             android:name="com.facebook.ads.InterstitialAdActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -44,10 +38,7 @@
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
-        <activity
-            android:name="com.vungle.publisher.FullScreenAdActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
         <activity
             android:name="com.androapplite.shadowsocks.activity.SplashActivity"
             android:screenOrientation="portrait"
