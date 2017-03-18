@@ -44,7 +44,8 @@
     <color name="notification_small_icon_bg_disconnect">#DE5E5D</color>
     <color name="notification_small_icon_bg_about_disconnect">#53BAE0</color>
     <color name="notification_text_about_disconnect">#FF4E4C</color>
-
+    <color name="success_connect">#31d6ff</color>
+    <color name="failed_connect">#ff9580</color>
 
 
 </resources>
