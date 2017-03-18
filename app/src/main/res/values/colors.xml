@@ -46,6 +46,6 @@
     <color name="notification_text_about_disconnect">#FF4E4C</color>
     <color name="success_connect">#31d6ff</color>
     <color name="failed_connect">#ff9580</color>
-
+    <color name="used_time_bg">#10000000</color>
 
 </resources>
