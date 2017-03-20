@@ -148,6 +148,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
+            //广告,准备好,首页全屏刚进入
+        }else{
+            //广告,没准备好,首页全屏刚进入
         }
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
@@ -307,8 +310,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
                             if(adAppHelper.isFullAdLoaded()) {
                                 adAppHelper.showFullAd();
+                                //广告，准备好，首页全屏连接成功
                             }else{
                                 rotateAd();
+                                //广告，没准备好，首页全屏连接成功
                             }
                         }
                     } catch (Exception ex) {
@@ -507,7 +512,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     })
                     .show();
 
-            AdAppHelper.getInstance(this).showFullAd();
+            final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+            if(adAppHelper.isFullAdLoaded()){
+                adAppHelper.showFullAd();
+                //广告，准备好，首页全屏退出
+            }else{
+                //广告，没准备好，首页全屏退出
+            }
 //            super.onBackPressed();
         }
     }
@@ -852,12 +863,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         ShadowsocksApplication.handleException(e);
                     }
                 }
-                try {
-                    if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-                    }
-                } catch (Exception ex) {
-                }
+//                try {
+//                    if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+//                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
+//                    }
+//                } catch (Exception ex) {
+//                }
             }else if(requestCode == OPEN_SERVER_LIST){
                 ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
                 if(connectivityManager != null){
