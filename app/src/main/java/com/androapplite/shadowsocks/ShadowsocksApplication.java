@@ -15,6 +15,7 @@ import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
+import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AbstractFirebase;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
@@ -62,7 +63,7 @@ public class ShadowsocksApplication extends Application implements Application.A
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEB
 
         registerActivityLifecycleCallbacks(this);
-        
+        AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
         AdAppHelper.FIREBASE = new FirebaseAdapter(this);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.init();
