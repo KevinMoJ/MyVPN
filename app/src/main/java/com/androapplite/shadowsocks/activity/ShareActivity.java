@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -30,7 +31,6 @@ public class ShareActivity extends AppCompatActivity {
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
-        GAHelper.sendScreenView(this, "分享屏幕");
 
     }
 
@@ -55,7 +55,7 @@ public class ShareActivity extends AppCompatActivity {
 
         intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(filePath)));
         startActivity(Intent.createChooser(intent, "Share app"));
-        GAHelper.sendEvent(this, "分享屏幕", "蓝牙分享");
+        Firebase.getInstance(this).logEvent("分享屏幕", "蓝牙分享");
     }
 
     public void moreShare(View view){
@@ -68,21 +68,21 @@ public class ShareActivity extends AppCompatActivity {
         }catch(ActivityNotFoundException e){
             ShadowsocksApplication.handleException(e);
         }
-        GAHelper.sendEvent(this, "分享屏幕", "更多分享");
+        Firebase.getInstance(this).logEvent("分享屏幕", "更多分享");
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             finish();
-            GAHelper.sendEvent(this, "分享屏幕", "后退", "导航栏");
+            Firebase.getInstance(this).logEvent("分享屏幕", "后退", "导航栏");
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        GAHelper.sendEvent(this, "分享屏幕", "后退", "按键");
+        Firebase.getInstance(this).logEvent("分享屏幕", "后退", "按键");
         super.onBackPressed();
     }
 }

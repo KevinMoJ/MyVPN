@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -52,13 +53,14 @@ public class ConnectionTestService extends IntentService {
                     .build();
             long t1 = System.currentTimeMillis();
             Response response = null;
+            Firebase firebase = Firebase.getInstance(this);
             try {
                 response = client.newCall(request).execute();
                 long t2 = System.currentTimeMillis();
-                GAHelper.sendTimingEvent(this, "连接后测试成功", serverName, t2-t1);
+                firebase.logEvent("连接后测试成功", serverName, t2-t1);
             } catch (IOException e) {
                 long t2 = System.currentTimeMillis();
-                GAHelper.sendTimingEvent(this, "连接后测试失败", serverName, t2-t1);
+                firebase.logEvent("连接后测试失败", serverName, t2-t1);
                 ShadowsocksApplication.handleException(e);
             }finally {
                 if(response != null) {

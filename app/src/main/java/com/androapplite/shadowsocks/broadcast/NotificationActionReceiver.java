@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 
@@ -16,7 +17,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()){
             case Action.NOTIFICATION_OPEN:
-                GAHelper.sendEvent(context, "通知", "打开app");
+                Firebase.getInstance(context).logEvent("通知", "打开app");
                 final Intent intent1 = new Intent(context, SplashActivity.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent1);

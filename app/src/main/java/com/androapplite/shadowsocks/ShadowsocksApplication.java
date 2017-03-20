@@ -61,61 +61,14 @@ public class ShadowsocksApplication extends Application implements Application.A
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
         // Initialize the SDK before executing any other operations,
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEB
-
         registerActivityLifecycleCallbacks(this);
         AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
-        AdAppHelper.FIREBASE = new FirebaseAdapter(this);
+        AdAppHelper.FIREBASE = Firebase.getInstance(this);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.init();
         mActivitys = new ArrayList<>();
         reportDailyUseTime(this);
-    }
 
-    private static class FirebaseAdapter extends AbstractFirebase{
-        private WeakReference<Context> mContextReference;
-
-        FirebaseAdapter(Context context){
-            mContextReference = new WeakReference<Context>(context);
-        }
-
-        @Override
-        public void logEvent(String key, Bundle values) {
-            Context context = mContextReference.get();
-            if(context != null){
-                FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(context);
-                analytics.logEvent(key, values);
-            }
-        }
-
-        @Override
-        public void logEvent(String key, long value) {
-            Bundle bundle = new Bundle();
-            bundle.putLong("Value", value);
-            logEvent(key, bundle);
-        }
-
-        @Override
-        public void logEvent(String key, String name, long value) {
-            Bundle bundle = new Bundle();
-            bundle.putString("Name", name);
-            bundle.putLong("Value", value);
-            logEvent(key, bundle);
-        }
-
-        @Override
-        public void logEvent(String key, String name, String value) {
-            Bundle bundle = new Bundle();
-            bundle.putString("Name", name);
-            bundle.putString("Value", value);
-            logEvent(key, bundle);
-        }
-
-        @Override
-        public void logEvent(String key, String value) {
-            Bundle bundle = new Bundle();
-            bundle.putString("Value", value);
-            logEvent(key, bundle);
-        }
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){

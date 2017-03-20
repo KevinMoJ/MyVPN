@@ -44,6 +44,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.vpn3.R;
@@ -124,7 +125,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
-        GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
         initVpnFlagAndNation();
         initForegroundBroadcastIntentFilter();
@@ -168,11 +168,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     public static final String NAME = "MainActivity";
     private boolean startUp = false;
-    private boolean watchedVideoFinish = true;
-    private boolean videoAvailble = false;
-    private boolean showResumeAd = false;
-    public static boolean nativeLoaded = false;
-
 
     private void initForegroundBroadcastIntentFilter(){
         mForgroundReceiverIntentFilter = new IntentFilter();
@@ -193,18 +188,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
                                 String errMsg = intent.getStringExtra("ErrMsg");
                                 boolean isIpUrl = intent.getBooleanExtra("IsIpUrl", false);
+                                Firebase firebase = Firebase.getInstance(context);
                                 if(errMsg != null){
                                     if(isIpUrl) {
-                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时IP", errMsg);
+                                        firebase.logEvent("VPN连不上", "取服务器列表超时IP", errMsg);
                                     }else{
-                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", errMsg);
+                                        firebase.logEvent("VPN连不上", "取服务器列表超时Domain", errMsg);
                                     }
 
                                 }else {
                                     if(isIpUrl) {
-                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时IP", "未知原因");
+                                        firebase.logEvent("VPN连不上", "取服务器列表超时IP", "未知原因");
                                     }else {
-                                        GAHelper.sendEvent(context, "VPN连不上", "取服务器列表超时Domain", "未知原因");
+                                        firebase.logEvent("VPN连不上", "取服务器列表超时Domain", "未知原因");
+
                                     }
                                 }
                                 increaseFailedCount();
@@ -225,7 +222,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(mSharedPreference != null){
             long failed = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0) + 1;
             mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, failed).commit();
-            GAHelper.sendEvent(this, "累计连接成功失败次数", "失败", String.valueOf(failed));
+            Firebase.getInstance(this).logEvent("累计连接成功失败次数", "失败", String.valueOf(failed));
         }
     }
 
@@ -369,7 +366,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     clearConnectingTimeout();
                     mIsConnecting = false;
                     mErrorServers.add(mConnectingConfig);
-                    GAHelper.sendEvent(this, "VPN连不上", "ERROR");
+                    Firebase.getInstance(this).logEvent("VPN连不上", "ERROR");
                     break;
             }
         }
@@ -448,7 +445,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             boolean autoConnect = mSharedPreference.getBoolean(SharedPreferenceKey.AUTO_CONNECT, false);
             if (autoConnect) {
                 connectVpnServerAsync();
-                GAHelper.sendEvent(this, "连接VPN", "自动连接", mNewState.name());
+                Firebase.getInstance(this).logEvent("连接VPN", "自动连接", mNewState.name());
             }
         }
 
@@ -467,12 +464,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerClosed(View drawerView) {
-                GAHelper.sendEvent(drawerView.getContext(), "菜单", "关闭");
+                Firebase.getInstance(drawerView.getContext()).logEvent("菜单", "关闭");
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                GAHelper.sendEvent(drawerView.getContext(), "菜单", "打开");
+                Firebase.getInstance(drawerView.getContext()).logEvent("菜单", "打开");
             }
         });
         toggle.syncState();
@@ -548,7 +545,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 Snackbar.make(findViewById(R.id.coordinator), R.string.stopping_tip, Snackbar.LENGTH_SHORT).show();
             }
-            GAHelper.sendEvent(this, "打开服务器列表", mNewState.name());
+            Firebase.getInstance(this).logEvent("打开服务器列表", mNewState.name());
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -559,22 +556,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        Firebase firebase = Firebase.getInstance(this);
         if (id == R.id.nav_rate_us) {
             rateUs();
-            GAHelper.sendEvent(this, "菜单", "给我们打分");
+            firebase.logEvent("菜单", "给我们打分");
 //        } else if (id == R.id.nav_share) {
 //            share();
 //            GAHelper.sendEvent(this, "抽屉", "分享");
         } else if (id == R.id.nav_contact_us) {
             contactUs();
-            GAHelper.sendEvent(this, "菜单", "联系我们");
+            firebase.logEvent("菜单", "联系我们");
         } else if (id == R.id.nav_about) {
             about();
-            GAHelper.sendEvent(this, "菜单", "关于");
+            firebase.logEvent("菜单", "关于");
         } else if(id == R.id.nav_settings){
             startActivity(new Intent(this, SettingsActivity.class));
-            GAHelper.sendEvent(this, "菜单", "设置");
+            firebase.logEvent("菜单", "设置");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -656,7 +653,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }catch(Exception e){
             Snackbar.make(findViewById(R.id.coordinator), R.string.not_start_vpn, Snackbar.LENGTH_SHORT).show();
             ShadowsocksApplication.handleException(e);
-            GAHelper.sendEvent(this, "VPN连不上", "VPN Prepare错误", e.getMessage());
+            Firebase.getInstance(this).logEvent("VPN连不上", "VPN Prepare错误", e.getMessage());
             increaseFailedCount();
             if(mConnectFragment != null){
                 mConnectFragment.updateUI();
@@ -702,7 +699,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             if(mConnectFragment != null){
                                 mConnectFragment.setConnectResult(Constants.State.ERROR);
                             }
-                            GAHelper.sendEvent(ConnectivityActivity.this, "VPN连不上", "没有可用的服务器");
+                            Firebase.getInstance(ConnectivityActivity.this).logEvent("VPN连不上", "没有可用的服务器");
                             mIsConnecting = false;
                             increaseFailedCount();
                             if(mConnectFragment != null){
@@ -736,7 +733,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 activity.mConnectingTimeoutHandler = null;
                 activity.mConnectingTimeoutRunnable = null;
                 Snackbar.make(activity.findViewById(R.id.coordinator), R.string.timeout_tip, Snackbar.LENGTH_SHORT).show();
-                GAHelper.sendEvent(activity, "VPN连不上", "VPN连接超时");
+                Firebase.getInstance(activity).logEvent("VPN连不上", "VPN连接超时");
                 if(activity.mConnectingConfig != null) {
                     activity.mErrorServers.add(activity.mConnectingConfig);
                 }
@@ -887,17 +884,20 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         final View decorView = findViewById(R.id.coordinator);
         boolean r = false;
+        Firebase firebase = Firebase.getInstance(this);
         if(connectivityManager == null){
             Snackbar.make(decorView, R.string.no_network, Snackbar.LENGTH_INDEFINITE).show();
-            GAHelper.sendEvent(this, "网络连接","异常","没有网络服务");
+            firebase.logEvent("网络连接","异常","没有网络服务");
         }else{
             final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             if(activeNetworkInfo == null){
                 showNoInternetSnackbar(R.string.no_internet_message);
-                GAHelper.sendEvent(this, "网络连接", "异常", "没有网络连接");
+                firebase.logEvent("网络连接","异常","没有网络连接");
+
             }else if(!activeNetworkInfo.isConnected()){
                 showNoInternetSnackbar(R.string.not_available_internet);
-                GAHelper.sendEvent(this, "网络连接", "异常", "当前网络连接不可用");
+                firebase.logEvent("网络连接","异常","当前网络连接不可用");
+
 //            }else if(activeNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
 //                final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 //                final WifiInfo connectionInfo = wifiManager.getConnectionInfo();
@@ -933,7 +933,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mNoInternetSnackbar.show();
                 }
 
-                GAHelper.sendEvent(v.getContext(), "网络连接", "异常", "打开WIFI");
+                Firebase.getInstance(v.getContext()).logEvent("网络连接", "异常", "打开WIFI");
             }
         });
         mNoInternetSnackbar.show();
@@ -969,6 +969,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 serverConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
             }
 
+            Firebase firebase = Firebase.getInstance(this);
             if (serverConfig != null) {
                 if (!serverConfigs.contains(serverConfig) ||
                         mErrorServers.contains(serverConfig)) {
@@ -976,9 +977,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 } else {
                     Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                     if (pair.first) {
-                        GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                        firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
                     } else {
-                        GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                        firebase.logEvent("连接测试失败", serverConfig.name, pair.second);
                         serverConfig = null;
                     }
 
@@ -1011,10 +1012,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     if (mErrorServers.contains(serverConfig)) continue;
                     Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                     if (pair.first) {
-                        GAHelper.sendTimingEvent(this, "连接测试成功", serverConfig.name, pair.second);
+                        firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
                         break;
                     } else {
-                        GAHelper.sendTimingEvent(this, "连接测试失败", serverConfig.name, pair.second);
+                        firebase.logEvent("连接测试失败", serverConfig.name, pair.second);
                     }
                 }
                 if (i >= filteredConfigs.size()) {
@@ -1093,20 +1094,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     @Override
     public void onConnectButtonClick() {
         if(mShadowsocksService != null) {
+            Firebase firebase = Firebase.getInstance(this);
             if (!mIsConnecting && (mNewState == Constants.State.INIT || mNewState == Constants.State.STOPPED || mNewState == Constants.State.ERROR)) {
                 if(checkNetworkConnectivity()) {
                     connectVpnServerAsync();
                 }
-                GAHelper.sendEvent(this, "连接VPN", "连接", mNewState.name());
+                firebase.logEvent("连接VPN", "连接", mNewState.name());
                 if(mSharedPreference != null) {
                     String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
-                    GAHelper.sendEvent(this, "选择国家", nation);
+                    firebase.logEvent("选择国家", nation);
                 }
 
             } else {
                 DisconnectFragment disconnectFragment = new DisconnectFragment();
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
-                GAHelper.sendEvent(this, "连接VPN", "断开", mNewState.name());
+                firebase.logEvent("连接VPN", "断开", mNewState.name());
             }
         }
 
@@ -1140,13 +1142,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onCancel(DisconnectFragment disconnectFragment) {
-        GAHelper.sendEvent(this, "连接VPN", "断开", "取消断开");
+        Firebase.getInstance(this).logEvent("连接VPN", "断开", "取消断开");
     }
 
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         disconnectVpnServiceAsync();
-        GAHelper.sendEvent(this, "连接VPN", "断开", "确认断开");
+        Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
     }
 
     @Override

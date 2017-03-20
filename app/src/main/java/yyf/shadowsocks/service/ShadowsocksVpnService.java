@@ -14,6 +14,7 @@ import android.os.*;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.GAHelper;
@@ -445,12 +446,12 @@ public class ShadowsocksVpnService extends BaseService {
                     }
                 }else{
                     String network = getConnectivityStateString();
-                    GAHelper.sendEvent(this, "State.Error", "无法创建", network + " " + config.getProxy());
+                    Firebase.getInstance(this).logEvent("State.Error", "无法创建", network + " " + config.getProxy());
                     stopRunnerForError();
                 }
             }else{
                 String network = getConnectivityStateString();
-                GAHelper.sendEvent(this, "State.Error", "DNS解析错误", network + " " + config.getProxy());
+                Firebase.getInstance(this).logEvent("State.Error", "DNS解析错误", network + " " + config.getProxy());
                 stopRunnerForError();
             }
         }

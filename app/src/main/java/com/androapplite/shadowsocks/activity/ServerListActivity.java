@@ -34,6 +34,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -106,7 +107,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             mHasServerJson = false;
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
-        GAHelper.sendScreenView(this, "服务器列表屏幕");
         addBottomAd(AdAppHelper.getInstance(this));
 
     }
@@ -177,7 +177,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     mSwipeRefreshLayout.setRefreshing(true);
                     ServerListFetcherService.fetchServerListAsync(this);
                 }
-                GAHelper.sendEvent(this, "刷新服务器列表", position, state.name());
+                Firebase.getInstance(this).logEvent("刷新服务器列表", position, state.name());
             } catch (RemoteException e) {
                 ShadowsocksApplication.handleException(e);
             }
@@ -298,7 +298,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     .apply();
             setResult(RESULT_OK);
             finish();
-            GAHelper.sendEvent(this, "选择国家", nation);
+            Firebase.getInstance(this).logEvent("选择国家", nation);
         }
     }
 
@@ -364,10 +364,11 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 }
                 mSwipeRefreshLayout.setRefreshing(true);
             }
-            GAHelper.sendEvent(this, "刷新服务器列表", "断开");
+            Firebase.getInstance(this).logEvent("刷新服务器列表", "断开");
         }else if(which == DialogInterface.BUTTON_NEGATIVE){
             mSwipeRefreshLayout.setRefreshing(false);
-            GAHelper.sendEvent(this, "刷新服务器列表", "取消");
+            Firebase.getInstance(this).logEvent("刷新服务器列表", "取消");
+
         }
     }
 

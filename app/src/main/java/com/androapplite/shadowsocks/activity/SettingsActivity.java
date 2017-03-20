@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -47,9 +48,6 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
 
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
-
-        GAHelper.sendScreenView(this, "设置屏幕");
-
     }
 
     private ServiceConnection createShadowsocksServiceConnection(){
@@ -93,7 +91,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         } catch (PackageManager.NameNotFoundException e) {
             ShadowsocksApplication.handleException(e);
         }
-        GAHelper.sendEvent(this, "设置", "关于");
+        Firebase.getInstance(this).logEvent("设置", "关于");
     }
 
     @Override
@@ -105,7 +103,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
                 ShadowsocksApplication.handleException(e);
             }
         }
-        GAHelper.sendEvent(this, "设置", "通知", String.valueOf(enable));
+        Firebase.getInstance(this).logEvent("设置", "通知", String.valueOf(enable));
     }
 
     @Override
@@ -118,6 +116,6 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
 
     @Override
     public void autoConect(boolean enable) {
-        GAHelper.sendEvent(this, "设置", "自动连接", String.valueOf(enable));
+        Firebase.getInstance(this).logEvent("设置", "自动连接", String.valueOf(enable));
     }
 }
