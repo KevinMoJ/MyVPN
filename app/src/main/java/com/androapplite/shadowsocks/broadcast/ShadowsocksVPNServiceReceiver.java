@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 

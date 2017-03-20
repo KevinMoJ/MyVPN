@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 

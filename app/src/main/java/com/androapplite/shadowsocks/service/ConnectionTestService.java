@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.Context;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import java.io.IOException;
 

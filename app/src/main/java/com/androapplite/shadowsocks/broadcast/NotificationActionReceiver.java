@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 
 public class NotificationActionReceiver extends BroadcastReceiver {

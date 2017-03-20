@@ -12,12 +12,9 @@ import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.*;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -32,19 +29,13 @@ import org.xbill.DNS.Type;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 import yyf.shadowsocks.Config;
-import yyf.shadowsocks.jni.*;
 import yyf.shadowsocks.jni.System;
 import yyf.shadowsocks.utils.ConfigUtils;
 import yyf.shadowsocks.utils.Console;
@@ -52,8 +43,6 @@ import yyf.shadowsocks.utils.Constants;
 import yyf.shadowsocks.utils.GuardedProcess;
 import yyf.shadowsocks.utils.InetAddressUtils;
 import yyf.shadowsocks.utils.ShadowsocksNotification;
-import yyf.shadowsocks.utils.TrafficMonitor;
-import yyf.shadowsocks.utils.TrafficMonitorThread;
 
 /**
  * Created by yyf on 2015/6/18.

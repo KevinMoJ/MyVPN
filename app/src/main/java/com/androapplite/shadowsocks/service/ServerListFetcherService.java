@@ -10,14 +10,10 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.vpn3.BuildConfig;
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

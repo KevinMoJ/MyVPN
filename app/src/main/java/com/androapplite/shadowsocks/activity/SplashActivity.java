@@ -4,8 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,23 +13,17 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
-import android.view.ViewPropertyAnimator;
 import android.widget.ProgressBar;
 
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
