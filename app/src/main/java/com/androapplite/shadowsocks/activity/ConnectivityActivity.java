@@ -144,11 +144,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
         });
 
+        Firebase firebase = Firebase.getInstance(this);
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
-            //广告,准备好,首页全屏刚进入
+            firebase.logEvent("广告","加载成功", "首页全屏刚进入");
         }else{
-            //广告,没准备好,首页全屏刚进入
+            firebase.logEvent("广告","没有加载成功", "首页全屏刚进入");
         }
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
@@ -303,12 +304,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                            Firebase firebase = Firebase.getInstance(this);
                             if(adAppHelper.isFullAdLoaded()) {
                                 adAppHelper.showFullAd();
-                                //广告，准备好，首页全屏连接成功
+                                firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
                             }else{
                                 rotateAd();
-                                //广告，没准备好，首页全屏连接成功
+                                firebase.logEvent("广告", "没有加载成功", "首页全屏连接成功");
                             }
                         }
                     } catch (Exception ex) {
@@ -508,11 +510,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     .show();
 
             final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+            Firebase firebase = Firebase.getInstance(this);
             if(adAppHelper.isFullAdLoaded()){
                 adAppHelper.showFullAd();
-                //广告，准备好，首页全屏退出
+                firebase.logEvent("广告", "加载成功", "首页全屏退出");
             }else{
-                //广告，没准备好，首页全屏退出
+                firebase.logEvent("广告", "没有加载成功", "首页全屏退出");
             }
 //            super.onBackPressed();
         }
