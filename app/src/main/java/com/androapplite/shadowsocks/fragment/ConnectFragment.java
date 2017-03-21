@@ -249,6 +249,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void error(){
         mLoadingView.clearAnimation();
         mLoadingView.setImageLevel(1);
+        mConnectButton.setText(R.string.connect);
 
         long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
         mFailedConnectTextView.setText(getString(R.string.failed_connect, error));
