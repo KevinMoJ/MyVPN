@@ -141,6 +141,7 @@
     <string name="notification_vpn_network_error2">your VPN is stopped. Touch to open.</string>
     <string name="success_connect">Successfully connected: %d</string>
     <string name="failed_connect">Failed connected: %d</string>
-    <string name="free_used_time">Free used time %s</string>
+    <string name="free_used_time">Free Used Time %s</string>
+    <string name="free_used_time2">Free Used Time</string>
 
 </resources>

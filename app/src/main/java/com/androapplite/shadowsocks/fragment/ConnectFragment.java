@@ -43,6 +43,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private TextView mSuccessConnectTextView;
     private TextView mFailedConnectTextView;
     private SharedPreferences mSharedPreference;
+    private TextView mFreeUsedTimeTextView;
 
     public ConnectFragment() {
         // Required empty public constructor
@@ -60,7 +61,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
         mSuccessConnectTextView = (TextView)view.findViewById(R.id.success_connect);
         mFailedConnectTextView = (TextView)view.findViewById(R.id.failed_connect);
-
+        mFreeUsedTimeTextView = (TextView)view.findViewById(R.id.free_used_time);
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
         return view;
     }
@@ -106,18 +107,23 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void onDetach() {
         super.onDetach();
         mLoadingView.clearAnimation();
+        clearTimer();
+
+    }
+
+    private void clearTimer() {
         if(mCountDownTimer != null){
             mCountDownTimer.cancel();
             mCountDownTimer.purge();
             mCountDownTimer = null;
         }
-
     }
 
     public void animateConnecting(){
         startAnimation();
         mConnectButton.setText(R.string.disconnect);
         mMessageTextView.setText(R.string.connecting);
+        mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
     }
 
@@ -131,7 +137,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         startAnimation();
         mConnectButton.setText(R.string.connect);
         mMessageTextView.setText(R.string.stopping);
+        mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
+        clearTimer();
     }
 
     public void setConnectResult(final Constants.State state){
@@ -189,7 +197,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void init(){
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
 
         long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
@@ -200,8 +209,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void connectFinish(){
         mLoadingView.clearAnimation();
-        mCountDownTimer = new Timer();
-        mCountDownTimer.schedule(new CountDownTimerTask(this), 0, 1000);
+        if(mCountDownTimer == null) {
+            mCountDownTimer = new Timer();
+            mCountDownTimer.schedule(new CountDownTimerTask(this), 0, 1000);
+        }
         mConnectButton.setText(R.string.disconnect);
         long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
@@ -234,7 +245,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 ConnectFragment fragment = mFragmentReference.get();
                 if(fragment != null && fragment.isVisible()){
                     final long countDown = fragment.mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-                    fragment.mMessageTextView.setText(fragment.getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+                    fragment.mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+                    fragment.mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -243,7 +255,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void stopFinish(){
         mLoadingView.clearAnimation();
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+        mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
     }
 
     private void error(){
