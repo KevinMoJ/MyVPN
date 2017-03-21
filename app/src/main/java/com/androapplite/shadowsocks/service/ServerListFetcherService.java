@@ -68,6 +68,7 @@ public class ServerListFetcherService extends IntentService {
         OkHttpClient client = builder.build();
 
         String url = "http://23.20.85.166:8080/VPNServerList/fsl";
+//        String url = "http://10.23.3.127/vpn/server_list.json";
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Accept-Encoding", "gzip")
