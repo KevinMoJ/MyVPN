@@ -41,6 +41,7 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.SplashActivity"
             android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
             android:theme="@style/AppTheme.NoActionBar.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -104,6 +105,7 @@
             android:name="com.androapplite.shadowsocks.activity.ConnectivityActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name="com.androapplite.shadowsocks.service.ServerListFetcherService" />
