@@ -707,6 +707,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     activity.mIsConnecting = false;
                     activity.increaseFailedCount();
                     activity.clearConnectingTimeout();
+                    activity.mErrorServers.clear();
                     activity.runOnUiThread(new NoAvailableServerErrorRunable(activity));
                 }
             }
