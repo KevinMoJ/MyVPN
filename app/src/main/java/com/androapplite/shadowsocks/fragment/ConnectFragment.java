@@ -248,7 +248,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void error(){
         mLoadingView.clearAnimation();
-        mLoadingView.setColorFilter(getResources().getColor(R.color.connect_error_red));
         mLoadingView.setImageLevel(1);
 
         long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);

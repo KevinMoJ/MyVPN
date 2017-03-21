@@ -1201,7 +1201,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         public void onReceive(Context context, Intent intent) {
             ConnectivityActivity activity = mActivityReference.get();
             if(activity != null){
-                if(activity.mConnectFragment != null){
+                if(activity.mConnectFragment != null && activity.mConnectFragment.isVisible()){
                     activity.mConnectFragment.updateUI();
                 }
             }
