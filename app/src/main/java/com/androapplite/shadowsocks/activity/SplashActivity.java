@@ -43,7 +43,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         initBackgroundReceiverIntentFilter();
 
         checkAndCopyAsset();
-        ShadowsockServiceHelper.startService(this);
+//        ShadowsockServiceHelper.startService(this);
 
         ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();

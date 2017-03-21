@@ -38,7 +38,6 @@
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
-
         <activity
             android:name="com.androapplite.shadowsocks.activity.SplashActivity"
             android:screenOrientation="portrait"
@@ -160,7 +159,17 @@
         <receiver
             android:name="com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false" />
+        <receiver android:name="com.androapplite.shadowsocks.broadcast.AutoRestartReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.androapplite.shadowsocks.service.AutoRestartService"
+            android:exported="false"></service>
     </application>
 
 </manifest>

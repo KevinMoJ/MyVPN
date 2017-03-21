@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
+import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
@@ -68,7 +69,7 @@ public class ShadowsocksApplication extends Application implements Application.A
         adAppHelper.init();
         mActivitys = new ArrayList<>();
         reportDailyUseTime(this);
-
+        AutoRestartService.startService(this);
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
