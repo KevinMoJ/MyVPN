@@ -201,25 +201,41 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void connectFinish(){
         mLoadingView.clearAnimation();
         mCountDownTimer = new Timer();
-        mCountDownTimer.schedule(new CountDownTimerTask(), 0, 1000);
+        mCountDownTimer.schedule(new CountDownTimerTask(this), 0, 1000);
         mConnectButton.setText(R.string.disconnect);
         long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
     }
 
-    private class CountDownTimerTask extends TimerTask{
+    private static class CountDownTimerTask extends TimerTask{
+        private WeakReference<ConnectFragment> mFragmentReference;
+
+        CountDownTimerTask(ConnectFragment fragment){
+            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
+        }
+
         @Override
         public void run() {
+            ConnectFragment fragment = mFragmentReference.get();
+            if(fragment != null){
+                fragment.mMessageTextView.post(new UpdateRunnable(fragment));
+            }
+        }
 
-            final Context context = getContext();
-            if(isVisible() && context != null) {
-                final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-                mMessageTextView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMessageTextView.setText(getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
-                    }
-                });
+        private static class UpdateRunnable implements Runnable{
+            private WeakReference<ConnectFragment> mFragmentReference;
+
+            UpdateRunnable(ConnectFragment fragment){
+                mFragmentReference = new WeakReference<ConnectFragment>(fragment);
+            }
+
+            @Override
+            public void run() {
+                ConnectFragment fragment = mFragmentReference.get();
+                if(fragment != null && fragment.isVisible()){
+                    final long countDown = fragment.mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+                    fragment.mMessageTextView.setText(fragment.getString(R.string.free_used_time, DateUtils.formatElapsedTime(countDown)));
+                }
             }
         }
     }

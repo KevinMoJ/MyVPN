@@ -739,7 +739,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     activity.mErrorServers.add(activity.mConnectingConfig);
                 }
                 activity.increaseFailedCount();
-                if(activity.mConnectFragment != null){
+                if(activity.mConnectFragment != null && activity.mConnectFragment.isVisible()){
                     activity.mConnectFragment.updateUI();
                 }
             }
