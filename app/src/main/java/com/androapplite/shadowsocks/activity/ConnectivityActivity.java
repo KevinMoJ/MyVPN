@@ -685,32 +685,51 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mConnectingTimeoutHandler = new Handler();
         mConnectingTimeoutRunnable = new ConnectingTimeoutRunnable(this);
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final ServerConfig serverConfig = findVPNServer();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(serverConfig != null) {
-                            mConnectingConfig = serverConfig;
-                            prepareStartService();
-                        }else {
-                            Snackbar.make(findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
-                            if(mConnectFragment != null){
-                                mConnectFragment.setConnectResult(Constants.State.ERROR);
-                            }
-                            Firebase.getInstance(ConnectivityActivity.this).logEvent("VPN连不上", "没有可用的服务器");
-                            mIsConnecting = false;
-                            increaseFailedCount();
-                            if(mConnectFragment != null){
-                                mConnectFragment.updateUI();
-                            }
-                        }
-                    }
-                });
+        new Thread(new PrepareStartServiceRunnable(this)).start();
+    }
+
+    private static class PrepareStartServiceRunnable implements Runnable{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+        PrepareStartServiceRunnable(ConnectivityActivity activity){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+        }
+
+        @Override
+        public void run() {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                final ServerConfig serverConfig = activity.findVPNServer();
+                if(serverConfig != null) {
+                    activity.mConnectingConfig = serverConfig;
+                    activity.prepareStartService();
+                }else{
+                    Firebase.getInstance(activity).logEvent("VPN连不上", "没有可用的服务器");
+                    activity.mIsConnecting = false;
+                    activity.increaseFailedCount();
+                    activity.clearConnectingTimeout();
+                    activity.runOnUiThread(new NoAvailableServerErrorRunable(activity));
+                }
             }
-        }).start();
+        }
+    }
+
+    private static class NoAvailableServerErrorRunable implements Runnable{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+        NoAvailableServerErrorRunable(ConnectivityActivity activity){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+        }
+
+        @Override
+        public void run() {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                Snackbar.make(activity.findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
+                if(activity.mConnectFragment != null && activity.mConnectFragment.isAdded()){
+                    activity.mConnectFragment.setConnectResult(Constants.State.ERROR);
+                    activity.mConnectFragment.updateUI();
+                }
+            }
+        }
     }
 
     private static class ConnectingTimeoutRunnable implements Runnable{
