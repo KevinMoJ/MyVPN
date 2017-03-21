@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
@@ -43,6 +44,7 @@ public class AutoRestartService extends Service implements ServiceConnection{
         mShadowsocksServiceCallbackBinder = new ShadowsocksServiceCallback(this);
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mState = sharedPreferences.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
+        Firebase.getInstance(this).logEvent("自动重启","创建");
     }
 
     @Override
@@ -62,6 +64,7 @@ public class AutoRestartService extends Service implements ServiceConnection{
                     if (serverConfig != null) {
                         Config config = new Config(serverConfig.server, serverConfig.port);
                         mShadowsocksService.start(config);
+                        Firebase.getInstance(this).logEvent("自动重启","恢复连接");
                     }
                 }
 
