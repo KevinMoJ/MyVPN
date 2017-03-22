@@ -120,5 +120,5 @@
     <string name="server_not_available">The VPN server is not available right now. Plase try it later!</string>
     <string name="notification_network_error">Because of network instability, your VPN is stopped. Touch to open.</string>
     <string name="notification_vpn_stop">Your VPN is stopped. Touch to open.</string>
-    <string name="use_time">Use time: %s</string>
+    <string name="use_time">Free Used Time %s</string>
 </resources>

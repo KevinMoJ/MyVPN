@@ -166,6 +166,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mElapseTextView.setVisibility(View.INVISIBLE);
         if(mUpdateElapseTimeHandler != null){
             mUpdateElapseTimeHandler.removeCallbacksAndMessages(null);
+            mUpdateElapseTimeHandler = null;
         }
     }
 
