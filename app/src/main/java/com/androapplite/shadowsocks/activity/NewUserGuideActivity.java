@@ -54,7 +54,6 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
         initNewUserGuideFinishButton();
         initBackgroundReceiverIntentFilter();
         initBackgroundReceiver();
-        GAHelper.sendScreenView(this, "新手引导屏幕");
     }
 
     private void initPagerIndicatorFragment(){

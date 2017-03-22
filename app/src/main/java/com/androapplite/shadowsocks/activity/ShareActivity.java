@@ -27,8 +27,6 @@ public class ShareActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        GAHelper.sendScreenView(this, "分享屏幕");
-
     }
 
     public void shareByFacebook(View view){

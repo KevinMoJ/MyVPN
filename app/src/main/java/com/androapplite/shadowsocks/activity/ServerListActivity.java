@@ -102,7 +102,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             mHasServerJson = false;
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
-        GAHelper.sendScreenView(this, "服务器列表屏幕");
         addBottomAd(AdAppHelper.getInstance(this));
 
     }

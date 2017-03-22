@@ -139,7 +139,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
-        GAHelper.sendScreenView(this, "VPN连接屏幕");
         initConnectivityReceiver();
         initVpnFlagAndNation();
 

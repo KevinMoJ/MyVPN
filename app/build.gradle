@@ -62,6 +62,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.2.0'
     compile 'com.android.support:design:23.2.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.8.1'
     compile 'com.joooonho:selectableroundedimageview:1.0.1'
     //    compile 'com.github.bumptech.glide:glide:3.7.0'
     testCompile 'junit:junit:4.12'

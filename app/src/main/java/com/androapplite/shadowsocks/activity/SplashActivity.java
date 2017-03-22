@@ -45,9 +45,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
-
-        GAHelper.sendScreenView(this, "启动屏幕");
-
+        
         ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();
 
