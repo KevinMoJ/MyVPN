@@ -20,4 +20,14 @@
     <string name="resume_ctrl">{exe=1}</string>
     <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=10000},{fbn=-1}</string>
     <long name="oc_req_i" value="600000" />
+
+    <string name="banner_ids">{admob=ca-app-pub-5330675173640052/3927500528},{fb=504824046367667_534985530018185}</string>
+    <string name="admob_full_ids">{count=1},{id1=ca-app-pub-5330675173640052/1238580129,全屏}</string>
+    <string name="admob_banner_native_ids">{count=0}</string>
+    <string name="fb_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
+    <string name="fbn_full_ids">{count=1},{id1=504824046367667_504825153034223,全屏}</string>
+    <string name="fbn_banner_ids">{count=1},{id1=504824046367667_504825153034223,全屏}</string>
+    <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2236626125,不确定}</string>
+    <string name="fb_native_ids">{count=1},{id1=504824046367667_504825153034223,不确定}</string>
+    <string name="native_size">{count=1},{id1=320,180}</string>
 </map>
