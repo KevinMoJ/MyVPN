@@ -30,14 +30,13 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/connect_fragment"
         android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/half_standard_margin"
         >
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ad_view_container"
-            android:layout_marginTop="@dimen/half_standard_margin"
-            android:layout_marginBottom="@dimen/half_standard_margin"
             >
             <!-- todo 显示横幅广告 -->
         </FrameLayout>

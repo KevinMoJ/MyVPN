@@ -31,8 +31,8 @@ android {
         applicationId "com.androapplite.vpn3"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 18
-        versionName "1.1.18"
+        versionCode 19
+        versionName "1.1.19"
 //        multiDexEnabled true
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
