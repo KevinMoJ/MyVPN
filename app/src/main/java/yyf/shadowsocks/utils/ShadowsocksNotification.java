@@ -166,6 +166,7 @@ public class ShadowsocksNotification {
                     ;
             Notification notification2 = builder.build();
             mNotificationManager.notify(2, notification2);
+            mNotificationManager.cancel(2);
 
             mBuilder.setContent(remoteViews);
             final Notification notification = mBuilder.build();
