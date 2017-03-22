@@ -11,54 +11,54 @@ import com.google.android.gms.analytics.Tracker;
  * Created by jim on 16/5/2.
  */
 public final class GAHelper {
-    @NonNull
-    public static final Tracker getTracker(@NonNull Context context){
-        return ((ShadowsocksApplication)context.getApplicationContext()).getTracker();
-    }
-
-    public static final void sendEvent(@NonNull Context context,
-                                       @NonNull String category,
-                                       @NonNull String action,
-                                       @NonNull String label,
-                                       long value){
-        getTracker(context).send(new HitBuilders.EventBuilder(category, action)
-                .setLabel(label).setValue(value).build());
-    }
-
-    public static final void sendEvent(@NonNull Context context,
-                                       @NonNull String category,
-                                       @NonNull String action,
-                                       @NonNull String label){
-        getTracker(context).send(new HitBuilders.EventBuilder(category, action)
-                .setLabel(label).build());
-    }
-
-    public static final void sendEvent(@NonNull Context context,
-                                       @NonNull String category,
-                                       @NonNull String action){
-        getTracker(context).send(new HitBuilders.EventBuilder(category, action).build());
-    }
-
-    public static final void sendTimingEvent(@NonNull Context context,
-                                             @NonNull String category,
-                                             @NonNull String variable,
-                                             long value){
-        getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value).build());
-    }
-
-    public static final void sendTimingEvent(@NonNull Context context,
-                                             @NonNull String category,
-                                             @NonNull String variable,
-                                             long value,
-                                             @NonNull String label){
-        getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value)
-                .setLabel(label)
-                .build());
-    }
-
-    public static final void sendScreenView(@NonNull Context context, @NonNull String screenView){
-        Tracker t = getTracker(context);
-        t.setScreenName(screenView);
-        t.send(new HitBuilders.ScreenViewBuilder().build());
-    }
+//    @NonNull
+//    public static final Tracker getTracker(@NonNull Context context){
+//        return ((ShadowsocksApplication)context.getApplicationContext()).getTracker();
+//    }
+//
+//    public static final void sendEvent(@NonNull Context context,
+//                                       @NonNull String category,
+//                                       @NonNull String action,
+//                                       @NonNull String label,
+//                                       long value){
+//        getTracker(context).send(new HitBuilders.EventBuilder(category, action)
+//                .setLabel(label).setValue(value).build());
+//    }
+//
+//    public static final void sendEvent(@NonNull Context context,
+//                                       @NonNull String category,
+//                                       @NonNull String action,
+//                                       @NonNull String label){
+//        getTracker(context).send(new HitBuilders.EventBuilder(category, action)
+//                .setLabel(label).build());
+//    }
+//
+//    public static final void sendEvent(@NonNull Context context,
+//                                       @NonNull String category,
+//                                       @NonNull String action){
+//        getTracker(context).send(new HitBuilders.EventBuilder(category, action).build());
+//    }
+//
+//    public static final void sendTimingEvent(@NonNull Context context,
+//                                             @NonNull String category,
+//                                             @NonNull String variable,
+//                                             long value){
+//        getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value).build());
+//    }
+//
+//    public static final void sendTimingEvent(@NonNull Context context,
+//                                             @NonNull String category,
+//                                             @NonNull String variable,
+//                                             long value,
+//                                             @NonNull String label){
+//        getTracker(context).send(new HitBuilders.TimingBuilder(category, variable, value)
+//                .setLabel(label)
+//                .build());
+//    }
+//
+//    public static final void sendScreenView(@NonNull Context context, @NonNull String screenView){
+//        Tracker t = getTracker(context);
+//        t.setScreenName(screenView);
+//        t.send(new HitBuilders.ScreenViewBuilder().build());
+//    }
 }
