@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
+import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -88,6 +89,8 @@ public class ShadowsocksApplication extends Application implements Application.A
         AdAppHelper.getInstance(getApplicationContext()).init();
         mActivitys = new ArrayList<>();
         reportDailyUseTime();
+        AutoRestartService.startService(this);
+
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){

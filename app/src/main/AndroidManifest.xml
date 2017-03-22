@@ -26,13 +26,6 @@
             android:name="UMENG_CHANNEL"
             android:value="Google" />
 
-        <receiver android:name=".ads.MonitorReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-        <activity android:name=".ads.AdActivity"></activity>
-
         <activity
             android:name="com.facebook.ads.InterstitialAdActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -172,14 +165,26 @@
         <service
             android:name=".service.VpnStatusMonitorService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false" />
         <service android:name=".service.TimeCountDownService" />
+
         <receiver android:name=".broadcast.NotificationActionReceiver">
             <intent-filter>
                 <action android:name="${applicationId}.NOTIFICATION_OPEN" />
             </intent-filter>
         </receiver>
         <receiver android:name=".broadcast.ReportUseTimeReceiver" />
+        <receiver android:name=".broadcast.AutoRestartReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.AutoRestartService"
+            android:enabled="true"
+            android:exported="false"></service>
     </application>
 
 </manifest>

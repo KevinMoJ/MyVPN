@@ -24,4 +24,5 @@ public final class SharedPreferenceKey {
     public static final String EXTENT_1H_ALERT = "EXTENT_1H_ALERT";
     public static final String USE_TIME = "USE_TIME";
     public static final String LAST_USE_TIME = "LAST_USE_TIME";
+    public static final String VPN_STATE = "VPN_STATE";
 }
