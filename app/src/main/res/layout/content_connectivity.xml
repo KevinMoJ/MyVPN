@@ -1,45 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.androapplite.shadowsocks.activity.ConnectivityActivity"
     tools:showIn="@layout/app_bar_connectivity"
-    android:background="@drawable/main_bg">
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="com.androapplite.shadowsocks.fragment.ConnectFragment"
-        tools:layout="@layout/fragment_connect"
-        android:id="@+id/connect_fragment"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/twice_margin"/>
+    android:background="@drawable/main_bg"
+    android:orientation="vertical">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/half_standard_margin"
-        android:id="@+id/rate_us_frame_layout"
         >
-    </FrameLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/connect_fragment"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="@dimen/half_standard_margin"
-        >
-
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.androapplite.shadowsocks.fragment.ConnectFragment"
+            tools:layout="@layout/fragment_connect"
+            android:id="@+id/connect_fragment"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/twice_margin"
+            />
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ad_view_container"
+            android:layout_margin="@dimen/half_standard_margin"
+            android:id="@+id/rate_us_frame_layout"
             >
-            <!-- todo 显示横幅广告 -->
         </FrameLayout>
-    </ScrollView>
+    </FrameLayout>
 
-</RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <com.androapplite.shadowsocks.view.AdBannerScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="@dimen/half_standard_margin"
+            >
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ad_view_container"
+                >
+                <!-- todo 显示横幅广告 -->
+            </FrameLayout>
+        </com.androapplite.shadowsocks.view.AdBannerScrollView>
+    </FrameLayout>
+
+
+</LinearLayout>
