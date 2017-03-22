@@ -17,7 +17,7 @@ import android.widget.FrameLayout;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -16,13 +16,12 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.widget.ProgressBar;
 
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.lang.ref.WeakReference;
 
@@ -45,7 +44,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 
         checkAndCopyAsset();
         ShadowsockServiceHelper.startService(this);
-        
+
         ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();
 

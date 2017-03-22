@@ -13,10 +13,10 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;

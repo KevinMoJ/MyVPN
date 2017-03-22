@@ -12,22 +12,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 
-import com.androapplite.shadowsocks.GAHelper;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
 import com.androapplite.shadowsocks.fragment.PagerIndicatorFragment;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NewUserGuideActivity extends BaseShadowsocksActivity {

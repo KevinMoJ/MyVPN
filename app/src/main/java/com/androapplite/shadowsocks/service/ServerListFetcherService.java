@@ -9,14 +9,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.BuildConfig;
-import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -81,7 +78,7 @@ public class ServerListFetcherService extends IntentService {
         try {
             Response response = client.newCall(request).execute();
             long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
+            Firebase.getInstance(this).logEvent( "访问服务器列表", "成功", t2-t1);
             String jsonString = response.body().string();
             if(jsonString != null && !jsonString.isEmpty()){
                 editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
@@ -91,7 +88,7 @@ public class ServerListFetcherService extends IntentService {
             return true;
         } catch (IOException e) {
             long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
+            Firebase.getInstance(this).logEvent( "访问服务器列表", "失败", t2-t1);
             ShadowsocksApplication.handleException(e);
             broadcastServerListFetchError(e, true);
             return false;
@@ -126,7 +123,7 @@ public class ServerListFetcherService extends IntentService {
         try {
             Response response = client.newCall(request).execute();
             long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "访问服务器列表", "成功", t2-t1);
+            Firebase.getInstance(this).logEvent( "访问服务器列表", "成功", t2-t1);
             String jsonString = response.body().string();
             if(jsonString != null && !jsonString.isEmpty()){
                 editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
@@ -135,7 +132,7 @@ public class ServerListFetcherService extends IntentService {
             Log.d("ServerListFetcher", "domain");
         } catch (IOException e) {
             long t2 = System.currentTimeMillis();
-            GAHelper.sendTimingEvent(this, "访问服务器列表", "失败", t2-t1);
+            Firebase.getInstance(this).logEvent( "访问服务器列表", "失败", t2-t1);
             ShadowsocksApplication.handleException(e);
             broadcastServerListFetchError(e, false);
         }
@@ -158,16 +155,16 @@ public class ServerListFetcherService extends IntentService {
 
         if(errMsg != null){
             if(isIpUrl) {
-                GAHelper.sendEvent(this, "取服务器列表失败", "IP", errMsg);
+                Firebase.getInstance(this).logEvent( "取服务器列表失败", "IP", errMsg);
             }else{
-                GAHelper.sendEvent(this, "取服务器列表失败", "Domain", errMsg);
+                Firebase.getInstance(this).logEvent( "取服务器列表失败", "Domain", errMsg);
             }
 
         }else {
             if(isIpUrl) {
-                GAHelper.sendEvent(this, "取服务器列表失败", "IP", e.toString());
+                Firebase.getInstance(this).logEvent( "取服务器列表失败", "IP", e.toString());
             }else {
-                GAHelper.sendEvent(this, "取服务器列表失败", "Domain", e.toString());
+                Firebase.getInstance(this).logEvent( "取服务器列表失败", "Domain", e.toString());
             }
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);

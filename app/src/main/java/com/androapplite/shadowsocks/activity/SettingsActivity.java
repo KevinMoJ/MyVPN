@@ -11,9 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -81,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
         } catch (PackageManager.NameNotFoundException e) {
             ShadowsocksApplication.handleException(e);
         }
-        GAHelper.sendEvent(this, "设置", "关于");
+        Firebase.getInstance(this).logEvent( "设置", "关于");
     }
 
     @Override
@@ -93,7 +92,7 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
                 ShadowsocksApplication.handleException(e);
             }
         }
-        GAHelper.sendEvent(this, "设置", "通知", String.valueOf(enable));
+        Firebase.getInstance(this).logEvent( "设置", "通知", String.valueOf(enable));
     }
 
     @Override
@@ -106,6 +105,6 @@ public class SettingsActivity extends AppCompatActivity implements SettingsFragm
 
     @Override
     public void autoConect(boolean enable) {
-        GAHelper.sendEvent(this, "设置", "自动连接", String.valueOf(enable));
+        Firebase.getInstance(this).logEvent( "设置", "自动连接", String.valueOf(enable));
     }
 }

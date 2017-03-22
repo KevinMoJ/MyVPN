@@ -33,16 +33,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ads.AdAppHelper;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -171,7 +171,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     mSwipeRefreshLayout.setRefreshing(true);
                     ServerListFetcherService.fetchServerListAsync(this);
                 }
-                GAHelper.sendEvent(this, "刷新服务器列表", position, state.name());
+                Firebase.getInstance(this).logEvent( "刷新服务器列表", position, state.name());
             } catch (RemoteException e) {
                 ShadowsocksApplication.handleException(e);
             }
@@ -292,7 +292,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     .apply();
             setResult(RESULT_OK);
             finish();
-            GAHelper.sendEvent(this, "选择国家", nation);
+            Firebase.getInstance(this).logEvent( "选择国家", nation);
         }
     }
 
@@ -358,10 +358,10 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 }
                 mSwipeRefreshLayout.setRefreshing(true);
             }
-            GAHelper.sendEvent(this, "刷新服务器列表", "断开");
+            Firebase.getInstance(this).logEvent( "刷新服务器列表", "断开");
         }else if(which == DialogInterface.BUTTON_NEGATIVE){
             mSwipeRefreshLayout.setRefreshing(false);
-            GAHelper.sendEvent(this, "刷新服务器列表", "取消");
+            Firebase.getInstance(this).logEvent( "刷新服务器列表", "取消");
         }
     }
 

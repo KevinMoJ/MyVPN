@@ -10,21 +10,17 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
-import android.util.Log;
 
-import com.androapplite.shadowsocks.GAHelper;
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
-import yyf.shadowsocks.service.ShadowsocksVpnService;
 import yyf.shadowsocks.utils.Constants;
 
 public class VpnStatusMonitorService extends Service implements ServiceConnection {
@@ -66,9 +62,9 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
         long current = System.currentTimeMillis();
         long spanSecond = (current - mStartMilli)/1000;
         if(mHasRate){
-            GAHelper.sendEvent(this, "VPN速度状态", mUuid, "有速度 " + spanSecond);
+            Firebase.getInstance(this).logEvent( "VPN速度状态", mUuid, "有速度 " + spanSecond);
         }else{
-            GAHelper.sendEvent(this, "VPN速度状态", mUuid, "无速度 " + spanSecond);
+            Firebase.getInstance(this).logEvent( "VPN速度状态", mUuid, "无速度 " + spanSecond);
         }
         removeNoRateDetectHandler();
         if(mVpnService != null) {
@@ -121,7 +117,7 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
                     long spanSecond = (current - mStartMilli)/1000;
                     mStartMilli = current;
                     mHasRate = true;
-                    GAHelper.sendEvent(VpnStatusMonitorService.this, "VPN速度状态", mUuid, "无速度 " + spanSecond);
+                    Firebase.getInstance(VpnStatusMonitorService.this).logEvent( "VPN速度状态", mUuid, "无速度 " + spanSecond);
                 }else {
                     removeNoRateDetectHandler();
                 }
@@ -139,7 +135,7 @@ public class VpnStatusMonitorService extends Service implements ServiceConnectio
                 long current = System.currentTimeMillis() - ONE_MINUTE;
                 long spanSecond = (current - mStartMilli)/1000;
                 mStartMilli = current;
-                GAHelper.sendEvent(VpnStatusMonitorService.this, "VPN速度状态", mUuid, "有速度 " + spanSecond);
+                Firebase.getInstance(VpnStatusMonitorService.this).logEvent( "VPN速度状态", mUuid, "有速度 " + spanSecond);
             }
             mHasRate = false;
         }
