@@ -681,11 +681,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 activity.prepareStartService();
             }else {
                 Snackbar.make(activity.findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
-                if(activity.mConnectFragment != null){
+                if(activity.mConnectFragment != null && activity.mConnectFragment.isVisible()){
                     activity.mConnectFragment.setConnectResult(Constants.State.ERROR);
                 }
                 Firebase.getInstance(activity).logEvent( "VPN连不上", "没有可用的服务器");
                 activity.mIsConnecting = false;
+                activity.mErrorServers.clear();
             }
         }
     }
