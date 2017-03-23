@@ -75,6 +75,8 @@ public class ShadowsocksNotification {
                 .setOngoing(true)
                 .setShowWhen(false);
 
+        showDisconnectStatus();
+
         mCallback = new IShadowsocksServiceCallback.Stub(){
             @Override
             public void stateChanged(int state, String msg) throws RemoteException {
@@ -234,17 +236,21 @@ public class ShadowsocksNotification {
             mService.startForeground(1, notification);
 
         }else {
-            mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
-                    .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
-            final Notification notification = mBuilder.build();
-            RemoteViews remoteViews = notification.contentView;
-            if(mRootView == null) {
-                mRootView = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-            }
-            remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
-            applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
-            mService.startForeground(1, notification);
+            showDisconnectStatus();
         }
+    }
+
+    private void showDisconnectStatus() {
+        mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
+                .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
+        final Notification notification = mBuilder.build();
+        RemoteViews remoteViews = notification.contentView;
+        if(mRootView == null) {
+            mRootView = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+        }
+        remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+        applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
+        mService.startForeground(1, notification);
     }
 
 

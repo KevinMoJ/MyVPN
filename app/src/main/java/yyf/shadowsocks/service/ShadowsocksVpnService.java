@@ -317,7 +317,7 @@ public class ShadowsocksVpnService extends BaseService {
     public void onCreate() {
         super.onCreate();
         ShadowsocksApplication.debug("ss-vpn", "onCreate");
-
+        mShadowsocksNotification = new ShadowsocksNotification(this, getString(R.string.app_name));
     }
 
 
