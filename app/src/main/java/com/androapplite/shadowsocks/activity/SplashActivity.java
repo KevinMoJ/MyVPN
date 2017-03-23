@@ -16,6 +16,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.widget.ProgressBar;
 
+import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -43,8 +44,8 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         initBackgroundReceiverIntentFilter();
 
         checkAndCopyAsset();
+        AutoRestartService.startService(this);
 //        ShadowsockServiceHelper.startService(this);
-
         ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();
 

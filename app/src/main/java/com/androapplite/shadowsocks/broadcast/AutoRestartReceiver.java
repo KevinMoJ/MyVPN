@@ -1,14 +1,22 @@
 package com.androapplite.shadowsocks.broadcast;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
+
+import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.service.AutoRestartService;
+
+import java.util.List;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
+import yyf.shadowsocks.service.ShadowsocksVpnService;
 
 
 public class AutoRestartReceiver extends BroadcastReceiver {
@@ -17,15 +25,9 @@ public class AutoRestartReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //什么都不做，在applictication里已经启动autoRestartService
-//        if(intent != null) {
-//            String action = intent.getAction();
-//            if ("android.net.conn.CONNECTIVITY_CHANGE".equals(action) ||
-//                    "android.intent.action.USER_PRESENT".equals(action)) {
-//                if (isNetworkConnected(context)) {
-//                }
-//            }
-//        }
+        if(!isVPNServiceRunning(context)){
+            AutoRestartService.recoverVpnServiceAfterKill(context);
+        }
     }
 
 //    private boolean isNetworkConnected(Context context) {
@@ -41,4 +43,22 @@ public class AutoRestartReceiver extends BroadcastReceiver {
 //        }
 //        return false;
 //    }
+
+    private boolean isVPNServiceRunning(Context context) {
+        boolean isWork = false;
+        ActivityManager myAM = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> myList = myAM.getRunningServices(Integer.MAX_VALUE);
+        if (myList.size() <= 0) {
+            return false;
+        }
+        for (int i = 0; i < myList.size(); i++) {
+            String mName = myList.get(i).service.getClassName().toString();
+            Log.d("自动重启", mName);
+            if (mName.equals(ShadowsocksVpnService.class.getCanonicalName())) {
+                isWork = true;
+                break;
+            }
+        }
+        return isWork;
+    }
 }
