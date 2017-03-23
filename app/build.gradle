@@ -35,6 +35,10 @@ android {
         versionName "1.1.19"
 //        multiDexEnabled true
     }
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "4g"
+    }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
     sourceSets.main {
