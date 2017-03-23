@@ -25,9 +25,9 @@ public class AutoRestartReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(!isVPNServiceRunning(context)){
-            AutoRestartService.recoverVpnServiceAfterKill(context);
-        }
+//        if(!isVPNServiceRunning(context)){
+//            AutoRestartService.recoverVpnServiceAfterKill(context);
+//        }
     }
 
 //    private boolean isNetworkConnected(Context context) {
@@ -44,21 +44,21 @@ public class AutoRestartReceiver extends BroadcastReceiver {
 //        return false;
 //    }
 
-    private boolean isVPNServiceRunning(Context context) {
-        boolean isWork = false;
-        ActivityManager myAM = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningServiceInfo> myList = myAM.getRunningServices(Integer.MAX_VALUE);
-        if (myList.size() <= 0) {
-            return false;
-        }
-        for (int i = 0; i < myList.size(); i++) {
-            String mName = myList.get(i).service.getClassName().toString();
-            Log.d("自动重启", mName);
-            if (mName.equals(ShadowsocksVpnService.class.getCanonicalName())) {
-                isWork = true;
-                break;
-            }
-        }
-        return isWork;
-    }
+//    private boolean isVPNServiceRunning(Context context) {
+//        boolean isWork = false;
+//        ActivityManager myAM = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+//        List<ActivityManager.RunningServiceInfo> myList = myAM.getRunningServices(Integer.MAX_VALUE);
+//        if (myList.size() <= 0) {
+//            return false;
+//        }
+//        for (int i = 0; i < myList.size(); i++) {
+//            String mName = myList.get(i).service.getClassName().toString();
+//            Log.d("自动重启", mName);
+//            if (mName.equals(ShadowsocksVpnService.class.getCanonicalName())) {
+//                isWork = true;
+//                break;
+//            }
+//        }
+//        return isWork;
+//    }
 }

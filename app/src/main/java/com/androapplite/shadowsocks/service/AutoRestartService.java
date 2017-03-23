@@ -63,7 +63,8 @@ public class AutoRestartService extends Service implements ServiceConnection{
             try {
                 mShadowsocksService.registerCallback(mShadowsocksServiceCallbackBinder);
                 int currentState = mShadowsocksService.getState();
-                if (mState == Constants.State.CONNECTED.ordinal() && currentState != Constants.State.CONNECTED.ordinal()) {
+                final int connectedState = Constants.State.CONNECTED.ordinal();
+                if (mState == connectedState && currentState != connectedState) {
                     SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
                     ServerConfig serverConfig = ServerConfig.loadFromSharedPreference(sharedPreferences);
                     if (serverConfig != null) {
@@ -71,8 +72,10 @@ public class AutoRestartService extends Service implements ServiceConnection{
                         mShadowsocksService.start(config);
                         Firebase.getInstance(this).logEvent("自动重启","恢复连接");
                     }
-                }else if(mIsRecoverAfterKill){
-                    Firebase.getInstance(this).logEvent("自动重启","不需恢复连接");
+                }else if(mState != connectedState){
+                    Firebase.getInstance(this).logEvent("自动重启","断开-不需恢复连接");
+                }else{
+                    Firebase.getInstance(this).logEvent("自动重启","连接-不需恢复连接");
                 }
 
             } catch (RemoteException e) {
@@ -132,26 +135,26 @@ public class AutoRestartService extends Service implements ServiceConnection{
         context.startService(new Intent(context, AutoRestartService.class));
     }
 
-    public static void recoverVpnServiceAfterKill(Context context){
-        final Intent intent = new Intent(context, AutoRestartService.class);
-        intent.putExtra(RECOVER_AFTER_KILL, true);
-        context.startService(intent);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null){
-            mIsRecoverAfterKill = intent.getBooleanExtra(RECOVER_AFTER_KILL, false);
-            if(mIsRecoverAfterKill){
-                Firebase.getInstance(this).logEvent("自动重启","被杀死");
-            }
-        }
-        synchronized (this) {
-            if (mShadowsocksService == null) {
-                ShadowsockServiceHelper.startService(this);
-                ShadowsockServiceHelper.bindService(this, this);
-            }
-        }
-        return super.onStartCommand(intent, flags, startId);
-    }
+//    public static void recoverVpnServiceAfterKill(Context context){
+//        final Intent intent = new Intent(context, AutoRestartService.class);
+//        intent.putExtra(RECOVER_AFTER_KILL, true);
+//        context.startService(intent);
+//    }
+//
+//    @Override
+//    public int onStartCommand(Intent intent, int flags, int startId) {
+//        if(intent != null){
+//            mIsRecoverAfterKill = intent.getBooleanExtra(RECOVER_AFTER_KILL, false);
+//            if(mIsRecoverAfterKill){
+//                Firebase.getInstance(this).logEvent("自动重启","被杀死");
+//            }
+//        }
+//        synchronized (this) {
+//            if (mShadowsocksService == null) {
+//                ShadowsockServiceHelper.startService(this);
+//                ShadowsockServiceHelper.bindService(this, this);
+//            }
+//        }
+//        return super.onStartCommand(intent, flags, startId);
+//    }
 }
