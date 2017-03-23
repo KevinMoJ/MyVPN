@@ -142,11 +142,15 @@ public class AutoRestartService extends Service implements ServiceConnection{
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent != null){
             mIsRecoverAfterKill = intent.getBooleanExtra(RECOVER_AFTER_KILL, false);
+            if(mIsRecoverAfterKill){
+                Firebase.getInstance(this).logEvent("自动重启","被杀死");
+            }
         }
-
-        if (mShadowsocksService == null) {
-            ShadowsockServiceHelper.startService(this);
-            ShadowsockServiceHelper.bindService(this, this);
+        synchronized (this) {
+            if (mShadowsocksService == null) {
+                ShadowsockServiceHelper.startService(this);
+                ShadowsockServiceHelper.bindService(this, this);
+            }
         }
         return super.onStartCommand(intent, flags, startId);
     }
