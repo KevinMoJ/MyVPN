@@ -70,6 +70,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.System;
 import java.lang.ref.WeakReference;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -990,18 +991,26 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 serverConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
             }
 
+            HashSet<String> pingedServers = new HashSet<>();
             Firebase firebase = Firebase.getInstance(this);
             if (serverConfig != null) {
                 if (!serverConfigs.contains(serverConfig) ||
                         mErrorServers.contains(serverConfig)) {
                     serverConfig = null;
                 } else {
-                    Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
-                    if (pair.first) {
-                        firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
-                    } else {
-                        firebase.logEvent("连接测试失败", serverConfig.name, pair.second);
+                    pingedServers.add(serverConfig.server);
+                    boolean isReachable = ping(serverConfig.server);
+                    firebase.logEvent("ping", serverConfig.server, String.valueOf(isReachable));
+                    if(!isReachable){
                         serverConfig = null;
+                    }else {
+                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
+                        if (pair.first) {
+                            firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
+                        } else {
+                            firebase.logEvent("连接测试失败", serverConfig.name, pair.second);
+                            serverConfig = null;
+                        }
                     }
 
                 }
@@ -1031,6 +1040,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 for (i = 0; i < filteredConfigs.size(); i++) {
                     serverConfig = filteredConfigs.get(i);
                     if (mErrorServers.contains(serverConfig)) continue;
+                    if(pingedServers.contains(serverConfig.server)) continue;
+                    boolean isReachable = ping(serverConfig.server);
+                    pingedServers.add(serverConfig.server);
+                    firebase.logEvent("ping", serverConfig.server, String.valueOf(isReachable));
+                    if(!isReachable) continue;
                     Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
                     if (pair.first) {
                         firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
@@ -1086,7 +1100,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         return result;
     }
 
-    public static Pair<Boolean, Long> isPortOpen(final String ip, final int port, final int timeout) {
+    private boolean ping(String ipAddress){
+        int  timeOut =  3000 ;  //超时应该在3钞以上
+        boolean status = false;
+        try {
+            status = InetAddress.getByName(ipAddress).isReachable(timeOut);     // 当返回值是true时，说明host是可用的，false则不可。
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
+        return status;
+    }
+
+    private Pair<Boolean, Long> isPortOpen(final String ip, final int port, final int timeout) {
         Socket socket = null;
         OutputStreamWriter osw;
         boolean result = false;
