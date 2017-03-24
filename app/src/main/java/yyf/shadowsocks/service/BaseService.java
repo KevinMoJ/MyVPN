@@ -62,10 +62,7 @@ public abstract class BaseService extends VpnService {
         }
 
         public void stop() {
-//            if (state != Constants.State.CONNECTING && state != Constants.State.STOPPING) {
-//                stopRunner();
-//            }
-            if(state != Constants.State.STOPPING){
+            if(state != Constants.State.INIT && state != Constants.State.STOPPED && state != Constants.State.ERROR){
                 stopRunner();
             }
             remain = 0;
