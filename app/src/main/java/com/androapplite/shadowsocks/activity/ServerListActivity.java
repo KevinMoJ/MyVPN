@@ -104,7 +104,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
         addBottomAd(AdAppHelper.getInstance(this));
-
+        Firebase.getInstance(this).logEvent("屏幕","服务器列表屏幕");
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {

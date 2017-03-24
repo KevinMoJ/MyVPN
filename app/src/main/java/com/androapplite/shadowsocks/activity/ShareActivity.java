@@ -30,7 +30,7 @@ public class ShareActivity extends AppCompatActivity {
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
-
+        Firebase.getInstance(this).logEvent("屏幕","分享屏幕");
     }
 
 //    public void shareByFacebook(View view){

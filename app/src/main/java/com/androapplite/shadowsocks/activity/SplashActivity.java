@@ -63,8 +63,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
-
-
+        Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
     }
 
     private static class AdLoadedCheckRunnable implements Runnable{

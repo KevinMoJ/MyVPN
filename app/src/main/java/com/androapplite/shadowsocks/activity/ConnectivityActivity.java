@@ -157,6 +157,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
         notificationCheck();
+        firebase.logEvent("屏幕","主屏幕");
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
