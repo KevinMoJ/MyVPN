@@ -16,6 +16,8 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.widget.ProgressBar;
 
+import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.NotificationsUtils;
 import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -57,6 +59,10 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
+
+        boolean isNotificationEnable = NotificationsUtils.isNotificationEnabled(this);
+        Firebase.getInstance(this).logEvent("通知设置", isNotificationEnable ? "启用" : "禁用");
+
     }
 
     private static class AdLoadedCheckRunnable implements Runnable{
