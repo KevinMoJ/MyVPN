@@ -427,6 +427,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     int state = mShadowsocksService.getState();
                     mNewState = Constants.State.values()[state];
                     updateConnectionState();
+                    mShadowsocksService.enableNotification(true);
                 } catch (RemoteException e) {
                     ShadowsocksApplication.handleException(e);
                 }
@@ -1279,6 +1280,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 Firebase.getInstance(this).logEvent("通知设置", "启用", "通过设置打开通知");
             }else{
                 Firebase.getInstance(this).logEvent("通知设置", "启用");
+            }
+            if(mShadowsocksService != null){
+                try {
+                    mShadowsocksService.enableNotification(true);
+                } catch (RemoteException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
             }
         }
     }

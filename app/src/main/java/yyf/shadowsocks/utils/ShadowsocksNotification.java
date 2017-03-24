@@ -94,6 +94,7 @@ public class ShadowsocksNotification {
                             .setOngoing(true)
                             .setAutoCancel(false)
                             .setFullScreenIntent(null, false)
+                            .setSubText(null)
                             .setSmallIcon(R.drawable.notification_icon)
                     ;
                     final Notification notification = mBuilder.build();
@@ -179,6 +180,7 @@ public class ShadowsocksNotification {
 
     public void enableNotification(){
         registerCallback();
+        showDisconnectStatus();
     }
 
     public void disableNotification(){
