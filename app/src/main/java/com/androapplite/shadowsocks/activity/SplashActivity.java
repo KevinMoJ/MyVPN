@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -7,6 +8,7 @@ import android.animation.PropertyValuesHolder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -14,6 +16,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.widget.ProgressBar;
 
 import com.androapplite.shadowsocks.Firebase;
@@ -60,8 +64,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
 
-        boolean isNotificationEnable = NotificationsUtils.isNotificationEnabled(this);
-        Firebase.getInstance(this).logEvent("通知设置", isNotificationEnable ? "启用" : "禁用");
 
     }
 

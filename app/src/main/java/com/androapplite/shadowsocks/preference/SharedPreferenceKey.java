@@ -26,5 +26,6 @@ public final class SharedPreferenceKey {
     public static final String SUCCESS_CONNECT_COUNT = "SUCCESS_CONNECT_COUNT";
     public static final String FAILED_CONNECT_COUNT = "FAILED_CONNECT_COUNT";
     public static final String VPN_STATE = "VPN_STATE";
+    public static final String NOTIFICATION_DISABLE_CHECK = "NOTIFICATION_DISABLE_CHECK";
 
 }

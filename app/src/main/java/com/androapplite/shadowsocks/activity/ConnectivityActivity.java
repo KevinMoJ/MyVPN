@@ -42,8 +42,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.NotificationsUtils;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -86,7 +88,7 @@ import yyf.shadowsocks.utils.Constants;
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener,
-        DisconnectFragment.OnDisconnectActionListener{
+        DisconnectFragment.OnDisconnectActionListener, View.OnClickListener{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
@@ -154,6 +156,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
+        notificationCheck();
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
@@ -1253,4 +1256,35 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
     }
 
+
+    private void notificationCheck(){
+        boolean isNotificationEnable = NotificationsUtils.isNotificationEnabled(this);
+        boolean isNotificationDisabledCheck = mSharedPreference.getBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, false);
+        if(!isNotificationEnable){
+            if(isNotificationDisabledCheck){
+                Firebase.getInstance(this).logEvent("通知设置", "禁用","禁用未启用");
+            }else{
+                Firebase.getInstance(this).logEvent("通知设置", "禁用", "禁用首次发现");
+            }
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, true).commit();
+
+            Snackbar.make(findViewById(R.id.coordinator),
+                    R.string.enable_notification,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.yes, this)
+                    .show();
+        }else{
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, false).commit();
+            if(isNotificationDisabledCheck){
+                Firebase.getInstance(this).logEvent("通知设置", "启用", "通过设置打开通知");
+            }else{
+                Firebase.getInstance(this).logEvent("通知设置", "启用");
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        NotificationsUtils.goToSet(ConnectivityActivity.this);
+    }
 }

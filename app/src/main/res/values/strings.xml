@@ -143,5 +143,5 @@
     <string name="failed_connect">Failed connected: %d</string>
     <string name="free_used_time">Free Used Time %s</string>
     <string name="free_used_time2">Free Used Time</string>
-
+    <string name="enable_notification">Please enable notification permission in Settings.</string>
 </resources>
