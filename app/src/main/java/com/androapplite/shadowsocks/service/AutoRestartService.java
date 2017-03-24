@@ -19,6 +19,7 @@ import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.coolerfall.daemon.Daemon;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -50,6 +51,9 @@ public class AutoRestartService extends Service implements ServiceConnection{
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mState = sharedPreferences.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
         Firebase.getInstance(this).logEvent("自动重启","创建");
+        Daemon.run(getApplicationContext(), AutoRestartService.class, 10);
+        ShadowsockServiceHelper.startService(this);
+        ShadowsockServiceHelper.bindService(this, this);
     }
 
     @Override
