@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
@@ -236,9 +237,10 @@ public class ShadowsocksNotification {
             remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
             applyTextColorToRemoteViews(remoteViews, mRootView, getColor(R.color.notification_text_about_disconnect));
             mService.startForeground(1, notification);
-
+            Firebase.getInstance(mService).logEvent("VPN断开","到时间");
         }else {
             showDisconnectStatus();
+            Firebase.getInstance(mService).logEvent("VPN断开","没到时间");
         }
     }
 
