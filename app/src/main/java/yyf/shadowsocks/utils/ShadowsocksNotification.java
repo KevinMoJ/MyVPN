@@ -85,24 +85,26 @@ public class ShadowsocksNotification {
 
             @Override
             public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
-                String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
-                String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
-                        .setColor(getColor(R.color.notification_small_icon_bg_connect))
-                        .setOngoing(true)
-                        .setAutoCancel(false)
-                        .setFullScreenIntent(null, false)
-                        .setSmallIcon(R.drawable.notification_icon)
-                ;
-                final Notification notification = mBuilder.build();
-                RemoteViews remoteViews = notification.contentView;
-                if(mRootView == null) {
-                    mRootView = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+                if(mService.getRemain() > 0) {
+                    String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
+                    String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
+                    mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
+                            .setColor(getColor(R.color.notification_small_icon_bg_connect))
+                            .setOngoing(true)
+                            .setAutoCancel(false)
+                            .setFullScreenIntent(null, false)
+                            .setSmallIcon(R.drawable.notification_icon)
+                    ;
+                    final Notification notification = mBuilder.build();
+                    RemoteViews remoteViews = notification.contentView;
+                    if (mRootView == null) {
+                        mRootView = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
+                    }
+                    remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
+                    applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
+                    mService.startForeground(1, notification);
+                    mNotificationManager.cancel(2);
                 }
-                remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
-                applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
-                mService.startForeground(1, notification);
-                mNotificationManager.cancel(2);
             }
         };
 
