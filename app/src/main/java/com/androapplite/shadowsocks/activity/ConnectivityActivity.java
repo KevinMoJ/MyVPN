@@ -112,6 +112,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private HashSet<ServerConfig> mErrorServers;
     private AlertDialog mExitAlert;
     private BroadcastReceiver mConnectCountChangedReceiver;
+    private boolean needToCheckNotification;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +144,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         if(mCurrentState == Constants.State.CONNECTED && mExitAlert == null) {
                             rotateAd();
                         }
+                        if(needToCheckNotification){
+                            needToCheckNotification = false;
+                            notificationCheck();
+                        }
                         break;
                 }
             }
@@ -151,12 +157,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
             firebase.logEvent("广告","加载成功", "首页全屏刚进入");
+            needToCheckNotification = true;
         }else{
             firebase.logEvent("广告","没有加载成功", "首页全屏刚进入");
+            notificationCheck();
         }
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
-        notificationCheck();
         firebase.logEvent("屏幕","主屏幕");
     }
 
