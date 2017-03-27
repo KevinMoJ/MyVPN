@@ -29,9 +29,6 @@ public class ShadowsocksVPNServiceReceiver extends BroadcastReceiver {
                     break;
                 case Action.CONNECTING:
                     firebase.logEvent("VPN状态", "开始连接");
-                    if(duration > 0){
-                        firebase.logEvent("VPN计时", "使用", duration);
-                    }
                     break;
                 case Action.CONNECTED:
                     sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
