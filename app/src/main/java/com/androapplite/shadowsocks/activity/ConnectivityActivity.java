@@ -2,6 +2,7 @@ package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -21,6 +22,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -78,6 +81,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
@@ -697,7 +703,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         mConnectingTimeoutHandler = new Handler();
         mConnectingTimeoutRunnable = new ConnectingTimeoutRunnable(this);
-        mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(20));
+        mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(30));
         new Thread(new PrepareStartServiceRunnable(this)).start();
     }
 
@@ -1003,20 +1009,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 serverConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
             }
 
-            HashSet<String> pingedServers = new HashSet<>();
             Firebase firebase = Firebase.getInstance(this);
             if (serverConfig != null) {
                 if (!serverConfigs.contains(serverConfig) ||
                         mErrorServers.contains(serverConfig)) {
                     serverConfig = null;
                 } else {
-                    pingedServers.add(serverConfig.server);
                     boolean isReachable = ping(serverConfig.server);
                     firebase.logEvent("ping", serverConfig.server, String.valueOf(isReachable));
                     if(!isReachable){
                         serverConfig = null;
                     }else {
-                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
+                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 5000);
                         if (pair.first) {
                             firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
                         } else {
@@ -1031,7 +1035,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if (serverConfig == null) {
                 final String global = getString(R.string.vpn_nation_opt);
                 final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
-                final boolean hasServerListJson = mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST);
                 final boolean isGlobalOption = nation.equals(global);
                 ArrayList<ServerConfig> filteredConfigs = null;
                 if (isGlobalOption) {
@@ -1045,33 +1048,78 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         }
                     }
                 }
-                if (!hasServerListJson) {
-                    Collections.shuffle(filteredConfigs);
+                ExecutorService executorService = Executors.newFixedThreadPool(5);
+                GetFirstAvailableServerPortHandler handler = new GetFirstAvailableServerPortHandler(Looper.getMainLooper(), executorService);
+                for(ServerConfig sc: filteredConfigs){
+                    executorService.submit(new GetAvailableServerPortRunnable(this, sc, handler));
                 }
-                int i;
-                for (i = 0; i < filteredConfigs.size(); i++) {
-                    serverConfig = filteredConfigs.get(i);
-                    if (mErrorServers.contains(serverConfig)) continue;
-                    if(pingedServers.contains(serverConfig.server)) continue;
-                    boolean isReachable = ping(serverConfig.server);
-                    pingedServers.add(serverConfig.server);
-                    firebase.logEvent("ping", serverConfig.server, String.valueOf(isReachable));
-                    if(!isReachable) continue;
-                    Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 15000);
-                    if (pair.first) {
-                        firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
-                        break;
-                    } else {
-                        firebase.logEvent("连接测试失败", serverConfig.name, pair.second);
-                    }
+                try {
+                    executorService.awaitTermination(20, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    ShadowsocksApplication.handleException(e);
                 }
-                if (i >= filteredConfigs.size()) {
-                    serverConfig = null;
-                }
+                serverConfig = handler.mServerConfig;
             }
         }
         return serverConfig;
     }
+
+    private static class GetFirstAvailableServerPortHandler extends Handler{
+        public ServerConfig mServerConfig;
+        private ExecutorService mExecutorService;
+
+        GetFirstAvailableServerPortHandler(Looper looper, ExecutorService executorService){
+            super(looper);
+            mExecutorService = executorService;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if(mServerConfig == null) {
+                mServerConfig = (ServerConfig) msg.obj;
+            }
+            mExecutorService.shutdown();
+            mExecutorService.shutdownNow();
+        }
+    }
+
+
+
+    private static class GetAvailableServerPortRunnable implements Runnable{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+        private ServerConfig mServerConfig;
+        private Handler mHandler;
+
+        GetAvailableServerPortRunnable(ConnectivityActivity activity, ServerConfig serverConfig, Handler handler){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+            mServerConfig = serverConfig;
+            mHandler = handler;
+        }
+
+        @Override
+        public void run() {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                if(Thread.currentThread().isInterrupted()) return;
+                boolean isReachable = activity.ping(mServerConfig.server);
+                if(Thread.currentThread().isInterrupted()) return;
+                Firebase.getInstance(activity).logEvent("ping", mServerConfig.server, String.valueOf(isReachable));
+                if (isReachable) {
+                    Pair<Boolean, Long> pair = activity.isPortOpen(mServerConfig.server, mServerConfig.port, 5000);
+                    if (pair.first) {
+                        Message message = mHandler.obtainMessage();
+                        message.obj = mServerConfig;
+                        mHandler.sendMessage(message);
+                        Firebase.getInstance(activity).logEvent("连接测试成功", mServerConfig.server, pair.second);
+                    } else {
+                        Firebase.getInstance(activity).logEvent("连接测试失败", mServerConfig.server, pair.second);
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
     private void changeProxyFlagIcon(){

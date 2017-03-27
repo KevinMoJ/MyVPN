@@ -46,70 +46,47 @@ public class Firebase extends AbstractFirebase {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
         Bundle bundle = new Bundle();
         bundle.putString("action", cutStringIfNecessary(action));
-        firebaseAnalytics.logEvent(category, bundle);
+        firebaseAnalytics.logEvent(validateKey(category), bundle);
     }
 
     public void logEvent(String category, String action, String label) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
         Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(action));
-        bundle.putString("label", cutStringIfNecessary(label));
-        firebaseAnalytics.logEvent(category, bundle);
-    }
-
-    public void logEvent(String category, String action, String label, long value) {
-        FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(action));
-        bundle.putString("label", cutStringIfNecessary(label));
-        bundle.putLong("value", value);
-        firebaseAnalytics.logEvent(category, bundle);
-    }
-
-    public void logEvent(String category, String action, String label, double value) {
-        FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(action));
-        bundle.putString("label", cutStringIfNecessary(label));
-        bundle.putDouble("value", value);
-        firebaseAnalytics.logEvent(category, bundle);
+        bundle.putString(validateKey(action), cutStringIfNecessary(label));
+        firebaseAnalytics.logEvent(validateKey(category), bundle);
     }
 
     public void logEvent(String category, String action, long value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
         Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(action));
-        bundle.putLong("value", value);
-        firebaseAnalytics.logEvent(category, bundle);
+        bundle.putLong(validateKey(action), value);
+        firebaseAnalytics.logEvent(validateKey(category), bundle);
     }
 
     public void logEvent(String category, String action, double value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
         Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(action));
-        bundle.putDouble("value", value);
-        firebaseAnalytics.logEvent(category, bundle);
+        bundle.putDouble(validateKey(action), value);
+        firebaseAnalytics.logEvent(validateKey(category), bundle);
     }
 
     public void logEvent(String category, long value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
         Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(category));
         bundle.putLong("value", value);
-        firebaseAnalytics.logEvent(category, bundle);
+        firebaseAnalytics.logEvent(validateKey(category), bundle);
     }
 
     public void logEvent(String category, double value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
         Bundle bundle = new Bundle();
-        bundle.putString("action", cutStringIfNecessary(category));
         bundle.putDouble("value", value);
-        firebaseAnalytics.logEvent(category, bundle);
+        firebaseAnalytics.logEvent(validateKey(category), bundle);
     }
 
     public void logEvent(String category, Bundle values) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        firebaseAnalytics.logEvent(category, values);
+        firebaseAnalytics.logEvent(validateKey(category), values);
     }
 
     private String cutStringIfNecessary(String v) {
@@ -117,6 +94,23 @@ public class Firebase extends AbstractFirebase {
             return v.substring(0, 100);
         }
         return v;
+    }
+
+    private String validateKey(String key) {
+        if (!TextUtils.isEmpty(key)) {
+            if (!Character.isLetter(key.charAt(0))) {
+                key = "K" + key;
+            }
+            if (key.length() > 40) {
+                key = key.substring(0, 40);
+            }
+            for (int i = 0; i < key.length(); i++) {
+                if (!Character.isLetterOrDigit(key.charAt(i)) && key.charAt(i) != '_') {
+                    key = key.replace(key.charAt(i), '_');
+                }
+            }
+        }
+        return key;
     }
 
     //设置是否开启数据收集功能
