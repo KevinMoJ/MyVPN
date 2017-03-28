@@ -242,7 +242,7 @@ public class ShadowsocksNotification {
             Firebase.getInstance(mService).logEvent("VPN断开","到时间");
         }else {
             showDisconnectStatus();
-            Firebase.getInstance(mService).logEvent("VPN断开","没到时间");
+            Firebase.getInstance(mService).logEvent("VPN断开","没到时间", remain);
         }
     }
 

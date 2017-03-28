@@ -19,6 +19,7 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
+import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -49,19 +50,20 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         registerTimeTickTimer();
         registerTimeUpBroadcast();
         registerDisconnectReceiver();
-        m1hCountDown = 1800;
+        m1hCountDown = mSharedPreference.getInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0);
+        if(m1hCountDown <= 0) m1hCountDown = 1800;
         mLastTickTime = System.currentTimeMillis();
         ShadowsockServiceHelper.bindService(this, this);
     }
 
     private void registerTimeTickTimer(){
         mTimeTickTimer = new Timer();
-        mTimeTickTimer.schedule(new TimeCountDownTask(), 100, 1000);
+        mTimeTickTimer.schedule(new TimeCountDownTask(this), 100, 1000);
     }
 
     private void registerTimeUpBroadcast(){
         IntentFilter intentFilter = new IntentFilter(Action.TIME_UP);
-        mTimeUpReceiver = new TimeUpReceiver();
+        mTimeUpReceiver = new TimeUpReceiver(this);
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
         manager.registerReceiver(mTimeUpReceiver, intentFilter);
     }
@@ -70,14 +72,13 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(yyf.shadowsocks.broadcast.Action.STOPPED);
         intentFilter.addAction(yyf.shadowsocks.broadcast.Action.ERROR);
-        mDisconnectReceiver = new DisconnectReceiver();
+        mDisconnectReceiver = new DisconnectReceiver(this);
         registerReceiver(mDisconnectReceiver, intentFilter);
     }
 
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mTimeTickTimer.cancel();
         mTimeTickTimer.purge();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mTimeUpReceiver);
@@ -85,33 +86,44 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         if(mShadowsocksService != null) {
             unbindService(this);
         }
-        mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
+        //手工停止的重新计时
+        mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0).commit();
+        super.onDestroy();
     }
 
-    private class TimeCountDownTask extends TimerTask{
+    private static class TimeCountDownTask extends TimerTask{
+        WeakReference<TimeCountDownService> mServiceReference;
+        TimeCountDownTask(TimeCountDownService service){
+            mServiceReference = new WeakReference<TimeCountDownService>(service);
+        }
+
         @Override
         public void run() {
-            long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-            //处理系统休眠的情况
+            TimeCountDownService service = mServiceReference.get();
+            if(service != null){
+                long countDown = service.mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+                //处理系统休眠的情况
 //            Log.d("TimeCountDownService", mLastTickTime + " " + System.currentTimeMillis());
-            long differ = System.currentTimeMillis() - mLastTickTime;
-            mLastTickTime = System.currentTimeMillis();
-            if(differ > 60 * 1000){
-                countDown += differ/1000;
-                mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, countDown).commit();
+                long differ = System.currentTimeMillis() - service.mLastTickTime;
+                service.mLastTickTime = System.currentTimeMillis();
+                if(differ > 60 * 1000){
+                    countDown += differ/1000;
+                    service.mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, countDown).commit();
 
-                m1hCountDown -= differ/1000;
-                if(m1hCountDown < 0){
-                    m1hCountDown = 0;
+                    service.m1hCountDown -= differ/1000;
+                    if(service.m1hCountDown < 0){
+                        service.m1hCountDown = 0;
+                    }
+                }else{
+                    service.mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, ++countDown).commit();
                 }
-            }else{
-                mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, ++countDown).commit();
-            }
 
-            if(--m1hCountDown <= 0){
-                sendTimeUpBroadcast();
+                if(--service.m1hCountDown <= 0){
+                    service.sendTimeUpBroadcast();
+                }
+                service.mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, service.m1hCountDown).commit();
+                Log.d("CountDownService", "剩余时间 " + service.m1hCountDown);
             }
-            Log.d("CountDownService", "剩余时间 " + m1hCountDown);
         }
     }
 
@@ -121,10 +133,17 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         manager.sendBroadcast(intent);
     }
 
-    private class TimeUpReceiver extends BroadcastReceiver{
+    private static class TimeUpReceiver extends BroadcastReceiver{
+        WeakReference<TimeCountDownService> mServiceReference;
+        TimeUpReceiver(TimeCountDownService service){
+            mServiceReference = new WeakReference<TimeCountDownService>(service);
+        }
         @Override
         public void onReceive(Context context, Intent intent) {
-            stopVPNConnection();
+            TimeCountDownService service = mServiceReference.get();
+            if(service != null) {
+                service.stopVPNConnection();
+            }
         }
     }
 
@@ -162,10 +181,17 @@ public class TimeCountDownService extends Service implements ServiceConnection{
         }
     }
 
-    private class DisconnectReceiver extends BroadcastReceiver{
+    private static class DisconnectReceiver extends BroadcastReceiver{
+        WeakReference<TimeCountDownService> mServiceReference;
+        DisconnectReceiver(TimeCountDownService service){
+            mServiceReference = new WeakReference<TimeCountDownService>(service);
+        }
         @Override
         public void onReceive(Context context, Intent intent) {
-            stopSelf();
+            TimeCountDownService service = mServiceReference.get();
+            if(service != null) {
+                service.stopSelf();
+            }
         }
     }
 

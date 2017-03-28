@@ -1267,21 +1267,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         super.onResume();
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.onResume();
-        boolean extent1hAlert = mSharedPreference.getBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false);
-        if(extent1hAlert){
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
-                    .setMessage("Vpn connection is extented")
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    })
-                    .setCustomTitle(null)
-                    .create();
-            alertDialog.show();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.EXTENT_1H_ALERT, false).commit();
-        }
     }
 
     private void rotateAd(){
