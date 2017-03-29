@@ -76,6 +76,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.google.firebase:firebase-core:10.0.1'
     compile project(path: ':ads')
-    compile project(':library')
 }
 apply plugin: 'com.google.gms.google-services'

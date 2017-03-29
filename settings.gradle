@@ -1,2 +1,2 @@
-include ':app', ':ads', ':library'
+include ':app', ':ads'
 project(':ads').projectDir = new File('adsplugin')
