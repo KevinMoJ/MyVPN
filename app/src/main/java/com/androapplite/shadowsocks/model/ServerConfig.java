@@ -12,6 +12,7 @@ import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -124,26 +125,26 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public static ArrayList<ServerConfig> createDefaultServerList(Resources resources){
-        TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
-        TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
-        TypedArray servers = resources.obtainTypedArray(R.array.vpn_servers);
-        TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
-        ArrayList<ServerConfig> arrayList = new ArrayList<>(names.length());
-        for(int i=0; i<servers.length(); i++){
-            String name = names.getString(i);
-            String server = servers.getString(i);
-            String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_bluetooth_24dp));
-            String nation = nations.getString(i);
-            ServerConfig serverConfig = new ServerConfig(name, server, flag, nation, 3);
-            arrayList.add(serverConfig);
-        }
-        return arrayList;
-    }
-
-    public int getResourceId(Context context){
-        return context.getResources().getIdentifier(flag, "drawable", context.getPackageName());
-    }
+//    public static ArrayList<ServerConfig> createDefaultServerList(Resources resources){
+//        TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
+//        TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
+//        TypedArray servers = resources.obtainTypedArray(R.array.vpn_servers);
+//        TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
+//        ArrayList<ServerConfig> arrayList = new ArrayList<>(names.length());
+//        for(int i=0; i<servers.length(); i++){
+//            String name = names.getString(i);
+//            String server = servers.getString(i);
+//            String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_bluetooth_24dp));
+//            String nation = nations.getString(i);
+//            ServerConfig serverConfig = new ServerConfig(name, server, flag, nation, 3);
+//            arrayList.add(serverConfig);
+//        }
+//        return arrayList;
+//    }
+//
+//    public int getResourceId(Context context){
+//        return context.getResources().getIdentifier(flag, "drawable", context.getPackageName());
+//    }
 
     public int getSignalResId(){
         return SINAL_IMAGES[signal];
@@ -173,5 +174,14 @@ public class ServerConfig {
             return null;
         }
 
+    }
+
+    public static boolean checkServerConfigJsonString(String jsonString){
+        try{
+            JSONObject jsonObject = new JSONObject(jsonString);
+            return jsonObject.has("city") && jsonObject.has("ip") && jsonObject.has("signal") && jsonObject.has("port");
+        }catch (JSONException e){
+            return false;
+        }
     }
 }

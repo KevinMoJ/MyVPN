@@ -18,11 +18,15 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -163,7 +167,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                     long t2 = System.currentTimeMillis();
                     firebase.logEvent("访问服务器列表成功", urlKey, t2-t1);
                     String jsonString = response.body().string();
-                    if(jsonString != null && !jsonString.isEmpty()) {
+                    if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
                         Message message = service.mServerListFastFetchHandler.obtainMessage();
                         message.obj = new Pair<String, String>(mUrl, jsonString);
                         service.mServerListFastFetchHandler.sendMessage(message);
