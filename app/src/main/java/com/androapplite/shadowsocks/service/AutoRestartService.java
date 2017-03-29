@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -19,15 +18,13 @@ import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.coolerfall.daemon.Daemon;
+import com.bestgo.adsplugin.daemon.Daemon;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
-import yyf.shadowsocks.service.ShadowsocksVpnService;
 import yyf.shadowsocks.utils.Constants;
 
 
