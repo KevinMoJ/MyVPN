@@ -10,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
@@ -103,7 +104,9 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             mHttpClient = builder.build();
             Collections.shuffle(FAST_URLS);
             mGetFirstServerListService = Executors.newScheduledThreadPool(FAST_URLS.size() + 1);
-            mServerListFastFetchHandler = new Handler(this);
+            HandlerThread serverListFastFetchHandlerThread = new HandlerThread("serverListFastFetchHandlerThread");
+            serverListFastFetchHandlerThread.start();
+            mServerListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
             long t1 = System.currentTimeMillis();
             for(int i = 0; i < FAST_URLS.size(); i++){
                 String url = FAST_URLS.get(i);
@@ -115,6 +118,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             } catch (InterruptedException e) {
                 ShadowsocksApplication.handleException(e);
             }
+            serverListFastFetchHandlerThread.quit();
             long t2 = System.currentTimeMillis();
             String urlKey = URL_KEY_MAP.get(mUrl);
             if(urlKey == null){
@@ -131,7 +135,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             TelephonyManager manager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
             String simOperator = manager.getSimOperator();
             String iosCountry = manager.getSimCountryIso();
-            Firebase.getInstance(this).logEvent("服务器url", urlKey, localCountry + simOperator + iosCountry);
+            Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", localCountry, simOperator, iosCountry));
             broadcastServerListFetchFinish();
             hasStart = false;
         }
