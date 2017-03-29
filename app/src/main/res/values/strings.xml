@@ -56,6 +56,7 @@
     <string name="vpn_name_sj_us" translatable="false">San Jose</string>
     <string name="vpn_name_pho_us" translatable="false">Phoenix</string>
     <string name="vpn_name_buf_us" translatable="false">Buffalo</string>
+    <string name="vpn_name_mtl_ca" translatable="false">Montreal</string>
 
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
@@ -79,6 +80,7 @@
     <string name="vpn_nation_sg">Singapore</string>
     <string name="vpn_nation_nl">Netherlands</string>
     <string name="vpn_nation_us">United States</string>
+    <string name="vpn_nation_ca">Canada</string>
 
     <string name="change_proxy_tip">Please change proxy when the connection is off.</string>
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>
