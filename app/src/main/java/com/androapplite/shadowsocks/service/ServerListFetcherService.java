@@ -51,12 +51,6 @@ import okio.Okio;
  */
 
 public class ServerListFetcherService extends IntentService implements Handler.Callback{
-    /*
-    http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json
-    http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json
-    http://23.20.85.166:8080/VPNServerList/fsl
-    http://s3c.vpnnest.com:8080/VPNServerList/fsl
-     */
     private boolean hasStart;
     private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json";
     private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json";
@@ -160,10 +154,14 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                         .build();
                 long t1 = System.currentTimeMillis();
                 Firebase firebase = Firebase.getInstance(service);
+                String urlKey = URL_KEY_MAP.get(mUrl);
+                if(urlKey == null){
+                    urlKey = "没有匹配的url";
+                }
                 try {
                     Response response = service.mHttpClient.newCall(request).execute();
                     long t2 = System.currentTimeMillis();
-                    firebase.logEvent("访问服务器列表成功", mUrl, t2-t1);
+                    firebase.logEvent("访问服务器列表成功", urlKey, t2-t1);
                     String jsonString = response.body().string();
                     if(jsonString != null && !jsonString.isEmpty()) {
                         Message message = service.mServerListFastFetchHandler.obtainMessage();
@@ -172,10 +170,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                     }
                 } catch (IOException e) {
                     long t2 = System.currentTimeMillis();
-                    String urlKey = URL_KEY_MAP.get(mUrl);
-                    if(urlKey == null){
-                        urlKey = "没有匹配的url";
-                    }
+
                     firebase.logEvent("访问服务器列表失败", urlKey, t2 - t1);
 
                     String errMsg = e.getMessage();
