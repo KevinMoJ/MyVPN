@@ -133,7 +133,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             TelephonyManager manager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
             String simOperator = manager.getSimOperator();
             String iosCountry = manager.getSimCountryIso();
-            Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", localCountry, simOperator, iosCountry));
+            Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", iosCountry, simOperator, localCountry));
             broadcastServerListFetchFinish();
             hasStart = false;
         }
