@@ -202,25 +202,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
                                 mFetchServerListProgressDialog.setOnDismissListener(null);
                                 Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
-
-                                String errMsg = intent.getStringExtra("ErrMsg");
-                                boolean isIpUrl = intent.getBooleanExtra("IsIpUrl", false);
-                                Firebase firebase = Firebase.getInstance(context);
-                                if(errMsg != null){
-                                    if(isIpUrl) {
-                                        firebase.logEvent("VPN连不上", "取服务器列表超时IP", errMsg);
-                                    }else{
-                                        firebase.logEvent("VPN连不上", "取服务器列表超时Domain", errMsg);
-                                    }
-
-                                }else {
-                                    if(isIpUrl) {
-                                        firebase.logEvent("VPN连不上", "取服务器列表超时IP", "未知原因");
-                                    }else {
-                                        firebase.logEvent("VPN连不上", "取服务器列表超时Domain", "未知原因");
-
-                                    }
-                                }
+                                Firebase.getInstance(context).logEvent("VPN连不上", "取服务器列表超时");
                                 increaseFailedCount();
                                 if(mConnectFragment != null){
                                     mConnectFragment.updateUI();
