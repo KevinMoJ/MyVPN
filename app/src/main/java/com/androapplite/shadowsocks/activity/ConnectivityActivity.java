@@ -71,6 +71,8 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdStateListener;
 import com.bestgo.adsplugin.ads.AdType;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.System;
@@ -704,7 +706,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     activity.mConnectingConfig = serverConfig;
                     activity.prepareStartService();
                 }else{
-                    Firebase.getInstance(activity).logEvent("VPN连不上", "没有可用的服务器");
+                    boolean isValidation = ServerConfig.checkServerConfigJsonString(activity.mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null));
+                    Firebase.getInstance(activity).logEvent("VPN连不上", "没有可用的服务器", "服务器列表合法 " + isValidation);
                     activity.mIsConnecting = false;
                     activity.increaseFailedCount();
                     activity.clearConnectingTimeout();
