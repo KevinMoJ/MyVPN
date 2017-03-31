@@ -180,7 +180,7 @@ public class ServerConfig {
         try{
             JSONObject jsonObject = new JSONObject(jsonString);
             return jsonObject.has("city") && jsonObject.has("ip") && jsonObject.has("signal") && jsonObject.has("port");
-        }catch (JSONException e){
+        }catch (Exception e){
             return false;
         }
     }
