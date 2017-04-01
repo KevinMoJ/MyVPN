@@ -131,8 +131,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         ArrayList<ServerConfig> serverConfigs = null;
         if(serverListJson != null){
             serverConfigs = ServerConfig.createServerList(this, serverListJson);
-        }else{
-            serverConfigs = ServerConfig.createServerListByRemoteConfig(this);
         }
 
         if(serverConfigs != null && !serverConfigs.isEmpty()) {

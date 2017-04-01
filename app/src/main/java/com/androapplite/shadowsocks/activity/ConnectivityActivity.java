@@ -1136,8 +1136,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         ArrayList<ServerConfig> serverList = null;
         if(serverlist != null){
             serverList = ServerConfig.createServerList(this, serverlist);
-        }else{
-            serverList = ServerConfig.createServerListByRemoteConfig(this);
         }
         if(serverList != null && serverList.size() > 1){
             result = serverList;

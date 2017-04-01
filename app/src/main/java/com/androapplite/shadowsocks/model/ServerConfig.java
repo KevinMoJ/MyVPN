@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created by jim on 16/11/7.
@@ -127,14 +128,48 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public static ArrayList<ServerConfig> createServerListByRemoteConfig(Context context){
+    public static String shuffleRemoteConfig(Context context){
+        String shuffleJsonString = null;
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        String jsonArrayString = remoteConfig.getString("server_list");
-        ArrayList<ServerConfig> arrayList = createServerList(context, jsonArrayString);
-        if(arrayList != null){
-            Collections.shuffle(arrayList);
+        String jsonArrayString = remoteConfig.getString("server_list", context.getPackageName());
+        try {
+            JSONObject jsonObject = new JSONObject(jsonArrayString);
+            JSONArray cityArray = jsonObject.optJSONArray("city");
+            JSONArray ipArray = jsonObject.optJSONArray("ip");
+            JSONArray signalArray = jsonObject.optJSONArray("signal");
+            JSONArray portArray = jsonObject.optJSONArray("port");
+            if(cityArray != null && ipArray != null && signalArray != null){
+                ArrayList<Integer> positions = new ArrayList<>(ipArray.length());
+                for(int i = 0; i<positions.size(); i++){
+                    positions.add(i);
+                }
+                Collections.shuffle(positions);
+                for(int i = 0; i<positions.size()/2; i++){
+                    int pos = positions.get(i);
+                    swipePosition(cityArray, i, pos);
+                    swipePosition(ipArray, i, pos);
+                    swipePosition(signalArray, i, pos);
+                    if(portArray != null){
+                        swipePosition(portArray, i, pos);
+                    }
+                }
+                shuffleJsonString = jsonObject.toString();
+            }
+
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
         }
-        return arrayList;
+        return shuffleJsonString;
+    }
+
+    private static void swipePosition(JSONArray array, int pos1, int pos2){
+        try {
+            Object obj = array.get(pos1);
+            array.put(pos1, array.get(pos2));
+            array.put(pos2, obj);
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
     }
 
 //    public static ArrayList<ServerConfig> createDefaultServerList(Resources resources){
