@@ -130,7 +130,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                 Firebase.getInstance(this).logEvent("取服务器列表成功总时间", urlKey, t2-t1);
             }else{
                 Firebase.getInstance(this).logEvent("取服务器列表失败总时间", t2-t1);
-                mServerListJsonString = ServerConfig.shuffleRemoteConfig(this);
+                mServerListJsonString = ServerConfig.shuffleRemoteConfig();
                 editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).commit();
             }
             String localCountry = getResources().getConfiguration().locale.getDisplayCountry();
