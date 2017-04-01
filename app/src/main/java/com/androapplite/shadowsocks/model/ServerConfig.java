@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.annotation.DrawableRes;
+import android.util.Log;
 
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -128,10 +130,11 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public static String shuffleRemoteConfig(Context context){
+    public static String shuffleRemoteConfig(){
         String shuffleJsonString = null;
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        String jsonArrayString = remoteConfig.getString("server_list", context.getPackageName());
+        String jsonArrayString = remoteConfig.getString("server_list");
+        Log.d("server_list", jsonArrayString);
         try {
             JSONObject jsonObject = new JSONObject(jsonArrayString);
             JSONArray cityArray = jsonObject.optJSONArray("city");
@@ -139,21 +142,21 @@ public class ServerConfig {
             JSONArray signalArray = jsonObject.optJSONArray("signal");
             JSONArray portArray = jsonObject.optJSONArray("port");
             if(cityArray != null && ipArray != null && signalArray != null){
-                ArrayList<Integer> positions = new ArrayList<>(ipArray.length());
-                for(int i = 0; i<positions.size(); i++){
-                    positions.add(i);
-                }
-                Collections.shuffle(positions);
-                for(int i = 0; i<positions.size()/2; i++){
-                    int pos = positions.get(i);
-                    swipePosition(cityArray, i, pos);
-                    swipePosition(ipArray, i, pos);
-                    swipePosition(signalArray, i, pos);
-                    if(portArray != null){
-                        swipePosition(portArray, i, pos);
+                Random random = new Random();
+                for(int i = 0; i<cityArray.length() * 3 / 4; i++){
+                    int pos = random.nextInt(cityArray.length());
+                    //新旧位置不相等才交换
+                    if(i != pos) {
+                        swipePosition(cityArray, i, pos);
+                        swipePosition(ipArray, i, pos);
+                        swipePosition(signalArray, i, pos);
+                        if (portArray != null) {
+                            swipePosition(portArray, i, pos);
+                        }
                     }
                 }
                 shuffleJsonString = jsonObject.toString();
+                Log.d("server_list shuffle", shuffleJsonString);
             }
 
         }catch (Exception e){
