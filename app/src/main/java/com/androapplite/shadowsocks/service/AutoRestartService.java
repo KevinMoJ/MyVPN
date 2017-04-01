@@ -165,7 +165,7 @@ public class AutoRestartService extends Service implements ServiceConnection{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mRemoteConfigFetchStart = System.currentTimeMillis();
-        mFirebaseRemoteConfig.fetch(1800).addOnCompleteListener(new RemoteConfigFetchListener(this));
+        mFirebaseRemoteConfig.fetch(300).addOnCompleteListener(new RemoteConfigFetchListener(this));
         return super.onStartCommand(intent, flags, startId);
     }
 }
