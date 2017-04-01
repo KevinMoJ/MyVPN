@@ -9,6 +9,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.androapplite.shadowsocks.Firebase;
@@ -19,6 +20,9 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.bestgo.adsplugin.daemon.Daemon;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.lang.ref.WeakReference;
 
@@ -32,8 +36,9 @@ public class AutoRestartService extends Service implements ServiceConnection{
     private volatile IShadowsocksService mShadowsocksService;
     private volatile IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private volatile int mState;
-    private boolean mIsRecoverAfterKill;
-    private static final String RECOVER_AFTER_KILL = "RECOVER_AFTER_KILL";
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+    private long mRemoteConfigFetchStart;
+
 
     @Nullable
     @Override
@@ -51,6 +56,7 @@ public class AutoRestartService extends Service implements ServiceConnection{
         Daemon.run(getApplicationContext(), AutoRestartService.class, 10);
         ShadowsockServiceHelper.startService(this);
         ShadowsockServiceHelper.bindService(this, this);
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
     }
 
     @Override
@@ -136,26 +142,30 @@ public class AutoRestartService extends Service implements ServiceConnection{
         context.startService(new Intent(context, AutoRestartService.class));
     }
 
-//    public static void recoverVpnServiceAfterKill(Context context){
-//        final Intent intent = new Intent(context, AutoRestartService.class);
-//        intent.putExtra(RECOVER_AFTER_KILL, true);
-//        context.startService(intent);
-//    }
-//
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        if(intent != null){
-//            mIsRecoverAfterKill = intent.getBooleanExtra(RECOVER_AFTER_KILL, false);
-//            if(mIsRecoverAfterKill){
-//                Firebase.getInstance(this).logEvent("自动重启","被杀死");
-//            }
-//        }
-//        synchronized (this) {
-//            if (mShadowsocksService == null) {
-//                ShadowsockServiceHelper.startService(this);
-//                ShadowsockServiceHelper.bindService(this, this);
-//            }
-//        }
-//        return super.onStartCommand(intent, flags, startId);
-//    }
+    private static class RemoteConfigFetchListener implements OnCompleteListener<Void> {
+        private WeakReference<AutoRestartService> mServiceReference;
+        RemoteConfigFetchListener(AutoRestartService service){
+            mServiceReference = new WeakReference<AutoRestartService>(service);
+        }
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+            AutoRestartService service = mServiceReference.get();
+            if(service != null){
+                if (task.isSuccessful()) {
+                    service.mFirebaseRemoteConfig.activateFetched();
+                    Firebase.getInstance(service).logEvent("获取远程配置", "成功", System.currentTimeMillis() - service.mRemoteConfigFetchStart);
+                } else {
+                    Firebase.getInstance(service).logEvent("获取远程配置", "失败", System.currentTimeMillis() - service.mRemoteConfigFetchStart);
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mRemoteConfigFetchStart = System.currentTimeMillis();
+        mFirebaseRemoteConfig.fetch(1800).addOnCompleteListener(new RemoteConfigFetchListener(this));
+        return super.onStartCommand(intent, flags, startId);
+    }
 }

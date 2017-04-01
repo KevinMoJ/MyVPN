@@ -50,7 +50,6 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         initBackgroundReceiverIntentFilter();
 
         checkAndCopyAsset();
-//        AutoRestartService.startService(this);
 //        ShadowsockServiceHelper.startService(this);
         ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();
@@ -64,6 +63,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
         Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
+        AutoRestartService.startService(this);
     }
 
     private static class AdLoadedCheckRunnable implements Runnable{

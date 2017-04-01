@@ -1133,15 +1133,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private ArrayList<ServerConfig> loadServerList(){
         ArrayList<ServerConfig> result = null;
         String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+        ArrayList<ServerConfig> serverList = null;
         if(serverlist != null){
-            ArrayList<ServerConfig> serverList = ServerConfig.createServerList(this, serverlist);
-            if(serverList != null && serverList.size() > 1){
-                result = serverList;
-            }
+            serverList = ServerConfig.createServerList(this, serverlist);
+        }else{
+            serverList = ServerConfig.createServerListByRemoteConfig(this);
         }
-//        if(result == null){
-//            result = ServerConfig.createDefaultServerList(getResources());
-//        }
+        if(serverList != null && serverList.size() > 1){
+            result = serverList;
+        }
         return result;
     }
 

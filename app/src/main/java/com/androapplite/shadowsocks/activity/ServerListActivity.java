@@ -127,14 +127,14 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
-        ArrayList<ServerConfig> serverConfigs = null;
         String serverListJson = mPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
+        ArrayList<ServerConfig> serverConfigs = null;
         if(serverListJson != null){
             serverConfigs = ServerConfig.createServerList(this, serverListJson);
+        }else{
+            serverConfigs = ServerConfig.createServerListByRemoteConfig(this);
         }
-//        if(serverConfigs == null || serverConfigs.isEmpty()){
-//            serverConfigs = ServerConfig.createDefaultServerList(getResources());
-//        }
+
         if(serverConfigs != null && !serverConfigs.isEmpty()) {
             for (ServerConfig serverConfig : serverConfigs) {
                 if (!mNations.contains(serverConfig.nation)) {

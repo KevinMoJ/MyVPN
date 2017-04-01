@@ -10,12 +10,14 @@ import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by jim on 16/11/7.
@@ -121,6 +123,16 @@ public class ServerConfig {
 
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
+        }
+        return arrayList;
+    }
+
+    public static ArrayList<ServerConfig> createServerListByRemoteConfig(Context context){
+        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        String jsonArrayString = remoteConfig.getString("server_list");
+        ArrayList<ServerConfig> arrayList = createServerList(context, jsonArrayString);
+        if(arrayList != null){
+            Collections.shuffle(arrayList);
         }
         return arrayList;
     }

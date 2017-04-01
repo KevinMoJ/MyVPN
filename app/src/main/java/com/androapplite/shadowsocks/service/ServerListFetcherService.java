@@ -64,8 +64,8 @@ public class ServerListFetcherService extends IntentService implements Handler.C
     private static final String TURKEY_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
     private static final ArrayList<String> FAST_URLS = new ArrayList<>();
     static {
-        FAST_URLS.add(EGPET_URL);
-        FAST_URLS.add(TURKEY_URL);
+        FAST_URLS.add(SGP_URL);
+        FAST_URLS.add(BOM_URL);
         FAST_URLS.add(IP_URL);
     }
     private static final HashMap<String, String> URL_KEY_MAP = new HashMap<>();
