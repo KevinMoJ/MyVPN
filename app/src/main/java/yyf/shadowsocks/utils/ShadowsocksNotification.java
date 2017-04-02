@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -18,9 +17,6 @@ import android.os.RemoteException;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.v4.app.NotificationCompat;
-import android.text.format.DateUtils;
-import android.util.Log;
-import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +26,8 @@ import android.widget.TextView;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.activity.ConnectivityActivity;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+
+import java.lang.ref.WeakReference;
 
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.service.BaseService;
@@ -78,47 +73,9 @@ public class ShadowsocksNotification {
 
         showDisconnectStatus();
 
-        mCallback = new IShadowsocksServiceCallback.Stub(){
-            @Override
-            public void stateChanged(int state, String msg) throws RemoteException {
+        mCallback = new TrafficUpdator(this);
 
-            }
-
-            @Override
-            public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
-                if(mService.getRemain() > 0) {
-                    String txr = TrafficMonitor.formatTrafficRate(mService, txRate);
-                    String rxr = TrafficMonitor.formatTrafficRate(mService, rxRate);
-                    mBuilder.setContentText(String.format(mService.getString(R.string.notification_no_time), rxr, txr))
-                            .setColor(getColor(R.color.notification_small_icon_bg_connect))
-                            .setOngoing(true)
-                            .setAutoCancel(false)
-                            .setFullScreenIntent(null, false)
-                            .setSubText(null)
-                            .setSmallIcon(R.drawable.notification_icon)
-                    ;
-                    final Notification notification = mBuilder.build();
-                    RemoteViews remoteViews = notification.contentView;
-                    if (mRootView == null) {
-                        mRootView = LayoutInflater.from(mService).inflate(remoteViews.getLayoutId(), null);
-                    }
-                    remoteViews.setInt(mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
-                    applyTextColorToRemoteViews(remoteViews, mRootView, Color.WHITE);
-                    mService.startForeground(1, notification);
-                    mNotificationManager.cancel(2);
-                }
-            }
-        };
-
-
-        mLockReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if(intent != null){
-                    update(intent.getAction());
-                }
-            }
-        };
+        mLockReceiver = new LockReceiver(this);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
@@ -260,4 +217,59 @@ public class ShadowsocksNotification {
     }
 
 
+    private static class TrafficUpdator extends IShadowsocksServiceCallback.Stub{
+        private WeakReference<ShadowsocksNotification> mNotificationReference;
+        TrafficUpdator(ShadowsocksNotification notification){
+            mNotificationReference = new WeakReference<ShadowsocksNotification>(notification);
+        }
+
+        @Override
+        public void stateChanged(int state, String msg) throws RemoteException {
+
+        }
+
+        @Override
+        public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
+            ShadowsocksNotification sn = mNotificationReference.get();
+            if(sn != null){
+                if(sn.mService.getRemain() > 0) {
+                    String txr = TrafficMonitor.formatTrafficRate(sn.mService, txRate);
+                    String rxr = TrafficMonitor.formatTrafficRate(sn.mService, rxRate);
+                    sn.mBuilder.setContentText(String.format(sn.mService.getString(R.string.notification_no_time), rxr, txr))
+                            .setColor(sn.mService.getResources().getColor(R.color.notification_small_icon_bg_connect))
+                            .setOngoing(true)
+                            .setAutoCancel(false)
+                            .setFullScreenIntent(null, false)
+                            .setSubText(null)
+                            .setSmallIcon(R.drawable.notification_icon)
+                    ;
+                    final Notification notification = sn.mBuilder.build();
+                    RemoteViews remoteViews = notification.contentView;
+                    if (sn.mRootView == null) {
+                        sn.mRootView = LayoutInflater.from(sn.mService).inflate(remoteViews.getLayoutId(), null);
+                    }
+                    remoteViews.setInt(sn.mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
+                    applyTextColorToRemoteViews(remoteViews, sn.mRootView, Color.WHITE);
+                    sn.mService.startForeground(1, notification);
+                    sn.mNotificationManager.cancel(2);
+                }
+            }
+        }
+    }
+
+    private static class LockReceiver extends BroadcastReceiver{
+        private WeakReference<ShadowsocksNotification> mNotificationReference;
+        LockReceiver(ShadowsocksNotification notification){
+            mNotificationReference = new WeakReference<ShadowsocksNotification>(notification);
+        }
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ShadowsocksNotification sn = mNotificationReference.get();
+            if(sn != null){
+                if(intent != null){
+                    sn.update(intent.getAction());
+                }
+            }
+        }
+    }
 }
