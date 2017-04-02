@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -75,7 +76,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
         URL_KEY_MAP.put(IP_URL, "ip");
         URL_KEY_MAP.put(DOMAIN_URL, "domain");
     }
-    private ScheduledExecutorService mGetFirstServerListService;
+    private volatile ScheduledExecutorService mGetFirstServerListService;
     private String mServerListJsonString;
     private Handler mServerListFastFetchHandler;
     private OkHttpClient mHttpClient;
@@ -109,8 +110,14 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             mServerListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
             long t1 = System.currentTimeMillis();
             for(int i = 0; i < FAST_URLS.size(); i++){
-                String url = FAST_URLS.get(i);
-                mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i, TimeUnit.SECONDS);
+                if(!mGetFirstServerListService.isShutdown()) {
+                    String url = FAST_URLS.get(i);
+                    try {
+                        mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i, TimeUnit.SECONDS);
+                    }catch (RejectedExecutionException e){
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
             }
             mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, DOMAIN_URL), FAST_URLS.size(), TimeUnit.SECONDS);
             try {
