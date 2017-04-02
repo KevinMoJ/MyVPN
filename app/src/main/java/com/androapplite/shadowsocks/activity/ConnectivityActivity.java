@@ -86,6 +86,7 @@ import java.util.HashSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
@@ -1036,7 +1037,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 ExecutorService executorService = Executors.newFixedThreadPool(5);
                 GetFirstAvailableServerPortHandler handler = new GetFirstAvailableServerPortHandler(Looper.getMainLooper(), executorService);
                 for(ServerConfig sc: filteredConfigs){
-                    executorService.submit(new GetAvailableServerPortRunnable(this, sc, handler));
+                    if(!executorService.isShutdown()) {
+                        try {
+                            executorService.submit(new GetAvailableServerPortRunnable(this, sc, handler));
+                        }catch (RejectedExecutionException e){
+                            ShadowsocksApplication.handleException(e);
+                        }
+                    }
                 }
                 try {
                     executorService.awaitTermination(20, TimeUnit.SECONDS);
