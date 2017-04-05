@@ -127,7 +127,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
         initConnectivityReceiver();
         initVpnFlagAndNation();
-        Firebase.getInstance(this).logEvent( "广告", "屏幕浏览", "首页");
+        Firebase.getInstance(this).logEvent("屏幕","主屏幕");
         UMGameAgent.onEvent(getApplicationContext(), "shouye");
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
@@ -143,6 +143,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
+            Firebase.getInstance(this).logEvent("广告","加载成功", "首页全屏刚进入");
+        }else{
+            Firebase.getInstance(this).logEvent("广告","没有加载成功", "首页全屏刚进入");
         }
         adAppHelper.setAdStateListener(new AdStateListener() {
             @Override
@@ -295,12 +298,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
+                            Firebase firebase = Firebase.getInstance(this);
                             if(adAppHelper.isFullAdLoaded()) {
-                                Firebase.getInstance(this).logEvent( "广告", "点击功能按钮");
-                                UMGameAgent.onEvent(getApplicationContext(), "gnan");
                                 adAppHelper.showFullAd();
+                                firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
                             }else{
                                 rotateAd();
+                                firebase.logEvent("广告", "没有加载成功", "首页全屏连接成功");
                             }
                         }
                     } catch (Exception ex) {
@@ -487,7 +491,14 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     })
                     .show();
 
-            AdAppHelper.getInstance(this).showFullAd();
+            final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+            Firebase firebase = Firebase.getInstance(this);
+            if(adAppHelper.isFullAdLoaded()){
+                adAppHelper.showFullAd();
+                firebase.logEvent("广告", "加载成功", "首页全屏退出");
+            }else{
+                firebase.logEvent("广告", "没有加载成功", "首页全屏退出");
+            }
 //            super.onBackPressed();
         }
     }

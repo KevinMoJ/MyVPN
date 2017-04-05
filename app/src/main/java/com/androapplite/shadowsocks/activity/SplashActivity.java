@@ -16,6 +16,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.widget.ProgressBar;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -56,6 +57,8 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
         mAdLoadedCheckHandler = new Handler();
         mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
+        Firebase.getInstance(this).logEvent("屏幕","闪幕屏幕");
+
     }
 
     private static class AdLoadedCheckRunnable implements Runnable{

@@ -1,6 +1,7 @@
 v2.1.4
     更换firebase
-    
+    增加首页广告统计
+    增加屏幕打开事件统计
 v2.1.3
     用adsplugin代替原来的ads
     用Firebase代替GAHelper

@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.NewUserGuideFragment;
@@ -49,6 +50,8 @@ public class NewUserGuideActivity extends BaseShadowsocksActivity {
         initNewUserGuideFinishButton();
         initBackgroundReceiverIntentFilter();
         initBackgroundReceiver();
+        Firebase.getInstance(this).logEvent("屏幕","新手引导屏幕");
+
     }
 
     private void initPagerIndicatorFragment(){

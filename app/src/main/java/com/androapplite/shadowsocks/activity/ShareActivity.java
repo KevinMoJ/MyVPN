@@ -27,6 +27,7 @@ public class ShareActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        Firebase.getInstance(this).logEvent("屏幕","分享屏幕");
     }
 
     public void shareByFacebook(View view){
