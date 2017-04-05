@@ -17,6 +17,7 @@ import android.os.RemoteException;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -161,6 +162,7 @@ public class ShadowsocksNotification {
 
     public void notifyStopConnection(){
         int remain = mService.getRemain();
+        Log.d("notification", "remain " + remain);
         if(remain <= 1){
             final Bitmap largeIcon = BitmapFactory.decodeResource(mService.getResources(), R.drawable.notification_icon_large);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
