@@ -103,7 +103,7 @@ public class ConfigUtils {
             "}\n" +
             "server {\n" +
             " label = \"china-servers\";\n" +
-            " ip = 223.5.5.5, 114.114.114.114;\n" +
+            " ip = 8.8.8.8, 4.2.2.1;\n" +
             " timeout = 2;\n" +
             " reject = %s;\n" +
             " reject_policy = fail;\n" +
