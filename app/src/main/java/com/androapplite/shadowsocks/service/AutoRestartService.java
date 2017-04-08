@@ -40,7 +40,6 @@ public class AutoRestartService extends Service implements ServiceConnection, Ha
     private volatile IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private volatile int mState;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private long mRemoteConfigFetchStart;
     private boolean mIsAutoStart;
     private Handler mConnectionTestHander;
     private long mRxTotal;
@@ -182,18 +181,21 @@ public class AutoRestartService extends Service implements ServiceConnection, Ha
 
     private static class RemoteConfigFetchListener implements OnCompleteListener<Void> {
         private WeakReference<AutoRestartService> mServiceReference;
-        RemoteConfigFetchListener(AutoRestartService service){
+        private long mStartTime;
+        RemoteConfigFetchListener(AutoRestartService service, long statTime){
             mServiceReference = new WeakReference<AutoRestartService>(service);
+            mStartTime = statTime;
         }
         @Override
         public void onComplete(@NonNull Task<Void> task) {
             AutoRestartService service = mServiceReference.get();
             if(service != null){
+                final long dur = System.currentTimeMillis() - mStartTime;
                 if (task.isSuccessful()) {
                     service.mFirebaseRemoteConfig.activateFetched();
-                    Firebase.getInstance(service).logEvent("获取远程配置", "成功", System.currentTimeMillis() - service.mRemoteConfigFetchStart);
+                    Firebase.getInstance(service).logEvent("获取远程配置", "成功", dur);
                 } else {
-                    Firebase.getInstance(service).logEvent("获取远程配置", "失败", System.currentTimeMillis() - service.mRemoteConfigFetchStart);
+                    Firebase.getInstance(service).logEvent("获取远程配置", "失败", dur);
                 }
             }
 
@@ -202,8 +204,7 @@ public class AutoRestartService extends Service implements ServiceConnection, Ha
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mRemoteConfigFetchStart = System.currentTimeMillis();
-        mFirebaseRemoteConfig.fetch(300).addOnCompleteListener(new RemoteConfigFetchListener(this));
+        mFirebaseRemoteConfig.fetch(300).addOnCompleteListener(new RemoteConfigFetchListener(this, System.currentTimeMillis()));
         return super.onStartCommand(intent, flags, startId);
     }
 
