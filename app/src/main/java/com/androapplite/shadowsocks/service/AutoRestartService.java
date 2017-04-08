@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.TimeUnit;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.IShadowsocksService;
@@ -32,13 +35,17 @@ import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
 
 
-public class AutoRestartService extends Service implements ServiceConnection{
+public class AutoRestartService extends Service implements ServiceConnection, Handler.Callback{
     private volatile IShadowsocksService mShadowsocksService;
     private volatile IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
     private volatile int mState;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private long mRemoteConfigFetchStart;
-
+    private boolean mIsAutoStart;
+    private Handler mConnectionTestHander;
+    private long mRxTotal;
+    private long mTxTotal;
+    private long mConnectStart;
 
     @Nullable
     @Override
@@ -57,6 +64,7 @@ public class AutoRestartService extends Service implements ServiceConnection{
         ShadowsockServiceHelper.startService(this);
         ShadowsockServiceHelper.bindService(this, this);
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        mConnectionTestHander = new Handler(this);
     }
 
     @Override
@@ -78,6 +86,7 @@ public class AutoRestartService extends Service implements ServiceConnection{
                         Config config = new Config(serverConfig.server, serverConfig.port);
                         mShadowsocksService.start(config);
                         Firebase.getInstance(this).logEvent("自动重启","恢复连接");
+                        mIsAutoStart = true;
                     }
                 }else if(mState != connectedState){
                     Firebase.getInstance(this).logEvent("自动重启","断开-不需恢复连接");
@@ -117,13 +126,42 @@ public class AutoRestartService extends Service implements ServiceConnection{
                 service.mState = state;
                 if(state == Constants.State.CONNECTED.ordinal()){
                     TimeCountDownService.start(service);
+                    service.mConnectionTestHander.removeMessages(0);
+                    service.mConnectionTestHander.sendEmptyMessageDelayed(0, TimeUnit.MINUTES.toMillis(1));
+                    service.mConnectStart = System.currentTimeMillis();
+                    service.mTxTotal = 0;
+                    service.mRxTotal = 0;
+                }else if(state == Constants.State.STOPPING.ordinal()
+                        || state == Constants.State.STOPPED.ordinal()
+                        || state == Constants.State.ERROR.ordinal()){
+                    service.mIsAutoStart = false;
                 }
             }
         }
 
         @Override
         public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
-
+            AutoRestartService service = mServiceReference.get();
+            if(service != null){
+                if(rxTotal > 0 && service.mRxTotal == 0){
+                    long dur = System.currentTimeMillis() - service.mConnectStart;
+                    if(service.mIsAutoStart) {
+                        Firebase.getInstance(service).logEvent("自动连接", "首次接收数据时间", dur);
+                    }else{
+                        Firebase.getInstance(service).logEvent("手动连接", "首次接收数据时间", dur);
+                    }
+                }
+                if(txTotal > 0 && service.mTxTotal == 0 ){
+                    long dur = System.currentTimeMillis() - service.mConnectStart;
+                    if(service.mIsAutoStart) {
+                        Firebase.getInstance(service).logEvent("自动连接", "首次发送数据时间", dur);
+                    }else{
+                        Firebase.getInstance(service).logEvent("手动连接", "首次发送数据时间", dur);
+                    }
+                }
+                service.mTxTotal = txTotal;
+                service.mRxTotal = rxTotal;
+            }
         }
     }
 
@@ -167,5 +205,18 @@ public class AutoRestartService extends Service implements ServiceConnection{
         mRemoteConfigFetchStart = System.currentTimeMillis();
         mFirebaseRemoteConfig.fetch(300).addOnCompleteListener(new RemoteConfigFetchListener(this));
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        if(mIsAutoStart){
+            Firebase.getInstance(this).logEvent("自动连接", "1分钟内发送", mTxTotal);
+            Firebase.getInstance(this).logEvent("自动连接", "1分钟内接收", mRxTotal);
+        }else{
+            Firebase.getInstance(this).logEvent("手动连接", "1分钟内发送", mTxTotal);
+            Firebase.getInstance(this).logEvent("手动连接", "1分钟内接收", mRxTotal);
+        }
+
+        return true;
     }
 }
