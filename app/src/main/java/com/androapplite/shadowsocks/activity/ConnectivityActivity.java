@@ -688,7 +688,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         mConnectingTimeoutHandler = new Handler();
         mConnectingTimeoutRunnable = new ConnectingTimeoutRunnable(this);
-        mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(30));
+        mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(32));//时间要超过等待并行测试服务器连接的时间
         new Thread(new PrepareStartServiceRunnable(this)).start();
     }
 
@@ -1001,12 +1001,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         mErrorServers.contains(serverConfig)) {
                     serverConfig = null;
                 } else {
+                    long t1 = System.currentTimeMillis();
                     boolean isReachable = ping(serverConfig.server);
-                    firebase.logEvent("ping", serverConfig.server, String.valueOf(isReachable));
+                    long dur = System.currentTimeMillis() - t1;
+                    if(isReachable){
+                        firebase.logEvent("ping成功", serverConfig.server, dur);
+                    }else{
+                        firebase.logEvent("ping失败", serverConfig.server, dur);
+                    }
                     if(!isReachable){
                         serverConfig = null;
                     }else {
-                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 5000);
+                        Pair<Boolean, Long> pair = isPortOpen(serverConfig.server, serverConfig.port, 2000);
                         if (pair.first) {
                             firebase.logEvent("连接测试成功", serverConfig.name, pair.second);
                         } else {
@@ -1046,7 +1052,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                 }
                 try {
-                    executorService.awaitTermination(20, TimeUnit.SECONDS);
+                    executorService.awaitTermination(30, TimeUnit.SECONDS);//时间不要超过timeouthander的时间
                 } catch (InterruptedException e) {
                     ShadowsocksApplication.handleException(e);
                 }
@@ -1093,11 +1099,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             ConnectivityActivity activity = mActivityReference.get();
             if(activity != null){
                 if(Thread.currentThread().isInterrupted()) return;
+                long t1 = System.currentTimeMillis();
                 boolean isReachable = activity.ping(mServerConfig.server);
+                long dur = System.currentTimeMillis() - t1;
+                if(isReachable){
+                    Firebase.getInstance(activity).logEvent("ping成功", mServerConfig.server, dur);
+                }else{
+                    Firebase.getInstance(activity).logEvent("ping失败", mServerConfig.server, dur);
+                }
                 if(Thread.currentThread().isInterrupted()) return;
-                Firebase.getInstance(activity).logEvent("ping", mServerConfig.server, String.valueOf(isReachable));
                 if (isReachable) {
-                    Pair<Boolean, Long> pair = activity.isPortOpen(mServerConfig.server, mServerConfig.port, 5000);
+                    Pair<Boolean, Long> pair = activity.isPortOpen(mServerConfig.server, mServerConfig.port, 2000);
                     if (pair.first) {
                         Message message = mHandler.obtainMessage();
                         message.obj = mServerConfig;
@@ -1151,7 +1163,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private boolean ping(String ipAddress){
-        int  timeOut =  3000 ;  //超时应该在3钞以上
+        int  timeOut =  2000 ;  //超时应该在3钞以上
         boolean status = false;
         try {
             status = InetAddress.getByName(ipAddress).isReachable(timeOut);     // 当返回值是true时，说明host是可用的，false则不可。
