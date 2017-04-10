@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Speed VPN</string>
+    <string name="facebook_app_id" translatable="false">1207655049289960</string>
+
+    <string name="vpn_name_opt" translatable="false">Global</string>
+    <string name="vpn_name_fr" translatable="false">Pairs</string>
+    <string name="vpn_name_jp" translatable="false">Tokyo</string>
+    <string name="vpn_name_uk" translatable="false">London</string>
+    <string name="vpn_name_mia_us" translatable="false">Miami</string>
+    <string name="vpn_name_la_us" translatable="false">Los Angeles</string>
+    <string name="vpn_name_au" translatable="false">Sydney</string>
+    <string name="vpn_name_da_us" translatable="false">Dallas</string>
+    <string name="vpn_name_de" translatable="false">Frankfurt</string>
+    <string name="vpn_name_sg" translatable="false">Singapore</string>
+    <string name="vpn_name_nl" translatable="false">Amsterdam</string>
+    <string name="vpn_name_chi_us" translatable="false">Chicago</string>
+    <string name="vpn_name_sea_us" translatable="false">Seattle</string>
+    <string name="vpn_name_alt_us" translatable="false">Atlanta</string>
+    <string name="vpn_name_ny_us" translatable="false">New York</string>
+    <string name="vpn_name_sv_us" translatable="false">Silicon Valley</string>
+    <string name="vpn_name_sj_us" translatable="false">San Jose</string>
+    <string name="vpn_name_pho_us" translatable="false">Phoenix</string>
+    <string name="vpn_name_buf_us" translatable="false">Buffalo</string>
+    <string name="vpn_name_mtl_ca" translatable="false">Montreal</string>
+
+    <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
+    <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>
+    <string name="vpn_server_jp" translatable="false">v6.vpnnest.com</string>
+    <string name="vpn_server_uk" translatable="false">v4.vpnnest.com</string>
+    <string name="vpn_server_mia_us" translatable="false">v3.vpnnest.com</string>
+    <string name="vpn_server_la_us" translatable="false">v5.vpnnest.com</string>
+    <string name="vpn_server_au" translatable="false">v8.vpnnest.com</string>
+    <string name="vpn_server_da_us" translatable="false">v9.vpnnest.com</string>
+    <string name="vpn_server_de" translatable="false">v10.vpnnest.com</string>
+    <string name="vpn_server_sg" translatable="false">v11.vpnnest.com</string>
+    <string name="vpn_server_nl" translatable="false">v12.vpnnest.com</string>
+</resources>
