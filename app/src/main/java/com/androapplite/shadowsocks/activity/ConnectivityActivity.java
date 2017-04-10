@@ -2,7 +2,6 @@ package com.androapplite.shadowsocks.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -45,7 +44,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
@@ -71,8 +69,6 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdStateListener;
 import com.bestgo.adsplugin.ads.AdType;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.System;
@@ -81,9 +77,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -121,7 +115,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private HashSet<ServerConfig> mErrorServers;
     private AlertDialog mExitAlert;
     private BroadcastReceiver mConnectCountChangedReceiver;
-    private boolean needToCheckNotification;
+    private boolean mNeedToCheckNotification;
 
 
     @Override
@@ -143,30 +137,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initForegroundBroadcastReceiver();
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.setAdStateListener(new AdStateListener() {
-            @Override
-            public void onAdClosed(AdType adType) {
-                switch (adType.getType()){
-                    case AdType.ADMOB_FULL:
-                    case AdType.FACEBOOK_FBN:
-                    case AdType.FACEBOOK_FULL:
-                        if(mCurrentState == Constants.State.CONNECTED && mExitAlert == null) {
-                            rotateAd();
-                        }
-                        if(needToCheckNotification){
-                            needToCheckNotification = false;
-                            notificationCheck();
-                        }
-                        break;
-                }
-            }
-        });
+        adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
 
         Firebase firebase = Firebase.getInstance(this);
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
             firebase.logEvent("广告","加载成功", "首页全屏刚进入");
-            needToCheckNotification = true;
+            mNeedToCheckNotification = true;
         }else{
             firebase.logEvent("广告","没有加载成功", "首页全屏刚进入");
             notificationCheck();
@@ -174,6 +151,39 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
         firebase.logEvent("屏幕","主屏幕");
+    }
+
+    private static class InterstitialAdStateListener extends AdStateListener{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+        InterstitialAdStateListener(ConnectivityActivity activity){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+        }
+
+        @Override
+        public void onAdClosed(AdType adType) {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                switch (adType.getType()){
+                    case AdType.ADMOB_FULL:
+                    case AdType.FACEBOOK_FBN:
+                    case AdType.FACEBOOK_FULL:
+                        if(activity.mCurrentState == Constants.State.CONNECTED && activity.mExitAlert == null) {
+                            activity.rotateAd();
+                        }
+                        if(activity.mNeedToCheckNotification){
+                            activity.mNeedToCheckNotification = false;
+                            activity.notificationCheck();
+                        }
+                        if(activity.mExitAlert == null){
+                            Firebase.getInstance(activity).logEvent("关闭广告", "刚进入主界面");
+                        }else{
+                            Firebase.getInstance(activity).logEvent("关闭广告", "准备退出主界面");
+                        }
+                        break;
+                }
+            }
+
+        }
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
