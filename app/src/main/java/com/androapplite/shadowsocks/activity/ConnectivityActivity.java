@@ -116,6 +116,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private AlertDialog mExitAlert;
     private BroadcastReceiver mConnectCountChangedReceiver;
     private boolean mNeedToCheckNotification;
+    private boolean mIsConnectButtonClicked;
 
 
     @Override
@@ -140,7 +141,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
 
         Firebase firebase = Firebase.getInstance(this);
-        if(adAppHelper.isFullAdLoaded()) {
+        if(adAppHelper.isAdSilent()){
+            firebase.logEvent("广告","第一天静默", "首页全屏刚进入");
+            notificationCheck();
+        }else if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
             firebase.logEvent("广告","加载成功", "首页全屏刚进入");
             mNeedToCheckNotification = true;
@@ -175,9 +179,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             activity.notificationCheck();
                         }
                         if(activity.mExitAlert == null){
-                            Firebase.getInstance(activity).logEvent("关闭广告", "刚进入主界面");
+                            if(activity.mIsConnectButtonClicked){
+                                Firebase.getInstance(activity).logEvent("关闭广告", "首页全屏连接成功");
+                            }else{
+                                Firebase.getInstance(activity).logEvent("关闭广告", "首页全屏刚进入");
+                            }
                         }else{
-                            Firebase.getInstance(activity).logEvent("关闭广告", "准备退出主界面");
+                            Firebase.getInstance(activity).logEvent("关闭广告", "首页全屏退出");
                         }
                         break;
                 }
@@ -318,7 +326,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     try {
                         if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
                             Firebase firebase = Firebase.getInstance(this);
-                            if(adAppHelper.isFullAdLoaded()) {
+                            if(adAppHelper.isAdSilent()){
+                                rotateAd();
+                                firebase.logEvent("广告", "第一天静默", "首页全屏连接成功");
+                            }else if(adAppHelper.isFullAdLoaded()) {
                                 adAppHelper.showFullAd();
                                 firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
                             }else{
@@ -525,7 +536,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
             final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
             Firebase firebase = Firebase.getInstance(this);
-            if(adAppHelper.isFullAdLoaded()){
+            if(adAppHelper.isAdSilent()){
+                firebase.logEvent("广告", "第一天静默", "首页全屏退出");
+            }else if(adAppHelper.isFullAdLoaded()){
                 adAppHelper.showFullAd();
                 firebase.logEvent("广告", "加载成功", "首页全屏退出");
             }else{
@@ -1228,6 +1241,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 disconnectFragment.show(getSupportFragmentManager(), "disconnect");
                 firebase.logEvent("连接VPN", "断开", mNewState.name());
             }
+            mIsConnectButtonClicked = true;
         }
 
     }
