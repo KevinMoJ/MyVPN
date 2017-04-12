@@ -60,7 +60,7 @@ public class ServerListFetcherService extends IntentService{
     private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl";
     private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl";
     private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
-    private static final String FIREBASE_HOST_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+    private static final String FIREBASE_HOST_URL = "https://flashlight35-6aae4.firebaseapp.com/fsl.json";
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
