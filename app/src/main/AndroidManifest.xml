@@ -116,7 +116,8 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.ServerListActivity"
             android:label="@string/server_list" />
-        <activity android:name="com.androapplite.shadowsocks.activity.ShareActivity" />
+        <activity android:name="com.androapplite.shadowsocks.activity.ShareActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
