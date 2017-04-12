@@ -51,15 +51,15 @@ import okio.Okio;
 
 public class ServerListFetcherService extends IntentService implements Handler.Callback{
     private boolean hasStart;
-    private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json";
-    private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json";
-    private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
-    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl";
-    private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl";
-    private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl";
-    private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl";
-    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
-    private static final String FIREBASE_HOST_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+    private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json1";
+    private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json1";
+    private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsli1";
+    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl111";
+    private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl1";
+    private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl1";
+    private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl1";
+    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json1";
+    private static final String FIREBASE_HOST_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json1";
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
@@ -267,27 +267,33 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                 if(urlKey == null){
                     urlKey = "没有匹配的url";
                 }
+                String jsonString = null;
+                String errMsg = null;
                 try {
                     Response response = service.mHttpClient.newCall(request).execute();
-                    long t2 = System.currentTimeMillis();
-                    firebase.logEvent("访问服务器列表成功", urlKey, t2-t1);
-                    String jsonString = response.body().string();
-                    if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
-                        Message message = service.mServerListFastFetchHandler.obtainMessage();
-                        message.obj = new Pair<String, String>(mUrl, jsonString);
-                        service.mServerListFastFetchHandler.sendMessage(message);
-                    }
-                } catch (IOException e) {
-                    long t2 = System.currentTimeMillis();
-
-                    firebase.logEvent("访问服务器列表失败", urlKey, t2 - t1);
-
-                    String errMsg = e.getMessage();
-                    if(errMsg != null) {
-                        firebase.logEvent("访问服务器列表失败", urlKey, errMsg);
+                    if(response.isSuccessful())
+                    {
+                        jsonString = response.body().string();
                     }else{
-                        firebase.logEvent("访问服务器列表失败", urlKey, e.toString());
+                        errMsg = response.message() + " " + response.code();
                     }
+                }catch (IOException e) {
+                    errMsg = e.getMessage();
+                    if(errMsg == null){
+                        errMsg = e.toString();
+                    }
+                }
+                long t2 = System.currentTimeMillis();
+                if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
+                    Message message = service.mServerListFastFetchHandler.obtainMessage();
+                    message.obj = new Pair<String, String>(mUrl, jsonString);
+                    service.mServerListFastFetchHandler.sendMessage(message);
+                    firebase.logEvent("访问服务器列表成功", urlKey, t2-t1);
+
+                }else{
+                    firebase.logEvent("访问服务器列表失败", urlKey, t2 - t1);
+                    if(errMsg == null) errMsg = "服务器列表JSON问题";
+                    firebase.logEvent("访问服务器列表失败", urlKey, errMsg);
                 }
             }
         }

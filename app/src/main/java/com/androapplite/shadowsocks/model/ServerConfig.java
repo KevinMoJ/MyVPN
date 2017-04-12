@@ -131,9 +131,13 @@ public class ServerConfig {
     }
 
     public static String shuffleRemoteConfig(){
-        String shuffleJsonString = null;
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         String jsonArrayString = remoteConfig.getString("server_list");
+        return shuffleStaticServerListJson(jsonArrayString);
+    }
+
+    public static String shuffleStaticServerListJson(String jsonArrayString){
+        String shuffleJsonString = null;
         Log.d("server_list", jsonArrayString);
         try {
             JSONObject jsonObject = new JSONObject(jsonArrayString);
@@ -164,6 +168,8 @@ public class ServerConfig {
         }
         return shuffleJsonString;
     }
+
+
 
     private static void swipePosition(JSONArray array, int pos1, int pos2){
         try {
