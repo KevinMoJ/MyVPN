@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -21,7 +22,10 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -135,10 +139,12 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                 }
             }
             try {
-                mGetFirstServerListService.awaitTermination(3500, TimeUnit.MILLISECONDS);
+                mGetFirstServerListService.awaitTermination(DOMAIN_URLS.size() * 500 + 2000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 ShadowsocksApplication.handleException(e);
             }
+            Log.d("FetchSeverList", "domain总时间：" + (System.currentTimeMillis() - t1));
+            //用ip获取服务器列表
             if(mServerListJsonString == null){
                 mGetFirstServerListService = Executors.newScheduledThreadPool(IP_URLS.size());
                 Collections.shuffle(IP_URLS);
@@ -152,13 +158,41 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                         }
                     }
                 }
+                try {
+                    mGetFirstServerListService.awaitTermination(IP_URLS.size() * 500 + 2000, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
             }
+            Log.d("FetchSeverList", "IP总时间：" + (System.currentTimeMillis() - t1));
 
-            try {
-                mGetFirstServerListService.awaitTermination(4000, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                ShadowsocksApplication.handleException(e);
+
+            //获取远程静态服务器列表
+            if(mServerListJsonString == null){
+                mGetFirstServerListService = Executors.newScheduledThreadPool(STATIC_HOST_URLS.size());
+                Collections.shuffle(STATIC_HOST_URLS);
+                for(int i = 0; i < STATIC_HOST_URLS.size(); i++){
+                    if(!mGetFirstServerListService.isShutdown()) {
+                        String url = STATIC_HOST_URLS.get(i);
+                        try {
+                            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i*500, TimeUnit.MILLISECONDS);
+                        }catch (RejectedExecutionException e){
+                            ShadowsocksApplication.handleException(e);
+                        }
+                    }
+                }
+                try {
+                    mGetFirstServerListService.awaitTermination(STATIC_HOST_URLS.size() * 500 + 2000, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+
+                if(mServerListJsonString != null){
+                    mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
+                }
             }
+            Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
+
             serverListFastFetchHandlerThread.quit();
 
             long t2 = System.currentTimeMillis();
@@ -168,13 +202,38 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             }
             //取结果
             if(mServerListJsonString != null){
-                editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).commit();
                 Firebase.getInstance(this).logEvent("取服务器列表成功总时间", urlKey, t2-t1);
             }else{
                 Firebase.getInstance(this).logEvent("取服务器列表失败总时间", t2-t1);
+            }
+
+            //使用remote config
+            if(mServerListJsonString == null){
                 mServerListJsonString = ServerConfig.shuffleRemoteConfig();
+            }
+
+            //使用本地静态服务器列表
+            if(mServerListJsonString == null){
+                AssetManager assetManager = getAssets();
+                try {
+                    InputStream inputStream = assetManager.open("fsl.json");
+                    InputStreamReader isr = new InputStreamReader(inputStream);
+                    BufferedReader br = new BufferedReader(isr);
+                    mServerListJsonString = br.readLine();
+                    if(mServerListJsonString != null){
+                        mServerListJsonString = ServerConfig.shuffleRemoteConfig();
+                    }
+
+                } catch (IOException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+
+            if(mServerListJsonString != null) {
                 editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).commit();
             }
+
+
             String localCountry = getResources().getConfiguration().locale.getDisplayCountry();
             TelephonyManager manager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
             String simOperator = manager.getSimOperator();
