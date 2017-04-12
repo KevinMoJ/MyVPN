@@ -15,6 +15,8 @@ import android.view.View;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 
 import java.io.File;
 
@@ -32,16 +34,17 @@ public class ShareActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(upArrow);
         Firebase.getInstance(this).logEvent("屏幕","分享屏幕");
     }
+    //https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dqrcode
 
-//    public void shareByFacebook(View view){
-//        ShareLinkContent content = new ShareLinkContent.Builder()
-//                .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.androapplite.shadowsocks&referrer=utm_source%3Dclient%26utm_medium%3Dfacebook"))
-//                .build();
-//
-//        ShareDialog shareDialog = new ShareDialog(this);
-//        shareDialog.show(content);
-//        GAHelper.sendEvent(this, "分享屏幕", "facebook分享");
-//    }
+    public void shareByFacebook(View view){
+        ShareLinkContent content = new ShareLinkContent.Builder()
+                .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dfacebook"))
+                .build();
+
+        ShareDialog shareDialog = new ShareDialog(this);
+        shareDialog.show(content);
+        Firebase.getInstance(this).logEvent("分享屏幕", "facebook分享");
+    }
 
     public void shareByBluetooth(View view){
         ApplicationInfo app = getApplication().getApplicationInfo();
@@ -58,7 +61,7 @@ public class ShareActivity extends AppCompatActivity {
     }
 
     public void moreShare(View view){
-        String url = "https://play.google.com/store/apps/details?id=com.androapplite.shadowsocks&referrer=utm_source%3Dclient%26utm_medium%3Dcommon";
+        String url = "https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dcommon";
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, url);
         shareIntent.setType("text/plain");

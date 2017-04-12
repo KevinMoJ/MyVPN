@@ -588,9 +588,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         if (id == R.id.nav_rate_us) {
             rateUs();
             firebase.logEvent("菜单", "给我们打分");
-//        } else if (id == R.id.nav_share) {
-//            share();
-//            GAHelper.sendEvent(this, "抽屉", "分享");
+        } else if (id == R.id.nav_share) {
+            share();
+            firebase.logEvent("抽屉", "分享");
         } else if (id == R.id.nav_contact_us) {
             contactUs();
             firebase.logEvent("菜单", "联系我们");
