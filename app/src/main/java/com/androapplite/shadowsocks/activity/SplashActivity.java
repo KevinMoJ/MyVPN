@@ -81,12 +81,10 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
             SplashActivity activity = mActivityReference.get();
             if(activity != null){
                 if(mAdAppHelper.isAdSilent()){
-                    int rand = new Random(1000).nextInt() + 1000;
+                    int rand = new Random().nextInt(1000) + 1000;
                     activity.mProgressbarAnimator.setDuration(rand);
-                    activity.mProgressbarAnimator.start();
                 }else if(mAdAppHelper.isFullAdLoaded()){
                     activity.mProgressbarAnimator.setDuration(100);
-                    activity.mProgressbarAnimator.start();
                 }else{
                     activity.mAdLoadedCheckHandler.postDelayed(activity.mAdLoadedCheckRunable, 1000);
                 }
