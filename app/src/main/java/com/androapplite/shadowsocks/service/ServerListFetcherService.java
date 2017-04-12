@@ -52,15 +52,15 @@ import okio.Okio;
 
 public class ServerListFetcherService extends IntentService{
     private boolean hasStart;
-    private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json1";
-    private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json1";
-    private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsli1";
-    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl111";
+    private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json";
+    private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json";
+    private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
+    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl";
     private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl";
-    private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl1";
-    private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl1";
-    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json1";
-    private static final String FIREBASE_HOST_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json1";
+    private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl";
+    private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl";
+    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+    private static final String FIREBASE_HOST_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
@@ -96,12 +96,13 @@ public class ServerListFetcherService extends IntentService{
         URL_KEY_MAP.put(FIREBASE_HOST_URL, "firebase_host");
 
     }
-//    private volatile ScheduledExecutorService mGetFirstServerListService;
+
+    private static final int DELAY_MILLI = 500;
+    private static final int TIMEOUT_MILLI = 2000;
+
     private String mServerListJsonString;
-//    private Handler serverListFastFetchHandler;
     private OkHttpClient mHttpClient;
     private String mUrl;
-    private volatile int mErrorCount;
 
     public ServerListFetcherService(){
         super("ServletListFetcher");
@@ -115,9 +116,9 @@ public class ServerListFetcherService extends IntentService{
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
             Cache cache = new Cache(getCacheDir(), 1024 * 1024);
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(2, TimeUnit.SECONDS)
-                    .readTimeout(2, TimeUnit.SECONDS)
-                    .writeTimeout(2, TimeUnit.SECONDS)
+                    .connectTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
+                    .readTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
+                    .writeTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
                     .cache(cache)
                     .addInterceptor(new UnzippingInterceptor());
             if(BuildConfig.DEBUG){
@@ -204,21 +205,20 @@ public class ServerListFetcherService extends IntentService{
 
     private void remoteFetchServerListParallel(HandlerThread handlerThread, ArrayList<String> urls){
         Collections.shuffle(urls);
-        mErrorCount = 0;
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(urls.size());
-        Handler handler = new Handler(handlerThread.getLooper(), new ServerListResultHandlerCallback(this, executorService));
+        Handler handler = new Handler(handlerThread.getLooper(), new ServerListResultHandlerCallback(this, executorService, urls));
         for(int i = 0; i < urls.size(); i++){
             if(!executorService.isShutdown()) {
                 String url = urls.get(i);
                 try {
-                    executorService.schedule(new FastFetchServerListRunnable(this, url, handler), i*500, TimeUnit.MILLISECONDS);
+                    executorService.schedule(new FastFetchServerListRunnable(this, url, handler), i*DELAY_MILLI, TimeUnit.MILLISECONDS);
                 }catch (RejectedExecutionException e){
                     ShadowsocksApplication.handleException(e);
                 }
             }
         }
         try {
-            executorService.awaitTermination(urls.size() * 500 + 2000, TimeUnit.MILLISECONDS);
+            executorService.awaitTermination(urls.size() * DELAY_MILLI + TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             ShadowsocksApplication.handleException(e);
         }
@@ -226,11 +226,16 @@ public class ServerListFetcherService extends IntentService{
     }
 
     private static class ServerListResultHandlerCallback implements Handler.Callback{
-        ExecutorService mExecutorService;
-        ServerListFetcherService mServerListFetcherService;
-        ServerListResultHandlerCallback(ServerListFetcherService fetcherService, ExecutorService executorService){
+        private ExecutorService mExecutorService;
+        private ServerListFetcherService mServerListFetcherService;
+        private ArrayList<String>  mUrls;
+        private int mErrorCount;
+        ServerListResultHandlerCallback(ServerListFetcherService fetcherService, ExecutorService executorService,
+                                        ArrayList<String> urls){
             mServerListFetcherService = fetcherService;
             mExecutorService = executorService;
+            mUrls = urls;
+            mErrorCount = 0;
         }
         @Override
         public boolean handleMessage(Message msg) {
@@ -244,18 +249,13 @@ public class ServerListFetcherService extends IntentService{
                 mExecutorService.shutdownNow();
                 Log.d("检查错误次数", "shutdown " + pair.first);
             }else{
-                mServerListFetcherService.mErrorCount++;
-                if(DOMAIN_URLS.contains(pair.first) && mServerListFetcherService.mErrorCount == DOMAIN_URLS.size()){
-                    mExecutorService.shutdown();
-                    mExecutorService.shutdownNow();
-                }else if(IP_URLS.contains(pair.first) && mServerListFetcherService.mErrorCount == IP_URLS.size()){
-                    mExecutorService.shutdown();
-                    mExecutorService.shutdownNow();
-                }else if(STATIC_HOST_URLS.contains(pair.first) && mServerListFetcherService.mErrorCount == STATIC_HOST_URLS.size()){
+                mErrorCount++;
+                if(mUrls.contains(pair.first) && mErrorCount == mUrls.size()){
                     mExecutorService.shutdown();
                     mExecutorService.shutdownNow();
                 }
-                Log.d("检查错误次数", mServerListFetcherService.mErrorCount + " " + pair.first);
+
+                Log.d("检查错误次数", mErrorCount + " " + pair.first);
             }
             return true;
         }
