@@ -55,7 +55,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
     private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json1";
     private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsli1";
     private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl111";
-    private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl1";
+    private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl";
     private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl1";
     private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl1";
     private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json1";
@@ -100,6 +100,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
     private Handler mServerListFastFetchHandler;
     private OkHttpClient mHttpClient;
     private String mUrl;
+    private volatile int mErrorCount;
 
     public ServerListFetcherService(){
         super("ServletListFetcher");
@@ -146,6 +147,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             Log.d("FetchSeverList", "domain总时间：" + (System.currentTimeMillis() - t1));
             //用ip获取服务器列表
             if(mServerListJsonString == null){
+                mErrorCount = 0;
                 mGetFirstServerListService = Executors.newScheduledThreadPool(IP_URLS.size());
                 Collections.shuffle(IP_URLS);
                 for(int i = 0; i < IP_URLS.size(); i++){
@@ -166,9 +168,9 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             }
             Log.d("FetchSeverList", "IP总时间：" + (System.currentTimeMillis() - t1));
 
-
             //获取远程静态服务器列表
             if(mServerListJsonString == null){
+                mErrorCount = 0;
                 mGetFirstServerListService = Executors.newScheduledThreadPool(STATIC_HOST_URLS.size());
                 Collections.shuffle(STATIC_HOST_URLS);
                 for(int i = 0; i < STATIC_HOST_URLS.size(); i++){
@@ -283,18 +285,21 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                         errMsg = e.toString();
                     }
                 }
-                long t2 = System.currentTimeMillis();
+                long dur = System.currentTimeMillis() - t1;
+                int result = 0;
                 if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
-                    Message message = service.mServerListFastFetchHandler.obtainMessage();
-                    message.obj = new Pair<String, String>(mUrl, jsonString);
-                    service.mServerListFastFetchHandler.sendMessage(message);
-                    firebase.logEvent("访问服务器列表成功", urlKey, t2-t1);
-
+                    firebase.logEvent("访问服务器列表成功", urlKey, dur);
+                    result = 1;
                 }else{
-                    firebase.logEvent("访问服务器列表失败", urlKey, t2 - t1);
+                    firebase.logEvent("访问服务器列表失败", urlKey, dur);
                     if(errMsg == null) errMsg = "服务器列表JSON问题";
                     firebase.logEvent("访问服务器列表失败", urlKey, errMsg);
                 }
+
+                Message message = service.mServerListFastFetchHandler.obtainMessage();
+                message.arg1 = result;
+                message.obj = new Pair<String, String>(mUrl, jsonString);
+                service.mServerListFastFetchHandler.sendMessage(message);
             }
         }
     }
@@ -353,13 +358,20 @@ public class ServerListFetcherService extends IntentService implements Handler.C
 
     @Override
     public boolean handleMessage(Message msg) {
-        if(mServerListJsonString == null){
-            Pair<String, String> pair = (Pair<String, String>)msg.obj;
-            mUrl = pair.first;
-            mServerListJsonString = pair.second;
+        Pair<String, String> pair = (Pair<String, String>)msg.obj;
+        if(msg.arg1 == 1){
+            if(mServerListJsonString == null){
+                mUrl = pair.first;
+                mServerListJsonString = pair.second;
+            }
+            mGetFirstServerListService.shutdown();
+            mGetFirstServerListService.shutdownNow();
+            Log.d("检查错误次数", "shutdown " + pair.first);
+        }else{
+            mErrorCount++;
+            Log.d("检查错误次数", mErrorCount + " " + pair.first);
         }
-        mGetFirstServerListService.shutdown();
-        mGetFirstServerListService.shutdownNow();
+
         return true;
     }
 }
