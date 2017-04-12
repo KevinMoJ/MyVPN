@@ -7,27 +7,33 @@
         <item
             android:id="@+id/nav_share"
             android:icon="@drawable/ic_share_24dp"
-            android:title="@string/tell_your_friends" />
+            android:title="@string/tell_your_friends"
+            android:checkable="false"/>
         <item
             android:id="@+id/nav_rate_us"
             android:icon="@drawable/ic_grade_24dp"
-            android:title="@string/like_us" />
+            android:title="@string/like_us"
+            android:checkable="false"
+            />
 
         <item
             android:id="@+id/nav_contact_us"
             android:icon="@drawable/ic_mode_comment_black_24dp"
             android:title="@string/feedback"
+            android:checkable="false"
             />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:title="@string/settings"
             android:visible="false"
+            android:checkable="false"
             />
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/about"
+            android:checkable="false"
             />
     </group>
 
