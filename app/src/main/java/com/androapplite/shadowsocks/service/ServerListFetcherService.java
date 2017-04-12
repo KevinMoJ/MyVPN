@@ -97,7 +97,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
     }
     private volatile ScheduledExecutorService mGetFirstServerListService;
     private String mServerListJsonString;
-    private Handler mServerListFastFetchHandler;
+//    private Handler serverListFastFetchHandler;
     private OkHttpClient mHttpClient;
     private String mUrl;
     private volatile int mErrorCount;
@@ -126,14 +126,15 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             mGetFirstServerListService = Executors.newScheduledThreadPool(DOMAIN_URLS.size());
             HandlerThread serverListFastFetchHandlerThread = new HandlerThread("serverListFastFetchHandlerThread");
             serverListFastFetchHandlerThread.start();
-            mServerListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
+            Handler serverListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
             long t1 = System.currentTimeMillis();
             Collections.shuffle(DOMAIN_URLS);
+            mErrorCount = 0;
             for(int i = 0; i < DOMAIN_URLS.size(); i++){
                 if(!mGetFirstServerListService.isShutdown()) {
                     String url = DOMAIN_URLS.get(i);
                     try {
-                        mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i*500, TimeUnit.MILLISECONDS);
+                        mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url, serverListFastFetchHandler), i*500, TimeUnit.MILLISECONDS);
                     }catch (RejectedExecutionException e){
                         ShadowsocksApplication.handleException(e);
                     }
@@ -144,17 +145,19 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             } catch (InterruptedException e) {
                 ShadowsocksApplication.handleException(e);
             }
+            serverListFastFetchHandler.removeCallbacksAndMessages(null);
             Log.d("FetchSeverList", "domain总时间：" + (System.currentTimeMillis() - t1));
             //用ip获取服务器列表
             if(mServerListJsonString == null){
                 mErrorCount = 0;
+                serverListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
                 mGetFirstServerListService = Executors.newScheduledThreadPool(IP_URLS.size());
                 Collections.shuffle(IP_URLS);
                 for(int i = 0; i < IP_URLS.size(); i++){
                     if(!mGetFirstServerListService.isShutdown()) {
                         String url = IP_URLS.get(i);
                         try {
-                            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i*500, TimeUnit.MILLISECONDS);
+                            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url, serverListFastFetchHandler), i*500, TimeUnit.MILLISECONDS);
                         }catch (RejectedExecutionException e){
                             ShadowsocksApplication.handleException(e);
                         }
@@ -166,18 +169,20 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                     ShadowsocksApplication.handleException(e);
                 }
             }
+            serverListFastFetchHandler.removeCallbacksAndMessages(null);
             Log.d("FetchSeverList", "IP总时间：" + (System.currentTimeMillis() - t1));
 
             //获取远程静态服务器列表
             if(mServerListJsonString == null){
                 mErrorCount = 0;
                 mGetFirstServerListService = Executors.newScheduledThreadPool(STATIC_HOST_URLS.size());
+                serverListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
                 Collections.shuffle(STATIC_HOST_URLS);
                 for(int i = 0; i < STATIC_HOST_URLS.size(); i++){
                     if(!mGetFirstServerListService.isShutdown()) {
                         String url = STATIC_HOST_URLS.get(i);
                         try {
-                            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i*500, TimeUnit.MILLISECONDS);
+                            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url, serverListFastFetchHandler), i*500, TimeUnit.MILLISECONDS);
                         }catch (RejectedExecutionException e){
                             ShadowsocksApplication.handleException(e);
                         }
@@ -193,6 +198,7 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                     mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
                 }
             }
+            serverListFastFetchHandler.removeCallbacksAndMessages(null);
             Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
 
             serverListFastFetchHandlerThread.quit();
@@ -249,16 +255,19 @@ public class ServerListFetcherService extends IntentService implements Handler.C
 
     private static class FastFetchServerListRunnable implements Runnable{
         private WeakReference<ServerListFetcherService> mServiceReference;
+        private WeakReference<Handler> mHandlerReference;
         private String mUrl;
-        FastFetchServerListRunnable(ServerListFetcherService service, String url){
+        FastFetchServerListRunnable(ServerListFetcherService service, String url, Handler handler){
             mServiceReference = new WeakReference<ServerListFetcherService>(service);
             mUrl = url;
+            mHandlerReference = new WeakReference<Handler>(handler);
         }
 
         @Override
         public void run() {
             ServerListFetcherService service = mServiceReference.get();
-            if(service != null){
+            Handler handler = mHandlerReference.get();
+            if(service != null && handler != null){
                 Request request = new Request.Builder()
                         .url(mUrl)
                         .addHeader("Accept-Encoding", "gzip")
@@ -296,10 +305,10 @@ public class ServerListFetcherService extends IntentService implements Handler.C
                     firebase.logEvent("访问服务器列表失败", urlKey, errMsg);
                 }
 
-                Message message = service.mServerListFastFetchHandler.obtainMessage();
+                Message message = handler.obtainMessage();
                 message.arg1 = result;
                 message.obj = new Pair<String, String>(mUrl, jsonString);
-                service.mServerListFastFetchHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         }
     }
@@ -369,6 +378,16 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             Log.d("检查错误次数", "shutdown " + pair.first);
         }else{
             mErrorCount++;
+            if(DOMAIN_URLS.contains(pair.first) && mErrorCount == DOMAIN_URLS.size()){
+                mGetFirstServerListService.shutdown();
+                mGetFirstServerListService.shutdownNow();
+            }else if(IP_URLS.contains(pair.first) && mErrorCount == IP_URLS.size()){
+                mGetFirstServerListService.shutdown();
+                mGetFirstServerListService.shutdownNow();
+            }else if(STATIC_HOST_URLS.contains(pair.first) && mErrorCount == STATIC_HOST_URLS.size()){
+                mGetFirstServerListService.shutdown();
+                mGetFirstServerListService.shutdownNow();
+            }
             Log.d("检查错误次数", mErrorCount + " " + pair.first);
         }
 
