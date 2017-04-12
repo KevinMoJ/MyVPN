@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
+import com.androapplite.shadowsocks.activity.SettingsActivity;
+import com.androapplite.shadowsocks.activity.ShareActivity;
 import com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver;
 import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
@@ -110,8 +112,17 @@ public class ShadowsocksApplication extends Application implements Application.A
     public void onActivityStopped(Activity activity) {
         mRunningActivityNum--;
         if(mRunningActivityNum == 0){
-            for(Activity activity1 : mActivitys){
-                activity1.finish();
+            boolean hasShareActivity = false;
+            for(Activity activity1: mActivitys){
+                if(activity1 instanceof ShareActivity){
+                    hasShareActivity = true;
+                    break;
+                }
+            }
+            if(!hasShareActivity) {
+                for (Activity activity1 : mActivitys) {
+                    activity1.finish();
+                }
             }
         }
     }
