@@ -31,6 +31,7 @@ import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.lang.ref.WeakReference;
+import java.util.Random;
 
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
@@ -79,7 +80,11 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         public void run() {
             SplashActivity activity = mActivityReference.get();
             if(activity != null){
-                if(mAdAppHelper.isFullAdLoaded()){
+                if(mAdAppHelper.isAdSilent()){
+                    int rand = new Random(1000).nextInt() + 1000;
+                    activity.mProgressbarAnimator.setDuration(rand);
+                    activity.mProgressbarAnimator.start();
+                }else if(mAdAppHelper.isFullAdLoaded()){
                     activity.mProgressbarAnimator.setDuration(100);
                     activity.mProgressbarAnimator.start();
                 }else{
