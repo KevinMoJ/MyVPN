@@ -5,10 +5,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -25,17 +21,11 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -59,22 +49,47 @@ public class ServerListFetcherService extends IntentService implements Handler.C
     private boolean hasStart;
     private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json";
     private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json";
-    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl";
     private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
-    private static final String EGPET_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
-    private static final String TURKEY_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
-    private static final ArrayList<String> FAST_URLS = new ArrayList<>();
+    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl";
+    private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl";
+    private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl";
+    private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl";
+    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+    private static final String FIREBASE_HOST_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+
+    private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
-        FAST_URLS.add(SGP_URL);
-        FAST_URLS.add(BOM_URL);
-        FAST_URLS.add(IP_URL);
+        DOMAIN_URLS.add(SGP_URL);
+        DOMAIN_URLS.add(BOM_URL);
+        DOMAIN_URLS.add(DOMAIN_URL);
     }
+    private static final ArrayList<String> IP_URLS = new ArrayList<>();
+    static {
+        IP_URLS.add(IP_URL);
+        IP_URLS.add(EGYPT_URL);
+        IP_URLS.add(TURKEY_URL);
+        IP_URLS.add(DUBAY_URL);
+    }
+
+    private static final ArrayList<String> STATIC_HOST_URLS = new ArrayList<>();
+    static {
+        STATIC_HOST_URLS.add(GITHUB_URL);
+        STATIC_HOST_URLS.add(FIREBASE_HOST_URL);
+    }
+
+
     private static final HashMap<String, String> URL_KEY_MAP = new HashMap<>();
     static {
         URL_KEY_MAP.put(SGP_URL, "sgp");
         URL_KEY_MAP.put(BOM_URL, "bom");
         URL_KEY_MAP.put(IP_URL, "ip");
         URL_KEY_MAP.put(DOMAIN_URL, "domain");
+        URL_KEY_MAP.put(EGYPT_URL, "egypt");
+        URL_KEY_MAP.put(TURKEY_URL, "turkey");
+        URL_KEY_MAP.put(DUBAY_URL, "dubay");
+        URL_KEY_MAP.put(GITHUB_URL, "github");
+        URL_KEY_MAP.put(FIREBASE_HOST_URL, "firebase_host");
+
     }
     private volatile ScheduledExecutorService mGetFirstServerListService;
     private String mServerListJsonString;
@@ -94,38 +109,58 @@ public class ServerListFetcherService extends IntentService implements Handler.C
             editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
             Cache cache = new Cache(getCacheDir(), 1024 * 1024);
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(5, TimeUnit.SECONDS)
-                    .writeTimeout(5, TimeUnit.SECONDS)
+                    .connectTimeout(2, TimeUnit.SECONDS)
+                    .readTimeout(2, TimeUnit.SECONDS)
+                    .writeTimeout(2, TimeUnit.SECONDS)
                     .cache(cache)
                     .addInterceptor(new UnzippingInterceptor());
             if(BuildConfig.DEBUG){
                 builder.addInterceptor(new LoggingInterceptor());
             }
             mHttpClient = builder.build();
-            Collections.shuffle(FAST_URLS);
-            mGetFirstServerListService = Executors.newScheduledThreadPool(FAST_URLS.size() + 1);
+            mGetFirstServerListService = Executors.newScheduledThreadPool(DOMAIN_URLS.size());
             HandlerThread serverListFastFetchHandlerThread = new HandlerThread("serverListFastFetchHandlerThread");
             serverListFastFetchHandlerThread.start();
             mServerListFastFetchHandler = new Handler(serverListFastFetchHandlerThread.getLooper(), this);
             long t1 = System.currentTimeMillis();
-            for(int i = 0; i < FAST_URLS.size(); i++){
+            Collections.shuffle(DOMAIN_URLS);
+            for(int i = 0; i < DOMAIN_URLS.size(); i++){
                 if(!mGetFirstServerListService.isShutdown()) {
-                    String url = FAST_URLS.get(i);
+                    String url = DOMAIN_URLS.get(i);
                     try {
-                        mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i, TimeUnit.SECONDS);
+                        mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i*500, TimeUnit.MILLISECONDS);
                     }catch (RejectedExecutionException e){
                         ShadowsocksApplication.handleException(e);
                     }
                 }
             }
-            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, DOMAIN_URL), FAST_URLS.size(), TimeUnit.SECONDS);
             try {
-                mGetFirstServerListService.awaitTermination(15, TimeUnit.SECONDS);
+                mGetFirstServerListService.awaitTermination(3500, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                ShadowsocksApplication.handleException(e);
+            }
+            if(mServerListJsonString == null){
+                mGetFirstServerListService = Executors.newScheduledThreadPool(IP_URLS.size());
+                Collections.shuffle(IP_URLS);
+                for(int i = 0; i < IP_URLS.size(); i++){
+                    if(!mGetFirstServerListService.isShutdown()) {
+                        String url = IP_URLS.get(i);
+                        try {
+                            mGetFirstServerListService.schedule(new FastFetchServerListRunnable(this, url), i*500, TimeUnit.MILLISECONDS);
+                        }catch (RejectedExecutionException e){
+                            ShadowsocksApplication.handleException(e);
+                        }
+                    }
+                }
+            }
+
+            try {
+                mGetFirstServerListService.awaitTermination(4000, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 ShadowsocksApplication.handleException(e);
             }
             serverListFastFetchHandlerThread.quit();
+
             long t2 = System.currentTimeMillis();
             String urlKey = URL_KEY_MAP.get(mUrl);
             if(urlKey == null){
