@@ -11,7 +11,7 @@
 
     <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=10000},{admob_en=-1}</string>
     <string name="banner_ctrl">{exe=1},{admob=10},{facebook=-1},{fbn=-1}</string>
-    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:0|adtype=0}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0},{banner_click=100},{ngs_click=100},{native_click=100},{home_delay_time=5000},{ad_silent=86400}</string>
+    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:0|adtype=0}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0},{banner_click=100},{ngs_click=100},{native_click=100},{home_delay_time=5000},{ad_silent=0}</string>
     <string name="resume_ctrl">{exe=0}</string>
     <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=10000}</string>
 
