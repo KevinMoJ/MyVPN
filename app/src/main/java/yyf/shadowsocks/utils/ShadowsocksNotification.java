@@ -25,10 +25,12 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.vpn3.R;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutorService;
 
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.service.BaseService;
@@ -245,15 +247,19 @@ public class ShadowsocksNotification {
                             .setSubText(null)
                             .setSmallIcon(R.drawable.notification_icon)
                     ;
-                    final Notification notification = sn.mBuilder.build();
-                    RemoteViews remoteViews = notification.contentView;
-                    if (sn.mRootView == null) {
-                        sn.mRootView = LayoutInflater.from(sn.mService).inflate(remoteViews.getLayoutId(), null);
+                    try {
+                        final Notification notification = sn.mBuilder.build();
+                        RemoteViews remoteViews = notification.contentView;
+                        if (sn.mRootView == null) {
+                            sn.mRootView = LayoutInflater.from(sn.mService).inflate(remoteViews.getLayoutId(), null);
+                        }
+                        remoteViews.setInt(sn.mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
+                        applyTextColorToRemoteViews(remoteViews, sn.mRootView, Color.WHITE);
+                        sn.mService.startForeground(1, notification);
+                        sn.mNotificationManager.cancel(2);
+                    }catch (Exception e){
+                        ShadowsocksApplication.handleException(e);
                     }
-                    remoteViews.setInt(sn.mRootView.getId(), "setBackgroundResource", R.color.notification_bg_connect);
-                    applyTextColorToRemoteViews(remoteViews, sn.mRootView, Color.WHITE);
-                    sn.mService.startForeground(1, notification);
-                    sn.mNotificationManager.cancel(2);
                 }
             }
         }
