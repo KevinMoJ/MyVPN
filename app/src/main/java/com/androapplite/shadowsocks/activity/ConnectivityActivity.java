@@ -728,7 +728,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 final ServerConfig serverConfig = activity.findVPNServer();
                 if(serverConfig != null) {
                     activity.mConnectingConfig = serverConfig;
-                    activity.prepareStartService();
+                    activity.runOnUiThread(new PrepareStartServiceOnMainThreadRunnable(activity));
                 }else{
                     boolean isValidation = ServerConfig.checkServerConfigJsonString(activity.mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null));
                     Firebase.getInstance(activity).logEvent("VPN连不上", "没有可用的服务器", "服务器列表合法 " + isValidation);
@@ -738,6 +738,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     activity.mErrorServers.clear();
                     activity.runOnUiThread(new NoAvailableServerErrorRunable(activity));
                 }
+            }
+        }
+    }
+
+    private static class PrepareStartServiceOnMainThreadRunnable implements Runnable{
+        private WeakReference<ConnectivityActivity> mActivityReference;
+        PrepareStartServiceOnMainThreadRunnable(ConnectivityActivity activity){
+            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
+        }
+
+        @Override
+        public void run() {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null){
+                activity.prepareStartService();
             }
         }
     }

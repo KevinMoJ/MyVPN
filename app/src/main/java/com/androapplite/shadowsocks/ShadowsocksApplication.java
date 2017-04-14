@@ -24,6 +24,7 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.lang.ref.WeakReference;
@@ -65,6 +66,7 @@ public class ShadowsocksApplication extends Application implements Application.A
         // Initialize the SDK before executing any other operations,
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEB
         registerActivityLifecycleCallbacks(this);
+        FirebaseApp.initializeApp(this);
         AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
         AdAppHelper.FIREBASE = Firebase.getInstance(this);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
