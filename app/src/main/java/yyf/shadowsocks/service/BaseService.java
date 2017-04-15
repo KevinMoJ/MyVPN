@@ -177,8 +177,10 @@ public abstract class BaseService extends VpnService {
                     intent.putExtra(SharedPreferenceKey.DURATION, c - mStartTime);
                 }
                 mStartTime = 0;
-                timer.cancel();
-                timer.purge();
+                if(timer != null) {
+                    timer.cancel();
+                    timer.purge();
+                }
                 break;
             case ERROR:
                 intent.setAction(Action.ERROR);
