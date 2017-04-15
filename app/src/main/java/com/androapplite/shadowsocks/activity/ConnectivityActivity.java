@@ -88,6 +88,10 @@ import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
 
+import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
+import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FBN;
+import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FULL;
+
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener,
@@ -117,6 +121,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private BroadcastReceiver mConnectCountChangedReceiver;
     private boolean mNeedToCheckNotification;
     private boolean mIsConnectButtonClicked;
+    private boolean mIsAdOpen;
 
 
     @Override
@@ -145,9 +150,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             firebase.logEvent("广告","第一天静默", "首页全屏刚进入");
             notificationCheck();
         }else if(adAppHelper.isFullAdLoaded()) {
-            adAppHelper.showFullAd();
-            firebase.logEvent("广告","加载成功", "首页全屏刚进入");
-            mNeedToCheckNotification = true;
+            if(!mIsAdOpen) {
+                adAppHelper.showFullAd();
+                mIsAdOpen = true;
+                firebase.logEvent("广告", "加载成功", "首页全屏刚进入");
+                mNeedToCheckNotification = true;
+            }
         }else{
             firebase.logEvent("广告","没有加载成功", "首页全屏刚进入");
             notificationCheck();
@@ -168,9 +176,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             ConnectivityActivity activity = mActivityReference.get();
             if(activity != null){
                 switch (adType.getType()){
-                    case AdType.ADMOB_FULL:
+                    case ADMOB_FULL:
                     case AdType.FACEBOOK_FBN:
                     case AdType.FACEBOOK_FULL:
+                        activity.mIsAdOpen = false;
                         if(activity.mCurrentState == Constants.State.CONNECTED && activity.mExitAlert == null) {
                             activity.rotateAd();
                         }
@@ -330,8 +339,11 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                                 rotateAd();
                                 firebase.logEvent("广告", "第一天静默", "首页全屏连接成功");
                             }else if(adAppHelper.isFullAdLoaded()) {
-                                adAppHelper.showFullAd();
-                                firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
+                                if(!mIsAdOpen) {
+                                    adAppHelper.showFullAd();
+                                    mIsAdOpen = true;
+                                    firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
+                                }
                             }else{
                                 rotateAd();
                                 firebase.logEvent("广告", "没有加载成功", "首页全屏连接成功");
