@@ -32,8 +32,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.jni.System;
@@ -560,7 +562,13 @@ public class ShadowsocksVpnService extends BaseService {
             lookup.setResolver(resolver);
             Record[] result = lookup.run();
             if (result == null)
-                return null;
+                try {
+                    String ip = InetAddress.getByName(host).getHostAddress();
+                    return ip;
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
+                    return  null;
+                }
             for (Record r : result) {
                 switch(addrType) {
                     case Type.A :
