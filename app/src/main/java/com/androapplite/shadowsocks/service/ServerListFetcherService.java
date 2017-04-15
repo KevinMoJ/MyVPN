@@ -67,6 +67,7 @@ public class ServerListFetcherService extends IntentService{
         DOMAIN_URLS.add(SGP_URL);
         DOMAIN_URLS.add(BOM_URL);
         DOMAIN_URLS.add(DOMAIN_URL);
+        DOMAIN_URLS.add(IP_URL);
     }
     private static final ArrayList<String> IP_URLS = new ArrayList<>();
     static {
@@ -98,7 +99,7 @@ public class ServerListFetcherService extends IntentService{
     }
 
     private static final int DELAY_MILLI = 500;
-    private static final int TIMEOUT_MILLI = 2000;
+    private static final int TIMEOUT_MILLI = 3000;
 
     private String mServerListJsonString;
     private OkHttpClient mHttpClient;
@@ -131,11 +132,11 @@ public class ServerListFetcherService extends IntentService{
             long t1 = System.currentTimeMillis();
             remoteFetchServerListParallel(serverListFastFetchHandlerThread, DOMAIN_URLS);
             Log.d("FetchSeverList", "domain总时间：" + (System.currentTimeMillis() - t1));
-            //用ip获取服务器列表
-            if(mServerListJsonString == null){
-                remoteFetchServerListParallel(serverListFastFetchHandlerThread, IP_URLS);
-            }
-            Log.d("FetchSeverList", "IP总时间：" + (System.currentTimeMillis() - t1));
+//            //用ip获取服务器列表
+//            if(mServerListJsonString == null){
+//                remoteFetchServerListParallel(serverListFastFetchHandlerThread, IP_URLS);
+//            }
+//            Log.d("FetchSeverList", "IP总时间：" + (System.currentTimeMillis() - t1));
 
             //获取远程静态服务器列表
             if(mServerListJsonString == null){
