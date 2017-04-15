@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 
 public class NotificationActionReceiver extends BroadcastReceiver {
@@ -19,7 +20,11 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 Firebase.getInstance(context).logEvent("通知", "打开app");
                 final Intent intent1 = new Intent(context, SplashActivity.class);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent1);
+                try {
+                    context.startActivity(intent1);
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
+                }
                 break;
             case Action.NOTIFICATION_DELETE:
                 Log.d("NotificationAction", "delete");
