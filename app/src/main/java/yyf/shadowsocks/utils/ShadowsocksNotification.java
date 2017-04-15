@@ -180,7 +180,23 @@ public class ShadowsocksNotification {
             applyTextColorToRemoteViews(remoteViews, mRootView, getColor(R.color.notification_text_about_disconnect));
             mService.startForeground(1, notification);
 
-            final Notification notification2 = mBuilder.build();
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mService)
+                    .setSmallIcon(R.drawable.notification_explain_marker)
+                    .setLargeIcon(notification.largeIcon)
+                    .setColor(getColor(R.color.notification_small_icon_bg_disconnect))
+                    .setContentTitle(mService.getString(R.string.app_name))
+                    .setContentIntent(mPendingIntent)
+                    .setContentText(mService.getString(R.string.notification_vpn_network_error1))
+                    .setSubText(mService.getString(R.string.notification_vpn_network_error2))
+                    .setFullScreenIntent(mPendingIntent, true)
+                    .setShowWhen(false)
+                    .setAutoCancel(true)
+                    ;
+            Notification notification2 = builder.build();
+            RemoteViews remoteViews2 = notification2.contentView;
+            View v2 = LayoutInflater.from(mService).inflate(remoteViews2.getLayoutId(), null);
+            remoteViews2.setInt(v2.getId(), "setBackgroundResource", R.color.notification_bg_disconnect);
+            applyTextColorToRemoteViews(remoteViews2, v2, getColor(R.color.notification_text_about_disconnect));
             mNotificationManager.notify(2, notification2);
             mNotificationManager.cancel(2);
 
