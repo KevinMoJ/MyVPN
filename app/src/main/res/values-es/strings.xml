@@ -37,6 +37,8 @@
     <string name="vpn_nation_nl">"Países Bajos"</string>
     <string name="vpn_nation_us">"Estados Unidos"</string>
     <string name="vpn_nation_ca">"Canadá"</string>
+    <string name="vpn_nation_lo_gl">Global</string>
+
 
     <string name="change_proxy_tip">"Por favor cambia proxy cuando la conexión está apagado."</string>
     <string name="not_start_vpn">"Conexión VPN se inicia. Por favor, inténtelo de nuevo."</string>

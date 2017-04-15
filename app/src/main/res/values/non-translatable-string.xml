@@ -23,6 +23,7 @@
     <string name="vpn_name_pho_us" translatable="false">Phoenix</string>
     <string name="vpn_name_buf_us" translatable="false">Buffalo</string>
     <string name="vpn_name_mtl_ca" translatable="false">Montreal</string>
+    <string name="vpn_name_lo_gl" translatable="false">Logl</string>
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
     <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>

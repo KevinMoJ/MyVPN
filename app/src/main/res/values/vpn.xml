@@ -21,6 +21,7 @@
         <item>@string/vpn_name_sj_us</item>
         <item>@string/vpn_name_pho_us</item>
         <item>@string/vpn_name_buf_us</item>
+        <item>@string/vpn_name_lo_gl</item>
     </array>
     <array name="vpn_servers" translatable="false">
         <item>@string/vpn_server_opt</item>
@@ -56,6 +57,7 @@
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_us</item>
         <item>@drawable/ic_flag_us</item>
+        <item>@drawable/ic_flag_lo_gl</item>
     </array>
 
     <array name="vpn_nations" translatable="false">
@@ -78,6 +80,7 @@
         <item>@string/vpn_nation_us</item>
         <item>@string/vpn_nation_us</item>
         <item>@string/vpn_nation_us</item>
+        <item>@string/vpn_nation_lo_gl</item>
     </array>
 
 </resources>
