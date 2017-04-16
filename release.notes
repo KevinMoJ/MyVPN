@@ -1,6 +1,8 @@
 1.2.4
     修复bug https://fabric.io/zhangs-projects10/android/apps/com.androapplite.vpn3/issues/58ef50630aeb16625b9e79a1?time=last-twenty-four-hours
     修复连接状态打开app广告弹出两次
+    本地列表部分用域名
+    升级广告 1.0.20
 1.2.3 -20170412
     修复ServiceExecutor导致的崩溃
     升级广告插件1.0.19

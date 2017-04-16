@@ -172,7 +172,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
 
         @Override
-        public void onAdClosed(AdType adType) {
+        public void onAdClosed(AdType adType, int index) {
             ConnectivityActivity activity = mActivityReference.get();
             if(activity != null){
                 switch (adType.getType()){
