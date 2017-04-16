@@ -13,6 +13,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -1075,9 +1076,41 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }
 
             if (serverConfig == null) {
-                final String global = getString(R.string.vpn_nation_opt);
-                final String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, global);
-                final boolean isGlobalOption = nation.equals(global);
+                final String defaultNation = getString(R.string.vpn_nation_opt);
+                String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, defaultNation);
+                //处理换语言的情况
+                if(!nation.equals(defaultNation)){
+                    TypedArray array = getResources().obtainTypedArray(R.array.vpn_nations);
+                    int i = 0;
+                    for(;i<array.length();i++){
+                        String n = array.getString(i);
+                        if(nation.equals(n)){
+                            break;
+                        }
+                    }
+                    if(i >= array.length()){
+                        nation = defaultNation;
+                        mSharedPreference.edit()
+                                .putString(SharedPreferenceKey.VPN_NATION, nation)
+                                .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
+                                .commit();
+                    }
+                }
+                //处理本地和服务器列表切换的问题
+                String defaultName = getString(R.string.vpn_name_opt);
+                String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
+                if(!name.equals(defaultName)){
+                    String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+                    if(serverlist != null && !serverlist.contains(name)){
+                        nation = defaultNation;
+                        mSharedPreference.edit()
+                                .putString(SharedPreferenceKey.VPN_NATION, nation)
+                                .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
+                                .commit();
+                    }
+                }
+
+                final boolean isGlobalOption = nation.equals(defaultNation);
                 ArrayList<ServerConfig> filteredConfigs = null;
                 if (isGlobalOption) {
                     filteredConfigs = serverConfigs;
