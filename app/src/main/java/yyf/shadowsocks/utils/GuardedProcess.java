@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.vpn3.BuildConfig;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,6 +35,11 @@ public class GuardedProcess extends Process {
         void callback();
     }
 
+    public  interface OutputReader{
+        void onReadOutput(String line);
+    }
+
+
     public GuardedProcess(String cmd){
         cmdPars = Arrays.asList(cmd.split("\\s+"));
         this.cmd = cmd;
@@ -57,7 +63,7 @@ public class GuardedProcess extends Process {
         cmd = sb.toString();
     }
 
-    public GuardedProcess start(final OnRestartCallback callback){
+    public GuardedProcess start(final OnRestartCallback callback, final OutputReader outputReader){
         final Semaphore semaphore = new Semaphore(1);
         try {
             semaphore.acquire();
@@ -77,8 +83,8 @@ public class GuardedProcess extends Process {
 
                                     final ProcessBuilder processBuilder = new ProcessBuilder(cmdPars).redirectErrorStream(true);
                                     process = processBuilder.start();
-                                    new StreamGobbler(process.getInputStream(), "OUTPUT").start();
-                                    new StreamGobbler(process.getErrorStream(), "ERROR").start();
+                                    new StreamGobbler(process.getInputStream(), "OUTPUT", outputReader).start();
+                                    new StreamGobbler(process.getErrorStream(), "ERROR", null).start();
                                     if (callback != null) {
                                         callback.callback();
                                     }
@@ -116,8 +122,8 @@ public class GuardedProcess extends Process {
     }
 
     private void destroyProcess(){
-        new StreamGobbler(process.getInputStream(), "OUTPUT").start();
-        new StreamGobbler(process.getErrorStream(), "ERROR").start();
+        new StreamGobbler(process.getInputStream(), "OUTPUT", null).start();
+        new StreamGobbler(process.getErrorStream(), "ERROR", null).start();
         try {
             process.waitFor();
         } catch (InterruptedException e) {
@@ -172,13 +178,15 @@ public class GuardedProcess extends Process {
         return 0;
     }
 
-    class StreamGobbler extends Thread {
-        InputStream is;
-        String type;
+    private static class StreamGobbler extends Thread {
+        private InputStream is;
+        private String type;
+        private OutputReader mOutputReader;
 
-        StreamGobbler(InputStream is, String type) {
+        StreamGobbler(InputStream is, String type, OutputReader outputReader) {
             this.is = is;
             this.type = type;
+            mOutputReader = outputReader;
         }
 
         public void run() {
@@ -186,8 +194,14 @@ public class GuardedProcess extends Process {
                 InputStreamReader isr = new InputStreamReader(is);
                 BufferedReader br = new BufferedReader(isr);
                 String line = null;
-                while ((line = br.readLine()) != null)
-                    System.out.println(type + ">" + line);
+                while ((line = br.readLine()) != null) {
+                    if (BuildConfig.DEBUG) {
+                        System.out.println(type + ">" + line);
+                    }
+                    if(mOutputReader != null){
+                        mOutputReader.onReadOutput(line);
+                    }
+                }
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }finally {

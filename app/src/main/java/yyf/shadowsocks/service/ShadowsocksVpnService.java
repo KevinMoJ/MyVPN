@@ -32,10 +32,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import yyf.shadowsocks.Config;
 import yyf.shadowsocks.jni.System;
@@ -130,7 +133,7 @@ public class ShadowsocksVpnService extends BaseService {
 
         //Log.d(TAG, cmd.mkString(" "));
 //        Console.runCommand(Console.mkCMD(cmd));
-        mSslocalProcess = new GuardedProcess(cmd).start(null);
+        mSslocalProcess = new GuardedProcess(cmd).start(null, null);
         ShadowsocksApplication.debug("ss-vpn", Console.mkCMD(cmd));
     }
 
@@ -161,7 +164,7 @@ public class ShadowsocksVpnService extends BaseService {
         //执行
         //Log.d(TAG, cmd.mkString(" "))
 //        Console.runCommand(Console.mkCMD(cmd));
-        mSstunnelProcess = new GuardedProcess(cmd).start(null);
+        mSstunnelProcess = new GuardedProcess(cmd).start(null, null);
 //        ShadowsocksApplication.debug("ss-vpn", "start DnsTun");
         ShadowsocksApplication.debug("ss-vpn", Console.mkCMD(cmd));
     }
@@ -178,14 +181,38 @@ public class ShadowsocksVpnService extends BaseService {
         printWriter.println(conf);
         printWriter.close();
 
-        String cmd = Constants.Path.BASE + "pdnsd -c " + Constants.Path.BASE + "pdnsd-vpn.conf";
+        String cmd = Constants.Path.BASE + "pdnsd --debug -c " + Constants.Path.BASE + "pdnsd-vpn.conf";
 
 //        Console.runCommand(cmd);
-        mPdnsdProcess = new GuardedProcess(cmd).start(null);
+        mPdnsdProcess = new GuardedProcess(cmd).start(null, new TrackDomain(this));
 //        ShadowsocksApplication.debug("ss-vpn", "start DnsDaemon");
         ShadowsocksApplication.debug("ss-vpn", cmd);
     }
 
+    private static class TrackDomain implements GuardedProcess.OutputReader{
+        private WeakReference<ShadowsocksVpnService> mReference;
+        private Pattern mPattern;
+        TrackDomain(ShadowsocksVpnService service){
+            mReference = new WeakReference<ShadowsocksVpnService>(service);
+            mPattern = Pattern.compile("query=\"([^\"]+)\"");
+        }
+
+        @Override
+        public void onReadOutput(String line) {
+            ShadowsocksVpnService service = mReference.get();
+            if(service != null) {
+                Matcher matcher = mPattern.matcher(line);
+                try {
+                    if (matcher.find()) {
+                        String domain = matcher.group(1);
+                        Firebase.getInstance(service).logEvent("域名", domain);
+                    }
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+        }
+    }
 
     String getVersionName(){
         String version = null;
@@ -274,7 +301,7 @@ public class ShadowsocksVpnService extends BaseService {
 
 
 //        Console.runCommand(cmd);
-        mTun2socksProcess = new GuardedProcess(cmd).start(null);
+        mTun2socksProcess = new GuardedProcess(cmd).start(null,null);
         sendFd(fd);
         ShadowsocksApplication.debug("ss-vpn", cmd);
 //        yyf.shadowsocks.jni.System.exec(cmd);
