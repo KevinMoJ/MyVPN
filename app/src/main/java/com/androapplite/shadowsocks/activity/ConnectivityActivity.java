@@ -231,23 +231,23 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 switch(action){
                     case Action.SERVER_LIST_FETCH_FINISH:
                         if(mFetchServerListProgressDialog != null){
-                            //双重保险
-                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
-                                if(serverListString != null) {
-                                    mSharedPreference.edit().putString(SharedPreferenceKey.SERVER_LIST, serverListString).apply();
-                                }
-                            }
-                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
-                                mFetchServerListProgressDialog.setOnDismissListener(null);
-                                Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
-                                Firebase.getInstance(context).logEvent("VPN连不上", "取服务器列表超时");
-                                increaseFailedCount();
-                                if(mConnectFragment != null && mConnectFragment.isVisible()){
-                                    mConnectFragment.updateUI();
-                                }
-                            }
                             mFetchServerListProgressDialog.dismiss();
                             mFetchServerListProgressDialog = null;
+                        }
+                        //双重保险
+                        if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
+                            if(serverListString != null) {
+                                mSharedPreference.edit().putString(SharedPreferenceKey.SERVER_LIST, serverListString).apply();
+                            }
+                        }
+                        if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
+                            mFetchServerListProgressDialog.setOnDismissListener(null);
+                            Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
+                            Firebase.getInstance(context).logEvent("VPN连不上", "取服务器列表超时");
+                            increaseFailedCount();
+                            if(mConnectFragment != null && mConnectFragment.isVisible()){
+                                mConnectFragment.updateUI();
+                            }
                         }
                         break;
                 }
