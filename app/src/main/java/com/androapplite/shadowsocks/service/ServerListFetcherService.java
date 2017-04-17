@@ -114,7 +114,7 @@ public class ServerListFetcherService extends IntentService{
         if(intent != null && !hasStart){
             hasStart = true;
             SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-            editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
+            editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
             Cache cache = new Cache(getCacheDir(), 1024 * 1024);
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
@@ -188,7 +188,7 @@ public class ServerListFetcherService extends IntentService{
             }
 
             if(mServerListJsonString != null) {
-                editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).commit();
+                editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).apply();
             }else{
                 urlKey = "没有任何可用的服务器列表";
             }

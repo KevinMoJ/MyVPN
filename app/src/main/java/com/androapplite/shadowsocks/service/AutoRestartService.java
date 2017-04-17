@@ -121,7 +121,7 @@ public class AutoRestartService extends Service implements ServiceConnection, Ha
             AutoRestartService service = mServiceReference.get();
             if(service != null && service.mState != state){
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(service);
-                sharedPreferences.edit().putInt(SharedPreferenceKey.VPN_STATE, state).commit();
+                sharedPreferences.edit().putInt(SharedPreferenceKey.VPN_STATE, state).apply();
                 service.mState = state;
                 if(state == Constants.State.CONNECTED.ordinal()){
                     TimeCountDownService.start(service);

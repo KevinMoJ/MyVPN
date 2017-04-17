@@ -214,7 +214,7 @@ public class ServerConfig {
                 .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, nation)
                 .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, signal)
                 .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT, port)
-                .commit();
+                .apply();
     }
 
     public static ServerConfig loadFromSharedPreference(SharedPreferences sharedPreferences){

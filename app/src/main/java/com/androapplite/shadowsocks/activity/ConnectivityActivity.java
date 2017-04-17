@@ -251,7 +251,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private void increaseFailedCount(){
         if(mSharedPreference != null){
             long failed = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0) + 1;
-            mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, failed).commit();
+            mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, failed).apply();
             Firebase.getInstance(this).logEvent("累计连接成功失败次数", "失败", String.valueOf(failed));
         }
     }
@@ -270,7 +270,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mSharedPreference.edit()
                     .putString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt))
                     .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
-                    .commit();
+                    .apply();
 
         }
     }
@@ -371,7 +371,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         if (mSharedPreference != null) {
                             mSharedPreference.edit()
                                     .putLong(com.androapplite.shadowsocks.preference.SharedPreferenceKey.CONNECT_TIME, System.currentTimeMillis())
-                                    .commit();
+                                    .apply();
                         }
                     }
                     if(mConnectFragment != null && mConnectingConfig != null ) {
@@ -1093,7 +1093,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         mSharedPreference.edit()
                                 .putString(SharedPreferenceKey.VPN_NATION, nation)
                                 .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
-                                .commit();
+                                .apply();
                     }
                 }
                 //处理本地和服务器列表切换的问题
@@ -1106,7 +1106,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         mSharedPreference.edit()
                                 .putString(SharedPreferenceKey.VPN_NATION, nation)
                                 .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
-                                .commit();
+                                .apply();
                     }
                 }
 
@@ -1323,7 +1323,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
-        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).commit();
+        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
     }
 
     @Override
@@ -1394,7 +1394,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             }else{
                 Firebase.getInstance(this).logEvent("通知设置", "禁用", "禁用首次发现");
             }
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, true).commit();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, true).apply();
 
             Snackbar.make(findViewById(R.id.coordinator),
                     R.string.enable_notification,
@@ -1402,7 +1402,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     .setAction(android.R.string.yes, this)
                     .show();
         }else{
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, false).commit();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, false).apply();
             if(isNotificationDisabledCheck){
                 Firebase.getInstance(this).logEvent("通知设置", "启用", "通过设置打开通知");
             }else{

@@ -87,7 +87,7 @@ public class TimeCountDownService extends Service implements ServiceConnection{
             unbindService(this);
         }
         //手工停止的重新计时
-        mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0).commit();
+        mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, 0).apply();
         super.onDestroy();
     }
 
@@ -108,20 +108,20 @@ public class TimeCountDownService extends Service implements ServiceConnection{
                 service.mLastTickTime = System.currentTimeMillis();
                 if(differ > 60 * 1000){
                     countDown += differ/1000;
-                    service.mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, countDown).commit();
+                    service.mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, countDown).apply();
 
                     service.m1hCountDown -= differ/1000;
                     if(service.m1hCountDown < 0){
                         service.m1hCountDown = 0;
                     }
                 }else{
-                    service.mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, ++countDown).commit();
+                    service.mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, ++countDown).apply();
                 }
 
                 if(--service.m1hCountDown <= 0){
                     service.sendTimeUpBroadcast();
                 }
-                service.mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, service.m1hCountDown).commit();
+                service.mSharedPreference.edit().putInt(SharedPreferenceKey.TIME_COUNT_DOWN, service.m1hCountDown).apply();
                 Log.d("CountDownService", "剩余时间 " + service.m1hCountDown);
             }
         }

@@ -23,6 +23,6 @@ public class ReportUseTimeReceiver extends BroadcastReceiver {
         }else if(useTime > lastUseTime){
             Firebase.getInstance(context).logEvent("使用时间", "非首次",useTime-lastUseTime);
         }
-        sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_USE_TIME, useTime).commit();
+        sharedPreferences.edit().putLong(SharedPreferenceKey.LAST_USE_TIME, useTime).apply();
     }
 }
