@@ -227,10 +227,17 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
+                String serverListString = intent.getStringExtra(SharedPreferenceKey.SERVER_LIST);
                 switch(action){
                     case Action.SERVER_LIST_FETCH_FINISH:
                         if(mFetchServerListProgressDialog != null){
-                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+                            //双重保险
+                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
+                                if(serverListString != null) {
+                                    mSharedPreference.edit().putString(SharedPreferenceKey.SERVER_LIST, serverListString).apply();
+                                }
+                            }
+                            if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
                                 mFetchServerListProgressDialog.setOnDismissListener(null);
                                 Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
                                 Firebase.getInstance(context).logEvent("VPN连不上", "取服务器列表超时");

@@ -329,7 +329,12 @@ public class ServerListFetcherService extends IntentService{
     }
 
     private void broadcastServerListFetchFinish(){
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.SERVER_LIST_FETCH_FINISH));
+        final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
+        if(mServerListJsonString != null){
+            //借用一下
+            intent.putExtra(SharedPreferenceKey.SERVER_LIST, mServerListJsonString);
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     static class LoggingInterceptor implements Interceptor {
