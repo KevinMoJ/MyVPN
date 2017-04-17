@@ -1,3 +1,5 @@
+1.2.5
+    用sharedpreference.editor.apply代替sharedpreference.commit
 1.2.4 - 20170416
     修复bug https://fabric.io/zhangs-projects10/android/apps/com.androapplite.vpn3/issues/58ef50630aeb16625b9e79a1?time=last-twenty-four-hours
     修复连接状态打开app广告弹出两次
