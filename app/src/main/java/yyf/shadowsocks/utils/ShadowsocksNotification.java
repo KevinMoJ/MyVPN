@@ -209,6 +209,7 @@ public class ShadowsocksNotification {
 
     private void showDisconnectStatus() {
         mBuilder.setContentText(mService.getString(R.string.notification_vpn_stop))
+                .setSubText(null)
                 .setColor(getColor(R.color.notification_small_icon_bg_disconnect));
         final Notification notification = mBuilder.build();
         RemoteViews remoteViews = notification.contentView;
