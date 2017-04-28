@@ -1,3 +1,5 @@
+1.2.6
+    升级adsplugin 1.0.23
 1.2.5
     用sharedpreference.editor.apply代替sharedpreference.commit
 1.2.4 - 20170416
