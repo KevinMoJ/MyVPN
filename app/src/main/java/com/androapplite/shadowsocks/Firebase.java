@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.bestgo.adsplugin.ads.AbstractFirebase;
+import com.bestgo.adsplugin.ads.analytics.AbstractFirebase;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 /**

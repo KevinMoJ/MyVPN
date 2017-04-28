@@ -19,7 +19,6 @@ import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AbstractFirebase;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
