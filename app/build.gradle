@@ -33,7 +33,7 @@ android {
         targetSdkVersion 22
         versionCode 26
         versionName "1.2.6"
-//        multiDexEnabled true
+        multiDexEnabled true
     }
     dexOptions {
         incremental true
@@ -69,7 +69,7 @@ dependencies {
     compile 'com.android.support:design:23.2.0'
     compile 'com.google.android.gms:play-services-ads:10.0.1'
 //    compile 'com.facebook.android:audience-network-sdk:4.8.1'
-    compile 'com.facebook.android:facebook-android-sdk:4.8.1'
+    compile 'com.facebook.android:facebook-android-sdk:4.20.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.joooonho:selectableroundedimageview:1.0.1'
 //    compile 'com.github.bumptech.glide:glide:3.7.0'
