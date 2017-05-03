@@ -36,7 +36,6 @@ android {
         multiDexEnabled true
     }
     dexOptions {
-        incremental true
         javaMaxHeapSize "4g"
     }
     project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
@@ -77,5 +76,6 @@ dependencies {
     compile 'com.google.firebase:firebase-core:10.0.1'
     compile project(path: ':ads')
     compile 'com.google.firebase:firebase-config:10.0.1'
+    compile 'com.android.support:multidex:1.0.1'
 }
 apply plugin: 'com.google.gms.google-services'

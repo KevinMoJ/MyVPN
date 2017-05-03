@@ -74,3 +74,5 @@
   public *;
 }
 -keepresourcexmlelements manifest/application/meta-data@value=GlideModule
+
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
