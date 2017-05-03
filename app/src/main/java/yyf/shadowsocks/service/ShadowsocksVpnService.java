@@ -108,7 +108,7 @@ public class ShadowsocksVpnService extends BaseService {
         //读取配置并写入文件
         String conf = String.format(Locale.ENGLISH,ConfigUtils.SHADOWSOCKS,
                 config.getProxy(), config.getRemotePort(), config.localPort,
-                config.getSitekey(), config.encMethod, 10);
+                config.getSitekey(), config.encMethod, 600);
         PrintWriter printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
@@ -123,7 +123,7 @@ public class ShadowsocksVpnService extends BaseService {
                 "-b", "127.0.0.1",
                 "-t", "600",
                 "-c", Constants.Path.BASE + "ss-local-vpn.conf",
-//                "-f", Constants.Path.BASE + "ss-local-vpn.pid"
+                "-n", "50"
         };
         //加入 acl
 //        List<String> list = new ArrayList<>(Arrays.asList(cmd));
