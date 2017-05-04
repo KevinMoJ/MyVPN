@@ -98,18 +98,21 @@ public class ShadowsocksVpnService extends BaseService {
 
     public void startShadowsocksDaemon() {
         //ACL 写入文件
-        //String[] acl =  getResources().getStringArray(R.array.private_route);
+        PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "acl.list"));
+        String[] acl =  getResources().getStringArray(R.array.private_route);
 //        String[] acl =  getResources().getStringArray(R.array.chn_route_full);
-//        PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "acl.list"));
-//        for (int i = 0; i < acl.length; i++)
-//            printWriter.println(acl[i]);
-//        printWriter.close();
+        for (int i = 0; i < acl.length; i++)
+            printWriter.println(acl[i]);
+        acl = getResources().getStringArray(R.array.bypass_websites);
+        for (int i = 0; i < acl.length; i++)
+            printWriter.println(acl[i]);
+        printWriter.close();
 
         //读取配置并写入文件
         String conf = String.format(Locale.ENGLISH,ConfigUtils.SHADOWSOCKS,
                 config.getProxy(), config.getRemotePort(), config.localPort,
                 config.getSitekey(), config.encMethod, 600);
-        PrintWriter printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
+        printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
 
@@ -123,13 +126,10 @@ public class ShadowsocksVpnService extends BaseService {
                 "-b", "127.0.0.1",
                 "-t", "600",
                 "-c", Constants.Path.BASE + "ss-local-vpn.conf",
-                "-n", "50"
+                "-n", "50",
+//                "--acl", Constants.Path.BASE + "acl.list"
         };
-        //加入 acl
-//        List<String> list = new ArrayList<>(Arrays.asList(cmd));
-//        list.add("--acl");
-//        list.add(Constants.Path.BASE + "acl.list");
-//        cmd = list.toArray(new String[0]);
+
 
         //Log.d(TAG, cmd.mkString(" "));
 //        Console.runCommand(Console.mkCMD(cmd));
