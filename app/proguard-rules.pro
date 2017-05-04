@@ -59,9 +59,11 @@
 -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 
 
--keep public class yyf.shadowsocks.**{*;}
--keep public class yyf.shadowsocks.service.**{*;}
--keep public class yyf.shadowsocks.jni.**{*;}
+-keep class yyf.shadowsocks.**{*;}
+-keep class yyf.shadowsocks.service.**{*;}
+-keep class yyf.shadowsocks.jni.**{*;}
+-keep class yyf.shadowsocks.utils.**{*;}
+
 
 #For design support library
 -keep class android.support.design.widget.** { *; }
