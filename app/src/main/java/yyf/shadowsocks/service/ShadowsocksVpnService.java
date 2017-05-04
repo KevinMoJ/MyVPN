@@ -97,22 +97,22 @@ public class ShadowsocksVpnService extends BaseService {
     }
 
     public void startShadowsocksDaemon() {
-        //ACL 写入文件
-        PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "acl.list"));
-        String[] acl =  getResources().getStringArray(R.array.private_route);
-//        String[] acl =  getResources().getStringArray(R.array.chn_route_full);
-        for (int i = 0; i < acl.length; i++)
-            printWriter.println(acl[i]);
-        acl = getResources().getStringArray(R.array.bypass_websites);
-        for (int i = 0; i < acl.length; i++)
-            printWriter.println(acl[i]);
-        printWriter.close();
+//        //ACL 写入文件
+//        PrintWriter printWriter = ConfigUtils.printToFile(new File(Constants.Path.BASE + "acl.list"));
+//        String[] acl =  getResources().getStringArray(R.array.private_route);
+////        String[] acl =  getResources().getStringArray(R.array.chn_route_full);
+//        for (int i = 0; i < acl.length; i++)
+//            printWriter.println(acl[i]);
+//        acl = getResources().getStringArray(R.array.bypass_websites);
+//        for (int i = 0; i < acl.length; i++)
+//            printWriter.println(acl[i]);
+//        printWriter.close();
 
         //读取配置并写入文件
         String conf = String.format(Locale.ENGLISH,ConfigUtils.SHADOWSOCKS,
                 config.getProxy(), config.getRemotePort(), config.localPort,
                 config.getSitekey(), config.encMethod, 600);
-        printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
+        PrintWriter printWriter =ConfigUtils.printToFile(new File(Constants.Path.BASE + "ss-local-vpn.conf"));
         printWriter.println(conf);
         printWriter.close();
 
