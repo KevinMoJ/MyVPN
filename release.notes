@@ -1,6 +1,7 @@
 1.2.6
     升级adsplugin 1.0.26
     facebook sdk升级到4.20.0和adsplugin保持一致
+    升级广告 1.0.36
 1.2.5
     用sharedpreference.editor.apply代替sharedpreference.commit
 1.2.4 - 20170416
