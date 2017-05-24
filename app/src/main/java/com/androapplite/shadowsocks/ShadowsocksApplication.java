@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.ConnectivityActivity;
@@ -26,6 +27,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.FirebaseApp;
 import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
@@ -67,6 +69,8 @@ public class ShadowsocksApplication extends Application implements Application.A
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
         if (BuildConfig.DEBUG) {
             //谷歌插页广告导致资源泄露
 //            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -82,8 +86,17 @@ public class ShadowsocksApplication extends Application implements Application.A
 //        mHelper = new IabHelper(this, base64EncodedPublicKey);
 //        mHelper.enableDebugLogging(BuildConfig.DEBUG);
         // Initialize the SDK before executing any other operations,
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
+        FirebaseApp.initializeApp(this);
+        AdAppHelper.FIREBASE = Firebase.getInstance(this);
+        AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
+//        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+//        int widthDp = (int) (displayMetrics.widthPixels / displayMetrics.density);
+//        AdAppHelper.NEWS_ADMOB_WIDTH = widthDp - 10;
+//        AdAppHelper.NEWS_TITLE_COLOR = Color.BLACK;
+//        AdAppHelper.NEWS_DETAIL_COLOR = Color.GRAY;
+//        AdAppHelper.NATIVE_ADMOB_WIDTH_LIST = getResources().getDimensionPixelOffset(R.dimen.half_standard_margin);
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        adAppHelper.init();
 //        FacebookSdk.setIsDebugEnabled(BuildConfig.DEBUG);
         registerActivityLifecycleCallbacks(this);
         AdAppHelper.getInstance(getApplicationContext()).init();
@@ -160,5 +173,11 @@ public class ShadowsocksApplication extends Application implements Application.A
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }
