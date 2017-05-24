@@ -1,32 +1,18 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <string name="cn_b_ctrl">{exe=1},{set=2},{admob=100},{facebook=-1},{fbn=-1}</string>
-    <string name="ad_ids">{admob=ca-app-pub-5330675173640052/3927500528},{admob_full=ca-app-pub-5330675173640052/1238580129 },{admob_n=ca-app-pub-5330675173640052/3927500528},{fb=504824046367667_534985530018185},{fb_f=504824046367667_534980353352036},{fb_n=504824046367667_534980353352036},{fbns=504824046367667_534980353352036,504824046367667_534980353352036}</string>
-    <int name="oc_ec" value="-1" />
-    <long name="umeng_net_report_interval" value="0" />
-    <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=-1}</string>
-    <string name="op_push">{id=103},{type=op},{pname=com.sevenstar.findeverything},{action=market://details?id=com.sevenstar.findeverything},{title=Are you there},{message=Welcome back, play the new puzzles!}</string>
-    <long name="oc_mdf_t" value="1487438426000" />
+    <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=-1},{admob_en=10000}</string>
     <string name="banner_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=-1}</string>
-    <long name="last_test_t" value="1487600903548" />
-    <string name="cn_ngs_ctrl">{exe=1},{set=2},{admob=100},{facebook=-1},{fbn=-1}</string>
-    <long name="oc_mdf_told" value="1487438426000" />
-    <string name="gift_ctrl">{exe=0},{before=video:1},{video=100},{ngs=100}</string>
-    <string name="dev_ctrl">{exe=0},{jump=1000},{dev=com.game.bubbleshooter.free,com.racergame.cityracinglite.free,com.gameone.jabbersuperjump,com.marbleage.free,com.games.solitaire.free,com.appgame7.fruitfrenzy,com.appgame7.candyfrenzy2,com.easygame.marblelegend,com.appgame7.friutslegend}</string>
-    <int name="umeng_net_report_policy" value="1" />
-    <string name="recommend_config">{&quot;enable&quot;:true,&quot;arr&quot;:[{&quot;imageUrl&quot;:&quot;https://s3-us-west-2.amazonaws.com/recommend-images/images/solitairev4.png&quot;,&quot;linkUrl&quot;:&quot;https://play.google.com/store/apps/details?id=com.solitaire.three.mobidev&amp;referrer=utm_source%3D2048V8%26utm_medium%3Dquit%26utm_campaign%3Dsolitaire&quot;}]}</string>
-    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:0|adtype=0}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0}</string>
-    <string name="silence_done">{slen_day=3},{push=0}</string>
-    <string name="resume_ctrl">{exe=1}</string>
-    <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=10000},{fbn=-1}</string>
-    <long name="oc_req_i" value="600000" />
+    <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:2000|adtype=0},{ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0},{banner_click=100},{native_click=100},{ngs_click=100},{home_delay_time=5000},{ad_silent=0}</string>
+    <string name="resume_ctrl">{exe=0}</string>
+    <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=-1}</string>
+    <string name="news_ctrl">{exe=1},{admob=100},{facebook=100}</string>
 
     <string name="banner_ids">{admob=ca-app-pub-5330675173640052/3927500528},{fb=504824046367667_534985530018185}</string>
     <string name="admob_full_ids">{count=1},{id1=ca-app-pub-5330675173640052/1238580129,全屏}</string>
     <string name="admob_banner_native_ids">{count=0}</string>
     <string name="fb_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
-    <string name="fbn_full_ids">{count=1},{id1=504824046367667_504825153034223,全屏}</string>
-    <string name="fbn_banner_ids">{count=1},{id1=504824046367667_504825153034223,全屏}</string>
+    <string name="fbn_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
+    <string name="fbn_banner_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
     <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2236626125,不确定}</string>
     <string name="fb_native_ids">{count=1},{id1=504824046367667_504825153034223,不确定}</string>
     <string name="native_size">{count=1},{id1=320,180}</string>

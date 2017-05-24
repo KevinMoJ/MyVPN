@@ -148,8 +148,9 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             Firebase.getInstance(this).logEvent("广告","没有加载成功", "首页全屏刚进入");
         }
         adAppHelper.setAdStateListener(new AdStateListener() {
+
             @Override
-            public void onAdClosed(AdType adType) {
+            public void onAdClosed(AdType adType, int index) {
                 switch (adType.getType()){
                     case AdType.ADMOB_FULL:
                     case AdType.FACEBOOK_FBN:
@@ -158,8 +159,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             rotateAd();
                         }
                         break;
-                }
-            }
+                }            }
         });
 
     }
@@ -363,13 +363,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void showRateUsFragment() {
-        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
-            if(fragment == null) {
-                mShowRateUsRunnable = new ShowRateUsRunnable(this);
-                getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
-            }
-        }
+//        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
+//            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
+//            if(fragment == null) {
+//                mShowRateUsRunnable = new ShowRateUsRunnable(this);
+//                getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
+//            }
+//        }
     }
 
     private static class ShowRateUsRunnable extends WeakReferenceRunnable<ConnectivityActivity>{
