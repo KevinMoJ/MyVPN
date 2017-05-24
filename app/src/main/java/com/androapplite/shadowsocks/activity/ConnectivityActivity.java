@@ -418,13 +418,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void showRateUsFragment() {
-        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
-            if(fragment == null) {
-                mShowRateUsRunnable = new ShowRateUsRunnable(this);
-                getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
-            }
-        }
+//        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
+//            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
+//            if(fragment == null) {
+//                mShowRateUsRunnable = new ShowRateUsRunnable(this);
+//                getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
+//            }
+//        }
     }
 
     private static class ShowRateUsRunnable implements Runnable{
