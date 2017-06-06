@@ -54,18 +54,18 @@ public class ServerListFetcherService extends IntentService{
     private boolean hasStart;
     private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json";
     private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json";
-    private static final String DOMAIN_URL = "http://s3c.vpnnest.com:8080/VPNServerList/fsl";
-    private static final String IP_URL = "http://23.20.85.166:8080/VPNServerList/fsl";
+    private static final String DOMAIN_URL = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+    private static final String IP_URL = "http://52.21.55.33:8080/VPNServerList/fsl";
     private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl";
     private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl";
     private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl";
-    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
-    private static final String FIREBASE_HOST_URL = "https://flashlight35-6aae4.firebaseapp.com/fsl.json";
+    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl-vpn1.json";
+    private static final String FIREBASE_HOST_URL = "https://flashlight35-6aae4.firebaseapp.com/fsl-vpn1.json";
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
-        DOMAIN_URLS.add(SGP_URL);
-        DOMAIN_URLS.add(BOM_URL);
+//        DOMAIN_URLS.add(SGP_URL);
+//        DOMAIN_URLS.add(BOM_URL);
         DOMAIN_URLS.add(DOMAIN_URL);
         DOMAIN_URLS.add(IP_URL);
     }
