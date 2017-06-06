@@ -1,3 +1,7 @@
+1.2.7
+    升级adsplugin版本: 1.0.37
+    广告高度150
+    程序进入后台不退出，除非是home键
 1.2.6
     升级adsplugin 1.0.26
     facebook sdk升级到4.20.0和adsplugin保持一致
