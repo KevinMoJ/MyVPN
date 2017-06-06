@@ -55,7 +55,6 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
-import com.androapplite.shadowsocks.fragment.RateUsFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -90,12 +89,10 @@ import yyf.shadowsocks.IShadowsocksServiceCallback;
 import yyf.shadowsocks.utils.Constants;
 
 import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
-import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FBN;
-import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FULL;
 
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener,
+        ConnectFragment.OnConnectActionListener,
         DisconnectFragment.OnDisconnectActionListener, View.OnClickListener{
 
     private IShadowsocksService mShadowsocksService;
@@ -427,36 +424,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 //        }
     }
 
-    private static class ShowRateUsRunnable implements Runnable{
-        private WeakReference<ConnectivityActivity> mActivityReference;
-
-        ShowRateUsRunnable(ConnectivityActivity activity){
-            mActivityReference = new WeakReference<ConnectivityActivity>(activity);
-        }
-
-        @Override
-        public void run() {
-            ConnectivityActivity activity = mActivityReference.get();
-            if(activity != null){
-                try {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        if (!activity.isDestroyed()) {
-                            activity.getSupportFragmentManager().beginTransaction()
-                                    .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                                    .commitAllowingStateLoss();
-                        }
-                    } else {
-                        activity.getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.rate_us_frame_layout, RateUsFragment.newInstance())
-                                .commitAllowingStateLoss();
-                    }
-                }catch (Exception e){
-                    ShadowsocksApplication.handleException(e);
-                }
-            }
-        }
-    }
 
     private ServiceConnection createShadowsocksServiceConnection(){
         return new ServiceConnection() {
@@ -1311,32 +1278,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mIsConnectButtonClicked = true;
         }
 
-    }
-
-    @Override
-    public void onCloseRateUs(final RateUsFragment fragment) {
-        remoeRateUsFragment(fragment);
-    }
-
-    private void remoeRateUsFragment(RateUsFragment fragment) {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                if (!isDestroyed()) {
-                    getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
-                }
-            } else {
-                getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
-            }
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
-        }
-        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, true).apply();
-    }
-
-    @Override
-    public void onRateUs(final RateUsFragment fragment) {
-        remoeRateUsFragment(fragment);
-        rateUs();
     }
 
     @Override
