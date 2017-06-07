@@ -308,7 +308,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         startUp = true;
                         adAppHelper.loadNewInterstitial();
                         adAppHelper.loadNewNative();
-                        adAppHelper.loadNewBanner();
+//                        adAppHelper.loadNewBanner();
                     }
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);

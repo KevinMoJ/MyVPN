@@ -13,7 +13,7 @@
     <string name="fb_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
     <string name="fbn_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
     <string name="fbn_banner_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
-    <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2236626125,不确定}</string>
+    <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/1014216123,不确定}</string>
     <string name="fb_native_ids">{count=1},{id1=504824046367667_504825153034223,不确定}</string>
     <string name="native_size">{count=1},{id1=320,80}</string>
 </map>

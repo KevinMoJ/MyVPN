@@ -51,7 +51,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
         adAppHelper.loadNewInterstitial();
-        adAppHelper.loadNewBanner();
+//        adAppHelper.loadNewBanner();
         adAppHelper.loadNewNative();
 
         mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
