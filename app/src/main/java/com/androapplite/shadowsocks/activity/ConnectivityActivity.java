@@ -134,13 +134,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mErrorServers = new HashSet<>();
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            container.addView(adAppHelper.getBanner(), params);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+
         if(adAppHelper.isFullAdLoaded()) {
             adAppHelper.showFullAd();
             Firebase.getInstance(this).logEvent("广告","加载成功", "首页全屏刚进入");
@@ -823,7 +817,18 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     protected void onResume() {
         AdAppHelper.getInstance(getApplicationContext()).onResume();
         super.onResume();
+        addBottomAd();
 
+    }
+
+    private void addBottomAd() {
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(AdAppHelper.getInstance(this).getNative(), params);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -1123,6 +1128,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
 
     @Override
     public void onCancel(DisconnectFragment disconnectFragment) {
+        addBottomAd();
         Firebase.getInstance(this).logEvent( "连接VPN", "断开", "取消断开");
     }
 
@@ -1130,6 +1136,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         disconnectVpnServiceAsync();
         Firebase.getInstance(this).logEvent( "连接VPN", "断开", "确认断开");
+        addBottomAd();
     }
 
     private void rotateAd(){

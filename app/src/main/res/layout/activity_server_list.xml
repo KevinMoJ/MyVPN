@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ad_view_container"
-            android:layout_marginBottom="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/half_standard_margin"
             >
         </FrameLayout>
     </LinearLayout>

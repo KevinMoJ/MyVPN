@@ -38,12 +38,15 @@ import io.fabric.sdk.android.Fabric;
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks{
+public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks
+    ,HomeWatcher.OnHomePressedListener{
     private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
     private int mRunningActivityNum;
     private ArrayList<Activity> mActivitys;
+    private HomeWatcher mHomeWathcer;
+    private boolean mIsHomeKeyPressed;
 
     @NonNull
     public Tracker getTracker(){
@@ -104,6 +107,9 @@ public class ShadowsocksApplication extends Application implements Application.A
         reportDailyUseTime();
         AutoRestartService.startService(this);
 
+        mHomeWathcer = new HomeWatcher(this);
+        mHomeWathcer.setOnHomePressedListener(this);
+
     }
 
     public static final void debug(@NonNull String tag, @NonNull String msg){
@@ -123,6 +129,9 @@ public class ShadowsocksApplication extends Application implements Application.A
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         mActivitys.add(activity);
+        if(mActivitys.size() == 1){
+            mHomeWathcer.startWatch();
+        }
     }
 
     @Override
@@ -144,9 +153,12 @@ public class ShadowsocksApplication extends Application implements Application.A
     public void onActivityStopped(Activity activity) {
         mRunningActivityNum--;
         if(mRunningActivityNum == 0){
-            for(Activity activity1 : mActivitys){
-                activity1.finish();
+            if(mIsHomeKeyPressed){
+                for (Activity activity1 : mActivitys) {
+                    activity1.finish();
+                }
             }
+            mIsHomeKeyPressed = false;
         }
 
     }
@@ -159,6 +171,9 @@ public class ShadowsocksApplication extends Application implements Application.A
     @Override
     public void onActivityDestroyed(Activity activity) {
         mActivitys.remove(activity);
+        if(mActivitys.isEmpty()){
+            mHomeWathcer.stopWatch();
+        }
     }
 
     public void reportDailyUseTime(){
@@ -179,5 +194,16 @@ public class ShadowsocksApplication extends Application implements Application.A
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+    }
+
+
+    @Override
+    public void onHomePressed() {
+        mIsHomeKeyPressed = true;
+    }
+
+    @Override
+    public void onHomeLongPressed() {
+
     }
 }

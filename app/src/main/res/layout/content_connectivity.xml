@@ -13,7 +13,8 @@
         android:layout_height="match_parent"
         android:name="com.androapplite.shadowsocks.fragment.ConnectFragment"
         tools:layout="@layout/fragment_connect"
-        android:id="@+id/connect_fragment"/>
+        android:id="@+id/connect_fragment"
+        android:layout_above="@id/ad_view_container"/>
     
     <!--<fragment-->
         <!--android:layout_width="match_parent"-->
@@ -33,7 +34,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:id="@+id/ad_view_container">
 <!-- todo 显示横幅广告 -->
