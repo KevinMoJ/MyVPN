@@ -15,6 +15,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -36,11 +37,12 @@ import java.util.Random;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
 
-public class SplashActivity extends BaseShadowsocksActivity implements ServiceConnection {
+public class SplashActivity extends BaseShadowsocksActivity implements ServiceConnection
+        ,Handler.Callback{
     private IShadowsocksService mShadowsocksService;
     private Handler mAdLoadedCheckHandler;
-    private Runnable mAdLoadedCheckRunable;
     private ObjectAnimator mProgressbarAnimator;
+    private static final int MSG_CHECK_ADS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,37 +62,23 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         adAppHelper.loadNewInterstitial();
         adAppHelper.loadNewNative();
 
-        mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
-        mAdLoadedCheckHandler = new Handler();
-        mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
+        mAdLoadedCheckHandler = new Handler(this);
+        mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_CHECK_ADS, 1000);
         Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
         AutoRestartService.startService(this);
     }
 
-    private static class AdLoadedCheckRunnable implements Runnable{
-        private WeakReference<SplashActivity> mActivityReference;
-        private AdAppHelper mAdAppHelper;
-
-        AdLoadedCheckRunnable(SplashActivity activity, AdAppHelper adAppHelper){
-            mActivityReference = new WeakReference<SplashActivity>(activity);
-            mAdAppHelper = adAppHelper;
-        }
-
-        @Override
-        public void run() {
-            SplashActivity activity = mActivityReference.get();
-            if(activity != null){
-                if(mAdAppHelper.isAdSilent()){
-                    int rand = new Random().nextInt(1000) + 1000;
-                    activity.mProgressbarAnimator.setDuration(rand);
-                }else if(mAdAppHelper.isFullAdLoaded()){
-                    activity.mProgressbarAnimator.setDuration(100);
-                }else{
-                    activity.mAdLoadedCheckHandler.postDelayed(activity.mAdLoadedCheckRunable, 1000);
-                }
+    @Override
+    public boolean handleMessage(Message msg) {
+        if(msg.what == MSG_CHECK_ADS){
+            final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
+            if(adAppHelper.isFullAdLoaded() && adAppHelper.isNativeLoaded()){
+                mProgressbarAnimator.setDuration(100);
+            }else {
+                mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_CHECK_ADS, 1000);
             }
-
         }
+        return true;
     }
 
     private void startProgressBarAnimation(){
@@ -146,7 +134,7 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
     protected void onDestroy() {
         super.onDestroy();
         unbindService(this);
-        mAdLoadedCheckHandler.removeCallbacks(mAdLoadedCheckRunable);
+        mAdLoadedCheckHandler.removeCallbacksAndMessages(null);
     }
 
     @Override
