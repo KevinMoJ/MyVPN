@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -55,20 +56,45 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 //        ShadowsockServiceHelper.startService(this);
         startProgressBarAnimation();
 
-
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
-        adAppHelper.loadNewInterstitial();
-        adAppHelper.loadNewNative();
-
         mAdLoadedCheckHandler = new Handler(this);
         mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_CHECK_ADS, 1000);
         Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
         AutoRestartService.startService(this);
 
-        int state = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
+        final SharedPreferences preferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        int state = preferences.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
         mState = Constants.State.values()[state];
         if(mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR){
             ServerListFetcherService.fetchServerListAsync(this);
+        }
+
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
+        boolean shouldLoadAd = true;
+        if(mState == Constants.State.CONNECTED){
+            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
+            String city = preferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+            if(city != null){
+                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
+                float chance = 1;
+                try {
+                    chance = Float.parseFloat(chanceString);
+                    if(chance < 0){
+                        chance = 0;
+                    }else if(chance > 1){
+                        chance = 1;
+                    }
+                }catch (Exception e){
+                    chance = 1;
+                }
+
+                float random = (float) Math.random();
+                shouldLoadAd = random < chance;
+            }
+        }
+
+        if(shouldLoadAd){
+            adAppHelper.loadNewInterstitial();
+            adAppHelper.loadNewNative();
         }
     }
 
