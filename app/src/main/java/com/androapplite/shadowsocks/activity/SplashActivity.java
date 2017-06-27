@@ -18,11 +18,14 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ProgressBar;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsockServiceHelper;
@@ -37,24 +40,19 @@ import java.util.Random;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
 
-public class SplashActivity extends BaseShadowsocksActivity implements ServiceConnection
-        ,Handler.Callback{
-    private IShadowsocksService mShadowsocksService;
+public class SplashActivity extends AppCompatActivity implements Handler.Callback{
     private Handler mAdLoadedCheckHandler;
     private ObjectAnimator mProgressbarAnimator;
     private static final int MSG_CHECK_ADS = 1;
+    private Constants.State mState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        initBackgroundReceiver();
-        initBackgroundReceiverIntentFilter();
-
         checkAndCopyAsset();
 //        ShadowsockServiceHelper.startService(this);
-        ShadowsockServiceHelper.bindService(this, this);
         startProgressBarAnimation();
 
 
@@ -66,6 +64,12 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_CHECK_ADS, 1000);
         Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
         AutoRestartService.startService(this);
+
+        int state = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
+        mState = Constants.State.values()[state];
+        if(mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR){
+            ServerListFetcherService.fetchServerListAsync(this);
+        }
     }
 
     @Override
@@ -112,49 +116,9 @@ public class SplashActivity extends BaseShadowsocksActivity implements ServiceCo
         }.start();
     }
 
-    private void initBackgroundReceiver(){
-        mBackgroundReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                final String action = intent.getAction();
-                if(action.equals(Action.CONNECTION_ACTIVITY_SHOW) || action.equals(Action.NEW_USER_GUIDE_ACTIVITY_SHOW)){
-                    finish();
-                }
-            }
-        };
-    }
-
-    private void initBackgroundReceiverIntentFilter(){
-        mBackgroundReceiverIntentFilter = new IntentFilter();
-        mBackgroundReceiverIntentFilter.addAction(Action.CONNECTION_ACTIVITY_SHOW);
-        mBackgroundReceiverIntentFilter.addAction(Action.NEW_USER_GUIDE_ACTIVITY_SHOW);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(this);
         mAdLoadedCheckHandler.removeCallbacksAndMessages(null);
     }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
-        try {
-            int s = mShadowsocksService.getState();
-            Constants.State state = Constants.State.values()[s];
-            if(state == Constants.State.INIT || state == Constants.State.STOPPED || state == Constants.State.ERROR){
-                ServerListFetcherService.fetchServerListAsync(this);
-            }
-        } catch (RemoteException e) {
-            ShadowsocksApplication.handleException(e);
-        }
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        mShadowsocksService = null;
-    }
-
-
 }
