@@ -41,7 +41,7 @@ import java.util.Random;
 import yyf.shadowsocks.IShadowsocksService;
 import yyf.shadowsocks.utils.Constants;
 
-public class SplashActivity extends AppCompatActivity implements Handler.Callback{
+public class SplashActivity extends AppCompatActivity implements Handler.Callback, Animator.AnimatorListener{
     private Handler mAdLoadedCheckHandler;
     private ObjectAnimator mProgressbarAnimator;
     private static final int MSG_CHECK_ADS = 1;
@@ -53,7 +53,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         setContentView(R.layout.activity_splash);
 
         checkAndCopyAsset();
-//        ShadowsockServiceHelper.startService(this);
         startProgressBarAnimation();
 
         mAdLoadedCheckHandler = new Handler(this);
@@ -117,13 +116,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
         mProgressbarAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
         mProgressbarAnimator.setDuration(5000);
-        mProgressbarAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
-                finish();
-            }
-        });
+        mProgressbarAnimator.addListener(this);
         mProgressbarAnimator.start();
 
     }
@@ -146,5 +139,26 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     protected void onDestroy() {
         super.onDestroy();
         mAdLoadedCheckHandler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    public void onAnimationStart(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+        startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onAnimationCancel(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animation) {
+
     }
 }
