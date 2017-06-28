@@ -77,6 +77,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
             final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
             mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
             mUpdateStateHandler.sendEmptyMessageDelayed(MSG_ONE_SECOND, 1000);
+            mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
+
         }
         return true;
     }
@@ -159,31 +161,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
         mState = state;
         updateUI();
     }
-
-
-//    private static class UpdateStateDelayedRunable implements Runnable{
-//        private WeakReference<ConnectFragment> mFragmentReference;
-//        private Constants.State mState;
-//
-//        UpdateStateDelayedRunable(ConnectFragment fragment, Constants.State state){
-//            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
-//            mState = state;
-//        }
-//
-//        @Override
-//        public void run() {
-//            ConnectFragment fragment = mFragmentReference.get();
-//            if(fragment != null){
-//                fragment.setConnectResult(mState);
-//                fragment.mUpdateStateHandler.removeCallbacks(fragment.mUpdateStateDelayedRunable);
-//                fragment.mUpdateStateHandler = null;
-//                fragment.mUpdateStateDelayedRunable = null;
-//            }
-//        }
-//
-//
-//    }
-
+    
     private void init(){
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
@@ -202,40 +180,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
         mConnectButton.setText(R.string.disconnect);
         long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
-    }
-
-    private static class CountDownTimerTask extends TimerTask{
-        private WeakReference<ConnectFragment> mFragmentReference;
-
-        CountDownTimerTask(ConnectFragment fragment){
-            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
-        }
-
-        @Override
-        public void run() {
-            ConnectFragment fragment = mFragmentReference.get();
-            if(fragment != null){
-                fragment.mMessageTextView.post(new UpdateRunnable(fragment));
-            }
-        }
-
-        private static class UpdateRunnable implements Runnable{
-            private WeakReference<ConnectFragment> mFragmentReference;
-
-            UpdateRunnable(ConnectFragment fragment){
-                mFragmentReference = new WeakReference<ConnectFragment>(fragment);
-            }
-
-            @Override
-            public void run() {
-                ConnectFragment fragment = mFragmentReference.get();
-                if(fragment != null && fragment.isVisible()){
-                    final long countDown = fragment.mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-                    fragment.mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
-                    fragment.mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
-                }
-            }
-        }
     }
 
     private void stopFinish(){

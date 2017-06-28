@@ -374,9 +374,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mCurrentState = mNewState;
             switch (mNewState) {
                 case INIT:
-                    if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(mNewState);
-                    }
                     break;
                 case CONNECTING:
                     if (mSharedPreference != null && mConnectingConfig != null) {
@@ -401,10 +398,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         firebase.logEvent("广告", "没有加载成功", "首页全屏连接成功");
                     }
 
-                    if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(mNewState);
-                    }
-
                     if (mConnectingConfig == null) {
                         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
                     } else {
@@ -424,27 +417,21 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     mErrorServers.clear();
                     break;
                 case STOPPING:
-                    if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(mNewState);
-                    }
                     clearConnectingTimeout();
                     break;
                 case STOPPED:
                     mIsConnecting = false;
-                    if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(mNewState);
-                    }
                     clearConnectingTimeout();
                     break;
                 case ERROR:
-                    if (mConnectFragment != null) {
-                        mConnectFragment.setConnectResult(mNewState);
-                    }
                     clearConnectingTimeout();
                     mIsConnecting = false;
                     mErrorServers.add(mConnectingConfig);
                     Firebase.getInstance(this).logEvent("VPN连不上", "ERROR");
                     break;
+            }
+            if (mConnectFragment != null) {
+                mConnectFragment.setConnectResult(mNewState);
             }
         }
         changeProxyFlagIcon();

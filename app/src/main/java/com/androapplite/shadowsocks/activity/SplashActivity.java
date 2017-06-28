@@ -69,7 +69,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
         boolean shouldLoadAd = true;
-        if(mState == Constants.State.CONNECTED || true){
+        if(mState == Constants.State.CONNECTED){
             String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
             String city = preferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
             if(city != null){
