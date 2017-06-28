@@ -110,7 +110,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private Snackbar mNoInternetSnackbar;
     private boolean mIsConnecting;
     private Runnable mUpdateVpnStateRunable;
-    private Runnable mShowRateUsRunnable;
     private ProgressDialog mFetchServerListProgressDialog;
     private Handler mConnectingTimeoutHandler;
     private Runnable mConnectingTimeoutRunnable;
@@ -120,6 +119,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean mNeedToCheckNotification;
     private boolean mIsConnectButtonClicked;
     private boolean mIsAdOpen;
+    private Runnable mShowRateUsRunnable;
 
 
     @Override
@@ -129,9 +129,10 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         Toolbar toolbar = initToolbar();
         initDrawer(toolbar);
         initNavigationView();
-        mNewState = Constants.State.INIT;
-        mCurrentState = mNewState;
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        int s = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
+        mNewState = Constants.State.values()[s];
+        mCurrentState = mNewState;
         mShadowsocksServiceConnection = createShadowsocksServiceConnection();
         ShadowsockServiceHelper.bindService(this, mShadowsocksServiceConnection);
         mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
@@ -149,10 +150,15 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             notificationCheck();
         }else if(adAppHelper.isFullAdLoaded()) {
             if(!mIsAdOpen) {
-                adAppHelper.showFullAd();
-                mIsAdOpen = true;
-                firebase.logEvent("广告", "加载成功", "首页全屏刚进入");
-                mNeedToCheckNotification = true;
+                if(shouldShowOrLoadAds()) {
+                    adAppHelper.showFullAd();
+                    mIsAdOpen = true;
+                    firebase.logEvent("广告", "加载成功", "首页全屏刚进入");
+                    mNeedToCheckNotification = true;
+                }else{
+                    firebase.logEvent("广告", "加载成功但不显示", "首页全屏刚进入");
+                    notificationCheck();
+                }
             }
         }else{
             firebase.logEvent("广告","没有加载成功", "首页全屏刚进入");
@@ -161,6 +167,34 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
         firebase.logEvent("屏幕","主屏幕");
+    }
+
+    private boolean shouldShowOrLoadAds(){
+        boolean shouldShow = true;
+        if(mCurrentState == Constants.State.CONNECTED){
+            final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
+            String city = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+            if(city != null){
+                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
+                float chance = 1;
+                try {
+                    chance = Float.parseFloat(chanceString);
+                    if(chance < 0){
+                        chance = 0;
+                    }else if(chance > 1){
+                        chance = 1;
+                    }
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
+                }
+
+                float random = (float) Math.random();
+                shouldShow = random < chance;
+            }
+        }
+        return  shouldShow;
+
     }
 
     private static class InterstitialAdStateListener extends AdStateListener{
@@ -202,17 +236,31 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
-        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            container.addView(adAppHelper.getNative(), params);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        Firebase firebase = Firebase.getInstance(this);
+        if(adAppHelper.isNativeLoaded()){
+            if(shouldShowOrLoadAds()){
+                FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+                try {
+                    final View aNative = adAppHelper.getNative();
+                    container.addView(aNative, params);
+                } catch (Exception ex) {
+                    ShadowsocksApplication.handleException(ex);
+                }
+                firebase.logEvent("广告", "native加载成功", "首页底部");
+
+            }else{
+                firebase.logEvent("广告", "native加载成功但不显示", "首页底部");
+            }
+        }else{
+            firebase.logEvent("广告", "native没有加载成功", "首页底部");
+
         }
+
     }
 
     public static final String NAME = "MainActivity";
-    private boolean startUp = false;
+//    private boolean startUp = false;
 
     private void initForegroundBroadcastIntentFilter(){
         mForgroundReceiverIntentFilter = new IntentFilter();
@@ -337,34 +385,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     break;
                 case CONNECTED:
                     final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-                    try {
-                        if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-                            Firebase firebase = Firebase.getInstance(this);
-                            if(adAppHelper.isAdSilent()){
-                                rotateAd();
-                                firebase.logEvent("广告", "第一天静默", "首页全屏连接成功");
-                            }else if(adAppHelper.isFullAdLoaded()) {
-                                if(!mIsAdOpen) {
-                                    adAppHelper.showFullAd();
-                                    mIsAdOpen = true;
-                                    firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
-                                }
+                    Firebase firebase = Firebase.getInstance(this);
+                    if(adAppHelper.isFullAdLoaded()) {
+                        if(!mIsAdOpen) {
+                            if(shouldShowOrLoadAds()) {
+                                adAppHelper.showFullAd();
+                                mIsAdOpen = true;
+                                firebase.logEvent("广告", "加载成功", "首页全屏连接成功");
                             }else{
-                                rotateAd();
-                                firebase.logEvent("广告", "没有加载成功", "首页全屏连接成功");
+                                firebase.logEvent("广告", "加载成功但不显示", "首页全屏连接成功");
                             }
                         }
-                    } catch (Exception ex) {
+                    }else{
+                        rotateAd();
+                        firebase.logEvent("广告", "没有加载成功", "首页全屏连接成功");
                     }
 
-                    if (!startUp) {
-                        try {
-                            adAppHelper.loadNewInterstitial();
-                            adAppHelper.loadNewNative();
-                        } catch (Exception ex) {
-                        }
-                        startUp = true;
-                    }
                     if (mConnectFragment != null) {
                         mConnectFragment.setConnectResult(mNewState);
                     }
@@ -526,8 +562,12 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             if(adAppHelper.isAdSilent()){
                 firebase.logEvent("广告", "第一天静默", "首页全屏退出");
             }else if(adAppHelper.isFullAdLoaded()){
-                adAppHelper.showFullAd();
-                firebase.logEvent("广告", "加载成功", "首页全屏退出");
+                if(shouldShowOrLoadAds()) {
+                    adAppHelper.showFullAd();
+                    firebase.logEvent("广告", "加载成功", "首页全屏退出");
+                }else{
+                    firebase.logEvent("广告", "加载成功但不显示", "首页全屏退出");
+                }
             }else{
                 firebase.logEvent("广告", "没有加载成功", "首页全屏退出");
             }

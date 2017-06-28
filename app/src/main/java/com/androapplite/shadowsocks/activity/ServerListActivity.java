@@ -77,7 +77,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
-
+        mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
@@ -108,23 +108,64 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
-        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            container.addView(adAppHelper.getNative(), params);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        Firebase firebase = Firebase.getInstance(this);
+        if(adAppHelper.isNativeLoaded()){
+            if(shouldShowOrLoadAds()){
+                FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+                try {
+                    container.addView(adAppHelper.getNative(), params);
+                } catch (Exception ex) {
+                    ShadowsocksApplication.handleException(ex);
+                }
 
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
-        container.startAnimation(animation);
+                Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
+                container.startAnimation(animation);
+                firebase.logEvent("广告", "native加载成功", "服务器列表");
+
+            }else{
+                firebase.logEvent("广告", "native加载成功但不显示", "服务器列表");
+            }
+
+        }else{
+            firebase.logEvent("广告", "native没有加载成功", "服务器列表");
+        }
+    }
+
+    private boolean shouldShowOrLoadAds(){
+        boolean shouldShow = true;
+        int s = mPreferences.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
+        Constants.State state = Constants.State.values()[s];
+        if(state == Constants.State.CONNECTED){
+            final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
+            String city = mPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+            if(city != null){
+                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
+                float chance = 1;
+                try {
+                    chance = Float.parseFloat(chanceString);
+                    if(chance < 0){
+                        chance = 0;
+                    }else if(chance > 1){
+                        chance = 1;
+                    }
+                }catch (Exception e){
+                    ShadowsocksApplication.handleException(e);
+                }
+
+                float random = (float) Math.random();
+                shouldShow = random < chance;
+            }
+        }
+        return  shouldShow;
+
     }
 
     private void parseServerList() {
         mNations = new ArrayList<>();
         mFlags = new ArrayList<>();
         mSignalResIds = new HashMap<>();
-        mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
         String serverListJson = mPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);

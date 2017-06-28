@@ -83,7 +83,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                         chance = 1;
                     }
                 }catch (Exception e){
-                    chance = 1;
+                    ShadowsocksApplication.handleException(e);
                 }
 
                 float random = (float) Math.random();

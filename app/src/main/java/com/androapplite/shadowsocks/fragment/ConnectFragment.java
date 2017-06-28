@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
@@ -32,18 +33,20 @@ import yyf.shadowsocks.utils.Constants;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConnectFragment extends Fragment implements View.OnClickListener{
+public class ConnectFragment extends Fragment implements View.OnClickListener, Handler.Callback{
     private OnConnectActionListener mListener;
     private TextView mMessageTextView;
     private Button mConnectButton;
     private ImageView mLoadingView;
-    private Timer mCountDownTimer;
+//    private Timer mCountDownTimer;
     private Handler mUpdateStateHandler;
     private Runnable mUpdateStateDelayedRunable;
     private TextView mSuccessConnectTextView;
     private TextView mFailedConnectTextView;
     private SharedPreferences mSharedPreference;
     private TextView mFreeUsedTimeTextView;
+    private static final int MSG_ONE_SECOND = 1;
+    private Constants.State mState;
 
     public ConnectFragment() {
         // Required empty public constructor
@@ -63,7 +66,19 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mFailedConnectTextView = (TextView)view.findViewById(R.id.failed_connect);
         mFreeUsedTimeTextView = (TextView)view.findViewById(R.id.free_used_time);
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+        mState = Constants.State.INIT;
+        mUpdateStateHandler = new Handler(this);
         return view;
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        if(msg.what == MSG_ONE_SECOND){
+            final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+            mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
+            mUpdateStateHandler.sendEmptyMessageDelayed(MSG_ONE_SECOND, 1000);
+        }
+        return true;
     }
 
     @Override
@@ -112,10 +127,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
 
     private void clearTimer() {
-        if(mCountDownTimer != null){
-            mCountDownTimer.cancel();
-            mCountDownTimer.purge();
-            mCountDownTimer = null;
+        if(mUpdateStateHandler != null) {
+            mUpdateStateHandler.removeCallbacksAndMessages(null);
         }
     }
 
@@ -143,57 +156,33 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
 
     public void setConnectResult(final Constants.State state){
-        if(isVisible()) {
-            switch (state) {
-                case INIT:
-                    init();
-                    break;
-                case CONNECTING:
-                    animateConnecting();
-                    break;
-                case CONNECTED:
-                    connectFinish();
-                    break;
-                case STOPPING:
-                    animateStopping();
-                    break;
-                case STOPPED:
-                    stopFinish();
-                    break;
-                case ERROR:
-                    error();
-                    break;
-            }
-        }else if(mUpdateStateHandler == null){
-            mUpdateStateHandler = new Handler();
-            mUpdateStateDelayedRunable = new UpdateStateDelayedRunable(this, state);
-            mUpdateStateHandler.postDelayed(mUpdateStateDelayedRunable, 100);
-        }
-
+        mState = state;
+        updateUI();
     }
 
-    private static class UpdateStateDelayedRunable implements Runnable{
-        private WeakReference<ConnectFragment> mFragmentReference;
-        private Constants.State mState;
 
-        UpdateStateDelayedRunable(ConnectFragment fragment, Constants.State state){
-            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
-            mState = state;
-        }
-
-        @Override
-        public void run() {
-            ConnectFragment fragment = mFragmentReference.get();
-            if(fragment != null){
-                fragment.setConnectResult(mState);
-                fragment.mUpdateStateHandler.removeCallbacks(fragment.mUpdateStateDelayedRunable);
-                fragment.mUpdateStateHandler = null;
-                fragment.mUpdateStateDelayedRunable = null;
-            }
-        }
-
-
-    }
+//    private static class UpdateStateDelayedRunable implements Runnable{
+//        private WeakReference<ConnectFragment> mFragmentReference;
+//        private Constants.State mState;
+//
+//        UpdateStateDelayedRunable(ConnectFragment fragment, Constants.State state){
+//            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
+//            mState = state;
+//        }
+//
+//        @Override
+//        public void run() {
+//            ConnectFragment fragment = mFragmentReference.get();
+//            if(fragment != null){
+//                fragment.setConnectResult(mState);
+//                fragment.mUpdateStateHandler.removeCallbacks(fragment.mUpdateStateDelayedRunable);
+//                fragment.mUpdateStateHandler = null;
+//                fragment.mUpdateStateDelayedRunable = null;
+//            }
+//        }
+//
+//
+//    }
 
     private void init(){
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
@@ -209,10 +198,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void connectFinish(){
         mLoadingView.clearAnimation();
-        if(mCountDownTimer == null) {
-            mCountDownTimer = new Timer();
-            mCountDownTimer.schedule(new CountDownTimerTask(this), 0, 1000);
-        }
+        mUpdateStateHandler.sendEmptyMessageDelayed(MSG_ONE_SECOND, 1000);
         mConnectButton.setText(R.string.disconnect);
         long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
@@ -257,6 +243,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
+        mUpdateStateHandler.removeCallbacksAndMessages(null);
     }
 
     private void error(){
@@ -272,20 +259,42 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onResume() {
         super.onResume();
-        init();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if(mUpdateStateHandler != null){
-            mUpdateStateHandler.removeCallbacks(mUpdateStateDelayedRunable);
-            mUpdateStateHandler = null;
-            mUpdateStateDelayedRunable = null;
+        int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
+        mState = Constants.State.values()[state];
+        updateUI();
+        if(mState == Constants.State.CONNECTED){
+            mUpdateStateHandler.sendEmptyMessageDelayed(MSG_ONE_SECOND, 1000);
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mUpdateStateHandler.removeCallbacksAndMessages(null);
+    }
+
     public void updateUI(){
-        init();
+        if(isVisible()) {
+            switch (mState) {
+                case INIT:
+                    init();
+                    break;
+                case CONNECTING:
+                    animateConnecting();
+                    break;
+                case CONNECTED:
+                    connectFinish();
+                    break;
+                case STOPPING:
+                    animateStopping();
+                    break;
+                case STOPPED:
+                    stopFinish();
+                    break;
+                case ERROR:
+                    error();
+                    break;
+            }
+        }
     }
 }
