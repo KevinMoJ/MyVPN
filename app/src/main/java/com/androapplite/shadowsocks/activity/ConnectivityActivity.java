@@ -204,6 +204,22 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
 
         @Override
+        public void onAdLoaded(AdType adType, int index) {
+            ConnectivityActivity activity = mActivityReference.get();
+            if(activity != null) {
+                switch (adType.getType()) {
+                    case AdType.ADMOB_NATIVE:
+                    case AdType.ADMOB_BANNER:
+                    case AdType.FACEBOOK_BANNER:
+                    case AdType.FACEBOOK_NATIVE:
+                    case AdType.FACEBOOK_FBN_BANNER:
+                        activity.addBottomAd(AdAppHelper.getInstance(activity));
+                        break;
+                }
+            }
+        }
+
+        @Override
         public void onAdClosed(AdType adType, int index) {
             ConnectivityActivity activity = mActivityReference.get();
             if(activity != null){

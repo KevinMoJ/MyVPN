@@ -161,7 +161,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
         mState = state;
         updateUI();
     }
-    
+
     private void init(){
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
