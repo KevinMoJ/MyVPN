@@ -170,30 +170,31 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     }
 
     private boolean shouldShowOrLoadAds(){
-        boolean shouldShow = true;
-        if(mCurrentState == Constants.State.CONNECTED){
-            final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
-            String city = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-            if(city != null){
-                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
-                float chance = 1;
-                try {
-                    chance = Float.parseFloat(chanceString);
-                    if(chance < 0){
-                        chance = 0;
-                    }else if(chance > 1){
-                        chance = 1;
-                    }
-                }catch (Exception e){
-                    ShadowsocksApplication.handleException(e);
-                }
-
-                float random = (float) Math.random();
-                shouldShow = random < chance;
-            }
-        }
-        return  shouldShow;
+//        boolean shouldShow = true;
+//        if(mCurrentState == Constants.State.CONNECTED){
+//            final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+//            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
+//            String city = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+//            if(city != null){
+//                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
+//                float chance = 1;
+//                try {
+//                    chance = Float.parseFloat(chanceString);
+//                    if(chance < 0){
+//                        chance = 0;
+//                    }else if(chance > 1){
+//                        chance = 1;
+//                    }
+//                }catch (Exception e){
+//                    ShadowsocksApplication.handleException(e);
+//                }
+//
+//                float random = (float) Math.random();
+//                shouldShow = random < chance;
+//            }
+//        }
+//        return  shouldShow;
+        return true;
 
     }
 
