@@ -22,18 +22,7 @@
     <string name="vpn_name_sj_us" translatable="false">San Jose</string>
     <string name="vpn_name_pho_us" translatable="false">Phoenix</string>
     <string name="vpn_name_buf_us" translatable="false">Buffalo</string>
-    <string name="vpn_name_mtl_ca" translatable="false">Montreal</string>
     <string name="vpn_name_lo_gl" translatable="false">Logl</string>
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
-    <string name="vpn_server_fr" translatable="false">v7.vpnnest.com</string>
-    <string name="vpn_server_jp" translatable="false">v6.vpnnest.com</string>
-    <string name="vpn_server_uk" translatable="false">v4.vpnnest.com</string>
-    <string name="vpn_server_mia_us" translatable="false">v3.vpnnest.com</string>
-    <string name="vpn_server_la_us" translatable="false">v5.vpnnest.com</string>
-    <string name="vpn_server_au" translatable="false">v8.vpnnest.com</string>
-    <string name="vpn_server_da_us" translatable="false">v9.vpnnest.com</string>
-    <string name="vpn_server_de" translatable="false">v10.vpnnest.com</string>
-    <string name="vpn_server_sg" translatable="false">v11.vpnnest.com</string>
-    <string name="vpn_server_nl" translatable="false">v12.vpnnest.com</string>
 </resources>

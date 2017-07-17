@@ -23,19 +23,6 @@
         <item>@string/vpn_name_buf_us</item>
         <item>@string/vpn_name_lo_gl</item>
     </array>
-    <array name="vpn_servers" translatable="false">
-        <item>@string/vpn_server_opt</item>
-        <item>@string/vpn_server_mia_us</item>
-        <item>@string/vpn_server_la_us</item>
-        <item>@string/vpn_server_uk</item>
-        <item>@string/vpn_server_fr</item>
-        <item>@string/vpn_server_jp</item>
-        <item>@string/vpn_server_au</item>
-        <item>@string/vpn_server_da_us</item>
-        <item>@string/vpn_server_de</item>
-        <item>@string/vpn_server_sg</item>
-        <item>@string/vpn_server_nl</item>
-    </array>
 
     <array name="vpn_icons" translatable="false">
         <item>@drawable/ic_flag_global</item>
