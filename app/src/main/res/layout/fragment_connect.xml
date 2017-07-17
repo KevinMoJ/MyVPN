@@ -61,7 +61,7 @@
             android:textSize="@dimen/large_text"
             android:text="00:00"
             android:textColor="@color/primary_white_text"
-            android:id="@id/message"
+            android:id="@+id/message"
             android:layout_gravity="center_horizontal"
             />
     </LinearLayout>
