@@ -865,6 +865,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 }
 
             }
+        }else{
+            if(requestCode == REQUEST_CONNECT){
+                mIsConnecting = false;
+                if(mConnectFragment != null){
+                    mConnectFragment.setConnectResult(Constants.State.STOPPED);
+                }
+            }
         }
     }
 
