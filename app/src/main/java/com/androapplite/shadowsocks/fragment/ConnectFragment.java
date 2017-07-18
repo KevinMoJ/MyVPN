@@ -182,12 +182,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
     }
 
-    private void stopFinish(){
+    public void stopFinish(){
         mLoadingView.clearAnimation();
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
         mUpdateStateHandler.removeCallbacksAndMessages(null);
+        mConnectButton.setText(R.string.connect);
     }
 
     private void error(){
@@ -218,7 +219,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     }
 
     public void updateUI(){
-        if(isVisible()) {
+        if(isAdded()) {
             switch (mState) {
                 case INIT:
                     init();

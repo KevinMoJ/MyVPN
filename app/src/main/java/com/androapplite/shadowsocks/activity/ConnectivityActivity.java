@@ -955,12 +955,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                         ShadowsocksApplication.handleException(e);
                     }
                 }
-//                try {
-//                    if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
-//                        AdAppHelper.getInstance(getApplicationContext()).showFullAd();
-//                    }
-//                } catch (Exception ex) {
-//                }
             }else if(requestCode == OPEN_SERVER_LIST){
                 ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
                 if(connectivityManager != null){
@@ -970,6 +964,13 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                 }
 
+            }
+        }else{
+            if(requestCode == REQUEST_CONNECT){
+                mIsConnecting = false;
+                if(mConnectFragment != null){
+                    mConnectFragment.stopFinish();
+                }
             }
         }
     }
