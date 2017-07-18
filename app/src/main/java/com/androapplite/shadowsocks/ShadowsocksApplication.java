@@ -22,13 +22,9 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.google.firebase.FirebaseApp;
-import com.umeng.analytics.game.UMGameAgent;
 
 import java.util.ArrayList;
 import java.util.Calendar;

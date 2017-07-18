@@ -67,7 +67,6 @@ import com.androapplite.shadowsocks.service.ConnectionTestService;
 //import com.bumptech.glide.request.target.SimpleTarget;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.facebook.appevents.AppEventsLogger;
-import com.umeng.analytics.game.UMGameAgent;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -128,7 +127,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         initConnectivityReceiver();
         initVpnFlagAndNation();
         Firebase.getInstance(this).logEvent("屏幕","主屏幕");
-        UMGameAgent.onEvent(getApplicationContext(), "shouye");
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
         mErrorServers = new HashSet<>();
@@ -853,7 +851,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 try {
                     if (DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.FIRST_CONNECT_SUCCESS, false)) {
                         Firebase.getInstance(this).logEvent( "广告", "点击功能按钮");
-                        UMGameAgent.onEvent(getApplicationContext(), "gnan");
                         AdAppHelper.getInstance(getApplicationContext()).showFullAd();
                     }
                 } catch (Exception ex) {
