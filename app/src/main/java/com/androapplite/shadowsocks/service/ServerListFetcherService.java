@@ -21,6 +21,7 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -130,6 +131,7 @@ public class ServerListFetcherService extends IntentService{
             HandlerThread serverListFastFetchHandlerThread = new HandlerThread("serverListFastFetchHandlerThread");
             serverListFastFetchHandlerThread.start();
             long t1 = System.currentTimeMillis();
+            useCustomURL();
             remoteFetchServerListParallel(serverListFastFetchHandlerThread, DOMAIN_URLS);
             Log.d("FetchSeverList", "domain总时间：" + (System.currentTimeMillis() - t1));
 //            //用ip获取服务器列表
@@ -198,9 +200,31 @@ public class ServerListFetcherService extends IntentService{
             String simOperator = manager.getSimOperator();
             String iosCountry = manager.getSimCountryIso();
             Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", iosCountry, simOperator, localCountry));
+            if(mUrl != null){
+                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+                String domain = adAppHelper.getCustomCtrlValue("serverListDomain", null);
+                String ip = adAppHelper.getCustomCtrlValue("serverListIP", null);
+                if(mUrl.equals(domain)){
+                    Firebase.getInstance(this).logEvent("服务器列表地址", "domain", mUrl);
+                }else if(mUrl.equals(ip)){
+                    Firebase.getInstance(this).logEvent("服务器列表地址", "ip", mUrl);
+                }
+            }
+
             broadcastServerListFetchFinish();
             hasStart = false;
         }
+
+    }
+
+    private void useCustomURL(){
+        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+        String url = adAppHelper.getCustomCtrlValue("serverListDomain", DOMAIN_URL);
+        DOMAIN_URLS.set(0, url);
+        URL_KEY_MAP.put(url, "domain");
+        url = adAppHelper.getCustomCtrlValue("serverListIP", IP_URL);
+        DOMAIN_URLS.set(1, url);
+        URL_KEY_MAP.put(url, "ip");
 
     }
 

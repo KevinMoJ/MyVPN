@@ -31,14 +31,14 @@ android {
         applicationId "com.androapplite.vpn3"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 31
-        versionName "1.3.1"
+        versionCode 32
+        versionName "1.3.2"
         multiDexEnabled true
     }
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    project.archivesBaseName = 'Speed_VPN-' + defaultConfig.versionName;
+    project.archivesBaseName = defaultConfig.applicationId + "_" + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
