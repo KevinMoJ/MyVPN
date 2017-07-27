@@ -38,7 +38,7 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    project.archivesBaseName = defaultConfig.applicationId + "_" + defaultConfig.versionName;
+    project.archivesBaseName = defaultConfig.applicationId + "-" + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
     sourceSets.main {
         jniLibs.srcDir 'src/main/libs'
