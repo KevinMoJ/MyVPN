@@ -93,7 +93,7 @@ import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ConnectFragment.OnConnectActionListener,
-        DisconnectFragment.OnDisconnectActionListener, View.OnClickListener{
+        DisconnectFragment.OnDisconnectActionListener, View.OnClickListener, Handler.Callback{
 
     private IShadowsocksService mShadowsocksService;
     private ServiceConnection mShadowsocksServiceConnection;
@@ -119,6 +119,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean mNeedToCheckNotification;
     private boolean mIsConnectButtonClicked;
     private boolean mIsAdOpen;
+    private Handler mForegroundHandler;
+    private static final int MSG_2_SECOND_FAKE_CONNECT = 1;
 
 
     @Override
@@ -166,6 +168,19 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mErrorServers = new HashSet<>();
         mConnectCountChangedReceiver = new ConnectCountChangeReceiver(this);
         firebase.logEvent("屏幕","主屏幕");
+
+        mForegroundHandler = new Handler(this);
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch(msg.what){
+            case MSG_2_SECOND_FAKE_CONNECT:
+                mIsConnecting = false;
+                mConnectFragment.setConnectResult(Constants.State.CONNECTED);
+                break;
+        }
+        return true;
     }
 
     private boolean shouldShowOrLoadAds(){
@@ -727,6 +742,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             mConnectFragment.animateConnecting();
             mIsConnecting = true;
         }
+        mForegroundHandler.sendEmptyMessageDelayed(MSG_2_SECOND_FAKE_CONNECT, TimeUnit.SECONDS.toMillis(2));
         mConnectingTimeoutHandler = new Handler();
         mConnectingTimeoutRunnable = new ConnectingTimeoutRunnable(this);
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(32));//时间要超过等待并行测试服务器连接的时间
@@ -789,7 +805,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                 Snackbar.make(activity.findViewById(R.id.coordinator), R.string.server_not_available, Snackbar.LENGTH_LONG).show();
                 if(activity.mConnectFragment != null && activity.mConnectFragment.isAdded()){
                     activity.mConnectFragment.setConnectResult(Constants.State.ERROR);
-                    activity.mConnectFragment.updateUI();
                 }
             }
         }
