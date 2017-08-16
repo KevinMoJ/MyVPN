@@ -321,8 +321,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                             Snackbar.make(findViewById(R.id.coordinator), R.string.fetch_server_list_failed, Snackbar.LENGTH_SHORT).show();
                             Firebase.getInstance(context).logEvent("VPN连不上", "取服务器列表超时");
                             increaseFailedCount();
-                            if(mConnectFragment != null && mConnectFragment.isVisible()){
-                                mConnectFragment.updateUI();
+                            if(mConnectFragment != null){
+                                mConnectFragment.setConnectResult(Constants.State.ERROR);
                             }
                         }
                         break;
@@ -716,8 +716,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
             ShadowsocksApplication.handleException(e);
             Firebase.getInstance(this).logEvent("VPN连不上", "VPN Prepare错误", e.getMessage());
             increaseFailedCount();
-            if(mConnectFragment != null && mConnectFragment.isVisible()){
-                mConnectFragment.updateUI();
+            if(mConnectFragment != null){
+                mConnectFragment.setConnectResult(Constants.State.ERROR);
             }
         }
     }
@@ -836,8 +836,8 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     activity.mErrorServers.add(activity.mConnectingConfig);
                 }
                 activity.increaseFailedCount();
-                if(activity.mConnectFragment != null && activity.mConnectFragment.isVisible()){
-                    activity.mConnectFragment.updateUI();
+                if(activity.mConnectFragment != null ){
+                    activity.mConnectFragment.setConnectResult(Constants.State.ERROR);
                 }
             }
         }
