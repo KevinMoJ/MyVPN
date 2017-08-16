@@ -39,7 +39,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     private Button mConnectButton;
     private ImageView mLoadingView;
     private Handler mUpdateStateHandler;
-    private Runnable mUpdateStateDelayedRunable;
     private TextView mSuccessConnectTextView;
     private TextView mFailedConnectTextView;
     private SharedPreferences mSharedPreference;
