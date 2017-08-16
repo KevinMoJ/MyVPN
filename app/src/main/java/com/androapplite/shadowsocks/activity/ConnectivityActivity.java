@@ -119,7 +119,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
     private boolean mNeedToCheckNotification;
     private boolean mIsConnectButtonClicked;
     private boolean mIsAdOpen;
-    private Runnable mShowRateUsRunnable;
 
 
     @Override
@@ -426,7 +425,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
                     }
                     if(mConnectFragment != null && mConnectingConfig != null ) {
                         ConnectionTestService.testConnection(this, mConnectingConfig.name);
-                        showRateUsFragment();
                     }
                     mIsConnecting = false;
                     TimeCountDownService.start(this);
@@ -453,17 +451,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         changeProxyFlagIcon();
     }
-
-    private void showRateUsFragment() {
-//        if(!mSharedPreference.getBoolean(SharedPreferenceKey.IS_RATE_US_FRAGMENT_SHOWN, false)) {
-//            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.rate_us_frame_layout);
-//            if(fragment == null) {
-//                mShowRateUsRunnable = new ShowRateUsRunnable(this);
-//                getWindow().getDecorView().postDelayed(mShowRateUsRunnable, 2000);
-//            }
-//        }
-    }
-
 
     private ServiceConnection createShadowsocksServiceConnection(){
         return new ServiceConnection() {
@@ -744,6 +731,7 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         mConnectingTimeoutRunnable = new ConnectingTimeoutRunnable(this);
         mConnectingTimeoutHandler.postDelayed(mConnectingTimeoutRunnable, TimeUnit.SECONDS.toMillis(32));//时间要超过等待并行测试服务器连接的时间
         new Thread(new PrepareStartServiceRunnable(this)).start();
+
     }
 
     private static class PrepareStartServiceRunnable implements Runnable{
@@ -922,9 +910,6 @@ public class ConnectivityActivity extends BaseShadowsocksActivity
         }
         if(mUpdateVpnStateRunable != null) {
             getWindow().getDecorView().removeCallbacks(mUpdateVpnStateRunable);
-        }
-        if(mShowRateUsRunnable != null){
-            getWindow().getDecorView().removeCallbacks(mShowRateUsRunnable);
         }
         clearConnectingTimeout();
         if(mFetchServerListProgressDialog != null){
