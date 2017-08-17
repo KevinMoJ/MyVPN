@@ -11,6 +11,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -121,7 +122,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     @Override
     public void onDetach() {
         super.onDetach();
-        mLoadingView.clearAnimation();
+        stopAnimation();
         clearTimer();
 
     }
@@ -141,8 +142,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     }
 
     private void startAnimation(){
-        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
-        mLoadingView.startAnimation(animation);
+        Animation currentAnimation = mLoadingView.getAnimation();
+        if(currentAnimation == null) {
+            Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+            mLoadingView.startAnimation(animation);
+        }
     }
 
 
@@ -156,8 +160,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     }
 
     public void setConnectResult(final Constants.State state){
-        mState = state;
-        updateUI();
+        Log.d("ConnectFragment", "current: " + mState + "; new: " + state);
+        if(mState != state) {
+            mState = state;
+            updateUI();
+        }
     }
 
     private void init(){
@@ -173,15 +180,20 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     }
 
     private void connectFinish(){
-        mLoadingView.clearAnimation();
+        stopAnimation();
         mUpdateStateHandler.sendEmptyMessageDelayed(MSG_ONE_SECOND, 1000);
         mConnectButton.setText(R.string.disconnect);
         long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
         mSuccessConnectTextView.setText(getString(R.string.success_connect, success));
     }
 
-    public void stopFinish(){
+    private void stopAnimation() {
         mLoadingView.clearAnimation();
+        mLoadingView.setAnimation(null);
+    }
+
+    public void stopFinish(){
+        stopAnimation();
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
@@ -190,7 +202,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
     }
 
     private void error(){
-        mLoadingView.clearAnimation();
+        stopAnimation();
         mLoadingView.setImageLevel(1);
         mConnectButton.setText(R.string.connect);
 
@@ -240,4 +252,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, H
             }
         }
     }
+
+    public Constants.State getState(){
+        return mState;
+    }
+
 }
