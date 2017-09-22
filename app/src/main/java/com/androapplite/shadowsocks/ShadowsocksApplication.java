@@ -22,8 +22,6 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Tracker;
 import com.google.firebase.FirebaseApp;
 
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import io.fabric.sdk.android.Fabric;
  */
 public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks
     ,HomeWatcher.OnHomePressedListener{
-    private Tracker mTracker;
     IabHelper mHelper;
     IabBroadcastReceiver mBroadcastReceiver;
     private int mRunningActivityNum;
@@ -44,25 +41,6 @@ public class ShadowsocksApplication extends Application implements Application.A
     private HomeWatcher mHomeWathcer;
     private boolean mIsHomeKeyPressed;
 
-    @NonNull
-    public Tracker getTracker(){
-        if(mTracker == null){
-            synchronized(this){
-                if(mTracker == null){
-                    final GoogleAnalytics googleAnalytics = GoogleAnalytics.getInstance(this);
-                    googleAnalytics.setDryRun(BuildConfig.DEBUG);
-                    mTracker = googleAnalytics.newTracker(R.xml.ga_tracker);
-                    mTracker.enableAdvertisingIdCollection(true);
-                    mTracker.enableExceptionReporting(!BuildConfig.DEBUG);
-                    return mTracker;
-                }else{
-                    return mTracker;
-                }
-            }
-        }else{
-            return mTracker;
-        }
-    }
 
     @Override
     public void onCreate() {
