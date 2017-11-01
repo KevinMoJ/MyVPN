@@ -79,11 +79,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
-import yyf.shadowsocks.Config;
-import yyf.shadowsocks.IShadowsocksService;
-import yyf.shadowsocks.IShadowsocksServiceCallback;
-import yyf.shadowsocks.utils.Constants;
-
 public class ConnectivityActivity extends BaseShadowsocksActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         ConnectFragment.OnConnectActionListener, RateUsFragment.OnFragmentInteractionListener,
