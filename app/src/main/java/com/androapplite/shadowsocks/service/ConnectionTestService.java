@@ -3,9 +3,12 @@ package com.androapplite.shadowsocks.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.SystemClock;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.io.IOException;
 
@@ -45,31 +48,48 @@ public class ConnectionTestService extends IntentService {
         if (intent != null) {
             String serverName = intent.getStringExtra(SERVER_NAME);
             OkHttpClient client = new OkHttpClient();
-            String url = "http://www.bing.com/";
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            long t1 = System.currentTimeMillis();
-            Response response = null;
-            Firebase firebase = Firebase.getInstance(this);
+            String url = "http://www.gstatic.com/generate_204";
             try {
-                response = client.newCall(request).execute();
-                long t2 = System.currentTimeMillis();
-                firebase.logEvent("连接后测试成功", serverName, t2-t1);
-            } catch (IOException e) {
-                long t2 = System.currentTimeMillis();
-                firebase.logEvent("连接后测试失败", serverName, t2-t1);
-                ShadowsocksApplication.handleException(e);
-            }finally {
-                if(response != null) {
-                    try {
-                        response.body().close();
-                    }catch (Exception e){
-                        ShadowsocksApplication.handleException(e);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                Firebase firebase = Firebase.getInstance(this);
+                long t1 = System.currentTimeMillis();
+                boolean result = false;
+                for (int i = 0; i < 3; i++) {
+                    if (testConnection(client, request)) {
+                        result = true;
+                        break;
                     }
+                    SystemClock.sleep(50);
                 }
+                long timeConsume = System.currentTimeMillis() - t1;
+                if (result) {
+                    firebase.logEvent("连接后测试成功", serverName, timeConsume);
+                } else {
+                    firebase.logEvent("连接后测试失败", serverName, timeConsume);
+                    LocalVpnService.IsRunning = false;
+                }
+            } catch (Exception e) {
+                ShadowsocksApplication.handleException(e);
             }
         }
+    }
+
+    private boolean testConnection(OkHttpClient client, Request request) {
+        boolean result = false;
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+            result = true;
+        } catch (Exception e) {
+            ShadowsocksApplication.handleException(e);
+        } finally {
+            if (response != null) {
+                response.body().close();
+            }
+        }
+        return result;
     }
 
 }

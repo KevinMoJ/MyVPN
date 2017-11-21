@@ -8,15 +8,17 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.vpn3.BuildConfig;
+import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.activity.MainActivity;
+import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -31,8 +33,12 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,49 +59,27 @@ import okio.Okio;
 
 public class ServerListFetcherService extends IntentService{
     private boolean hasStart;
-    private static final String SGP_URL = "http://s3-ap-southeast-1.amazonaws.com/vpn-sl-sgp/3.json";
-    private static final String BOM_URL = "http://s3.ap-south-1.amazonaws.com/vpn-sl-bom/3.json";
     private static final String DOMAIN_URL = "http://c.vpnnest.com:8080/VPNServerList/fsl";
     private static final String IP_URL = "http://52.21.55.33:8080/VPNServerList/fsl";
-    private static final String EGYPT_URL = "http://41.215.240.102/VPNServerList/fsl";
-    private static final String TURKEY_URL = "http://185.65.206.147/VPNServerList/fsl";
-    private static final String DUBAY_URL = "http://146.71.94.215/VPNServerList/fsl";
-    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl-vpn1.json";
-    private static final String FIREBASE_HOST_URL = "https://flashlight35-6aae4.firebaseapp.com/fsl-vpn1.json";
+    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
-//        DOMAIN_URLS.add(SGP_URL);
-//        DOMAIN_URLS.add(BOM_URL);
         DOMAIN_URLS.add(DOMAIN_URL);
         DOMAIN_URLS.add(IP_URL);
-    }
-    private static final ArrayList<String> IP_URLS = new ArrayList<>();
-    static {
-        IP_URLS.add(IP_URL);
-        IP_URLS.add(EGYPT_URL);
-        IP_URLS.add(TURKEY_URL);
-        IP_URLS.add(DUBAY_URL);
     }
 
     private static final ArrayList<String> STATIC_HOST_URLS = new ArrayList<>();
     static {
         STATIC_HOST_URLS.add(GITHUB_URL);
-        STATIC_HOST_URLS.add(FIREBASE_HOST_URL);
     }
 
 
     private static final HashMap<String, String> URL_KEY_MAP = new HashMap<>();
     static {
-        URL_KEY_MAP.put(SGP_URL, "sgp");
-        URL_KEY_MAP.put(BOM_URL, "bom");
         URL_KEY_MAP.put(IP_URL, "ip");
         URL_KEY_MAP.put(DOMAIN_URL, "domain");
-        URL_KEY_MAP.put(EGYPT_URL, "egypt");
-        URL_KEY_MAP.put(TURKEY_URL, "turkey");
-        URL_KEY_MAP.put(DUBAY_URL, "dubay");
         URL_KEY_MAP.put(GITHUB_URL, "github");
-        URL_KEY_MAP.put(FIREBASE_HOST_URL, "firebase_host");
 
     }
 
@@ -128,28 +112,63 @@ public class ServerListFetcherService extends IntentService{
             }
             mHttpClient = builder.build();
 
-            HandlerThread serverListFastFetchHandlerThread = new HandlerThread("serverListFastFetchHandlerThread");
-            serverListFastFetchHandlerThread.start();
-            long t1 = System.currentTimeMillis();
             useCustomURL();
-            remoteFetchServerListParallel(serverListFastFetchHandlerThread, DOMAIN_URLS);
-            Log.d("FetchSeverList", "domain总时间：" + (System.currentTimeMillis() - t1));
-//            //用ip获取服务器列表
-//            if(mServerListJsonString == null){
-//                remoteFetchServerListParallel(serverListFastFetchHandlerThread, IP_URLS);
-//            }
-//            Log.d("FetchSeverList", "IP总时间：" + (System.currentTimeMillis() - t1));
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorCompletionService<Pair<String, String>> ecs = new ExecutorCompletionService<>(executorService);
+
+            Firebase firebase = Firebase.getInstance(this);
+            ArrayList<MyCallable> tasks = new ArrayList<>(DOMAIN_URLS.size());
+            for (String url: DOMAIN_URLS) {
+                tasks.add(new MyCallable(url, firebase, mHttpClient));
+            }
+
+            long t1 = System.currentTimeMillis();
+            for (MyCallable callable: tasks) {
+                ecs.submit(callable);
+            }
+
+            for (int i = 0; i < tasks.size(); i++) {
+                try {
+                    Future<Pair<String, String>> future = ecs.take();
+                    Pair<String, String> result= future.get(3*TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
+                    if (result != null) {
+                        mUrl = result.first;
+                        mServerListJsonString = result.second;
+                        break;
+                    }
+                } catch (Exception e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+            Log.d("FetchSeverList", "动态列表总时间：" + (System.currentTimeMillis() - t1));
 
             //获取远程静态服务器列表
             if(mServerListJsonString == null){
-                remoteFetchServerListParallel(serverListFastFetchHandlerThread, STATIC_HOST_URLS);
-                if(mServerListJsonString != null){
-                    mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
+                tasks = new ArrayList<>(STATIC_HOST_URLS.size());
+                for (String url: STATIC_HOST_URLS) {
+                    tasks.add(new MyCallable(url, firebase, mHttpClient));
                 }
-            }
-            Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
 
-            serverListFastFetchHandlerThread.quit();
+                t1 = System.currentTimeMillis();
+                for (MyCallable callable: tasks) {
+                    ecs.submit(callable);
+                }
+
+                for (int i = 0; i < tasks.size(); i++) {
+                    try {
+                        Future<Pair<String, String>> future = ecs.take();
+                        Pair<String, String> result= future.get(3*TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
+                        if (result != null) {
+                            mUrl = result.first;
+                            mServerListJsonString = result.second;
+                            break;
+                        }
+                    } catch (Exception e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
+                Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
+            }
 
             long t2 = System.currentTimeMillis();
             String urlKey = URL_KEY_MAP.get(mUrl);
@@ -225,125 +244,54 @@ public class ServerListFetcherService extends IntentService{
         url = adAppHelper.getCustomCtrlValue("serverListIP", IP_URL);
         DOMAIN_URLS.set(1, url);
         URL_KEY_MAP.put(url, "ip");
-
     }
 
-    private void remoteFetchServerListParallel(HandlerThread handlerThread, ArrayList<String> urls){
-        Collections.shuffle(urls);
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(urls.size());
-        Handler handler = new Handler(handlerThread.getLooper(), new ServerListResultHandlerCallback(this, executorService, urls));
-        for(int i = 0; i < urls.size(); i++){
-            if(!executorService.isShutdown()) {
-                String url = urls.get(i);
-                try {
-                    executorService.schedule(new FastFetchServerListRunnable(this, url, handler), i*DELAY_MILLI, TimeUnit.MILLISECONDS);
-                }catch (RejectedExecutionException e){
-                    ShadowsocksApplication.handleException(e);
-                }
-            }
-        }
-        try {
-            executorService.awaitTermination(urls.size() * DELAY_MILLI + TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            ShadowsocksApplication.handleException(e);
-        }
-        handler.removeCallbacksAndMessages(null);
-    }
-
-    private static class ServerListResultHandlerCallback implements Handler.Callback{
-        private ExecutorService mExecutorService;
-        private ServerListFetcherService mServerListFetcherService;
-        private ArrayList<String>  mUrls;
-        private int mErrorCount;
-        ServerListResultHandlerCallback(ServerListFetcherService fetcherService, ExecutorService executorService,
-                                        ArrayList<String> urls){
-            mServerListFetcherService = fetcherService;
-            mExecutorService = executorService;
-            mUrls = urls;
-            mErrorCount = 0;
-        }
-        @Override
-        public boolean handleMessage(Message msg) {
-            Pair<String, String> pair = (Pair<String, String>)msg.obj;
-            if(msg.arg1 == 1){
-                if(mServerListFetcherService.mServerListJsonString == null){
-                    mServerListFetcherService.mUrl = pair.first;
-                    mServerListFetcherService.mServerListJsonString = pair.second;
-                }
-                mExecutorService.shutdown();
-                mExecutorService.shutdownNow();
-                Log.d("检查错误次数", "shutdown " + pair.first);
-            }else{
-                mErrorCount++;
-                if(mUrls.contains(pair.first) && mErrorCount == mUrls.size()){
-                    mExecutorService.shutdown();
-                    mExecutorService.shutdownNow();
-                }
-
-                Log.d("检查错误次数", mErrorCount + " " + pair.first);
-            }
-            return true;
-        }
-    }
-
-
-    private static class FastFetchServerListRunnable implements Runnable{
-        private WeakReference<ServerListFetcherService> mServiceReference;
-        private WeakReference<Handler> mHandlerReference;
+    private static class MyCallable implements Callable<Pair<String, String>> {
         private String mUrl;
-        FastFetchServerListRunnable(ServerListFetcherService service, String url, Handler handler){
-            mServiceReference = new WeakReference<ServerListFetcherService>(service);
+        private Firebase mFirebase;
+        private OkHttpClient mHttpClient;
+
+        MyCallable(String url, Firebase firebase, OkHttpClient client) {
             mUrl = url;
-            mHandlerReference = new WeakReference<Handler>(handler);
+            mFirebase = firebase;
+            mHttpClient = client;
         }
-
         @Override
-        public void run() {
-            ServerListFetcherService service = mServiceReference.get();
-            Handler handler = mHandlerReference.get();
-            if(service != null && handler != null){
-                Request request = new Request.Builder()
-                        .url(mUrl)
-                        .addHeader("Accept-Encoding", "gzip")
-                        .build();
-                long t1 = System.currentTimeMillis();
-                Firebase firebase = Firebase.getInstance(service);
-                String urlKey = URL_KEY_MAP.get(mUrl);
-                if(urlKey == null){
-                    urlKey = "没有匹配的url";
-                }
-                String jsonString = null;
-                String errMsg = null;
-                try {
-                    Response response = service.mHttpClient.newCall(request).execute();
-                    if(response.isSuccessful())
-                    {
-                        jsonString = response.body().string();
-                    }else{
-                        errMsg = response.message() + " " + response.code();
-                    }
-                }catch (IOException e) {
-                    errMsg = e.getMessage();
-                    if(errMsg == null){
-                        errMsg = e.toString();
-                    }
-                }
-                long dur = System.currentTimeMillis() - t1;
-                int result = 0;
-                if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
-                    firebase.logEvent("访问服务器列表成功", urlKey, dur);
-                    result = 1;
-                }else{
-                    firebase.logEvent("访问服务器列表失败", urlKey, dur);
-                    if(errMsg == null) errMsg = "服务器列表JSON问题";
-                    firebase.logEvent("访问服务器列表失败", urlKey, errMsg);
-                }
-
-                Message message = handler.obtainMessage();
-                message.arg1 = result;
-                message.obj = new Pair<String, String>(mUrl, jsonString);
-                handler.sendMessage(message);
+        public Pair<String, String> call() throws Exception {
+            Request request = new Request.Builder()
+                    .url(mUrl)
+                    .addHeader("Accept-Encoding", "gzip")
+                    .build();
+            long t1 = System.currentTimeMillis();
+            String urlKey = URL_KEY_MAP.get(mUrl);
+            if(urlKey == null){
+                urlKey = "没有匹配的url";
             }
+            String jsonString = null;
+            String errMsg = null;
+            try {
+                Response response = mHttpClient.newCall(request).execute();
+                if(response.isSuccessful())
+                {
+                    jsonString = response.body().string();
+                }else{
+                    errMsg = response.message() + " " + response.code();
+                }
+            }catch (IOException e) {
+                errMsg = e.getMessage();
+                if(errMsg == null){
+                    errMsg = e.toString();
+                }
+            }
+            long dur = System.currentTimeMillis() - t1;
+            if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
+                mFirebase.logEvent("访问服务器列表成功", urlKey, dur);
+            }else{
+                mFirebase.logEvent("访问服务器列表失败", urlKey, dur);
+                if(errMsg == null) errMsg = "服务器列表JSON问题";
+                mFirebase.logEvent("访问服务器列表失败", urlKey, errMsg);
+            }
+            return new Pair<>(mUrl, jsonString);
         }
     }
 

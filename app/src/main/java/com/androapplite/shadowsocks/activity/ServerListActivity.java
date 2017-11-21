@@ -1,18 +1,13 @@
 package com.androapplite.shadowsocks.activity;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -31,10 +26,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.ShadowsockServiceHelper;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -45,15 +38,9 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import yyf.shadowsocks.IShadowsocksService;
-import yyf.shadowsocks.IShadowsocksServiceCallback;
-import yyf.shadowsocks.utils.Constants;
-
 public class ServerListActivity extends BaseShadowsocksActivity implements
         SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
-        ServiceConnection, DialogInterface.OnClickListener, AbsListView.OnScrollListener{
-    private IShadowsocksService mShadowsocksService;
-
+        DialogInterface.OnClickListener, AbsListView.OnScrollListener{
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SharedPreferences mPreferences;
@@ -64,8 +51,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     private String mNation;
     private int mSelectedIndex;
     private boolean mHasServerJson;
-    private IShadowsocksServiceCallback.Stub mShadowsocksServiceCallbackBinder;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +62,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
-        mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
@@ -93,8 +78,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         initForegroundBroadcastReceiver();
 
         parseServerList();
-        ShadowsockServiceHelper.bindService(this, this);
-        mShadowsocksServiceCallbackBinder = createShadowsocksServiceCallbackBinder();
 
         String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getString(SharedPreferenceKey.SERVER_LIST, null);
         if(serverList != null && serverList.length() > 2){
@@ -108,64 +91,27 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     }
 
     private void addBottomAd(AdAppHelper adAppHelper) {
-        Firebase firebase = Firebase.getInstance(this);
-        if(adAppHelper.isNativeLoaded()){
-            if(shouldShowOrLoadAds()){
-                FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-                try {
-                    container.addView(adAppHelper.getNative(), params);
-                } catch (Exception ex) {
-                    ShadowsocksApplication.handleException(ex);
-                }
+        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            container.addView(adAppHelper.getNative(), params);
+            Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "服务器列表底部");
 
-                Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
-                container.startAnimation(animation);
-                firebase.logEvent("广告", "native加载成功", "服务器列表");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Firebase.getInstance(this).logEvent("NATIVE广告", "显示失败", "服务器列表底部");
 
-            }else{
-                firebase.logEvent("广告", "native加载成功但不显示", "服务器列表");
-            }
-
-        }else{
-            firebase.logEvent("广告", "native没有加载成功", "服务器列表");
         }
-    }
 
-    private boolean shouldShowOrLoadAds(){
-        boolean shouldShow = true;
-        int s = mPreferences.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
-        Constants.State state = Constants.State.values()[s];
-        if(state == Constants.State.CONNECTED){
-            final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
-            String city = mPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-            if(city != null){
-                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
-                float chance = 1;
-                try {
-                    chance = Float.parseFloat(chanceString);
-                    if(chance < 0){
-                        chance = 0;
-                    }else if(chance > 1){
-                        chance = 1;
-                    }
-                }catch (Exception e){
-                    ShadowsocksApplication.handleException(e);
-                }
-
-                float random = (float) Math.random();
-                shouldShow = random < chance;
-            }
-        }
-        return  shouldShow;
-
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
+        container.startAnimation(animation);
     }
 
     private void parseServerList() {
         mNations = new ArrayList<>();
         mFlags = new ArrayList<>();
         mSignalResIds = new HashMap<>();
+        mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
         String serverListJson = mPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
@@ -183,6 +129,10 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 }
             }
         }
+
+        mSelectedIndex = mNations.indexOf(mNation);
+        if(mSelectedIndex == -1) mSelectedIndex = 0;
+        mListView.setItemChecked(mSelectedIndex, true);
     }
 
     @Override
@@ -198,25 +148,9 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     }
 
     private void disconnectToRefresh(String position) {
-        if(mShadowsocksService != null){
-            try {
-                int s = mShadowsocksService.getState();
-                Constants.State state = Constants.State.values()[s];
-                if(state == Constants.State.CONNECTED){
-                    new AlertDialog.Builder(this)
-                            .setTitle(R.string.disconnect_to_refresh)
-                            .setPositiveButton(R.string.disconnect, this)
-                            .setNegativeButton(android.R.string.cancel, this)
-                            .show();
-                }else{
-                    mSwipeRefreshLayout.setRefreshing(true);
-                    ServerListFetcherService.fetchServerListAsync(this);
-                }
-                Firebase.getInstance(this).logEvent("刷新服务器列表", position, state.name());
-            } catch (RemoteException e) {
-                ShadowsocksApplication.handleException(e);
-            }
-        }
+        mSwipeRefreshLayout.setRefreshing(true);
+        ServerListFetcherService.fetchServerListAsync(this);
+        Firebase.getInstance(this).logEvent("刷新服务器列表", position);
     }
 
     @Override
@@ -238,7 +172,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     case Action.SERVER_LIST_FETCH_FINISH:
                         mSwipeRefreshLayout.setRefreshing(false);
                         parseServerList();
-//                        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).contains(SharedPreferenceKey.SERVER_LIST);
                         String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.SERVER_LIST, null);
                         if(serverList != null && serverList.length() > 2){
                             mHasServerJson = true;
@@ -290,12 +223,12 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
             holder.mFlagImageView.setImageResource(resid);
             String nation = mNations.get(position);
             holder.mNationTextView.setText(nation);
-            if(nation.equals(mNation)) {
-                holder.mItemView.setSelected(true);
-                mSelectedIndex = position;
-            }else{
-                holder.mItemView.setSelected(false);
-            }
+//            if(nation.equals(mNation)) {
+//                holder.mItemView.setSelected(true);
+//                mSelectedIndex = position;
+//            }else{
+//                holder.mItemView.setSelected(false);
+//            }
             if(mHasServerJson) {
                 holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
                 holder.mSignalImageView.setVisibility(View.VISIBLE);
@@ -321,84 +254,24 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        View selectedView = parent.getChildAt(mSelectedIndex);
-        if(selectedView != null){
-            ServerListAdapter.ViewHolder holder = (ServerListAdapter.ViewHolder) selectedView.getTag();
-            holder.mItemView.setSelected(false);
 
-            String nation = mNations.get(position);
-            String flag = mFlags.get(position);
-            mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
-                    .putString(SharedPreferenceKey.VPN_FLAG, flag)
-                    .apply();
-            setResult(RESULT_OK);
-            finish();
-            Firebase.getInstance(this).logEvent("选择国家", nation);
-        }
-    }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        mShadowsocksService = IShadowsocksService.Stub.asInterface(service);
-
-        try {
-            mShadowsocksService.registerCallback(mShadowsocksServiceCallbackBinder);
-            int s = mShadowsocksService.getState();
-            Constants.State state = Constants.State.values()[s];
-            if(state == Constants.State.INIT || state == Constants.State.STOPPED || state == Constants.State.ERROR){
-                ServerListFetcherService.fetchServerListAsync(this);
-            }
-        } catch (RemoteException e) {
-            ShadowsocksApplication.handleException(e);
-        }
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        mShadowsocksService = null;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(mShadowsocksService != null){
-            try {
-                mShadowsocksService.unregisterCallback(mShadowsocksServiceCallbackBinder);
-            } catch (RemoteException e) {
-                ShadowsocksApplication.handleException(e);
-            }
-        }
-        unbindService(this);
-
-    }
-
-    private IShadowsocksServiceCallback.Stub createShadowsocksServiceCallbackBinder(){
-        return new IShadowsocksServiceCallback.Stub(){
-            @Override
-            public void stateChanged(int state, String msg) throws RemoteException {
-                Constants.State s = Constants.State.values()[state];
-                if(s == Constants.State.INIT || s == Constants.State.STOPPED || s == Constants.State.ERROR){
-                    ServerListFetcherService.fetchServerListAsync(ServerListActivity.this);
-                }
-            }
-
-            @Override
-            public void trafficUpdated(long txRate, long rxRate, long txTotal, long rxTotal) throws RemoteException {
-            }
-        };
+        mListView.setItemChecked(mSelectedIndex, false);
+        mSelectedIndex = position;
+        mListView.setItemChecked(position, true);
+        String nation = mNations.get(position);
+        String flag = mFlags.get(position);
+        mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
+                .putString(SharedPreferenceKey.VPN_FLAG, flag)
+                .apply();
+        setResult(RESULT_OK);
+        finish();
+        Firebase.getInstance(this).logEvent("选择国家", nation);
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
         if(which == DialogInterface.BUTTON_POSITIVE){
-            if(mShadowsocksService != null){
-                try {
-                    mShadowsocksService.stop();
-                } catch (RemoteException e) {
-                    ShadowsocksApplication.handleException(e);
-                }
-                mSwipeRefreshLayout.setRefreshing(true);
-            }
+            mSwipeRefreshLayout.setRefreshing(true);
             Firebase.getInstance(this).logEvent("刷新服务器列表", "断开");
         }else if(which == DialogInterface.BUTTON_NEGATIVE){
             mSwipeRefreshLayout.setRefreshing(false);

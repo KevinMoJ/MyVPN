@@ -1,13 +1,8 @@
 <resources>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="share">"Compartir"</string>
-    <string name="about">"Acerca de"</string>
-    <string name="connect">"Conectar"</string>
     <string name="connecting">"Conectando"</string>
     <string name="more">"Más"</string>
-
-    <string name="navigation_drawer_open">"Abrir el cajón de navegación"</string>
-    <string name="navigation_drawer_close">"Cerrar el cajón de navegación"</string>
 
     <string name="action_choose_server">"Elegir servidor"</string>
     <string name="stopping">"Parada"</string>
@@ -25,7 +20,7 @@
     <string name="vpn_nation_sg">"Singapur"</string>
     <string name="vpn_nation_nl">"Países Bajos"</string>
     <string name="vpn_nation_us">"Estados Unidos"</string>
-    <string name="vpn_nation_ae">"Emiratos Árabes Unidos"</string>
+    <string name="vpn_nation_egypt">"Egipto"</string>
 
 
     <string name="not_start_vpn">"La conexión VPN no se inicia. Vuelve a intentarlo."</string>
@@ -36,17 +31,6 @@
     <string name="bluetooth">"Bluetooth"</string>
     <string name="scan_qr_code_download">"Escanear código QR\nDescargar en Google Play
 "</string>
-
-    <string name="connection">"Conexión"</string>
-    <string name="auto_connect">"Conectarse cuando se inicia la VPN"</string>
-    <string name="auto_connect_title">"Autoconectar"</string>
-    <string name="notification">"Notificación"</string>
-    <string name="settings">"Ajustes"</string>
-    <string name="information">"Información"</string>
-
-    <string name="tell_your_friends">"Dile a tus amigos"</string>
-    <string name="like_us">"Como nosotros"</string>
-    <string name="feedback">"Realimentación"</string>
 
     <string name="connecting_tip">"VPN is connectiong. Please try it later!"</string>
     <string name="stopping_tip">"VPN is connectiong. Please try it later!"</string>
@@ -60,13 +44,24 @@
     <string name="fetch_server_list">"Obtener lista de servidores"</string>
     <string name="fetch_server_list_failed">"Obtener el tiempo de espera de lista de servidores!"</string>
     <!--dialog 注意多语言 -->
-    <string name="notification_no_time">"Descargar: %1$s , carga: %2$s"</string>
+    <string name="notification_no_time">"Descargar: %1$d B/s, carga: %2$d B/s"</string>
     <string name="server_not_available">"El servidor VPN no está disponible en este momento. Plase intentarlo más tarde!"</string>
     <string name="notification_vpn_stop">"Su VPN está detenida. Toque para abrir."</string>
     <string name="notification_vpn_network_error1">"Debido a la inestabilidad de la red,"</string>
     <string name="notification_vpn_network_error2">"Su VPN está detenida. Toque para abrir."</string>
-    <string name="success_connect">"Conectado correctamente: %d"</string>
-    <string name="failed_connect">"Error de conexión: %d"</string>
-    <string name="free_used_time2">"Tiempo libre usado"</string>
+    <string name="success_connect">"Conectado correctamente: %d veces"</string>
+    <string name="failed_connect">"Error de conexión: %d veces"</string>
+    <string name="free_used_time">"Libre Usada: %s"</string>
     <string name="enable_notification">"Habilite el permiso de notificación en Configuración."</string>
+
+    <string name="news">"Noticias"</string>
+    <string name="video">"Vídeo"</string>
+    <string name="splash_subtitle">"Rápida y estable VPN"</string>
+    <string name="touch_to_connect">"Toca para conectarte"</string>
+    <string name="enable_vpn_connection">Por favor active la conexión VPN.</string>
+    <string-array name="network_errors">
+        <item>Sin redes disponibles, active Wi-Fi.</item>
+        <item>Conectado, no hay internet.</item>
+    </string-array>
+
 </resources>

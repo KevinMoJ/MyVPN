@@ -41,9 +41,7 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.SplashActivity"
             android:screenOrientation="portrait"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen">
+            android:theme="@style/Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,63 +49,9 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="yyf.shadowsocks.service.ShadowsocksVpnService"
-            android:permission="android.permission.BIND_VPN_SERVICE"
-            android:process=":vpn">
-            <intent-filter>
-                <action android:name="android.net.VpnService" />
-            </intent-filter>
-        </service>
-        <!-- Enable background dispatching to improve delivery on non-Google Play devices -->
-        <receiver
-            android:name="com.google.android.gms.analytics.AnalyticsReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="com.google.android.gms.analytics.AnalyticsService"
-            android:enabled="true"
-            android:exported="false" />
-
-        <!-- Enable Google Play Store Campaign reports -->
-        <receiver
-            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name="com.google.android.gms.analytics.CampaignTrackingService"
-            android:enabled="true" />
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="52a14ce59287e0edc5512692515ab0270feaef99" />
-
-        <receiver android:name="com.androapplite.shadowsocks.broadcast.ShadowsocksVPNServiceReceiver">
-            <intent-filter>
-                <action android:name="${applicationId}.INIT" />
-                <action android:name="${applicationId}.CONNECTING" />
-                <action android:name="${applicationId}.CONNECTED" />
-                <action android:name="${applicationId}.STOPPING" />
-                <action android:name="${applicationId}.STOPPED" />
-                <action android:name="${applicationId}.ERROR" />
-            </intent-filter>
-        </receiver>
-
-        <activity
-            android:name="com.androapplite.shadowsocks.activity.ConnectivityActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:excludeFromRecents="true"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name="com.androapplite.shadowsocks.service.ServerListFetcherService" />
         <service
@@ -117,51 +61,44 @@
         <activity
             android:name="com.androapplite.shadowsocks.activity.ServerListActivity"
             android:label="@string/server_list" />
-        <activity android:name="com.androapplite.shadowsocks.activity.ShareActivity"
-            android:screenOrientation="portrait"/>
-        <!--<activity-->
-            <!--android:name="com.facebook.FacebookActivity"-->
-            <!--android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"-->
-            <!--android:label="@string/app_name"-->
-            <!--android:theme="@android:style/Theme.Translucent.NoTitleBar" />-->
-
-        <!-- <provider -->
-        <!-- android:name="com.facebook.FacebookContentProvider" -->
-        <!-- android:authorities="com.facebook.app.FacebookContentProvider${applicationId}" -->
-        <!-- android:exported="true" /> -->
-
         <activity
-            android:name="com.androapplite.shadowsocks.activity.SettingsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name="com.androapplite.shadowsocks.activity.ShareActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
 
         <service
-            android:name="com.androapplite.shadowsocks.service.TimeCountDownService"
-            android:enabled="true"
-            android:exported="false" />
-
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.NotificationActionReceiver"
-            android:enabled="true"
-            android:exported="false">
+            android:name="com.vm.shadowsocks.core.LocalVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
-                <action android:name="${applicationId}.NOTIFICATION_DELETE" />
-                <action android:name="${applicationId}.NOTIFICATION_OPEN" />
+                <action android:name="android.net.VpnService" />
             </intent-filter>
-        </receiver>
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.ReportUseTimeReceiver"
+        </service>
+        <service
+            android:name="com.androapplite.shadowsocks.service.VpnManageService"
             android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name="com.androapplite.shadowsocks.service.FindProxyService"
             android:exported="false" />
-        <receiver android:name="com.androapplite.shadowsocks.broadcast.AutoRestartReceiver">
-            <intent-filter android:priority="1000">
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.intent.action.USER_PRESENT" />
+        <!--<service-->
+        <!--android:name="com.androapplite.shadowsocks.service.InterruptVpnIntentService"-->
+        <!--android:exported="false"></service>-->
+        <receiver android:name="com.androapplite.shadowsocks.broadcast.MyMultipleReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
 
-        <service
-            android:name="com.androapplite.shadowsocks.service.AutoRestartService"
-            android:exported="false"></service>
     </application>
 
 </manifest>

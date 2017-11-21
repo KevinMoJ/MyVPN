@@ -1,13 +1,8 @@
 <resources>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="share">Share</string>
-    <string name="about">About</string>
-    <string name="connect">Connect</string>
     <string name="connecting">Connecting</string>
     <string name="more">More</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_choose_server">Choose server</string>
     <string name="stopping">Stopping</string>
@@ -25,7 +20,7 @@
     <string name="vpn_nation_sg">Singapore</string>
     <string name="vpn_nation_nl">Netherlands</string>
     <string name="vpn_nation_us">United States</string>
-    <string name="vpn_nation_ae">UAE</string>
+    <string name="vpn_nation_egypt">Egypt</string>
 
 
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>
@@ -35,17 +30,6 @@
     <string name="facebook">Facebook</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="scan_qr_code_download">Scan QR code\ndownload on Google Play</string>
-
-    <string name="connection">Connection</string>
-    <string name="auto_connect">Connect when VPN starts</string>
-    <string name="auto_connect_title">Auto Connect</string>
-    <string name="notification">Notification</string>
-    <string name="settings">Settings</string>
-    <string name="information">Information</string>
-
-    <string name="tell_your_friends">Tell your friends</string>
-    <string name="like_us">Like us</string>
-    <string name="feedback">Feedback</string>
 
     <string name="connecting_tip">VPN is connectiong. Please try it later!</string>
     <string name="stopping_tip">VPN is stopping. Please try it later!</string>
@@ -59,13 +43,30 @@
     <string name="fetch_server_list">Fetching server list</string>
     <string name="fetch_server_list_failed">Fetching server list timeout!</string>
     <!--dialog 注意多语言 -->
-    <string name="notification_no_time">Download: %1$s, upload: %2$s</string>
+    <string name="notification_no_time">Download: %1$d B/s, upload: %2$d B/s</string>
     <string name="server_not_available">The VPN server is not available right now. Plase try it later!</string>
     <string name="notification_vpn_stop">Your VPN is stopped. Touch to open.</string>
     <string name="notification_vpn_network_error1">Because of network instability,</string>
     <string name="notification_vpn_network_error2">your VPN is stopped. Touch to open.</string>
-    <string name="success_connect">Successfully connected: %d</string>
-    <string name="failed_connect">Failed connected: %d</string>
-    <string name="free_used_time2">Free Used Time</string>
+    <string name="success_connect">Successfully connected: %d times</string>
+    <string name="failed_connect">Failed connected: %d times</string>
+    <string name="free_used_time">Free Used Time: %s</string>
     <string name="enable_notification">Please enable notification permission in Settings.</string>
+
+    <string name="news">news</string>
+    <string name="video">Video</string>
+    <string name="splash_subtitle">Fast and stable VPN</string>
+    <string name="touch_to_connect">Touch to connect</string>
+    <string name="enable_vpn_connection">Please enable VPN connection.</string>
+    <string-array name="network_errors">
+        <item>No available networks, turn Wi-Fi on.</item>
+        <item>Connected, no Internet.</item>
+    </string-array>
+    <string name="tell_your_friends">Tell your friends</string>
+    <string name="like_us">Like us</string>
+    <string name="feedback">Feedback</string>
+    <string name="about">About</string>
+    <string name="settings">Settings</string>
+    <string name="connect">Connect</string>
+    <string name="free_used_time2">Free Used Time</string>
 </resources>

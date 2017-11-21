@@ -1,0 +1,3 @@
+/Users/huangjian/AndroidStudioProjects/shadowsocks/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/edit_cache.dir
+/Users/huangjian/AndroidStudioProjects/shadowsocks/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/rebuild_cache.dir
+/Users/huangjian/AndroidStudioProjects/shadowsocks/app/.externalNativeBuild/cmake/debug/armeabi/CMakeFiles/des.dir

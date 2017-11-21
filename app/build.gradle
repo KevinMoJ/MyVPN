@@ -59,7 +59,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/dnsjava-2.1.7.jar')
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
@@ -67,15 +66,13 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.android.support:support-v4:25.0.0'
     compile 'com.google.android.gms:play-services-ads:10.0.1'
-//    compile 'com.facebook.android:audience-network-sdk:4.8.1'
     compile 'com.facebook.android:facebook-android-sdk:4.22.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.joooonho:selectableroundedimageview:1.0.1'
-//    compile 'com.github.bumptech.glide:glide:3.7.0'
-    testCompile 'junit:junit:4.12'
     compile 'com.google.firebase:firebase-core:10.0.1'
     compile project(path: ':ads')
     compile 'com.google.firebase:firebase-config:10.0.1'
     compile 'com.android.support:multidex:1.0.1'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.57'
 }
 apply plugin: 'com.google.gms.google-services'

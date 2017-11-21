@@ -48,4 +48,8 @@ public class NotificationsUtils {
             }
         }
     }
+
+    public static int getNotificationImportance(Context context) {
+        return NotificationManagerCompat.from(context).getImportance();
+    }
 }

@@ -1,111 +1,93 @@
 package com.androapplite.shadowsocks.activity;
 
-import android.Manifest;
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.os.RemoteException;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.NotificationsUtils;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.service.AutoRestartService;
 import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.ShadowsockServiceHelper;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.Firebase;
+
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.service.VpnManageService;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
-import java.lang.ref.WeakReference;
-import java.util.Random;
 
-import yyf.shadowsocks.IShadowsocksService;
-import yyf.shadowsocks.utils.Constants;
-
-public class SplashActivity extends AppCompatActivity implements Handler.Callback, Animator.AnimatorListener{
+public class SplashActivity extends AppCompatActivity implements Handler.Callback,
+        Animator.AnimatorListener{
     private Handler mAdLoadedCheckHandler;
     private ObjectAnimator mProgressbarAnimator;
-    private static final int MSG_CHECK_ADS = 1;
-    private Constants.State mState;
+    private static final int MSG_AD_LOADED_CHECK = 1;
+    private AdAppHelper mAdAppHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-        checkAndCopyAsset();
         startProgressBarAnimation();
+        mAdAppHelper = AdAppHelper.getInstance(this);
+        mAdAppHelper.loadNewInterstitial();
+        mAdAppHelper.loadNewNative();
 
         mAdLoadedCheckHandler = new Handler(this);
-        mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_CHECK_ADS, 1000);
+        mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 3000);
+        ServerListFetcherService.fetchServerListAsync(this);
+        VpnManageService.start(this);
         Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
-        AutoRestartService.startService(this);
-
-        final SharedPreferences preferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        int state = preferences.getInt(SharedPreferenceKey.VPN_STATE, Constants.State.INIT.ordinal());
-        mState = Constants.State.values()[state];
-        if(mState == Constants.State.INIT || mState == Constants.State.STOPPED || mState == Constants.State.ERROR){
-            ServerListFetcherService.fetchServerListAsync(this);
-        }
-
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
-        boolean shouldLoadAd = true;
-        if(mState == Constants.State.CONNECTED){
-            String defaultChange = adAppHelper.getCustomCtrlValue("default", "1");
-            String city = preferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-            if(city != null){
-                String chanceString = adAppHelper.getCustomCtrlValue(city, defaultChange);
-                float chance = 1;
-                try {
-                    chance = Float.parseFloat(chanceString);
-                    if(chance < 0){
-                        chance = 0;
-                    }else if(chance > 1){
-                        chance = 1;
-                    }
-                }catch (Exception e){
-                    ShadowsocksApplication.handleException(e);
-                }
-
-                float random = (float) Math.random();
-                shouldLoadAd = random < chance;
+        Intent intent = getIntent();
+        if (intent != null) {
+            String source = intent.getStringExtra("source");
+            if (source != null && source.equals("notificaiton")) {
+                Firebase.getInstance(this).logEvent("打开app来源","通知");
+            } else {
+                Firebase.getInstance(this).logEvent("打开app来源","图标");
             }
         }
 
-        if(shouldLoadAd){
-            adAppHelper.loadNewInterstitial();
-            adAppHelper.loadNewNative();
+        AdAppHelper.getInstance(getApplicationContext()).loadNewSplashAd();
+
+        FrameLayout frameLayout = (FrameLayout)findViewById(R.id.splash_ad_ll);
+        LinearLayout centerLogoLL = (LinearLayout)findViewById(R.id.center_logo_ll);
+        LinearLayout bottomLogoLL = (LinearLayout)findViewById(R.id.bottom_logo_ll);
+        if (AdAppHelper.getInstance(getApplicationContext()).isSplashReady()) {
+            View view = AdAppHelper.getInstance(getApplicationContext()).getSplashAd();
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+            frameLayout.addView(view, layoutParams);
+
+            centerLogoLL.setVisibility(View.GONE);
+            frameLayout.setVisibility(View.VISIBLE);
+            bottomLogoLL.setVisibility(View.VISIBLE);
+        } else {
+            centerLogoLL.setVisibility(View.VISIBLE);
+            frameLayout.setVisibility(View.GONE);
+            bottomLogoLL.setVisibility(View.GONE);
         }
+
     }
 
     @Override
     public boolean handleMessage(Message msg) {
-        if(msg.what == MSG_CHECK_ADS){
-            final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
-            if(adAppHelper.isFullAdLoaded() && adAppHelper.isNativeLoaded()){
-                mProgressbarAnimator.setDuration(100);
-            }else {
-                mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_CHECK_ADS, 1000);
-            }
+        switch (msg.what) {
+            case MSG_AD_LOADED_CHECK:
+                Log.d("SplanshActivity", "mAdAppHelper.isFullAdLoaded() " + mAdAppHelper.isFullAdLoaded());
+                if(mAdAppHelper.isFullAdLoaded()){
+                    mProgressbarAnimator.setDuration(100);
+                }else{
+                    mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 1000);
+                }
+                break;
         }
         return true;
     }
@@ -121,24 +103,10 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
     }
 
-
-    private void checkAndCopyAsset() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    ShadowsockServiceHelper.checkAndCopyAsset(getAssets(), yyf.shadowsocks.jni.System.getABI());
-                }catch (Exception e){
-                    ShadowsocksApplication.handleException(e);
-                }
-            }
-        }.start();
-    }
-
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mAdLoadedCheckHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 
     @Override
@@ -148,7 +116,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
     @Override
     public void onAnimationEnd(Animator animation) {
-        startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
+        startActivity(new Intent(SplashActivity.this, MainActivity.class));
         finish();
     }
 
