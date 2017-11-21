@@ -22,5 +22,6 @@
     <color name="failed_connect">#ff9580</color>
     <color name="used_time_bg">#10000000</color>
     <color name="free_used_time">#69f1ed</color>
+    <color name="connect_green">#5FE490</color>
 
 </resources>

@@ -9,11 +9,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -22,10 +25,14 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,11 +41,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 
+import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
@@ -76,10 +87,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
 
-public class MainActivity extends AppCompatActivity implements
-        ConnectFragment.OnConnectActionListener,
+public class MainActivity extends AppCompatActivity implements ConnectFragment.OnConnectActionListener,
         Handler.Callback, View.OnClickListener, DialogInterface.OnDismissListener,
-        DisconnectFragment.OnDisconnectActionListener, LocalVpnService.onStatusChangedListener{
+        DisconnectFragment.OnDisconnectActionListener, LocalVpnService.onStatusChangedListener,
+        NavigationView.OnNavigationItemSelectedListener{
     private Snackbar mSnackbar;
     private SharedPreferences mSharedPreference;
     private ProgressDialog mFetchServerListProgressDialog;
@@ -108,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_connectivity);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        initDrawer(toolbar);
+        initNavigationView();
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mReceiver = new MyReceiver(this);
         mIntentFilter = new IntentFilter(Action.SERVER_LIST_FETCH_FINISH);
@@ -134,6 +147,30 @@ public class MainActivity extends AppCompatActivity implements
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
         }
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
+    }
+
+    private void initNavigationView(){
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void initDrawer(Toolbar toolbar) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                Firebase.getInstance(drawerView.getContext()).logEvent("菜单", "关闭");
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                Firebase.getInstance(drawerView.getContext()).logEvent("菜单", "打开");
+            }
+        });
+        toggle.syncState();
     }
 
     private static class InterstitialAdStateListener extends AdStateListener {
@@ -184,18 +221,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
 
-        }
-    }
-
-    private void addBottomAd() {
-        if (mConnectFragment != null && mConnectFragment.isAdded()) {
-            mConnectFragment.addBottomAd();
-        }
-    }
-
-    private void rotatedBottomAd() {
-        if (mExitAlertDialog == null && mConnectFragment != null && mConnectFragment.isAdded()) {
-            mConnectFragment.rotateAd();
         }
     }
 
@@ -270,7 +295,10 @@ public class MainActivity extends AppCompatActivity implements
             final String flagKey = mVpnState == VpnState.Connected ? SharedPreferenceKey.CONNECTING_VPN_FLAG : SharedPreferenceKey.VPN_FLAG;
             final String flag = mSharedPreference.getString(flagKey, globalFlag);
             int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
-            mMenu.findItem(R.id.action_flag).setIcon(resId);
+            MenuItem item = mMenu.findItem(R.id.action_flag);
+            if (item != null) {
+                item.setIcon(resId);
+            }
         }
     }
 
@@ -698,7 +726,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDismiss(DisconnectFragment disconnectFragment) {
-        mConnectFragment.addBottomAd();
+        addBottomAd();
     }
 
     private void checkNotification(){
@@ -774,7 +802,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mMenu = menu;
-        getMenuInflater().inflate(R.menu.activity_connectivity_drawer, menu);
+        getMenuInflater().inflate(R.menu.connectivity, menu);
         return true;
     }
 
@@ -802,7 +830,7 @@ public class MainActivity extends AppCompatActivity implements
             if (isRunning) {
                 mConnectingConfig.saveInSharedPreference(mSharedPreference);
                 if (!AdAppHelper.getInstance(this).isFullAdLoaded()) {
-                    mConnectFragment.rotateAd();
+                    rotatedBottomAd();
                 }
                 ConnectionTestService.testConnection(this, mConnectingConfig.server);
                 mForgroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
@@ -837,4 +865,107 @@ public class MainActivity extends AppCompatActivity implements
     public void onTrafficUpdated(@Nullable TcpTrafficMonitor tcpTrafficMonitor) {
 
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        Firebase firebase = Firebase.getInstance(this);
+        if (id == R.id.nav_rate_us) {
+            rateUs();
+            firebase.logEvent("菜单", "给我们打分");
+        } else if (id == R.id.nav_share) {
+            share();
+            firebase.logEvent("抽屉", "分享");
+        } else if (id == R.id.nav_contact_us) {
+            contactUs();
+            firebase.logEvent("菜单", "联系我们");
+        } else if (id == R.id.nav_about) {
+            about();
+            firebase.logEvent("菜单", "关于");
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void rateUs(){
+        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+            startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(getPlayStoreUrlString())));
+            }catch (Exception ex){
+                ShadowsocksApplication.handleException(ex);
+            }
+        }
+    }
+
+    private void contactUs(){
+        Intent data=new Intent(Intent.ACTION_SENDTO);
+        data.setData(Uri.parse("mailto:watchfacedev@gmail.com"));
+        data.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.app_name));
+        data.putExtra(Intent.EXTRA_TEXT, "");
+        try {
+            startActivity(data);
+        }catch(ActivityNotFoundException e){
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    private void about(){
+        PackageManager packageManager = getPackageManager();
+        String packageName = getPackageName();
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
+            String version = packageInfo.versionName;
+
+            String appName = getResources().getString(R.string.app_name);
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.about)
+                    .setMessage(appName + " (" + version + ")")
+                    .show();
+        } catch (PackageManager.NameNotFoundException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+    }
+
+    private void share(){
+        startActivity(new Intent(this, ShareActivity.class));
+    }
+
+    private void addBottomAd() {
+        FrameLayout container = (FrameLayout) findViewById(R.id.ad_view_container);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        try {
+            AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+            container.addView(adAppHelper.getNative(), params);
+            Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "首页底部");
+        } catch (Exception ex) {
+            ShadowsocksApplication.handleException(ex);
+            Firebase.getInstance(this).logEvent("NATIVE广告", "显示失败", "首页底部");
+        }
+    }
+
+    private void rotatedBottomAd(){
+        FrameLayout view = (FrameLayout)findViewById(R.id.ad_view_container);
+        float centerX = view.getWidth() / 2.0f;
+        float centerY = view.getHeight() / 2.0f;
+        Rotate3dAnimation rotate3dAnimation = new Rotate3dAnimation(this, 0, 360, centerX, centerY, 0f, false, true);
+        rotate3dAnimation.setDuration(1000);
+        rotate3dAnimation.setFillAfter(false);
+        view.startAnimation(rotate3dAnimation);
+    }
+
+
 }

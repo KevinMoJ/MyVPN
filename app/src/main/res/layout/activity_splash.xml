@@ -4,26 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.androapplite.shadowsocks.activity.SplashActivity"
-    android:background="@drawable/splash_bg"
     >
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/splash_bg_top"
-        android:scaleType="fitXY"
-        android:alpha="0.3"/>
-    <View
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        android:layout_centerInParent="true"
-        android:id="@+id/center" />
+
     <android.support.v4.widget.ContentLoadingProgressBar
         android:layout_width="123dp"
         android:layout_height="10dp"
         android:id="@+id/progress_bar"
         style="Widget.ProgressBar.Horizontal"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/center"
         android:layout_marginBottom="24dp"
         android:indeterminate="false"
         android:indeterminateOnly="false"
@@ -34,17 +22,92 @@
         android:paddingLeft="2dp"
         android:paddingRight="2dp"
         android:progressDrawable="@drawable/progressbar"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
         />
 
-    <ImageView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_above="@id/progress_bar"
+        android:gravity="center_horizontal"
+        android:id="@+id/center_logo_ll"
+        android:visibility="visible"
+        >
+        <ImageView
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/splash_logo"
+            android:layout_above="@+id/progress_bar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="0dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/primary_black_text"
+            android:textSize="24sp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/splash_subtitle"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/splash_ad_ll"
+        android:visibility="gone"></FrameLayout>
+
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
-        android:src="@drawable/splash_logo"
-        android:layout_above="@+id/progress_bar"
+        android:orientation="horizontal"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:id="@+id/bottom_logo_ll"
+        android:visibility="gone"
+        >
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/splash_logo"
+            />
+        <View android:layout_height="1dp"
+            android:layout_width="8dp" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/primary_black_text"
+                android:textSize="20sp"
+                />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/splash_subtitle"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="16sp"/>
+        </LinearLayout>
+    </LinearLayout>
 
-        />
 
 </RelativeLayout>

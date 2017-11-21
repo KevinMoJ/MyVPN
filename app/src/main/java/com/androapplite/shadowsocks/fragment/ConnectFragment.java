@@ -51,8 +51,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private TextView mSuccessConnectTextView;
     private TextView mFailedConnectTextView;
     private SharedPreferences mSharedPreference;
-    private ImageView mBigCircleImageView;
-    private ImageView mMiddleCircleImageView;
+    private ImageView mLoadingView;
+    private TextView mFreeUsedTimeTextView;
     private boolean mIsAnimating;
     private MyReceiver mMyReceiver;
     private VpnState mVpnState;
@@ -67,14 +67,14 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_conn, container, false);
+        View view = inflater.inflate(R.layout.fragment_connect, container, false);
         mMessageTextView = (TextView)view.findViewById(R.id.message);
         mConnectButton = (Button)view.findViewById(R.id.connect_button);
         mSuccessConnectTextView = (TextView)view.findViewById(R.id.success_connect);
         mFailedConnectTextView = (TextView)view.findViewById(R.id.failed_connect);
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        mBigCircleImageView = (ImageView)view.findViewById(R.id.circle_big_image_view);
-        mMiddleCircleImageView = (ImageView)view.findViewById(R.id.circle_mid_image_view);
+        mLoadingView = (ImageView)view.findViewById(R.id.loading);
+        mFreeUsedTimeTextView = (TextView)view.findViewById(R.id.free_used_time);
         return view;
     }
 
@@ -91,8 +91,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
             mVpnState = VpnState.Init;
             stopFinish();
         }
-
-        addBottomAd();
 
         IntentFilter intentFilter = new IntentFilter(Action.ACTION_TIME_USE);
         mMyReceiver = new MyReceiver(this);
@@ -166,19 +164,20 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     public void animateConnecting(){
         startAnimation();
-        mConnectButton.setText(R.string.connecting);
-        mConnectButton.setBackgroundResource(R.drawable.connect_btn);
+        mConnectButton.setText(R.string.disconnect);
+        mMessageTextView.setText(R.string.connecting);
+        mFreeUsedTimeTextView.setVisibility(View.GONE);
+        mLoadingView.setImageLevel(0);
 
     }
 
     private void startAnimation(){
         if(!mIsAnimating) {
-            Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.zoom);
-            animation.setDuration(500);
-            mBigCircleImageView.startAnimation(animation);
-            animation = AnimationUtils.loadAnimation(getContext(), R.anim.zoom);
-            animation.setDuration(450);
-            mMiddleCircleImageView.startAnimation(animation);
+            Animation currentAnimation = mLoadingView.getAnimation();
+            if(currentAnimation == null) {
+                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
+                mLoadingView.startAnimation(animation);
+            }
             mIsAnimating = true;
         }
     }
@@ -189,30 +188,33 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void clearAnimation(){
         mIsAnimating = false;
-        mBigCircleImageView.clearAnimation();
-        mMiddleCircleImageView.clearAnimation();
+        mLoadingView.clearAnimation();
     }
 
     public void animateStopping(){
         startAnimation();
-        mConnectButton.setText(R.string.stopping);
+        mConnectButton.setText(R.string.connect);
+        mMessageTextView.setText(R.string.stopping);
+        mFreeUsedTimeTextView.setVisibility(View.GONE);
+        mLoadingView.setImageLevel(0);
     }
 
     private void connectFinish(){
         stopAnimation();
-        mConnectButton.setBackgroundResource(R.drawable.connect_btn);
         mConnectButton.setText(R.string.disconnect);
     }
 
     private void stopFinish(){
         stopAnimation();
-        mConnectButton.setText(R.string.touch_to_connect);
+        mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
+        mConnectButton.setText(R.string.connect);
     }
 
     private void error(){
         stopAnimation();
         updateFailedTimes();
-        mConnectButton.setBackgroundResource(R.drawable.connect_error);
+        mLoadingView.setImageLevel(1);
+        mConnectButton.setText(R.string.connect);
     }
 
     @Override
@@ -221,7 +223,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
         mVpnState = VpnState.values()[state];
         updateUI();
-        addBottomAd();
     }
 
     @Override
@@ -286,40 +287,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     }
 
-    public void addBottomAd() {
-        final View rootView = getView();
-        if(getView() != null) {
-            FrameLayout container = (FrameLayout) rootView.findViewById(R.id.ad_view_container);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-            try {
-                AdAppHelper adAppHelper = AdAppHelper.getInstance(getContext());
-                container.addView(adAppHelper.getNative(), params);
-                Firebase.getInstance(rootView.getContext()).logEvent("NATIVE广告", "显示成功", "首页底部");
-            } catch (Exception ex) {
-                ShadowsocksApplication.handleException(ex);
-                Firebase.getInstance(rootView.getContext()).logEvent("NATIVE广告", "显示失败", "首页底部");
-            }
-        }
-    }
 
-    public void rotateAd(){
-        final View rootView = getView();
-        if(rootView != null) {
-            FrameLayout view = (FrameLayout) rootView.findViewById(R.id.ad_view_container);
-            float centerX = view.getWidth() / 2.0f;
-            float centerY = view.getHeight() / 2.0f;
-            Rotate3dAnimation rotate3dAnimation = new Rotate3dAnimation(getContext(), 0, 360, centerX, centerY, 0f, false, true);
-            rotate3dAnimation.setDuration(1000);
-            rotate3dAnimation.setFillAfter(false);
-            view.startAnimation(rotate3dAnimation);
-        }
-    }
 
     private static class MyReceiver extends BroadcastReceiver {
         private WeakReference<ConnectFragment> mReference;
 
         MyReceiver(ConnectFragment fragment) {
-            mReference = new WeakReference<ConnectFragment>(fragment);
+            mReference = new WeakReference<>(fragment);
         }
 
         @Override
