@@ -57,13 +57,6 @@
 -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 
-
--keep class yyf.shadowsocks.**{*;}
--keep class yyf.shadowsocks.service.**{*;}
--keep class yyf.shadowsocks.jni.**{*;}
--keep class yyf.shadowsocks.utils.**{*;}
-
-
 #For design support library
 -keep class android.support.design.widget.** { *; }
 -keep interface android.support.design.widget.** { *; }
@@ -76,3 +69,9 @@
 }
 
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+-keep class org.jsoup.**
+
+-dontwarn org.bouncycastle.**
+
+-keep public class android.os.SystemProperties { *; }
+-keep class com.vm.shadowsocks.tunnel.shadowsocks.** { *;}
