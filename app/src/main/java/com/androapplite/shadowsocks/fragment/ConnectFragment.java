@@ -16,26 +16,20 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.Rotate3dAnimation;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.lang.ref.WeakReference;
@@ -206,8 +200,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void stopFinish(){
         stopAnimation();
-        mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
+        mFreeUsedTimeTextView.setVisibility(View.GONE);
         mConnectButton.setText(R.string.connect);
+        updateFreeUsedTime();
     }
 
     private void error(){

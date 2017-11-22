@@ -216,7 +216,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     case ADMOB_FULL:
                     case AdType.FACEBOOK_FBN:
                     case AdType.FACEBOOK_FULL:
-                        activity.rotatedBottomAd();
+                        if (activity.mExitAlertDialog == null && activity.mVpnState == VpnState.Connected) {
+                            activity.rotatedBottomAd();
+                        }
                         break;
                 }
             }

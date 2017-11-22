@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/small_text"
             android:gravity="center"
-            android:text="@string/success_connect"
+            tools:text="@string/success_connect"
             android:textColor="@color/success_connect"
             android:id="@+id/success_connect" />
 
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/small_text"
             android:gravity="center"
-            android:text="@string/failed_connect"
+            tools:text="@string/failed_connect"
             android:textColor="@color/failed_connect"
             android:id="@+id/failed_connect"/>
     </LinearLayout>
