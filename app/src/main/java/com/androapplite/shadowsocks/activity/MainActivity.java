@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
                 firebase.logEvent("选择国家", nation);
             }
+            PromotionTracking.getInstance(this).reportClickConnectButtonCount();
         } else {
             DisconnectFragment disconnectFragment = new DisconnectFragment();
             disconnectFragment.show(getSupportFragmentManager(), "disconnect");

@@ -31,6 +31,7 @@ public final class SharedPreferenceKey {
     public static final String PAYLOAD_100M = "PAYLOAD_100M";
     public static final String INSTALL_APP_TIME = "INSTALL_APP_TIME";
     public static final String PHONE_MODEL_OS_TIME = "PHONE_MODEL_OS_TIME";
-
+    public static final String CLICK_CONNECT_BUTTON_TIME = "CLICK_CONNECT_BUTTON_TIME";
+    public static final String CLICK_CONNECT_BUTTON_COUNT = "CLICK_CONNECT_BUTTON_COUNT";
 
 }

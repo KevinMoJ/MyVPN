@@ -323,4 +323,23 @@ public class PromotionTracking {
             mEditor.putLong(SharedPreferenceKey.INSTALL_APP_TIME, lastCalendar.getTimeInMillis()).apply();
         }
     }
+
+    public void reportClickConnectButtonCount() {
+        Calendar currentCalendar = Calendar.getInstance();
+        long last = mSharedPreference.getLong(SharedPreferenceKey.CLICK_CONNECT_BUTTON_TIME, currentCalendar.getTimeInMillis());
+        Calendar lastCalendar = Calendar.getInstance();
+        lastCalendar.setTimeInMillis(last);
+        int count = mSharedPreference.getInt(SharedPreferenceKey.CLICK_CONNECT_BUTTON_COUNT, 0);
+        if (isNewDay(lastCalendar, currentCalendar)) {
+            lastCalendar = currentCalendar;
+            count = 0;
+        }
+        count++;
+        if (count == 3){
+            mFirebase.logEvent("点击连接按钮超过3次", "广告投放统计");
+        }
+        mEditor.putLong(SharedPreferenceKey.CLICK_CONNECT_BUTTON_TIME, lastCalendar.getTimeInMillis())
+                .putInt(SharedPreferenceKey.CLICK_CONNECT_BUTTON_COUNT, count)
+                .apply();
+    }
 }
