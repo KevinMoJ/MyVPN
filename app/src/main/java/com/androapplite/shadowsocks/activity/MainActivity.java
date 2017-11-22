@@ -133,9 +133,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         firebase.logEvent("屏幕","主屏幕");
         checkNotification();
 
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
-        adAppHelper.showFullAd();
         LocalVpnService.addOnStatusChangedListener(this);
         int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
         mVpnState = VpnState.values()[state];
@@ -147,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
         }
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
+
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
+        adAppHelper.showFullAd();
     }
 
     private void initNavigationView(){
@@ -421,6 +422,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         AdAppHelper.getInstance(this).onResume();
         updateFlagMenuIcon();
         VpnService.prepare(this);
+        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        if (adAppHelper.isNativeLoaded()) {
+            addBottomAd();
+        } else {
+            adAppHelper.loadNewNative();
+        }
     }
 
     @Override

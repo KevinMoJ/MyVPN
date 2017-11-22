@@ -7,38 +7,64 @@
     android:orientation="vertical"
     android:background="@android:color/white"
     tools:context="com.androapplite.shadowsocks.activity.ShareActivity">
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:text="@string/facebook"
-        android:textAllCaps="false"
-        android:textAlignment="textStart"
-        android:gravity="start|center_vertical"
-        android:drawableLeft="@drawable/ic_facebook_circle"
-        android:drawablePadding="24dp"
-        android:paddingLeft="24dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:orientation="horizontal"
+        android:focusable="true"
+        android:clickable="true"
         android:onClick="shareByFacebook"
-        />
+        android:background="?android:attr/selectableItemBackground"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_facebook_circle"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:text="@string/facebook"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            />
+    </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="@color/grey_cc" />
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:text="@string/bluetooth"
-        android:textAllCaps="false"
-        android:textAlignment="textStart"
-        android:gravity="start|center_vertical"
-        android:drawableLeft="@drawable/ic_bluetooth_24dp"
-        android:drawablePadding="24dp"
-        android:paddingLeft="24dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:orientation="horizontal"
+        android:focusable="true"
+        android:clickable="true"
         android:onClick="shareByBluetooth"
-        />
+        android:background="?android:attr/selectableItemBackground"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_bluetooth_24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:text="@string/bluetooth"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            />
+    </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
