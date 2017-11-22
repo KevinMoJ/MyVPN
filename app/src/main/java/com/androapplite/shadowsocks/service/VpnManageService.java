@@ -183,7 +183,9 @@ public class VpnManageService extends Service implements Runnable,
 
     @Override
     public void onTrafficUpdated(@Nullable TcpTrafficMonitor tcpTrafficMonitor) {
-        PromotionTracking.getInstance(this).reportUsageByte(tcpTrafficMonitor);
+        if (tcpTrafficMonitor != null) {
+            PromotionTracking.getInstance(this).reportUsageByte(tcpTrafficMonitor);
+        }
     }
 
     @Override

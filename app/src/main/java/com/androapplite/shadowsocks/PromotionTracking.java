@@ -26,6 +26,10 @@ public class PromotionTracking {
     private SharedPreferences.Editor mEditor;
     private HashSet<String> mPhoneModels;
 
+    private int mByte1M;
+    private int mByte10M;
+    private int mByte100M;
+
     private void initPhoneModels() {
         String[] models = ("SM-J700F\n" +
                 "GT-I9060I\n" +
@@ -138,7 +142,9 @@ public class PromotionTracking {
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mContext);
         mEditor = mSharedPreference.edit();
         initPhoneModels();
-
+        mByte1M = 1024 * 1024;
+        mByte10M = 10 * mByte1M;
+        mByte100M = 10 * mByte10M;
     }
 
     public static PromotionTracking getInstance(Context context) {
@@ -200,6 +206,8 @@ public class PromotionTracking {
             lastCalendar = currentCalendar;
             if (count >= 2 && count < 8) {
                 mFirebase.logEvent("连续打开" + count + "天", "广告投放统计");
+            } else if (count >=8 && count < 14){
+                mFirebase.logEvent("连续打开7天", "广告投放统计");
             } else if (count >=14 && count < 30) {
                 mFirebase.logEvent("连续打开14天", "广告投放统计");
             } else if (count >= 30) {
@@ -223,7 +231,9 @@ public class PromotionTracking {
                 int day = (int) ((currentCalendar.getTimeInMillis() - installTime) / DateUtils.DAY_IN_MILLIS);
                 int uninstallDay = day - 1;
                 if (uninstallDay >= 2 && uninstallDay < 8) {
-                    mFirebase.logEvent("安装" + day + "天未删除", "广告投放统计");
+                    mFirebase.logEvent("安装" + uninstallDay + "天未删除", "广告投放统计");
+                } else if (uninstallDay >=8 && uninstallDay <14){
+                    mFirebase.logEvent("安装7天未删除", "广告投放统计");
                 } else if (uninstallDay >=14 && uninstallDay < 30) {
                     mFirebase.logEvent("安装14天未删除", "广告投放统计");
                 } else if (uninstallDay >= 30) {
@@ -258,13 +268,19 @@ public class PromotionTracking {
 
         }
         payload += tcpTrafficMonitor.pProxyPayloadReceivedByteCount + tcpTrafficMonitor.pProxyPayloadSentByteCount;
-        if (payload >= 1024*1024 && payload < 1024 * 1024 * 100) {
+        if (payload >= mByte1M && payload < mByte10M) {
+            boolean isReport = mSharedPreference.getBoolean(SharedPreferenceKey.PAYLOAD_1M, false);
+            if (!isReport) {
+                mFirebase.logEvent("每天流量1M", "广告投放统计");
+                mEditor.putBoolean(SharedPreferenceKey.PAYLOAD_1M, true);
+            }
+        }else if (payload >= mByte10M && payload < mByte100M) {
             boolean isReport = mSharedPreference.getBoolean(SharedPreferenceKey.PAYLOAD_10M, false);
             if (!isReport) {
                 mFirebase.logEvent("每天流量10M", "广告投放统计");
                 mEditor.putBoolean(SharedPreferenceKey.PAYLOAD_10M, true);
             }
-        } else if (payload >= 1024 * 1024 * 100){
+        } else if (payload >= mByte100M){
             boolean isReport = mSharedPreference.getBoolean(SharedPreferenceKey.PAYLOAD_100M, false);
             if (!isReport) {
                 mFirebase.logEvent("每天流量100M", "广告投放统计");

@@ -27,6 +27,7 @@ public final class SharedPreferenceKey {
     public static final String UNINSTALL_DAY_TIME = "UNINSTALL_DAY_TIME";
     public static final String PAYLOAD_TIME = "PAYLOAD_TIME";
     public static final String PAYLOAD_BYTE = "PAYLOAD_BYTE";
+    public static final String PAYLOAD_1M = "PAYLOAD_1M";
     public static final String PAYLOAD_10M = "PAYLOAD_10M";
     public static final String PAYLOAD_100M = "PAYLOAD_100M";
     public static final String INSTALL_APP_TIME = "INSTALL_APP_TIME";

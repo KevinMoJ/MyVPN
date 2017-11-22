@@ -422,7 +422,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         registerReceiver();
         AdAppHelper.getInstance(this).onResume();
         updateFlagMenuIcon();
-        VpnService.prepare(this);
+        try {
+            VpnService.prepare(this);
+        } catch (Exception e) {
+            ShadowsocksApplication.handleException(e);
+        }
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         if (adAppHelper.isNativeLoaded()) {
             addBottomAd();
