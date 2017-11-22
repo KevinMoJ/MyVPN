@@ -62,5 +62,13 @@
         <item>Нет доступных сетей, включите Wi-Fi.</item>
         <item>Подключено, нет Интернета.</item>
     </string-array>
-
+    <string name="tell_your_friends">"Расскажи своим друзьям"</string>
+    <string name="like_us">"Как мы"</string>
+    <string name="feedback">"Обратная связь"</string>
+    <string name="about">"Около"</string>
+    <string name="settings">"настройки"</string>
+    <string name="connect">"соединять"</string>
+    <string name="free_used_time2">"Свободное время использования"</string>
+    <string name="navigation_drawer_open">"Открыть навигационный ящик"</string>
+    <string name="navigation_drawer_close">"Закрыть навигационный ящик"</string>
 </resources>

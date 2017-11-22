@@ -62,5 +62,13 @@
         <item>Aucun réseau disponible, activez le Wi-Fi.</item>
         <item>Connecté, pas d\'Internet.</item>
     </string-array>
-
+    <string name="tell_your_friends">"Dis-le à tes amis"</string>
+    <string name="like_us">"Comme nous"</string>
+    <string name="feedback">"Retour d'information"</string>
+    <string name="about">"Sur"</string>
+    <string name="settings">"Paramètres"</string>
+    <string name="connect">"Relier"</string>
+    <string name="free_used_time2">"Temps d'utilisation gratuit"</string>
+    <string name="navigation_drawer_open">"Ouvrir le tiroir de navigation"</string>
+    <string name="navigation_drawer_close">"Fermer le tiroir de navigation"</string>
 </resources>

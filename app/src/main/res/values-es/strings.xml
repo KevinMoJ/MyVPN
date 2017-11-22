@@ -63,5 +63,13 @@
         <item>Sin redes disponibles, active Wi-Fi.</item>
         <item>Conectado, no hay internet.</item>
     </string-array>
-
+    <string name="tell_your_friends">"Dile a tus amigos"</string>
+    <string name="like_us">"Como nosotros"</string>
+    <string name="feedback">"Realimentación"</string>
+    <string name="about">"Acerca de"</string>
+    <string name="settings">"Ajustes"</string>
+    <string name="connect">"Conectar"</string>
+    <string name="free_used_time2">"Tiempo de uso gratuito"</string>
+    <string name="navigation_drawer_open">"Abrir el cajón de navegación"</string>
+    <string name="navigation_drawer_close">"Cerrar el cajón de navegación"</string>
 </resources>

@@ -62,5 +62,13 @@
         <item>Немає доступних мереж, увімкніть Wi-Fi.</item>
         <item>Підключено, немає Інтернету.</item>
     </string-array>
-
+    <string name="tell_your_friends">"Скажи своїм друзям"</string>
+    <string name="like_us">"Як нас"</string>
+    <string name="feedback">"Зворотній зв'язок"</string>
+    <string name="about">"Про"</string>
+    <string name="settings">"Налаштування"</string>
+    <string name="connect">"Підключіться"</string>
+    <string name="free_used_time2">"Вільний використаний час"</string>
+    <string name="navigation_drawer_open">"Відкрийте навігатор навігації"</string>
+    <string name="navigation_drawer_close">"Закрити навігаційну панель"</string>
 </resources>

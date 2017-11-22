@@ -62,4 +62,13 @@
         <item>"Não há redes disponíveis, ligue Wi-Fi."</item>
         <item>"Conectado, sem Internet."</item>
     </string-array>
+    <string name="tell_your_friends">"Conte aos seus amigos"</string>
+    <string name="like_us">"Como nós"</string>
+    <string name="feedback">"Comentários"</string>
+    <string name="about">"Sobre"</string>
+    <string name="settings">"Configurações"</string>
+    <string name="connect">"Conectar"</string>
+    <string name="free_used_time2">"Tempo Livre Usado"</string>
+    <string name="navigation_drawer_open">"Abrir a gaveta de navegação"</string>
+    <string name="navigation_drawer_close">"Fechar gaveta de navegação"</string>
 </resources>
