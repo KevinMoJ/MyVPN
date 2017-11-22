@@ -299,6 +299,11 @@ public class PromotionTracking {
                 mFirebase.logEvent("装过Twitter", "广告投放统计");
             } catch (Exception e) {
             }
+            try{
+                packageManager.getPackageInfo("com.whatsapp", 0);
+                mFirebase.logEvent("装过Whatsapp", "广告投放统计");
+            } catch (Exception e) {
+            }
             mEditor.putLong(SharedPreferenceKey.INSTALL_APP_TIME, lastCalendar.getTimeInMillis()).apply();
         }
     }
