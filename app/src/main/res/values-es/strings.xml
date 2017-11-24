@@ -63,5 +63,16 @@
         <item>Sin redes disponibles, active Wi-Fi.</item>
         <item>Conectado, no hay internet.</item>
     </string-array>
-
+    <string name="tap_to_connect">"Toca para conectar"</string>
+    <string name="use_time">"Tiempo de uso gratuito %s"</string>
+    <string name="notification_network_error">"Debido a la inestabilidad de la red, su VPN se detiene. Toca para abrir."</string>
+    <string name="settings">"Ajustes"</string>
+    <string name="tell_your_friends">"Dile a tus amigos"</string>
+    <string name="like_us">"Como nosotros"</string>
+    <string name="feedback">"Realimentación"</string>
+    <string name="about">"Acerca de"</string>
+    <string name="navigation_drawer_open">"Abrir el cajón de navegación"</string>
+    <string name="navigation_drawer_close">"Cerrar el cajón de navegación"</string>
+    <string name="retry">"Rever"</string>
+    <string name="connected">"Conectado"</string>
 </resources>

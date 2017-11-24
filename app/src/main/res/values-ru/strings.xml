@@ -62,5 +62,16 @@
         <item>Нет доступных сетей, включите Wi-Fi.</item>
         <item>Подключено, нет Интернета.</item>
     </string-array>
-
+    <string name="tap_to_connect">"Нажмите, чтобы подключиться"</string>
+    <string name="use_time">"Свободное время использования %s"</string>
+    <string name="notification_network_error">"Из-за нестабильности сети ваша VPN остановлена. Нажмите, чтобы открыть."</string>
+    <string name="settings">"настройки"</string>
+    <string name="tell_your_friends">"Расскажи своим друзьям"</string>
+    <string name="like_us">"Как мы"</string>
+    <string name="feedback">"Обратная связь"</string>
+    <string name="about">"Около"</string>
+    <string name="navigation_drawer_open">"Открыть навигационный ящик"</string>
+    <string name="navigation_drawer_close">"Закрыть навигационный ящик"</string>
+    <string name="retry">"Retry"</string>
+    <string name="connected">"Связанный"</string>
 </resources>

@@ -62,4 +62,16 @@
         <item>"لا تتوفر شبكات، يمكنك تشغيل واي-في."</item>
         <item>"متصل، لا إنترنت."</item>
     </string-array>
+    <string name="tap_to_connect">"انقر للاتصال"</string>
+    <string name="use_time">"الحرة المستخدمة الوقت %s"</string>
+    <string name="notification_network_error">"بسبب عدم استقرار الشبكة، يتم إيقاف فين الخاص بك. المس لفتح."</string>
+    <string name="settings">"إعدادات"</string>
+    <string name="tell_your_friends">"أخبر أصدقائك"</string>
+    <string name="like_us">"مثلنا"</string>
+    <string name="feedback">"ردود الفعل"</string>
+    <string name="about">"حول"</string>
+    <string name="navigation_drawer_open">"فتح درج التنقل"</string>
+    <string name="navigation_drawer_close">"إغلاق درج التنقل"</string>
+    <string name="retry">"إعادة المحاولة"</string>
+    <string name="connected">"متصل"</string>
 </resources>

@@ -62,5 +62,16 @@
         <item>Немає доступних мереж, увімкніть Wi-Fi.</item>
         <item>Підключено, немає Інтернету.</item>
     </string-array>
-
+    <string name="tap_to_connect">"Натисніть, щоб з'єднати"</string>
+    <string name="use_time">"Вільний час використання %s"</string>
+    <string name="notification_network_error">"Через нестабільність мережі ваш VPN припиняється. Торкніться, щоб відкрити."</string>
+    <string name="settings">"Налаштування"</string>
+    <string name="tell_your_friends">"Скажи своїм друзям"</string>
+    <string name="like_us">"Як нас"</string>
+    <string name="feedback">"Зворотній зв'язок"</string>
+    <string name="about">"Про"</string>
+    <string name="navigation_drawer_open">"Відкрийте навігатор навігації"</string>
+    <string name="navigation_drawer_close">"Закрити навігаційну панель"</string>
+    <string name="retry">"Спроба спробувати"</string>
+    <string name="connected">"Підключений"</string>
 </resources>

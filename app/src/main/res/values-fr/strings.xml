@@ -62,5 +62,16 @@
         <item>Aucun réseau disponible, activez le Wi-Fi.</item>
         <item>Connecté, pas d\'Internet.</item>
     </string-array>
-
+    <string name="tap_to_connect">"Appuyez pour vous connecter"</string>
+    <string name="use_time">"Temps d'utilisation gratuit %s"</string>
+    <string name="notification_network_error">"En raison de l'instabilité du réseau, votre VPN est arrêté. Touchez pour ouvrir."</string>
+    <string name="settings">"Paramètres"</string>
+    <string name="tell_your_friends">"Dis-le à tes amis"</string>
+    <string name="like_us">"Comme nous"</string>
+    <string name="feedback">"Retour d'information"</string>
+    <string name="about">"Sur"</string>
+    <string name="navigation_drawer_open">"Ouvrir le tiroir de navigation"</string>
+    <string name="navigation_drawer_close">"Fermer le tiroir de navigation"</string>
+    <string name="retry">"Recommencez"</string>
+    <string name="connected">"Connecté"</string>
 </resources>

@@ -62,4 +62,16 @@
         <item>"कोई उपलब्ध नेटवर्क नहीं, वाई-फ़ाई चालू करें।"</item>
         <item>"कनेक्टेड, कोई इंटरनेट नहीं"</item>
     </string-array>
+    <string name="tap_to_connect">"कनेक्ट करने के लिए टैप करें"</string>
+    <string name="use_time">"निशुल्क समय %s"</string>
+    <string name="notification_network_error">"नेटवर्क अस्थिरता के कारण, आपका वीपीएन बंद हो गया है। खोलने के लिए स्पर्श करें"</string>
+    <string name="settings">"सेटिंग्स"</string>
+    <string name="tell_your_friends">"अपने दोस्तों को बताएँ"</string>
+    <string name="like_us">"हमारी तरह"</string>
+    <string name="feedback">"प्रतिक्रिया"</string>
+    <string name="about">"के बारे में"</string>
+    <string name="navigation_drawer_open">"नेविगेशन ड्रॉवर खोलें"</string>
+    <string name="navigation_drawer_close">"नेविगेशन ड्रॉवर को बंद करें"</string>
+    <string name="retry">"पुन: प्रयास करें"</string>
+    <string name="connected">"जुड़े हुए"</string>
 </resources>
