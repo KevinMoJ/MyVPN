@@ -2,8 +2,8 @@ package com.vm.shadowsocks.core;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.support.v4.BuildConfig;
 
+import com.androapplite.shadowsocks.BuildConfig;
 import com.vm.shadowsocks.tcpip.CommonMethods;
 import com.vm.shadowsocks.tunnel.Config;
 import com.vm.shadowsocks.tunnel.httpconnect.HttpConnectConfig;
@@ -28,7 +28,7 @@ import okhttp3.Response;
 
 public class ProxyConfig {
     public static final ProxyConfig Instance = new ProxyConfig();
-    public final static boolean IS_DEBUG = BuildConfig.DEBUG;
+    public final static boolean IS_DEBUG = false; //BuildConfig.DEBUG;
     public static String AppInstallID;
     public static String AppVersion;
     public final static int FAKE_NETWORK_MASK = CommonMethods.ipStringToInt("255.255.0.0");
@@ -450,9 +450,13 @@ public class ProxyConfig {
             }
             config = HttpConnectConfig.parse(proxyString);
         }
-        if (!m_ProxyList.contains(config)) {
+        int index = m_ProxyList.indexOf(config);
+        if (index < 0) {
             m_ProxyList.add(0, config);
             m_DomainMap.put(config.ServerAddress.getHostName(), false);
+        } else if (index > 0) {
+            Config old = m_ProxyList.set(0, m_ProxyList.get(index));
+            m_ProxyList.set(index, old);
         }
     }
 }

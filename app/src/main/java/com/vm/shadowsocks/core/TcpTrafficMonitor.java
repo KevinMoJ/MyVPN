@@ -4,7 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.vm.shadowsocks.tcpip.IPHeader;
 import com.vm.shadowsocks.tcpip.TCPHeader;
 
@@ -46,9 +50,9 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
     public volatile long pProxyPayloadSentByteCountLast;
     public volatile long pProxyPayloadReceivedByteCountLast;
     private volatile boolean mIsStoped;
-    private ScheduledFuture mScheduledFuture;
+    private volatile ScheduledFuture mScheduledFuture;
     private ScheduledExecutorService mScheduledExecutorService;
-    private IntentFilter mIntentFilter;
+    private volatile IntentFilter mIntentFilter;
     private long mSentSpeedLast;
     private long mReceivedSpeedLast;
     private long mProxySentSpeedLast;
@@ -57,10 +61,14 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
     private long mPayloadReceivedSpeedLast;
     private long mProxyPayloadSentSpeedLast;
     private long mProxyPayloadReceivedSpeedLast;
+    public int pNetworkError;
+    private int mNetworkErrorCount;
 
 
     public TcpTrafficMonitor(ScheduledExecutorService service) {
         mScheduledExecutorService = service;
+        pNetworkError = -1;
+        mNetworkErrorCount = 0;
     }
 
     private void stop() {
@@ -74,7 +82,11 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
     private void start() {
         mIsStoped = false;
         if (mScheduledFuture == null) {
-            mScheduledFuture = mScheduledExecutorService.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
+            try {
+                mScheduledFuture = mScheduledExecutorService.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                ShadowsocksApplication.handleException(e);
+            }
         }
     }
 
@@ -119,11 +131,39 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
                 mPayloadReceivedSpeedLast = pPayloadReceivedSpeed;
                 mProxyPayloadSentSpeedLast = pProxyPayloadSentSpeed;
                 mProxyPayloadReceivedSpeedLast = pProxyPayloadReceivedSpeed;
+                if (pPayloadReceivedSpeed <= 0) {
+                    if (checkActiveNetwork()){
+                        if (pPayloadSentSpeed > 0) {
+                            mNetworkErrorCount++;
+                        }
+                    } else {
+                        pNetworkError = 0;
+                        mNetworkErrorCount = 0;
+                    }
+                } else {
+                    pNetworkError = -1;
+                    mNetworkErrorCount = 0;
+                }
+
+                if (mNetworkErrorCount > 5) {
+                    pNetworkError = 1;
+                }
+
                 LocalVpnService.Instance.updateTraffic();
                 if (ProxyConfig.IS_DEBUG) {
                     System.out.println("speed updateTraffic");
                 }
             }
+        }
+    }
+
+    private boolean checkActiveNetwork() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) LocalVpnService.Instance.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetInfo != null && activeNetInfo.isConnected()) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -169,16 +209,24 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
             mIntentFilter = new IntentFilter();
             mIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
             mIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
-            context.registerReceiver(this, mIntentFilter);
+            try {
+                context.registerReceiver(this, mIntentFilter);
+            } catch (Exception e) {
+                ShadowsocksApplication.handleException(e);
+            }
             start();
         }
     }
 
     public void unscheduleAndUnregisterReceiver(Context context) {
         if (mIntentFilter != null) {
-            stop();
-            context.unregisterReceiver(this);
             mIntentFilter = null;
+            stop();
+            try {
+                context.unregisterReceiver(this);
+            } catch (Exception e) {
+                ShadowsocksApplication.handleException(e);
+            }
         }
     }
 }

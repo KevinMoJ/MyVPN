@@ -57,12 +57,21 @@
 -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
 
-
--keep public class yyf.shadowsocks.**{*;}
--keep public class yyf.shadowsocks.service.**{*;}
--keep public class yyf.shadowsocks.jni.**{*;}
-
 #For design support library
 -keep class android.support.design.widget.** { *; }
 -keep interface android.support.design.widget.** { *; }
 
+#glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+}
+
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+-keep class org.jsoup.**
+
+-dontwarn org.bouncycastle.**
+
+-keep public class android.os.SystemProperties { *; }
+-keep class com.vm.shadowsocks.tunnel.shadowsocks.** { *;}

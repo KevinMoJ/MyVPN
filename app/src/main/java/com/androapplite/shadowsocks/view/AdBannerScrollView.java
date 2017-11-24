@@ -6,7 +6,6 @@ import android.widget.ScrollView;
 
 import com.androapplite.shadowsocks.R;
 
-
 /**
  * Created by jim on 17/3/22.
  */

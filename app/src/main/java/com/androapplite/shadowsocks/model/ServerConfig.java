@@ -4,23 +4,28 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.support.annotation.DrawableRes;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
 
 import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by jim on 16/11/7.
  */
 
-public class ServerConfig {
+public class ServerConfig implements Parcelable{
     public String name; //city
     public String server;
     public String flag;
@@ -57,8 +62,6 @@ public class ServerConfig {
         this.signal = signal;
         this.port = port;
     }
-
-
 
     @Override
     public boolean equals(Object o) {
@@ -124,25 +127,55 @@ public class ServerConfig {
         return arrayList;
     }
 
-    public static ArrayList<ServerConfig> createDefaultServerList(Resources resources){
-        TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
-        TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
-        TypedArray servers = resources.obtainTypedArray(R.array.vpn_servers);
-        TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
-        ArrayList<ServerConfig> arrayList = new ArrayList<>(names.length());
-        for(int i=0; i<servers.length(); i++){
-            String name = names.getString(i);
-            String server = servers.getString(i);
-            String flag = resources.getResourceEntryName(icons.getResourceId(i, R.drawable.ic_bluetooth_24dp));
-            String nation = nations.getString(i);
-            ServerConfig serverConfig = new ServerConfig(name, server, flag, nation, 3);
-            arrayList.add(serverConfig);
-        }
-        return arrayList;
+    public static String shuffleRemoteConfig(){
+        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        String jsonArrayString = remoteConfig.getString("server_list");
+        return shuffleStaticServerListJson(jsonArrayString);
     }
 
-    public int getResourceId(Context context){
-        return context.getResources().getIdentifier(flag, "drawable", context.getPackageName());
+    public static String shuffleStaticServerListJson(String jsonArrayString){
+        String shuffleJsonString = null;
+        Log.d("server_list", jsonArrayString);
+        try {
+            JSONObject jsonObject = new JSONObject(jsonArrayString);
+            JSONArray cityArray = jsonObject.optJSONArray("city");
+            JSONArray ipArray = jsonObject.optJSONArray("ip");
+            JSONArray signalArray = jsonObject.optJSONArray("signal");
+            JSONArray portArray = jsonObject.optJSONArray("port");
+            if(cityArray != null && ipArray != null && signalArray != null){
+                Random random = new Random();
+                for(int i = 0; i<cityArray.length() * 3 / 4; i++){
+                    int pos = random.nextInt(cityArray.length());
+                    //新旧位置不相等才交换
+                    if(i != pos) {
+                        swipePosition(cityArray, i, pos);
+                        swipePosition(ipArray, i, pos);
+                        swipePosition(signalArray, i, pos);
+                        if (portArray != null) {
+                            swipePosition(portArray, i, pos);
+                        }
+                    }
+                }
+                shuffleJsonString = jsonObject.toString();
+                Log.d("server_list shuffle", shuffleJsonString);
+            }
+
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
+        return shuffleJsonString;
+    }
+
+
+
+    private static void swipePosition(JSONArray array, int pos1, int pos2){
+        try {
+            Object obj = array.get(pos1);
+            array.put(pos1, array.get(pos2));
+            array.put(pos2, obj);
+        }catch (Exception e){
+            ShadowsocksApplication.handleException(e);
+        }
     }
 
     public int getSignalResId(){
@@ -156,8 +189,8 @@ public class ServerConfig {
                 .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, flag)
                 .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, nation)
                 .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, signal)
-                .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT,port)
-                .commit();
+                .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT, port)
+                .apply();
     }
 
     public static ServerConfig loadFromSharedPreference(SharedPreferences sharedPreferences){
@@ -173,5 +206,60 @@ public class ServerConfig {
             return null;
         }
 
+    }
+
+    public static boolean checkServerConfigJsonString(String jsonString){
+        try{
+            JSONObject jsonObject = new JSONObject(jsonString);
+            return jsonObject.has("city") && jsonObject.has("ip") && jsonObject.has("signal") && jsonObject.has("port");
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(name);
+        out.writeString(server);
+        out.writeString(flag);
+        out.writeString(nation);
+        out.writeInt(signal);
+        out.writeInt(port);
+    }
+
+    public static final Parcelable.Creator<ServerConfig> CREATOR = new Parcelable.Creator<ServerConfig>() {
+        public ServerConfig createFromParcel(Parcel in)
+        {
+            return new ServerConfig(in);
+        }
+        public ServerConfig[] newArray(int size)
+        {
+            return new ServerConfig[size];
+        }
+    };
+
+    private ServerConfig(Parcel in) {
+        name = in.readString();
+        server = in.readString();
+        flag = in.readString();
+        nation = in.readString();
+        signal = in.readInt();
+        port = in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public String toProxyUrl() {
+        try {
+            String password = URLEncoder.encode("vpnnest!@#123d", "UTF-8");
+            String url = String.format("ss://%s:%s@%s:%d", "aes-256-cfb", password, server, port);
+            return url;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

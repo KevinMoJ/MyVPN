@@ -16,4 +16,6 @@
     <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/1014216123,不确定}</string>
     <string name="fb_native_ids">{count=1},{id1=504824046367667_504825153034223,不确定}</string>
     <string name="native_size">{count=1},{id1=320,80}</string>
+    <string name="custom_ctrl">{serverListDomain=http://c.vpnnest.com:8080/VPNServerList/fsl},{serverListIP=http://52.21.55.33:8080/VPNServerList/fsl},{exit_ad=1}</string>
+    <string name="splash_ctrl">{exe=1},{fb=504824046367667_534980353352036}</string>
 </map>

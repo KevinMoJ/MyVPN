@@ -4,6 +4,7 @@ package com.androapplite.shadowsocks.fragment;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.R;
-import com.androapplite.shadowsocks.activity.ConnectivityActivity;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
@@ -39,6 +39,9 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         v.findViewById(R.id.cancel_disconnect).setOnClickListener(this);
         v.findViewById(R.id.disconnect).setOnClickListener(this);
         mAdLayout = (FrameLayout)v.findViewById(R.id.adContainer);
+//        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)mAdLayout.getLayoutParams();
+//        lp.width = (int) ((AdAppHelper.NATIVE_ADMOB_WIDTH_LIST[0] + 16) * getResources().getDisplayMetrics().density) ;
+//        mAdLayout.setLayoutParams(lp);
         mAdLayout.setVisibility(View.GONE);
         try {
             mAdLayout.addView(AdAppHelper.getInstance(getContext()).getNative());
@@ -51,6 +54,7 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
     public interface OnDisconnectActionListener{
         void onCancel(DisconnectFragment disconnectFragment);
         void onDisconnect(DisconnectFragment disconnectFragment);
+        void onDismiss(DisconnectFragment disconnectFragment);
     }
 
     @Override
@@ -111,5 +115,13 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         }catch (Exception e){
             ShadowsocksApplication.handleException(e);
         }
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        if(mListener != null){
+            mListener.onDismiss(this);
+        }
+        super.onDismiss(dialog);
     }
 }

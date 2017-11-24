@@ -1,70 +1,101 @@
 package com.androapplite.shadowsocks.activity;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.R;
-import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.Firebase;
+
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.service.VpnManageService;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
-import java.lang.ref.WeakReference;
 
-public class SplashActivity extends BaseShadowsocksActivity {
-    private ObjectAnimator mProgressbarAnimator;
+public class SplashActivity extends AppCompatActivity implements Handler.Callback,
+        Animator.AnimatorListener{
     private Handler mAdLoadedCheckHandler;
-    private Runnable mAdLoadedCheckRunable;
+    private ObjectAnimator mProgressbarAnimator;
+    private static final int MSG_AD_LOADED_CHECK = 1;
+    private AdAppHelper mAdAppHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-        initBackgroundReceiver();
-        initBackgroundReceiverIntentFilter();
         startProgressBarAnimation();
+        mAdAppHelper = AdAppHelper.getInstance(this);
+        mAdAppHelper.loadNewInterstitial();
+        mAdAppHelper.loadNewNative();
+        mAdAppHelper.loadNewSplashAd();
 
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(SplashActivity.this);
-        adAppHelper.loadNewInterstitial();
-//        adAppHelper.loadNewBanner();
-        adAppHelper.loadNewNative();
+        mAdLoadedCheckHandler = new Handler(this);
+        mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 3000);
+        ServerListFetcherService.fetchServerListAsync(this);
+        VpnManageService.start(this);
+        Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
+        Intent intent = getIntent();
+        if (intent != null) {
+            try {
+                String source = intent.getStringExtra("source");
+                if (source != null && source.equals("notificaiton")) {
+                    Firebase.getInstance(this).logEvent("打开app来源", "通知");
+                } else {
+                    Firebase.getInstance(this).logEvent("打开app来源", "图标");
+                }
+            } catch (Exception e) {
+                ShadowsocksApplication.handleException(e);
+            }
+        }
 
-        mAdLoadedCheckRunable = new AdLoadedCheckRunnable(this, adAppHelper);
-        mAdLoadedCheckHandler = new Handler();
-        mAdLoadedCheckHandler.postDelayed(mAdLoadedCheckRunable, 1000);
-        Firebase.getInstance(this).logEvent("屏幕","闪幕屏幕");
+        AdAppHelper.getInstance(getApplicationContext()).loadNewSplashAd();
+
+        FrameLayout frameLayout = (FrameLayout)findViewById(R.id.splash_ad_ll);
+        LinearLayout centerLogoLL = (LinearLayout)findViewById(R.id.center_logo_ll);
+        LinearLayout bottomLogoLL = (LinearLayout)findViewById(R.id.bottom_logo_ll);
+        if (AdAppHelper.getInstance(getApplicationContext()).isSplashReady()) {
+            View view = AdAppHelper.getInstance(getApplicationContext()).getSplashAd();
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+            frameLayout.addView(view, layoutParams);
+
+            centerLogoLL.setVisibility(View.GONE);
+            frameLayout.setVisibility(View.VISIBLE);
+            bottomLogoLL.setVisibility(View.VISIBLE);
+        } else {
+            centerLogoLL.setVisibility(View.VISIBLE);
+            frameLayout.setVisibility(View.GONE);
+            bottomLogoLL.setVisibility(View.GONE);
+        }
 
     }
 
-    private static class AdLoadedCheckRunnable implements Runnable{
-        private WeakReference<SplashActivity> mActivityReference;
-        AdAppHelper mAdAppHelper;
-        AdLoadedCheckRunnable(SplashActivity activity, AdAppHelper adAppHelper){
-            mActivityReference = new WeakReference<SplashActivity>(activity);
-            mAdAppHelper = adAppHelper;
-        }
-
-        @Override
-        public void run() {
-            SplashActivity activity = mActivityReference.get();
-            if(activity != null){
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_AD_LOADED_CHECK:
+                Log.d("SplanshActivity", "mAdAppHelper.isFullAdLoaded() " + mAdAppHelper.isFullAdLoaded());
                 if(mAdAppHelper.isFullAdLoaded()){
-                    activity.mProgressbarAnimator.setDuration(100);
-                    activity.mProgressbarAnimator.start();
+                    mProgressbarAnimator.setDuration(100);
                 }else{
-                    activity.mAdLoadedCheckHandler.postDelayed(activity.mAdLoadedCheckRunable, 1000);
+                    mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 1000);
                 }
-            }
+                break;
         }
+        return true;
     }
 
     private void startProgressBarAnimation(){
@@ -73,38 +104,35 @@ public class SplashActivity extends BaseShadowsocksActivity {
         PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
         mProgressbarAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
         mProgressbarAnimator.setDuration(5000);
-        mProgressbarAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                startActivity(new Intent(SplashActivity.this, ConnectivityActivity.class));
-                finish();
-            }
-        });
+        mProgressbarAnimator.addListener(this);
         mProgressbarAnimator.start();
 
     }
 
-    private void initBackgroundReceiver(){
-        mBackgroundReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                final String action = intent.getAction();
-                if(action.equals(Action.CONNECTION_ACTIVITY_SHOW) || action.equals(Action.NEW_USER_GUIDE_ACTIVITY_SHOW)){
-                    finish();
-                }
-            }
-        };
-    }
-
-    private void initBackgroundReceiverIntentFilter(){
-        mBackgroundReceiverIntentFilter = new IntentFilter();
-        mBackgroundReceiverIntentFilter.addAction(Action.CONNECTION_ACTIVITY_SHOW);
-        mBackgroundReceiverIntentFilter.addAction(Action.NEW_USER_GUIDE_ACTIVITY_SHOW);
+    @Override
+    protected void onDestroy() {
+        mAdLoadedCheckHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mAdLoadedCheckHandler.removeCallbacks(mAdLoadedCheckRunable);
+    public void onAnimationStart(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+        finish();
+    }
+
+    @Override
+    public void onAnimationCancel(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animation) {
+
     }
 }

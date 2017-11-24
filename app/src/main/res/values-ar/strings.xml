@@ -1,0 +1,65 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"شارك"</string>
+    <string name="connecting">"توصيل"</string>
+    <string name="more">"أكثر من"</string>
+
+    <string name="action_choose_server">"اختر الخادم"</string>
+    <string name="stopping">"وقف"</string>
+    <string name="no_network">"لا توجد شبكة"</string>
+    <string name="no_internet_message">"لا يوجد اتصال بالإنترنت. هل تريد تشغيل واي فاي؟"</string>
+    <string name="not_available_internet">"اتصال الإنترنت الحالي غير متوفر. هل تريد تشغيل واي فاي؟"</string>
+    <string name="failed_to_open_wifi_setting">"أخفق فتح لوحة إعداد ويفي، يرجى تشغيل ويفي."</string>
+
+    <string name="vpn_nation_opt">"حدد الخادم السريع"</string>
+    <string name="vpn_nation_fr">"فرنسا"</string>
+    <string name="vpn_nation_jp">"اليابان"</string>
+    <string name="vpn_nation_uk">"يونيتيد كيندوم"</string>
+    <string name="vpn_nation_au">"أستراليا"</string>
+    <string name="vpn_nation_de">"ألمانيا"</string>
+    <string name="vpn_nation_sg">"سنغافورة"</string>
+    <string name="vpn_nation_nl">"هولندا"</string>
+    <string name="vpn_nation_us">"الولايات المتحدة الامريكانية"</string>
+    <string name="vpn_nation_egypt">"مصر"</string>
+
+
+    <string name="not_start_vpn">"اتصال فين لا يبدأ. حاول مرة اخرى."</string>
+    <string name="server_list">"موقع الخادم"</string>
+    <string name="repair">"يصلح"</string>
+
+    <string name="facebook">"فيس بوك"</string>
+    <string name="bluetooth">"بلوتوث"</string>
+    <string name="scan_qr_code_download">"مسح رمز الاستجابة السريعة \ إدنلواد على غوغل بلاي"</string>
+
+    <string name="connecting_tip">"فين هو كونتاكغ. يرجى المحاولة في وقت لاحق!"</string>
+    <string name="stopping_tip">"فين توقف. يرجى المحاولة في وقت لاحق!"</string>
+    <string name="timeout_tip">"انتهى وقت محاولة الاتصال. الرجاء اعادة المحاولة!"</string>
+
+    <string name="disconnect">"قطع الاتصال"</string>
+    <string name="disconnect_dialog_title">"هل تريد قطع الاتصال؟"</string>
+    <string name="disconnect_to_refresh">"هل تريد فصل الشبكة الافتراضية الخاصة بالتحديث؟"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"جار جلب قائمة الخادم"</string>
+    <string name="fetch_server_list_failed">"جلب مهلة قائمة الخادم!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"تنزيل: %1$d B / s، تحميل: %2$d B / s"</string>
+    <string name="server_not_available">"خادم فين غير متوفر الآن. بليس محاولة ذلك في وقت لاحق!"</string>
+    <string name="notification_vpn_stop">"تم إيقاف فين. المس لفتح."</string>
+    <string name="notification_vpn_network_error1">"بسبب عدم استقرار الشبكة،"</string>
+    <string name="notification_vpn_network_error2">"تم إيقاف فين الخاص بك. المس لفتح."</string>
+    <string name="success_connect">"تم الاتصال بنجاح: %d المرات"</string>
+    <string name="failed_connect">"أخفق الاتصال: %d المرات"</string>
+    <string name="free_used_time">"مجانا الوقت المستخدم: %s"</string>
+    <string name="enable_notification">"الرجاء تمكين إذن الإعلام في الإعدادات."</string>
+
+    <string name="news">"أخبار"</string>
+    <string name="video">"فيديو"</string>
+    <string name="splash_subtitle">"سريع ومستقر فين"</string>
+    <string name="touch_to_connect">"المس للاتصال"</string>
+    <string name="enable_vpn_connection">"الرجاء تمكين اتصال فين."</string>
+    <string-array name="network_errors">
+        <item>"لا تتوفر شبكات، يمكنك تشغيل واي-في."</item>
+        <item>"متصل، لا إنترنت."</item>
+    </string-array>
+</resources>

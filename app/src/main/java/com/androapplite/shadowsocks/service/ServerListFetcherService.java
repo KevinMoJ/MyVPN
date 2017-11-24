@@ -5,17 +5,42 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.util.Pair;
 
 import com.androapplite.shadowsocks.BuildConfig;
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.activity.MainActivity;
+import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
@@ -32,109 +57,241 @@ import okio.Okio;
  * Created by jim on 16/11/7.
  */
 
-public class ServerListFetcherService extends IntentService {
+public class ServerListFetcherService extends IntentService{
     private boolean hasStart;
+    private static final String DOMAIN_URL = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+    private static final String IP_URL = "http://52.21.55.33:8080/VPNServerList/fsl";
+    private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+
+    private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
+    static {
+        DOMAIN_URLS.add(DOMAIN_URL);
+        DOMAIN_URLS.add(IP_URL);
+    }
+
+    private static final ArrayList<String> STATIC_HOST_URLS = new ArrayList<>();
+    static {
+        STATIC_HOST_URLS.add(GITHUB_URL);
+    }
+
+
+    private static final HashMap<String, String> URL_KEY_MAP = new HashMap<>();
+    static {
+        URL_KEY_MAP.put(IP_URL, "ip");
+        URL_KEY_MAP.put(DOMAIN_URL, "domain");
+        URL_KEY_MAP.put(GITHUB_URL, "github");
+
+    }
+
+    private static final int DELAY_MILLI = 500;
+    private static final int TIMEOUT_MILLI = 3000;
+
+    private String mServerListJsonString;
+    private OkHttpClient mHttpClient;
+    private String mUrl;
 
     public ServerListFetcherService(){
-        super("ServerListFetcher");
+        super("ServletListFetcher");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if(intent != null && !hasStart){
             hasStart = true;
-            if(!fetchServerListByIp()) {
-                fetchServerListByDomain();
+            SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
+            editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
+            Cache cache = new Cache(getCacheDir(), 1024 * 1024);
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    .connectTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
+                    .readTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
+                    .writeTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
+                    .cache(cache)
+                    .addInterceptor(new UnzippingInterceptor());
+            if(BuildConfig.DEBUG){
+                builder.addInterceptor(new LoggingInterceptor());
             }
+            mHttpClient = builder.build();
+
+            useCustomURL();
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorCompletionService<Pair<String, String>> ecs = new ExecutorCompletionService<>(executorService);
+
+            Firebase firebase = Firebase.getInstance(this);
+            ArrayList<MyCallable> tasks = new ArrayList<>(DOMAIN_URLS.size());
+            for (String url: DOMAIN_URLS) {
+                tasks.add(new MyCallable(url, firebase, mHttpClient));
+            }
+
+            long t1 = System.currentTimeMillis();
+            for (MyCallable callable: tasks) {
+                ecs.submit(callable);
+            }
+
+            for (int i = 0; i < tasks.size(); i++) {
+                try {
+                    Future<Pair<String, String>> future = ecs.take();
+                    Pair<String, String> result= future.get(3*TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
+                    if (result != null) {
+                        mUrl = result.first;
+                        mServerListJsonString = result.second;
+                        break;
+                    }
+                } catch (Exception e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+            Log.d("FetchSeverList", "动态列表总时间：" + (System.currentTimeMillis() - t1));
+
+            //获取远程静态服务器列表
+            if(mServerListJsonString == null){
+                tasks = new ArrayList<>(STATIC_HOST_URLS.size());
+                for (String url: STATIC_HOST_URLS) {
+                    tasks.add(new MyCallable(url, firebase, mHttpClient));
+                }
+
+                t1 = System.currentTimeMillis();
+                for (MyCallable callable: tasks) {
+                    ecs.submit(callable);
+                }
+
+                for (int i = 0; i < tasks.size(); i++) {
+                    try {
+                        Future<Pair<String, String>> future = ecs.take();
+                        Pair<String, String> result= future.get(3*TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
+                        if (result != null) {
+                            mUrl = result.first;
+                            mServerListJsonString = result.second;
+                            break;
+                        }
+                    } catch (Exception e) {
+                        ShadowsocksApplication.handleException(e);
+                    }
+                }
+                Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
+            }
+
+            long t2 = System.currentTimeMillis();
+            String urlKey = URL_KEY_MAP.get(mUrl);
+            if(urlKey == null){
+                urlKey = "没有匹配的url";
+            }
+            //取结果
+            if(mServerListJsonString != null){
+                Firebase.getInstance(this).logEvent("取服务器列表成功总时间", urlKey, t2-t1);
+            }else{
+                Firebase.getInstance(this).logEvent("取服务器列表失败总时间", t2-t1);
+            }
+
+            //使用remote config
+            if(mServerListJsonString == null){
+                mServerListJsonString = ServerConfig.shuffleRemoteConfig();
+                if(mServerListJsonString != null) {
+                    urlKey = "remote_config";
+                }
+            }
+
+            //使用本地静态服务器列表
+            if(mServerListJsonString == null){
+                AssetManager assetManager = getAssets();
+                try {
+                    InputStream inputStream = assetManager.open("fsl.json");
+                    InputStreamReader isr = new InputStreamReader(inputStream);
+                    BufferedReader br = new BufferedReader(isr);
+                    mServerListJsonString = br.readLine();
+                    if(mServerListJsonString != null){
+                        mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
+                        urlKey = "local_config";
+                    }
+
+                } catch (IOException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
+
+            if(mServerListJsonString != null) {
+                editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).apply();
+            }else{
+                urlKey = "没有任何可用的服务器列表";
+            }
+
+            String localCountry = getResources().getConfiguration().locale.getDisplayCountry();
+            TelephonyManager manager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+            String simOperator = manager.getSimOperator();
+            String iosCountry = manager.getSimCountryIso();
+            Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", iosCountry, simOperator, localCountry));
+            if(mUrl != null){
+                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+                String domain = adAppHelper.getCustomCtrlValue("serverListDomain", null);
+                String ip = adAppHelper.getCustomCtrlValue("serverListIP", null);
+                if(mUrl.equals(domain)){
+                    Firebase.getInstance(this).logEvent("服务器列表地址", "domain", mUrl);
+                }else if(mUrl.equals(ip)){
+                    Firebase.getInstance(this).logEvent("服务器列表地址", "ip", mUrl);
+                }
+            }
+
+            broadcastServerListFetchFinish();
             hasStart = false;
         }
 
     }
 
-    private boolean fetchServerListByIp() {
-        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-        editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
-        Cache cache = new Cache(getCacheDir(), 1024 * 1024);
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .writeTimeout(5, TimeUnit.SECONDS)
-                .cache(cache)
-                .addInterceptor(new UnzippingInterceptor());
-
-        if(BuildConfig.DEBUG){
-            builder.addInterceptor(new LoggingInterceptor());
-        }
-        OkHttpClient client = builder.build();
-
-        String url = "http://52.21.55.33:8080/VPNServerList/fsl";
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("Accept-Encoding", "gzip")
-                .build();
-
-
-        long t1 = System.currentTimeMillis();
-        try {
-            Response response = client.newCall(request).execute();
-            long t2 = System.currentTimeMillis();
-            Firebase.getInstance(this).logEvent( "访问服务器列表", "成功", t2-t1);
-            String jsonString = response.body().string();
-            if(jsonString != null && !jsonString.isEmpty()){
-                editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
-            }
-            broadcastServerListFetchFinish();
-            Log.d("ServerListFetcher", "ip");
-            return true;
-        } catch (IOException e) {
-            long t2 = System.currentTimeMillis();
-            Firebase.getInstance(this).logEvent( "访问服务器列表", "失败", t2-t1);
-            ShadowsocksApplication.handleException(e);
-            broadcastServerListFetchError(e, true);
-            return false;
-        }
+    private void useCustomURL(){
+        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+        String url = adAppHelper.getCustomCtrlValue("serverListDomain", DOMAIN_URL);
+        DOMAIN_URLS.set(0, url);
+        URL_KEY_MAP.put(url, "domain");
+        url = adAppHelper.getCustomCtrlValue("serverListIP", IP_URL);
+        DOMAIN_URLS.set(1, url);
+        URL_KEY_MAP.put(url, "ip");
     }
 
-    private void fetchServerListByDomain() {
-        SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-        editor.remove(SharedPreferenceKey.SERVER_LIST).commit();
-        Cache cache = new Cache(getCacheDir(), 1024 * 1024);
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
-                .cache(cache)
-                .addInterceptor(new UnzippingInterceptor());
+    private static class MyCallable implements Callable<Pair<String, String>> {
+        private String mUrl;
+        private Firebase mFirebase;
+        private OkHttpClient mHttpClient;
 
-        if(BuildConfig.DEBUG){
-            builder.addInterceptor(new LoggingInterceptor());
+        MyCallable(String url, Firebase firebase, OkHttpClient client) {
+            mUrl = url;
+            mFirebase = firebase;
+            mHttpClient = client;
         }
-        OkHttpClient client = builder.build();
-
-        String url = "http://c.vpnnest.com:8080/VPNServerList/fsl";
-//            String url = "http://192.168.31.29:8080/VPNServerList/fsl";
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("Accept-Encoding", "gzip")
-                .build();
-
-
-        long t1 = System.currentTimeMillis();
-        try {
-            Response response = client.newCall(request).execute();
-            long t2 = System.currentTimeMillis();
-            Firebase.getInstance(this).logEvent( "访问服务器列表", "成功", t2-t1);
-            String jsonString = response.body().string();
-            if(jsonString != null && !jsonString.isEmpty()){
-                editor.putString(SharedPreferenceKey.SERVER_LIST, jsonString).commit();
+        @Override
+        public Pair<String, String> call() throws Exception {
+            Request request = new Request.Builder()
+                    .url(mUrl)
+                    .addHeader("Accept-Encoding", "gzip")
+                    .build();
+            long t1 = System.currentTimeMillis();
+            String urlKey = URL_KEY_MAP.get(mUrl);
+            if(urlKey == null){
+                urlKey = "没有匹配的url";
             }
-            broadcastServerListFetchFinish();
-            Log.d("ServerListFetcher", "domain");
-        } catch (IOException e) {
-            long t2 = System.currentTimeMillis();
-            Firebase.getInstance(this).logEvent( "访问服务器列表", "失败", t2-t1);
-            ShadowsocksApplication.handleException(e);
-            broadcastServerListFetchError(e, false);
+            String jsonString = null;
+            String errMsg = null;
+            try {
+                Response response = mHttpClient.newCall(request).execute();
+                if(response.isSuccessful())
+                {
+                    jsonString = response.body().string();
+                }else{
+                    errMsg = response.message() + " " + response.code();
+                }
+            }catch (IOException e) {
+                errMsg = e.getMessage();
+                if(errMsg == null){
+                    errMsg = e.toString();
+                }
+            }
+            long dur = System.currentTimeMillis() - t1;
+            if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
+                mFirebase.logEvent("访问服务器列表成功", urlKey, dur);
+            }else{
+                mFirebase.logEvent("访问服务器列表失败", urlKey, dur);
+                if(errMsg == null) errMsg = "服务器列表JSON问题";
+                mFirebase.logEvent("访问服务器列表失败", urlKey, errMsg);
+            }
+            return new Pair<>(mUrl, jsonString);
         }
     }
 
@@ -143,36 +300,13 @@ public class ServerListFetcherService extends IntentService {
         context.startService(intent);
     }
 
-    public void broadcastServerListFetchError(Exception e, boolean isIpUrl){
+    private void broadcastServerListFetchFinish(){
         final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
-        String errMsg = e.getMessage();
-        if(errMsg != null) {
-            intent.putExtra("ErrMsg", e.getMessage());
-        }else{
-            intent.putExtra("ErrMsg", e.toString());
-        }
-        intent.putExtra("IsIpUrl", isIpUrl);
-
-        if(errMsg != null){
-            if(isIpUrl) {
-                Firebase.getInstance(this).logEvent( "取服务器列表失败", "IP", errMsg);
-            }else{
-                Firebase.getInstance(this).logEvent( "取服务器列表失败", "Domain", errMsg);
-            }
-
-        }else {
-            if(isIpUrl) {
-                Firebase.getInstance(this).logEvent( "取服务器列表失败", "IP", e.toString());
-            }else {
-                Firebase.getInstance(this).logEvent( "取服务器列表失败", "Domain", e.toString());
-            }
+        if(mServerListJsonString != null){
+            //借用一下
+            intent.putExtra(SharedPreferenceKey.SERVER_LIST, mServerListJsonString);
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
-    }
-
-    private void broadcastServerListFetchFinish(){
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Action.SERVER_LIST_FETCH_FINISH));
     }
 
     static class LoggingInterceptor implements Interceptor {
@@ -217,5 +351,4 @@ public class ServerListFetcherService extends IntentService {
                     .build();
         }
     }
-
 }

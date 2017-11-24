@@ -1,22 +1,18 @@
 package com.androapplite.shadowsocks.fragment;
 
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.animation.AnimatorListenerCompat;
-import android.support.v4.animation.ValueAnimatorCompat;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,29 +23,30 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.RunnableFuture;
-
-import yyf.shadowsocks.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ConnectFragment extends Fragment implements View.OnClickListener{
+    private OnConnectActionListener mListener;
+    private TextView mMessageTextView;
+
+    private ImageButton mConnectButton;
+    private SharedPreferences mSharedPreference;
+    private boolean mIsAnimating;
+    private MyReceiver mMyReceiver;
+    private VpnState mVpnState;
     private ImageView mJaguarImageView;
     private ImageView mJaguarAnimationImageView;
-    private OnConnectActionListener mListener;
-    private ImageButton mConnectButton;
     private ProgressBar mProgressBar;
-    private TextView mMessageTextView;
     private TextView mElapseTextView;
-    private UpdateElapseTimeHandler mUpdateElapseTimeHandler;
 
 
     public ConnectFragment() {
@@ -62,22 +59,48 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_connect, container, false);
-        mConnectButton = (ImageButton) view.findViewById(R.id.connect_button);
-        mConnectButton.setOnClickListener(this);
+        mMessageTextView = (TextView)view.findViewById(R.id.message);
+        mConnectButton = (ImageButton)view.findViewById(R.id.connect_button);
         mJaguarImageView = (ImageView)view.findViewById(R.id.jaguar_image_view);
         mJaguarAnimationImageView = (ImageView)view.findViewById(R.id.jaguar_animation_image_view);
         mProgressBar = (ProgressBar)view.findViewById(R.id.progress_bar);
         mMessageTextView = (TextView)view.findViewById(R.id.message);
         mElapseTextView = (TextView)view.findViewById(R.id.elapse);
+        mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        mConnectButton.setOnClickListener(this);
+        if (LocalVpnService.IsRunning) {
+            mVpnState = VpnState.Connected;
+            connectFinish();
+        } else {
+            mVpnState = VpnState.Init;
+            stopFinish();
+        }
+
+        IntentFilter intentFilter = new IntentFilter(Action.ACTION_TIME_USE);
+        mMyReceiver = new MyReceiver(this);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMyReceiver, intentFilter);
+    }
+
+    @Override
+    public void onDestroy() {
+        clearAnimation();
+        super.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
         if(mListener != null){
-            mListener.onConnectButtonClick();
+            switch (v.getId()){
+                case R.id.connect_button:
+                    mListener.onConnectButtonClick();
+                    break;
+            }
         }
-
     }
 
     public interface OnConnectActionListener{
@@ -104,162 +127,164 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+
     @Override
     public void onDetach() {
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mMyReceiver);
         super.onDetach();
-        ObjectAnimator progressAnimator = (ObjectAnimator) mProgressBar.getTag();
-        if(progressAnimator != null) {
-            progressAnimator.removeAllListeners();
-            progressAnimator.end();
-        }
-        if(mUpdateElapseTimeHandler != null){
-            mUpdateElapseTimeHandler.removeCallbacksAndMessages(null);
-        }
-        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-        mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
-        mConnectButton.setTag(null);
+    }
+
+    private void init(){
     }
 
     public void animateConnecting(){
         startAnimation();
         mMessageTextView.setText(R.string.connecting);
-        Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-        if(showDisconnectDelayRunnable == null){
-            showDisconnectDelayRunnable = new ShowDisconnectDelayRunnable(this);
-            mConnectButton.setTag(showDisconnectDelayRunnable);
-        }
-        mConnectButton.postDelayed(showDisconnectDelayRunnable, 20000);
-
-    }
-
-    private static class ShowDisconnectDelayRunnable implements Runnable{
-        WeakReference<ConnectFragment> mFragmentReference;
-        ShowDisconnectDelayRunnable(ConnectFragment fragment){
-            mFragmentReference = new WeakReference<ConnectFragment>(fragment);
-        }
-
-        @Override
-        public void run() {
-            ConnectFragment fragment = mFragmentReference.get();
-            if(fragment != null){
-                fragment.mConnectButton.setVisibility(View.VISIBLE);
-                fragment.mConnectButton.setImageLevel(1);
-            }
-        }
     }
 
     private void startAnimation(){
-        mJaguarImageView.setVisibility(View.INVISIBLE);
-        mJaguarAnimationImageView.setVisibility(View.VISIBLE);
-        AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
-        animationDrawable.start();
-        mConnectButton.setVisibility(View.INVISIBLE);
+        if(!mIsAnimating) {
+            mJaguarImageView.setVisibility(View.INVISIBLE);
+            mJaguarAnimationImageView.setVisibility(View.VISIBLE);
+            AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
+            animationDrawable.start();
+            mConnectButton.setVisibility(View.INVISIBLE);
 
-        mProgressBar.setVisibility(View.VISIBLE);
-        int max = 60000;
-        mProgressBar.setMax(max);
-        ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 0, mProgressBar.getMax());
-        progressAnimator.setDuration(max);
-        progressAnimator.start();
-        mProgressBar.setTag(progressAnimator);
-        mMessageTextView.setText(R.string.connecting);
-        mElapseTextView.setVisibility(View.INVISIBLE);
-        if(mUpdateElapseTimeHandler != null){
-            mUpdateElapseTimeHandler.removeCallbacksAndMessages(null);
-            mUpdateElapseTimeHandler = null;
+            mProgressBar.setVisibility(View.VISIBLE);
+            int max = 60000;
+            mProgressBar.setMax(max);
+            ObjectAnimator progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 0, mProgressBar.getMax());
+            progressAnimator.setDuration(max);
+            progressAnimator.start();
+            mProgressBar.setTag(progressAnimator);
+            mMessageTextView.setText(R.string.connecting);
+            mElapseTextView.setVisibility(View.INVISIBLE);
+            mIsAnimating = true;
         }
     }
 
+    private void stopAnimation(){
+        clearAnimation();
+    }
+
+    private void clearAnimation(){
+        mIsAnimating = false;
+        AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
+        animationDrawable.stop();
+        ObjectAnimator progressAnimator = (ObjectAnimator)mProgressBar.getTag();
+        if (progressAnimator != null) {
+            progressAnimator.end();
+        }
+    }
 
     public void animateStopping(){
         startAnimation();
         mMessageTextView.setText(R.string.stopping);
     }
 
-    public void setConnectResult(final Constants.State state){
-        ObjectAnimator progressAnimator = (ObjectAnimator) mProgressBar.getTag();
-        if(progressAnimator != null) {
-            progressAnimator.end();
-        }
-        progressAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", mProgressBar.getProgress(), mProgressBar.getMax());
-        progressAnimator.setDuration(500);
-        progressAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                stopAnimation(state);
-            }
-        });
-        progressAnimator.start();
-        mProgressBar.setTag(progressAnimator);
-    }
-    
-    private void stopAnimation(Constants.State state){
+    private void connectFinish(){
+        stopAnimation();
+        mJaguarImageView.setImageLevel(1);
+        mJaguarImageView.requestLayout();
         mJaguarImageView.setVisibility(View.VISIBLE);
-        mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
-        AnimationDrawable animationDrawable = (AnimationDrawable)mJaguarAnimationImageView.getDrawable();
-        animationDrawable.stop();
+        mConnectButton.setImageLevel(1);
         mConnectButton.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.INVISIBLE);
-        mProgressBar.setTag(null);
-        if(state == Constants.State.CONNECTED){
-            mJaguarImageView.setImageLevel(1);
-            mJaguarImageView.requestLayout();
-            mConnectButton.setImageLevel(1);
-            mMessageTextView.setText(R.string.connected);
-            mElapseTextView.setVisibility(View.VISIBLE);
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            long useTime = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
-            final String elpasedTime = DateUtils.formatElapsedTime(useTime);
-            mElapseTextView.setText(getString(R.string.use_time, elpasedTime));
-            if(mUpdateElapseTimeHandler == null){
-                mUpdateElapseTimeHandler = new UpdateElapseTimeHandler(this);
-                mUpdateElapseTimeHandler.sendEmptyMessageAtTime(0, 1000);
-            }
+        mProgressBar.setVisibility(View.GONE);
+        mMessageTextView.setText(R.string.connected);
+        mElapseTextView.setVisibility(View.VISIBLE);
+        mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
+    }
 
-            Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-            mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
-        }else if(state == Constants.State.STOPPED){
-            mJaguarImageView.setImageLevel(0);
-            mJaguarImageView.requestLayout();
-            mConnectButton.setImageLevel(0);
-            mMessageTextView.setText(R.string.tap_to_connect);
-            mElapseTextView.setVisibility(View.INVISIBLE);
-        }else if(state == Constants.State.ERROR){
-            mJaguarImageView.setImageLevel(0);
-            mJaguarImageView.requestLayout();
-            mConnectButton.setImageLevel(0);
-            mMessageTextView.setText(R.string.retry);
-            mElapseTextView.setVisibility(View.INVISIBLE);
-            Runnable showDisconnectDelayRunnable = (Runnable)mConnectButton.getTag();
-            mConnectButton.removeCallbacks(showDisconnectDelayRunnable);
+    private void stopFinish(){
+        stopAnimation();
+        mJaguarImageView.setImageLevel(0);
+        mJaguarImageView.requestLayout();
+        mJaguarImageView.setVisibility(View.VISIBLE);
+        mConnectButton.setImageLevel(0);
+        mMessageTextView.setText(R.string.tap_to_connect);
+        mElapseTextView.setVisibility(View.INVISIBLE);
+        mConnectButton.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
+        mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
+    }
+
+    private void error(){
+        stopAnimation();
+        mJaguarImageView.setImageLevel(0);
+        mJaguarImageView.requestLayout();
+        mJaguarImageView.setVisibility(View.VISIBLE);
+        mConnectButton.setImageLevel(0);
+        mMessageTextView.setText(R.string.retry);
+        mElapseTextView.setVisibility(View.INVISIBLE);
+        mConnectButton.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
+        mJaguarAnimationImageView.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
+        mVpnState = VpnState.values()[state];
+        updateUI();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    public void updateUI(){
+        if(isVisible()) {
+            switch (mVpnState) {
+                case Init:
+                    init();
+                    break;
+                case Connecting:
+                    animateConnecting();
+                    break;
+                case Connected:
+                    connectFinish();
+                    break;
+                case Stopping:
+                    animateStopping();
+                    break;
+                case Stopped:
+                    stopFinish();
+                    break;
+                case Error:
+                    error();
+                    break;
+            }
         }
     }
 
+    private static class MyReceiver extends BroadcastReceiver {
+        private WeakReference<ConnectFragment> mReference;
 
-    private static class UpdateElapseTimeHandler extends Handler{
-        private WeakReference<ConnectFragment> mFragmentReference;
-
-        UpdateElapseTimeHandler(ConnectFragment connectFragment){
-            mFragmentReference = new WeakReference<ConnectFragment>(connectFragment);
+        MyReceiver(ConnectFragment fragment) {
+            mReference = new WeakReference<>(fragment);
         }
 
         @Override
-        public void handleMessage(Message msg) {
-            ConnectFragment fragment = mFragmentReference.get();
-            if(fragment != null){
-                Context context = fragment.getContext();
-                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-                long useTime = sharedPreferences.getLong(SharedPreferenceKey.USE_TIME, 0);
-                String elapsedTime = DateUtils.formatElapsedTime(useTime);
-                fragment.mElapseTextView.setText(fragment.getString(R.string.use_time, elapsedTime));
+        public void onReceive(Context context, Intent intent) {
+            ConnectFragment fragment = mReference.get();
+            if (fragment != null && fragment.isVisible()) {
+                fragment.updateFreeUseTime();
             }
-            sendEmptyMessageDelayed(0, 1000);
+        }
+    }
+    public void setConnectResult(VpnState state) {
+        mVpnState = state;
+        if (getUserVisibleHint() || isVisible()) {
+            updateUI();
         }
     }
 
-    public void addProgress(int millisecond){
-        if(mProgressBar != null) {
-            mProgressBar.setProgress(mProgressBar.getProgress() + millisecond);
-        }
+    private void updateFreeUseTime() {
+        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        final String elapsedTime = DateUtils.formatElapsedTime(countDown);
+        String freeUseTime = String.format(getString(R.string.free_used_time), elapsedTime);
+        mElapseTextView.setText(freeUseTime);
     }
 }

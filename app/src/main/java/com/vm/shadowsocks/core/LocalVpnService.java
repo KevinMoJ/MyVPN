@@ -12,8 +12,10 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.Nullable;
 
-import com.androapplite.powervpn.R;
+import com.androapplite.shadowsocks.R;
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.MainActivity;
+import com.androapplite.shadowsocks.service.InterruptVpnIntentService;
 import com.vm.shadowsocks.core.ProxyConfig.IPAddress;
 import com.vm.shadowsocks.dns.DnsPacket;
 import com.vm.shadowsocks.tcpip.CommonMethods;
@@ -37,7 +39,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
     public static LocalVpnService Instance;
     public static String ProxyUrl;
-    public static boolean IsRunning = false;
+    public static volatile boolean IsRunning = false;
 
     private static int ID;
     private static int LOCAL_IP;
@@ -57,8 +59,9 @@ public class LocalVpnService extends VpnService implements Runnable {
     private Handler m_Handler;
     private volatile TcpTrafficMonitor mTcpTrafficMonitor;
     private volatile StatusGuard mStatusGuard;
-    private ScheduledExecutorService mScheduleExecutorService;
+    private volatile ScheduledExecutorService mScheduleExecutorService;
     private VpnNotification mNotification;
+    private volatile UdpProxy mUdpProxy;
 
     public LocalVpnService() {
         ID++;
@@ -223,6 +226,11 @@ public class LocalVpnService extends VpnService implements Runnable {
             m_DnsProxy = new DnsProxy();
             m_DnsProxy.start();
             writeLog("LocalDnsProxy started.");
+
+            mUdpProxy = new UdpProxy();
+            mUdpProxy.start();
+            writeLog("LocalUdpProxy started.");
+
             startNotification();
 
             while (true) {
@@ -253,10 +261,10 @@ public class LocalVpnService extends VpnService implements Runnable {
                     startSchedule();
                     mNotification.showVpnStartedNotification();
                     runVPN();
-                } else {
-                    Thread.sleep(100);
                     //停止定时服务和通知
                     stopSchedule();
+                } else {
+                    Thread.sleep(100);
                 }
             }
         } catch (InterruptedException e) {
@@ -311,7 +319,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         int size = 0;
         while (size != -1 && IsRunning) {
             while ((size = in.read(m_Packet)) > 0 && IsRunning) {
-                if (m_DnsProxy.Stopped || m_TcpProxyServer.Stopped) {
+                if (m_DnsProxy.Stopped || m_TcpProxyServer.Stopped || mUdpProxy.Stopped) {
                     in.close();
                     throw new Exception("LocalServer stopped.");
                 }
@@ -324,6 +332,12 @@ public class LocalVpnService extends VpnService implements Runnable {
     }
 
     void onIPPacketReceived(IPHeader ipHeader, int size) throws IOException {
+        if (ProxyConfig.IS_DEBUG){
+            System.out.printf("Ip %s=>%s protocol %d\n",
+                    CommonMethods.ipIntToInet4Address(ipHeader.getSourceIP()),
+                    CommonMethods.ipIntToInet4Address(ipHeader.getDestinationIP()),
+                    ipHeader.getProtocol());
+        }
         switch (ipHeader.getProtocol()) {
             case IPHeader.TCP:
                 TCPHeader tcpHeader = m_TCPHeader;
@@ -413,15 +427,24 @@ public class LocalVpnService extends VpnService implements Runnable {
                 }
                 break;
             case IPHeader.UDP:
-                // 转发DNS数据包：
                 UDPHeader udpHeader = m_UDPHeader;
                 udpHeader.m_Offset = ipHeader.getHeaderLength();
-                if (ipHeader.getSourceIP() == LOCAL_IP && udpHeader.getDestinationPort() == 53) {
-                    m_DNSBuffer.clear();
-                    m_DNSBuffer.limit(ipHeader.getDataLength() - 8);
-                    DnsPacket dnsPacket = DnsPacket.FromBytes(m_DNSBuffer);
-                    if (dnsPacket != null && dnsPacket.Header.QuestionCount > 0) {
-                        m_DnsProxy.onDnsRequestReceived(ipHeader, udpHeader, dnsPacket);
+                if (ipHeader.getSourceIP() == LOCAL_IP) {
+                    if (udpHeader.getDestinationPort() == 53) {
+                        m_DNSBuffer.clear();
+                        m_DNSBuffer.limit(ipHeader.getDataLength() - 8);
+                        DnsPacket dnsPacket = DnsPacket.FromBytes(m_DNSBuffer);
+                        if (dnsPacket != null && dnsPacket.Header.QuestionCount > 0) {
+                            m_DnsProxy.onDnsRequestReceived(ipHeader, udpHeader, dnsPacket);
+                            String question = dnsPacket.Questions[0].Domain;
+                            if (ProxyConfig.Instance.needProxy(question, m_DnsProxy.getIPFromCache(question))) {
+                                Firebase.getInstance(this).logEvent("DNS", "走代理", dnsPacket.Questions[0].Domain);
+                            } else {
+                                Firebase.getInstance(this).logEvent("DNS", "不走代理", dnsPacket.Questions[0].Domain);
+                            }
+                        }
+                    } else {
+                        mUdpProxy.onUdpRequestReceived(ipHeader, udpHeader);
                     }
                 }
                 break;
@@ -489,7 +512,9 @@ public class LocalVpnService extends VpnService implements Runnable {
                     System.out.printf("%s=%s\n", name, value);
             }
         }
-
+//        if (AppProxyManager.isLollipopOrAbove) {
+//            builder.addDisallowedApplication(getPackageName());
+//        }
 //        if (AppProxyManager.isLollipopOrAbove){
 //            if (AppProxyManager.Instance.proxyAppInfo.size() == 0){
 //                writeLog("Proxy All Apps");
@@ -549,6 +574,13 @@ public class LocalVpnService extends VpnService implements Runnable {
             writeLog("LocalDnsProxy stopped.");
         }
 
+        // 停止Udp转发
+        if (mUdpProxy != null) {
+            mUdpProxy.stop();
+            mUdpProxy = null;
+            writeLog("LocalDnsProxy stopped.");
+        }
+
         //停止定时服务和通知
         stopSchedule();
         stopNotification();
@@ -564,6 +596,10 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (m_VPNThread != null) {
             m_VPNThread.interrupt();
         }
+        stopSchedule();
+        VpnNotification.showVpnStoppedNotificationGlobe(getApplicationContext(), true);
+        System.out.println("VPNService " + IsRunning);
+//        startService(new Intent(this, InterruptVpnIntentService.class));
         super.onDestroy();
     }
 
@@ -594,4 +630,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         });
     }
 
+    public UdpProxy getUdpProxy () {
+        return mUdpProxy;
+    }
 }

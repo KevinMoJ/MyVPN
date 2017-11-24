@@ -1,0 +1,65 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"शेयर"</string>
+    <string name="connecting">"कनेक्ट"</string>
+    <string name="more">"अधिक"</string>
+
+    <string name="action_choose_server">"सर्वर चुनें"</string>
+    <string name="stopping">"रोक"</string>
+    <string name="no_network">"कोई नेटवर्क नहीं"</string>
+    <string name="no_internet_message">"कोई इंटरनेट कनेक्शन नहीं है क्या आप वाईफाई चालू करना चाहते हैं?"</string>
+    <string name="not_available_internet">"वर्तमान इंटरनेट कनेक्शन उपलब्ध नहीं है क्या आप वाईफाई चालू करना चाहते हैं?"</string>
+    <string name="failed_to_open_wifi_setting">"वाईफाई सेटिंग पैनल खोलने में विफल, कृपया वाईफाई चालू करें।"</string>
+
+    <string name="vpn_nation_opt">"तेज सर्वर को चुना"</string>
+    <string name="vpn_nation_fr">"फ्रांस"</string>
+    <string name="vpn_nation_jp">"जापान"</string>
+    <string name="vpn_nation_uk">"संयुक्त राज्य"</string>
+    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_de">"जर्मनी"</string>
+    <string name="vpn_nation_sg">"सिंगापुर"</string>
+    <string name="vpn_nation_nl">"नीदरलैंड्स"</string>
+    <string name="vpn_nation_us">"संयुक्त राज्य अमेरिका"</string>
+    <string name="vpn_nation_egypt">"मिस्र"</string>
+
+
+    <string name="not_start_vpn">"वीपीएन कनेक्शन शुरू नहीं है कृपया पुन: प्रयास करें।"</string>
+    <string name="server_list">"सर्वर स्थान"</string>
+    <string name="repair">"मरम्मत"</string>
+
+    <string name="facebook">"फेसबुक"</string>
+    <string name="bluetooth">"ब्लूटूथ"</string>
+    <string name="scan_qr_code_download">"Google Play पर QR कोड \ nd डाउनलोड करें स्कैन करें"</string>
+
+    <string name="connecting_tip">"वीपीएन कनेक्शन है कृपया इसे बाद में आज़माएं!"</string>
+    <string name="stopping_tip">"वीपीएन रोक रहा है कृपया इसे बाद में आज़माएं!"</string>
+    <string name="timeout_tip">"कनेक्शन का समय समाप्त। कृपया फिर से कोशिश करें!"</string>
+
+    <string name="disconnect">"डिस्कनेक्ट"</string>
+    <string name="disconnect_dialog_title">"क्या आप डिस्कनेक्ट करना चाहते हैं?"</string>
+    <string name="disconnect_to_refresh">"ताज़ा करने के लिए वीपीएन डिस्कनेक्ट करें?"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"सर्वर सूची ला रहा है"</string>
+    <string name="fetch_server_list_failed">"सर्वर सूची समय समाप्ति प्राप्त कर रहा है!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"डाउनलोड करें: %1$d B / s, अपलोड करें: %2$d B / s"</string>
+    <string name="server_not_available">"वीपीएन सर्वर अभी उपलब्ध नहीं है बाद में कोशिश करो!"</string>
+    <string name="notification_vpn_stop">"आपका वीपीएन बंद हो गया है खोलने के लिए स्पर्श करें"</string>
+    <string name="notification_vpn_network_error1">"नेटवर्क अस्थिरता के कारण,"</string>
+    <string name="notification_vpn_network_error2">"आपका वीपीएन बंद हो गया है खोलने के लिए स्पर्श करें"</string>
+    <string name="success_connect">"सफलतापूर्वक कनेक्ट किया गया: %d बार"</string>
+    <string name="failed_connect">"कनेक्टेड विफल: %d बार"</string>
+    <string name="free_used_time">"निशुल्क उपयोग किए गए समय: %s"</string>
+    <string name="enable_notification">"कृपया सेटिंग में नोटिफिकेशन अनुमति सक्षम करें।"</string>
+
+    <string name="news">"समाचार"</string>
+    <string name="video">"वीडियो"</string>
+    <string name="splash_subtitle">"फास्ट और स्थिर वीपीएन"</string>
+    <string name="touch_to_connect">"कनेक्ट करने के लिए स्पर्श करें"</string>
+    <string name="enable_vpn_connection">"कृपया वीपीएन कनेक्शन सक्षम करें।"</string>
+    <string-array name="network_errors">
+        <item>"कोई उपलब्ध नेटवर्क नहीं, वाई-फ़ाई चालू करें।"</item>
+        <item>"कनेक्टेड, कोई इंटरनेट नहीं"</item>
+    </string-array>
+</resources>

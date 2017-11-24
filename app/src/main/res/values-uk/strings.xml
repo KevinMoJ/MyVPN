@@ -1,0 +1,66 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"Поділитися"</string>
+    <string name="connecting">"Підключення"</string>
+    <string name="more">"Більше"</string>
+
+    <string name="action_choose_server">"Виберіть сервер"</string>
+    <string name="stopping">"Зупинка"</string>
+    <string name="no_network">"Немає мережі"</string>
+    <string name="no_internet_message">"Немає підключення до Інтернету. Ви хочете включити Wi-Fi?"</string>
+    <string name="not_available_internet">"Поточне інтернет-з'єднання недоступне. Ви хочете включити Wi-Fi?"</string>
+    <string name="failed_to_open_wifi_setting">"Не вдалося відкрити панель налаштування WiFi, будь ласка, увімкніть Wi-Fi."</string>
+
+    <string name="vpn_nation_opt">"Вибрано швидкий сервер"</string>
+    <string name="vpn_nation_fr">"Франція"</string>
+    <string name="vpn_nation_jp">"Японія"</string>
+    <string name="vpn_nation_uk">"United Kindom"</string>
+    <string name="vpn_nation_au">"Австралла"</string>
+    <string name="vpn_nation_de">"Німеччина"</string>
+    <string name="vpn_nation_sg">"Сінгапур"</string>
+    <string name="vpn_nation_nl">"Нідерланди"</string>
+    <string name="vpn_nation_us">"Сполучені Штати"</string>
+    <string name="vpn_nation_egypt">"Єгипет"</string>
+
+
+    <string name="not_start_vpn">"VPN-зв'язок не запускається. Будь ласка спробуйте ще раз."</string>
+    <string name="server_list">"Місцезнаходження сервера"</string>
+    <string name="repair">"РЕМОНТ"</string>
+
+    <string name="facebook">"Facebook"</string>
+    <string name="bluetooth">"Bluetooth"</string>
+    <string name="scan_qr_code_download">"Сканувати QR-код \ ndownload в Google Play"</string>
+
+    <string name="connecting_tip">"VPN - це з'єднання g. Спробуйте це пізніше!"</string>
+    <string name="stopping_tip">"VPN припиняється. Спробуйте це пізніше!"</string>
+    <string name="timeout_tip">"Час очікування підключення. Повторіть спробу!"</string>
+
+    <string name="disconnect">"Від'єднати"</string>
+    <string name="disconnect_dialog_title">"Ви хочете від'єднати?"</string>
+    <string name="disconnect_to_refresh">"Відновити vpn відновити?"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"Отримання списку серверів"</string>
+    <string name="fetch_server_list_failed">"Отримання часу очікування списку серверів!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"Завантажити: %1$d B/s, завантажте: %2$d B/s"</string>
+    <string name="server_not_available">"Сервер VPN зараз недоступний. Plase спробуйте це пізніше!"</string>
+    <string name="notification_vpn_stop">"Ваша VPN-служба зупинена. Торкніться, щоб відкрити."</string>
+    <string name="notification_vpn_network_error1">"Через нестабільність мережі"</string>
+    <string name="notification_vpn_network_error2">"Ваш VPN зупинено. Торкніться, щоб відкрити."</string>
+    <string name="success_connect">"Успішно з'єднано: %d разів"</string>
+    <string name="failed_connect">"Не вдалося підключитися: %d разів"</string>
+    <string name="free_used_time">"Вільний використаний час: %s"</string>
+    <string name="enable_notification">"Будь ласка, увімкніть сповіщення про дозволи в налаштуваннях."</string>
+
+    <string name="news">"Новини"</string>
+    <string name="video">"Відео"</string>
+    <string name="splash_subtitle">"Швидкий та стабільний VPN"</string>
+    <string name="touch_to_connect">"Торкніться, щоб з'єднатися"</string>
+    <string name="enable_vpn_connection">"Будь ласка, увімкніть VPN-зв'язок."</string>
+    <string-array name="network_errors">
+        <item>Немає доступних мереж, увімкніть Wi-Fi.</item>
+        <item>Підключено, немає Інтернету.</item>
+    </string-array>
+
+</resources>

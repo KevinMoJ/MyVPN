@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -196,7 +197,7 @@ public class DnsProxy implements Runnable {
         }
     }
 
-    private int getIPFromCache(String domain) {
+    public int getIPFromCache(String domain) {
         Integer ip = DomainIPMaps.get(domain);
         if (ip == null) {
             return 0;
@@ -207,7 +208,10 @@ public class DnsProxy implements Runnable {
 
     private boolean interceptDns(IPHeader ipHeader, UDPHeader udpHeader, DnsPacket dnsPacket) {
         Question question = dnsPacket.Questions[0];
-        System.out.println("DNS Qeury " + question.Domain);
+        if (ProxyConfig.IS_DEBUG) {
+            System.out.println("DNS Qeury " + question.Domain);
+        }
+
         if (question.Type == 1) {
             if (ProxyConfig.Instance.needProxy(question.Domain, getIPFromCache(question.Domain))) {
                 int fakeIP = getOrCreateFakeIP(question.Domain);
@@ -230,7 +234,7 @@ public class DnsProxy implements Runnable {
                             CommonMethods.ipIntToString(ipHeader.getSourceIP()),
                             CommonMethods.ipIntToString(ipHeader.getDestinationIP()),
                             udpHeader.getSourcePort(),
-                            udpHeader.getDestinationPort()
+                            udpHeader.getDestinationPort() & 0xffff
                     );
                 }
 
@@ -245,7 +249,7 @@ public class DnsProxy implements Runnable {
         long now = System.nanoTime();
         for (int i = m_QueryArray.size() - 1; i >= 0; i--) {
             QueryState state = m_QueryArray.valueAt(i);
-            if ((now - state.QueryNanoTime) > QUERY_TIMEOUT_NS) {
+            if (state != null && (now - state.QueryNanoTime) > QUERY_TIMEOUT_NS) {
                 m_QueryArray.removeAt(i);
             }
         }

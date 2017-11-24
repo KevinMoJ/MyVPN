@@ -1,0 +1,66 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"Поделиться"</string>
+    <string name="connecting">"соединительный"</string>
+    <string name="more">"Больше"</string>
+
+    <string name="action_choose_server">"Выберите сервер"</string>
+    <string name="stopping">"остановка"</string>
+    <string name="no_network">"Нет сети"</string>
+    <string name="no_internet_message">"Нет подключения к Интернету. Вы хотите включить Wi-Fi?"</string>
+    <string name="not_available_internet">"Текущее подключение к Интернету недоступно. Вы хотите включить Wi-Fi?"</string>
+    <string name="failed_to_open_wifi_setting">"Не удалось открыть панель настройки WiFi, включите WiFi."</string>
+
+    <string name="vpn_nation_opt">"Выбранный быстрый сервер"</string>
+    <string name="vpn_nation_fr">"Франция"</string>
+    <string name="vpn_nation_jp">"Япония"</string>
+    <string name="vpn_nation_uk">"United Kindom"</string>
+    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_de">"Германия"</string>
+    <string name="vpn_nation_sg">"Сингапур"</string>
+    <string name="vpn_nation_nl">"Нидерланды"</string>
+    <string name="vpn_nation_us">"Соединенные Штаты"</string>
+    <string name="vpn_nation_egypt">"Египет"</string>
+
+
+    <string name="not_start_vpn">"Соединение VPN не запускается. Пожалуйста, попробуйте еще раз."</string>
+    <string name="server_list">"Расположение сервера"</string>
+    <string name="repair">"РЕМОНТ"</string>
+
+    <string name="facebook">"facebook"</string>
+    <string name="bluetooth">"блютуз"</string>
+    <string name="scan_qr_code_download">"Сканировать QR-код \ nзагрузка в Google Play"</string>
+
+    <string name="connecting_tip">"VPN - connectiong. Пожалуйста, попробуйте позже!"</string>
+    <string name="stopping_tip">"VPN останавливается. Пожалуйста, попробуйте позже!"</string>
+    <string name="timeout_tip">"Время соединения вышло. Повторите попытку!"</string>
+
+    <string name="disconnect">"Отключить"</string>
+    <string name="disconnect_dialog_title">"Вы хотите отключиться?"</string>
+    <string name="disconnect_to_refresh">"Отключить vpn для обновления?"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"Выбор списка серверов"</string>
+    <string name="fetch_server_list_failed">"Получение тайм-аута списка серверов!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"Загрузить: %1$d B/s, загрузить: %2$d B/s"</string>
+    <string name="server_not_available">"VPN-сервер недоступен прямо сейчас. Plase попробуйте это позже!"</string>
+    <string name="notification_vpn_stop">"Ваша VPN остановлена. Нажмите, чтобы открыть."</string>
+    <string name="notification_vpn_network_error1">"Из-за нестабильности сети,"</string>
+    <string name="notification_vpn_network_error2">"Ваша VPN остановлена. Нажмите, чтобы открыть."</string>
+    <string name="success_connect">"Успешно подключено: %d раз"</string>
+    <string name="failed_connect">"Не удалось подключить: %d раз"</string>
+    <string name="free_used_time">"Свободное время использования: %s"</string>
+    <string name="enable_notification">"Включите разрешение для уведомлений в настройках."</string>
+
+    <string name="news">"Новости"</string>
+    <string name="video">"видео"</string>
+    <string name="splash_subtitle">"Быстрый и стабильный VPN"</string>
+    <string name="touch_to_connect">"Нажмите для подключения"</string>
+    <string name="enable_vpn_connection">Включите VPN-подключение.</string>
+    <string-array name="network_errors">
+        <item>Нет доступных сетей, включите Wi-Fi.</item>
+        <item>Подключено, нет Интернета.</item>
+    </string-array>
+
+</resources>

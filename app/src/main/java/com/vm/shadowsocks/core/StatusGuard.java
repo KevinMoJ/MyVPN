@@ -4,8 +4,12 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.service.ConnectionTestService;
+import com.androapplite.shadowsocks.service.FindProxyService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,6 +63,7 @@ public class StatusGuard implements Runnable{
     private long mReceivedCountHourly;
     private long mProxySentCountHourly;
     private long mProxyReceivedCountHourly;
+    private int mProxyBadCountSequence;
 
     public StatusGuard(Context context, ScheduledExecutorService scheduledExecutorService) {
 //        String state = Environment.getExternalStorageState();
@@ -76,8 +81,12 @@ public class StatusGuard implements Runnable{
 //                e.printStackTrace();
 //            }
 //        }
-        mCalendar = Calendar.getInstance();
-        scheduledExecutorService.scheduleWithFixedDelay(this, 1, 5, TimeUnit.SECONDS);
+//        mCalendar = Calendar.getInstance();
+        try {
+            scheduledExecutorService.scheduleWithFixedDelay(this, 1, 5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            ShadowsocksApplication.handleException(e);
+        }
         mContext = context;
     }
 
@@ -96,10 +105,11 @@ public class StatusGuard implements Runnable{
 //            }
             //检查线程
             Map<Thread, StackTraceElement[]> threads = Thread.getAllStackTraces();
-            println("thread exist? VPNService %s, Dns proxy %s, Tcp proxy %s",
+            println("thread exist? VPNService %s, Dns proxy %s, Tcp proxy %s, Udp proxy %s",
                     threads.containsKey(localVpnService.getVpnThread()),
                     threads.containsKey(localVpnService.getDnsProxy().getThread()),
-                    threads.containsKey(localVpnService.getTcpProxyServer().getThread()));
+                    threads.containsKey(localVpnService.getTcpProxyServer().getThread()),
+                    threads.containsKey(localVpnService.getUdpProxy().getThread()));
 
 
             //检查DNS端口
@@ -108,7 +118,7 @@ public class StatusGuard implements Runnable{
             DatagramSocket datagramSocket = null;
             try {
                 dnsProxyPort = localVpnService.getDnsProxy().Port;
-                datagramSocket = new DatagramSocket(localVpnService.getDnsProxy().Port);
+                datagramSocket = new DatagramSocket(dnsProxyPort);
             } catch (BindException e) {
                 isDnsProxyPortExist = true;
             } catch (SocketException e) {
@@ -124,9 +134,9 @@ public class StatusGuard implements Runnable{
             int tcpProxyPort = 0;
             ServerSocket serverSocket = null;
             try {
-                tcpProxyPort = localVpnService.getTcpProxyServer().Port & 0xffff;
+                tcpProxyPort = localVpnService.getTcpProxyServer().Port;
                 serverSocket = new ServerSocket();
-                serverSocket.bind(new InetSocketAddress(localVpnService.getTcpProxyServer().Port & 0xffff));
+                serverSocket.bind(new InetSocketAddress(tcpProxyPort));
             } catch (BindException e) {
                 isTcpProxyPortExist = true;
             } catch (IOException e) {
@@ -141,11 +151,32 @@ public class StatusGuard implements Runnable{
                 }
             }
 
-            println("port exist? Dns proxy %d %s, Tcp proxy %d %s",
-                    dnsProxyPort, isDnsProxyPortExist, tcpProxyPort, isTcpProxyPortExist);
+            //检查UDP端口
+            boolean isUdpProxyPortExist = false;
+            int udpProxyPort = 0;
+            datagramSocket = null;
+            try {
+                udpProxyPort = localVpnService.getUdpProxy().Port;
+                datagramSocket = new DatagramSocket(udpProxyPort);
+            } catch (BindException e) {
+                isDnsProxyPortExist = true;
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } finally {
+                if (datagramSocket != null) {
+                    datagramSocket.close();
+                }
+            }
+
+            println("port exist? Dns proxy %d %s, Tcp proxy %d %s, Udp proxy %d %s",
+                    dnsProxyPort, isDnsProxyPortExist, tcpProxyPort, isTcpProxyPortExist,
+                    udpProxyPort, isUdpProxyPortExist);
 
             boolean needCheckNetwork = false;
             boolean needCheckProxy = false;
+            boolean noTrafficData = false;
+            boolean noProxyTrafficData = false;
+
             TcpTrafficMonitor trafficMonitor = localVpnService.getTcpTrafficMonitor();
             if (trafficMonitor != null) {
                 //发送和接收数据
@@ -156,11 +187,11 @@ public class StatusGuard implements Runnable{
                         trafficMonitor.pProxySentByteCount - mProxySentByteCountHourly, trafficMonitor.pProxyReceivedByteCount - mProxyReceivedByteCountHourly);
 
                 //检查连接数
-
                 if (mPayloadReceivedByteCountLast == trafficMonitor.pPayloadReceivedByteCount) {
                     needCheckNetwork = true;
                     if (mPayloadSentByteCountLast != trafficMonitor.pPayloadSentByteCount) {
                         ++mNoReceivedCount;
+                        noTrafficData = true;
                     }
                 }
 
@@ -168,6 +199,7 @@ public class StatusGuard implements Runnable{
                     needCheckProxy = true;
                     if (mProxyPayloadSentByteCountLast != trafficMonitor.pProxyPayloadSentByteCount) {
                         ++mNoProxyReceivedCount;
+                        noProxyTrafficData = true;
                     }
                 }
 
@@ -185,20 +217,29 @@ public class StatusGuard implements Runnable{
                 mPayloadReceivedByteCountLast = trafficMonitor.pPayloadReceivedByteCount;
             }
 
-
             if (needCheckNetwork || needCheckProxy) {
                 if (checkActiveNetwork()){
                     ++mNetworkGoodCount;
-                    if (needCheckProxy) {
-                        if (checkProxy()) {
-                            ++mProxyGoodCount;
-                        } else {
-                            ++mProxyBadCount;
-                        }
-                    }
                 } else  {
                     ++mNetworkBadCount;
                 }
+            }
+
+            if (!noTrafficData && noProxyTrafficData) {
+                ++mProxyBadCount;
+                ++mProxyBadCountSequence;
+            } else if (!noProxyTrafficData){
+                ++mProxyGoodCount;
+            }
+
+            if (!needCheckProxy) {
+                mProxyBadCountSequence = 0;
+            }
+
+            if (mProxyBadCountSequence > 2 && LocalVpnService.IsRunning) {
+                Log.d("[heart beat]", "switchProxy");
+                FindProxyService.switchProxy(mContext);
+                mProxyBadCountSequence = 0;
             }
 
             println("connectivity status Network: %d/%d; Proxy: %d/%d",
@@ -243,16 +284,6 @@ public class StatusGuard implements Runnable{
         } else {
             return false;
         }
-    }
-
-    private boolean checkProxy(){
-        return true;
-//        try{
-//            InetSocketAddress proxy = ProxyConfig.Instance.getDefaultProxy().ServerAddress;
-//            return InetAddress.getByName(proxy.getHostName()).isReachable((int) TimeUnit.SECONDS.toMillis(5));
-//        }catch (IOException e) {
-//            return false;
-//        }
     }
 
     public Map<String, Integer> getErrors() {

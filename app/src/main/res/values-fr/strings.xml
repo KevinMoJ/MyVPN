@@ -1,0 +1,66 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"Partager"</string>
+    <string name="connecting">"De liaison"</string>
+    <string name="more">"Plus"</string>
+
+    <string name="action_choose_server">"Choisissez le serveur"</string>
+    <string name="stopping">"Arrêt"</string>
+    <string name="no_network">"Pas de réseau"</string>
+    <string name="no_internet_message">"Il n'y a pas de connexion Internet. Voulez-vous allumer WiFi?"</string>
+    <string name="not_available_internet">"La connexion Internet actuelle n'est pas disponible. Voulez-vous allumer WiFi?"</string>
+    <string name="failed_to_open_wifi_setting">"Impossible d'ouvrir le panneau de configuration Wi-Fi, passez WiFi."</string>
+
+    <string name="vpn_nation_opt">"Sélectionné le serveur rapide"</string>
+    <string name="vpn_nation_fr">"France"</string>
+    <string name="vpn_nation_jp">"Japon"</string>
+    <string name="vpn_nation_uk">"United Kindom"</string>
+    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_de">"Allemagne"</string>
+    <string name="vpn_nation_sg">"Singapour"</string>
+    <string name="vpn_nation_nl">"Pays-Bas"</string>
+    <string name="vpn_nation_us">"États Unis"</string>
+    <string name="vpn_nation_egypt">"Egypte"</string>
+
+
+    <string name="not_start_vpn">"La connexion VPN ne démarre pas. Veuillez réessayer."</string>
+    <string name="server_list">"Emplacement du serveur"</string>
+    <string name="repair">"RÉPARATION"</string>
+
+    <string name="facebook">"Facebook"</string>
+    <string name="bluetooth">"Bluetooth"</string>
+    <string name="scan_qr_code_download">"Scannez le code QR\nTélécharger sur Google Play"</string>
+
+    <string name="connecting_tip">"VPN est connectiong. Essayez-le plus tard!"</string>
+    <string name="stopping_tip">"VPN s'arrête. Essayez-le plus tard!"</string>
+    <string name="timeout_tip">"Délai de connection dépassé. Réessayez!"</string>
+
+    <string name="disconnect">"Déconnecter"</string>
+    <string name="disconnect_dialog_title">"Voulez-vous vous déconnecter?"</string>
+    <string name="disconnect_to_refresh">"Déconnecter vpn pour actualiser?"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"Liste des serveurs de récupération"</string>
+    <string name="fetch_server_list_failed">"Récupérer le délai d'attente de la liste des serveurs!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"Télécharger: %1$d B/s, téléverser: %2$d B/s"</string>
+    <string name="server_not_available">"Le serveur VPN n'est pas disponible en ce moment. Plase, essayez-le plus tard!"</string>
+    <string name="notification_vpn_stop">"Votre VPN est arrêté. Touchez pour ouvrir."</string>
+    <string name="notification_vpn_network_error1">"En raison de l'instabilité du réseau,"</string>
+    <string name="notification_vpn_network_error2">"Votre VPN est arrêté. Touchez pour ouvrir."</string>
+    <string name="success_connect">"Connecté avec succès: %d fois"</string>
+    <string name="failed_connect">"Échec de connexion: %d fois"</string>
+    <string name="free_used_time">"Temps libre utilisé: %s"</string>
+    <string name="enable_notification">"Activez l'autorisation de notification dans Paramètres."</string>
+
+    <string name="news">"nouvelles"</string>
+    <string name="video">"Vidéo"</string>
+    <string name="splash_subtitle">"VPN rapide et stable"</string>
+    <string name="touch_to_connect">"Touchez pour vous connecter"</string>
+    <string name="enable_vpn_connection">Veuillez activer la connexion VPN.</string>
+    <string-array name="network_errors">
+        <item>Aucun réseau disponible, activez le Wi-Fi.</item>
+        <item>Connecté, pas d\'Internet.</item>
+    </string-array>
+
+</resources>
