@@ -35,4 +35,6 @@ public final class SharedPreferenceKey {
     public static final String CLICK_CONNECT_BUTTON_TIME = "CLICK_CONNECT_BUTTON_TIME";
     public static final String CLICK_CONNECT_BUTTON_COUNT = "CLICK_CONNECT_BUTTON_COUNT";
 
+    public static final String GRAB_SPEED_TIME = "GRAB_SPEED_TIME";
+
 }

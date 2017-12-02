@@ -15,7 +15,6 @@ import android.support.annotation.Nullable;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.MainActivity;
-import com.androapplite.shadowsocks.service.InterruptVpnIntentService;
 import com.vm.shadowsocks.core.ProxyConfig.IPAddress;
 import com.vm.shadowsocks.dns.DnsPacket;
 import com.vm.shadowsocks.tcpip.CommonMethods;
@@ -473,14 +472,14 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (ProxyConfig.IS_DEBUG)
             System.out.printf("addAddress: %s/%d\n", ipAddress.Address, ipAddress.PrefixLength);
 
-        for (ProxyConfig.IPAddress dns : ProxyConfig.Instance.getDnsList()) {
+        for (IPAddress dns : ProxyConfig.Instance.getDnsList()) {
             builder.addDnsServer(dns.Address);
             if (ProxyConfig.IS_DEBUG)
                 System.out.printf("addDnsServer: %s\n", dns.Address);
         }
 
         if (ProxyConfig.Instance.getRouteList().size() > 0) {
-            for (ProxyConfig.IPAddress routeAddress : ProxyConfig.Instance.getRouteList()) {
+            for (IPAddress routeAddress : ProxyConfig.Instance.getRouteList()) {
                 builder.addRoute(routeAddress.Address, routeAddress.PrefixLength);
                 if (ProxyConfig.IS_DEBUG)
                     System.out.printf("addRoute: %s/%d\n", routeAddress.Address, routeAddress.PrefixLength);
@@ -548,8 +547,8 @@ public class LocalVpnService extends VpnService implements Runnable {
             if (m_VPNInterface != null) {
                 m_VPNInterface.close();
                 m_VPNInterface = null;
-                onStatusChanged(ProxyConfig.Instance.getSessionName(), false);
             }
+            onStatusChanged(ProxyConfig.Instance.getSessionName(), false);
         } catch (Exception e) {
             // ignore
         }
@@ -597,7 +596,7 @@ public class LocalVpnService extends VpnService implements Runnable {
             m_VPNThread.interrupt();
         }
         stopSchedule();
-        VpnNotification.showVpnStoppedNotificationGlobe(getApplicationContext(), true);
+        VpnNotification.showVpnStoppedNotificationGlobe(this, true);
         System.out.println("VPNService " + IsRunning);
 //        startService(new Intent(this, InterruptVpnIntentService.class));
         super.onDestroy();

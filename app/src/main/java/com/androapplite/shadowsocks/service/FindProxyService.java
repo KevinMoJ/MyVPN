@@ -14,6 +14,7 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.vm.shadowsocks.core.LocalVpnService;
+import com.vm.shadowsocks.core.VpnNotification;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -52,6 +53,7 @@ public class FindProxyService extends IntentService {
             if (serverConfig != null) {
                 try {
                     LocalVpnService.IsRunning = false;
+                    VpnNotification.gSupressNotification = true;
                     ServerConfig testConfig = testServerIpAndPort(serverConfig);
                     if (testConfig == null) {
                         Log.d("FindProxyService", "old proxy " + serverConfig.server + " 联不通");
@@ -129,7 +131,7 @@ public class FindProxyService extends IntentService {
                 }
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorService executorService = Executors.newFixedThreadPool(tasks.size());
             ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
             for (MyCallable callable: tasks) {
                 ecs.submit(callable);
@@ -190,7 +192,7 @@ public class FindProxyService extends IntentService {
     }
 
     private boolean ping(String ipAddress){
-        int  timeOut =  3000 ;  //超时应该在3钞以上
+        int  timeOut =  5000 ;  //超时应该在3钞以上
         boolean status = false;
         try {
             status = InetAddress.getByName(ipAddress).isReachable(timeOut);     // 当返回值是true时，说明host是可用的，false则不可。
@@ -198,6 +200,9 @@ public class FindProxyService extends IntentService {
             ShadowsocksApplication.handleException(e);
         }
         Log.d("MyCaller", "ping: " + ipAddress + " " + status);
+        if (!status) {
+            Firebase.getInstance(this).logEvent("ping", ipAddress, String.valueOf(status));
+        }
         return status;
     }
 
@@ -222,6 +227,9 @@ public class FindProxyService extends IntentService {
             }
         }
         Log.d("MyCaller", ip + ":" + port + " " + result);
+        if (!result) {
+            Firebase.getInstance(this).logEvent("port", ip + ":" + port, String.valueOf(result));
+        }
         return result;
     }
 

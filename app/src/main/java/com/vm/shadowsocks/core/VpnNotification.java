@@ -5,10 +5,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.SpannableString;
@@ -18,6 +19,8 @@ import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by huangjian on 2017/10/19.
@@ -26,8 +29,9 @@ import com.androapplite.shadowsocks.activity.SplashActivity;
 public class VpnNotification implements LocalVpnService.onStatusChangedListener {
     private NotificationCompat.Builder mNormalNetworkStatusBuilder;
     private NotificationCompat.Builder mErrorNetworkStatusBuilder;
-
+    private static final int VPN_NOTIFICATION_ID = 1;
     private Service mService;
+    public static boolean gSupressNotification = false;
 
 
     public VpnNotification(Service service) {
@@ -58,7 +62,8 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
     @Override
     public void onStatusChanged(String status, Boolean isRunning) {
         if (!isRunning) {
-            showVpnStoppedNotificationGlobe(mService.getApplicationContext(), true);
+            showVpnStoppedNotificationGlobe(mService, !gSupressNotification);
+            gSupressNotification = false;
         }
     }
 
@@ -122,11 +127,12 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
 
     public static void showVpnStoppedNotificationGlobe(Context context, boolean showFullScreenIntent){
         try {
-            Intent intent = new Intent(context, SplashActivity.class);
+            final Context applicationContext = context.getApplicationContext();
+            Intent intent = new Intent(applicationContext, SplashActivity.class);
             intent.putExtra("source", "notificaiton");
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.notification_icon_large);
-            NotificationCompat.Builder errorNetworkStatusBuilder = new NotificationCompat.Builder(context);
+            PendingIntent pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Bitmap largeIcon = BitmapFactory.decodeResource(applicationContext.getResources(), R.drawable.notification_icon_large);
+            NotificationCompat.Builder errorNetworkStatusBuilder = new NotificationCompat.Builder(applicationContext);
             errorNetworkStatusBuilder.setSmallIcon(R.drawable.notification_icon)
                     .setLargeIcon(largeIcon)
                     .setContentIntent(pendingIntent)
@@ -138,8 +144,15 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                     .setContentText(applyColorText(context.getString(R.string.notification_vpn_stop), Color.RED));
             if (showFullScreenIntent) {
                 errorNetworkStatusBuilder.setFullScreenIntent(pendingIntent, true);
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showVpnStoppedNotificationGlobe(applicationContext, false);
+                    }
+                }, TimeUnit.SECONDS.toMillis(3));
             }
-            NotificationManagerCompat.from(context).notify(1, errorNetworkStatusBuilder.build());
+            NotificationManagerCompat.from(applicationContext).notify(VPN_NOTIFICATION_ID, errorNetworkStatusBuilder.build());
         } catch (Exception e) {
             ShadowsocksApplication.handleException(e);
         }

@@ -69,6 +69,7 @@ import com.bestgo.adsplugin.ads.AdStateListener;
 import com.bestgo.adsplugin.ads.AdType;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
+import com.vm.shadowsocks.core.VpnNotification;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -542,6 +543,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                             connectVpnServerAsync();
                         }
                         LocalVpnService.IsRunning = false;
+                        VpnNotification.gSupressNotification = true;
                         mVpnState = VpnState.Connecting;
                         mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
                         mIsRestart = true;
@@ -676,7 +678,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private boolean ping(String ipAddress){
-        int  timeOut =  3000 ;  //超时应该在3钞以上
+        int  timeOut =  5000 ;  //超时应该在3钞以上
         boolean status = false;
         try {
             status = InetAddress.getByName(ipAddress).isReachable(timeOut);     // 当返回值是true时，说明host是可用的，false则不可。
@@ -684,6 +686,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             ShadowsocksApplication.handleException(e);
         }
         Log.d("MyCaller", "ping: " + ipAddress + " " + status);
+        if (!status) {
+            Firebase.getInstance(this).logEvent("ping", ipAddress, String.valueOf(status));
+        }
         return status;
     }
 
@@ -708,8 +713,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
         }
         Log.d("MyCaller", ip + ":" + port + " " + result);
+        if (!result) {
+            Firebase.getInstance(this).logEvent("port", ip + ":" + port, String.valueOf(result));
+        }
         return result;
     }
+
 
     @Override
     protected void onDestroy() {
@@ -733,7 +742,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void disconnectVpnServiceAsync(){
         if(mConnectFragment != null){
-            mConnectFragment.animateStopping();
+            if (LocalVpnService.IsRunning) {
+                mConnectFragment.animateStopping();
+            } else {
+                mVpnState = VpnState.Stopped;
+                mConnectFragment.setConnectResult(mVpnState);
+            }
         }
         LocalVpnService.IsRunning = false;
     }
@@ -806,7 +820,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 .show();
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        String exitAdSwitch = adAppHelper.getCustomCtrlValue("exit_ad", "1");
+        String exitAdSwitch = adAppHelper.getCustomCtrlValue("exit_ad", "-1");
         if ("1".equals(exitAdSwitch)) {
             adAppHelper.showFullAd();
             firebase.logEvent("主页", "退出", "后退键");

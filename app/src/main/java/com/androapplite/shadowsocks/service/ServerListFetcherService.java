@@ -6,10 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -17,7 +13,6 @@ import android.util.Pair;
 
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.activity.MainActivity;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -29,18 +24,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
@@ -98,8 +88,7 @@ public class ServerListFetcherService extends IntentService{
     protected void onHandleIntent(Intent intent) {
         if(intent != null && !hasStart){
             hasStart = true;
-            SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-            editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
+//            editor.remove(SharedPreferenceKey.SERVER_LIST).apply();
             Cache cache = new Cache(getCacheDir(), 1024 * 1024);
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
@@ -130,8 +119,8 @@ public class ServerListFetcherService extends IntentService{
             for (int i = 0; i < tasks.size(); i++) {
                 try {
                     Future<Pair<String, String>> future = ecs.take();
-                    Pair<String, String> result= future.get(3*TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
-                    if (result != null) {
+                    Pair<String, String> result= future.get(3 * TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
+                    if (result != null && result.second != null) {
                         mUrl = result.first;
                         mServerListJsonString = result.second;
                         break;
@@ -157,8 +146,8 @@ public class ServerListFetcherService extends IntentService{
                 for (int i = 0; i < tasks.size(); i++) {
                     try {
                         Future<Pair<String, String>> future = ecs.take();
-                        Pair<String, String> result= future.get(3*TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
-                        if (result != null) {
+                        Pair<String, String> result= future.get(3 * TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
+                        if (result != null && result.second != null) {
                             mUrl = result.first;
                             mServerListJsonString = result.second;
                             break;
@@ -190,6 +179,15 @@ public class ServerListFetcherService extends IntentService{
                 }
             }
 
+            //使用旧的server list
+            if(mServerListJsonString == null) {
+                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+                mServerListJsonString = sharedPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
+                if (mServerListJsonString != null) {
+                    urlKey = "旧的server list";
+                }
+            }
+
             //使用本地静态服务器列表
             if(mServerListJsonString == null){
                 AssetManager assetManager = getAssets();
@@ -209,6 +207,7 @@ public class ServerListFetcherService extends IntentService{
             }
 
             if(mServerListJsonString != null) {
+                SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
                 editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).apply();
             }else{
                 urlKey = "没有任何可用的服务器列表";
