@@ -71,4 +71,6 @@
     <string name="free_used_time2">"Temps d'utilisation gratuit"</string>
     <string name="navigation_drawer_open">"Ouvrir le tiroir de navigation"</string>
     <string name="navigation_drawer_close">"Fermer le tiroir de navigation"</string>
+    <string name="grab_speed_notification_title">"Prenez la vitesse"</string>
+    <string name="grab_speed_notification_content">"Cliquez sur la vitesse de prise, pour que votre vitesse soit plus rapide et plus fluide!"</string>
 </resources>

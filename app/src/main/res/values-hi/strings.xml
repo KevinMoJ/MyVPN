@@ -71,4 +71,6 @@
     <string name="free_used_time2">"निशुल्क प्रयुक्त समय"</string>
     <string name="navigation_drawer_open">"नेविगेशन ड्रॉवर खोलें"</string>
     <string name="navigation_drawer_close">"नेविगेशन ड्रॉवर को बंद करें"</string>
+    <string name="grab_speed_notification_title">"गति ले लो"</string>
+    <string name="grab_speed_notification_content">"हड़पने की गति को क्लिक करें, ताकि आपकी गति तेज और अधिक तरल हो!"</string>
 </resources>

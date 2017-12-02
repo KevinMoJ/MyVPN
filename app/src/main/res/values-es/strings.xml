@@ -72,4 +72,6 @@
     <string name="free_used_time2">"Tiempo de uso gratuito"</string>
     <string name="navigation_drawer_open">"Abrir el cajón de navegación"</string>
     <string name="navigation_drawer_close">"Cerrar el cajón de navegación"</string>
+    <string name="grab_speed_notification_title">"Coge la velocidad"</string>
+    <string name="grab_speed_notification_content">"Haga clic en velocidad de agarre, para que su velocidad sea más rápida y fluida."</string>
 </resources>

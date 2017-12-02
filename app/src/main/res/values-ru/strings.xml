@@ -71,4 +71,6 @@
     <string name="free_used_time2">"Свободное время использования"</string>
     <string name="navigation_drawer_open">"Открыть навигационный ящик"</string>
     <string name="navigation_drawer_close">"Закрыть навигационный ящик"</string>
+    <string name="grab_speed_notification_title">"Захват скорости"</string>
+    <string name="grab_speed_notification_content">"Нажмите скорость захвата, чтобы ваша скорость была быстрее и быстрее!"</string>
 </resources>

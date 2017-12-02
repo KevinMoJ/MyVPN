@@ -71,4 +71,6 @@
     <string name="free_used_time2">"Tempo Livre Usado"</string>
     <string name="navigation_drawer_open">"Abrir a gaveta de navegação"</string>
     <string name="navigation_drawer_close">"Fechar gaveta de navegação"</string>
+    <string name="grab_speed_notification_title">"Agarre a velocidade"</string>
+    <string name="grab_speed_notification_content">"Clique na velocidade de captura, de modo que sua velocidade seja mais rápida e fluida!"</string>
 </resources>

@@ -71,4 +71,6 @@
     <string name="free_used_time2">"الحرة المستخدمة الوقت"</string>
     <string name="navigation_drawer_open">"فتح درج التنقل"</string>
     <string name="navigation_drawer_close">"إغلاق درج التنقل"</string>
+    <string name="grab_speed_notification_title">"الاستيلاء على السرعة"</string>
+    <string name="grab_speed_notification_content">"انقر فوق سرعة انتزاع، بحيث سرعة أسرع وأكثر مرونة!"</string>
 </resources>
