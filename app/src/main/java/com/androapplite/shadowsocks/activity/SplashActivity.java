@@ -40,6 +40,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         mAdAppHelper = AdAppHelper.getInstance(this);
         mAdAppHelper.loadNewInterstitial();
         mAdAppHelper.loadNewNative();
+        mAdAppHelper.loadNewSplashAd();
 
         mAdLoadedCheckHandler = new Handler(this);
         mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 3000);

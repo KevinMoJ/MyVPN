@@ -44,7 +44,8 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
 //        mAdLayout.setLayoutParams(lp);
         mAdLayout.setVisibility(View.GONE);
         try {
-            mAdLayout.addView(AdAppHelper.getInstance(getContext()).getNative());
+            View aNative = AdAppHelper.getInstance(getContext()).getNative();
+            mAdLayout.addView(aNative);
             mAdLayout.setVisibility(View.VISIBLE);
         } catch (Exception ex) {
         }
