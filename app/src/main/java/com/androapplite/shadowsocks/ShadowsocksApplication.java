@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 
@@ -58,6 +59,12 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         FirebaseApp.initializeApp(this);
         AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
         AdAppHelper.FIREBASE = Firebase.getInstance(this);
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        if (displayMetrics.density * 320 >= displayMetrics.widthPixels) {
+            AdAppHelper.NATIVE_ADMOB_WIDTH_LIST = new int[1];
+            AdAppHelper.NATIVE_ADMOB_WIDTH_LIST[0] = 280;
+        }
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.init();
