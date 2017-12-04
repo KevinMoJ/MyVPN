@@ -325,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             if(mConnectFragment != null){
                 mConnectFragment.updateUI();
             }
+            ConnectionTestService.testConnectionWithoutVPN(this);
         }
     }
 
@@ -470,6 +471,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 if(mConnectFragment != null){
                     mConnectFragment.updateUI();
                 }
+                ConnectionTestService.testConnectionWithoutVPN(this);
                 break;
             case MSG_PREPARE_START_VPN_BACKGROUND:
                 prepareStartVpnBackground();
@@ -500,6 +502,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mForgroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
             mErrorServers.clear();
             mForgroundHandler.sendEmptyMessage(MSG_NO_AVAILABE_VPN);
+            ConnectionTestService.testConnectionWithoutVPN(this);
+
         }
     }
 
@@ -860,7 +864,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 if (!AdAppHelper.getInstance(this).isFullAdLoaded()) {
                     rotatedBottomAd();
                 }
-                ConnectionTestService.testConnection(this, mConnectingConfig.server);
+                ConnectionTestService.testConnectionWithVPN(this, mConnectingConfig.server);
                 mForgroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mErrorServers.clear();
                 AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());

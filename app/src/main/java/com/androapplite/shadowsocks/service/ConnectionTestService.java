@@ -3,14 +3,10 @@ package com.androapplite.shadowsocks.service;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.SystemClock;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.vm.shadowsocks.core.LocalVpnService;
-
-import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -25,6 +21,9 @@ import okhttp3.Response;
  */
 public class ConnectionTestService extends IntentService {
     private static final String SERVER_NAME = "SERVER_NAME";
+    private static final String URL_BING = "https://www.bing.com/";
+    private static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
+    private static final String URL = "URL";
 
     public ConnectionTestService() {
         super("ConnectionTestService");
@@ -37,9 +36,15 @@ public class ConnectionTestService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void testConnection(Context context, String serverName) {
+    public static void testConnectionWithVPN(Context context, String serverName) {
         Intent intent = new Intent(context, ConnectionTestService.class);
-        intent.putExtra(SERVER_NAME, serverName);
+        intent.putExtra(SERVER_NAME, serverName).putExtra(URL, URL_GOOGLE);
+        context.startService(intent);
+    }
+
+    public static void testConnectionWithoutVPN(Context context) {
+        Intent intent = new Intent(context, ConnectionTestService.class);
+        intent.putExtra(URL, URL_BING);
         context.startService(intent);
     }
 
@@ -47,8 +52,8 @@ public class ConnectionTestService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             String serverName = intent.getStringExtra(SERVER_NAME);
+            String url = intent.getStringExtra(URL);
             OkHttpClient client = new OkHttpClient();
-            String url = "http://www.gstatic.com/generate_204";
             try {
                 Request request = new Request.Builder()
                         .url(url)
@@ -64,11 +69,15 @@ public class ConnectionTestService extends IntentService {
                     SystemClock.sleep(50);
                 }
                 long timeConsume = System.currentTimeMillis() - t1;
-                if (result) {
-                    firebase.logEvent("连接后测试成功", serverName, timeConsume);
-                } else {
-                    firebase.logEvent("连接后测试失败", serverName, timeConsume);
-                    LocalVpnService.IsRunning = false;
+                if (url.equals(URL_GOOGLE)) {
+                    if (result) {
+                        firebase.logEvent("连接后测试成功", serverName, timeConsume);
+                    } else {
+                        firebase.logEvent("连接后测试失败", serverName, timeConsume);
+                        FindProxyService.switchProxy(this);
+                    }
+                } else if (url.equals(URL_BING)) {
+                    firebase.logEvent("连接失败后测试", String.valueOf(result), timeConsume);
                 }
             } catch (Exception e) {
                 ShadowsocksApplication.handleException(e);
