@@ -132,7 +132,7 @@ public class FindProxyService extends IntentService {
                 }
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool(tasks.size());
+            ExecutorService executorService = Executors.newCachedThreadPool();
             ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
             for (MyCallable callable: tasks) {
                 ecs.submit(callable);
