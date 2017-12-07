@@ -130,7 +130,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
             final Context applicationContext = context.getApplicationContext();
             Intent intent = new Intent(applicationContext, SplashActivity.class);
             intent.putExtra("source", "notificaiton");
-            PendingIntent pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(applicationContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             Bitmap largeIcon = BitmapFactory.decodeResource(applicationContext.getResources(), R.drawable.notification_icon_large);
             NotificationCompat.Builder errorNetworkStatusBuilder = new NotificationCompat.Builder(applicationContext);
             errorNetworkStatusBuilder.setSmallIcon(R.drawable.notification_icon)
@@ -143,7 +143,8 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                     .setColor(Color.RED)
                     .setContentText(applyColorText(context.getString(R.string.notification_vpn_stop), Color.RED));
             if (showFullScreenIntent) {
-                errorNetworkStatusBuilder.setFullScreenIntent(pendingIntent, true);
+                PendingIntent fullScreenIntent = PendingIntent.getActivity(applicationContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                errorNetworkStatusBuilder.setFullScreenIntent(fullScreenIntent, true);
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(new Runnable() {
                     @Override

@@ -50,6 +50,7 @@ import android.widget.FrameLayout;
 
 
 import com.androapplite.shadowsocks.Rotate3dAnimation;
+import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
@@ -74,9 +75,11 @@ import com.vm.shadowsocks.core.VpnNotification;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -546,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                         if (!LocalVpnService.IsRunning) {
                             connectVpnServerAsync();
                         }
-                        LocalVpnService.IsRunning = false;
+                        VpnManageService.stopVpnByUserSwitchProxy();
                         VpnNotification.gSupressNotification = true;
                         mVpnState = VpnState.Connecting;
                         mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
@@ -621,7 +624,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorService executorService = Executors.newCachedThreadPool();
             ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
             for (MyCallable callable: tasks) {
                 ecs.submit(callable);
@@ -638,6 +641,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } catch (Exception e) {
                 }
             }
+            executorService.shutdown();
         }
         return serverConfig;
     }
@@ -646,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         private WeakReference<MainActivity> mReference;
         private ServerConfig mConfig;
         MyCallable(MainActivity mainActivity, ServerConfig config) {
-            mReference = new WeakReference<MainActivity>(mainActivity);
+            mReference = new WeakReference<>(mainActivity);
             mConfig = config;
         }
         @Override
@@ -682,12 +686,19 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private boolean ping(String ipAddress){
-        int  timeOut =  5000 ;  //超时应该在3钞以上
         boolean status = false;
+        HttpURLConnection connection = null;
         try {
-            status = InetAddress.getByName(ipAddress).isReachable(timeOut);     // 当返回值是true时，说明host是可用的，false则不可。
-        }catch (Exception e){
+            connection = (HttpURLConnection) new URL(String.format("http://%s/ping.html", ipAddress)).openConnection();
+            connection.setConnectTimeout(1000 * 5);
+            connection.setReadTimeout(1000 * 5);
+            status = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+        } catch (Exception e) {
             ShadowsocksApplication.handleException(e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
         Log.d("MyCaller", "ping: " + ipAddress + " " + status);
         if (!status) {
@@ -748,12 +759,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         if(mConnectFragment != null){
             if (LocalVpnService.IsRunning) {
                 mConnectFragment.animateStopping();
+                VpnManageService.stopVpnByUser();
             } else {
                 mVpnState = VpnState.Stopped;
                 mConnectFragment.setConnectResult(mVpnState);
             }
         }
-        LocalVpnService.IsRunning = false;
     }
 
     @Override

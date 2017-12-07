@@ -28,6 +28,7 @@ import com.androapplite.shadowsocks.PromotionTracking;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -66,6 +67,9 @@ public class VpnManageService extends Service implements Runnable,
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private long mRemoteFetchStartTime;
     private boolean mIsRemoteFetchSuccess;
+    private TcpTrafficMonitor mLastTcpTrafficMonitor;
+    private static int sStopReason = 0;
+
 
 
     public VpnManageService() {
@@ -97,6 +101,10 @@ public class VpnManageService extends Service implements Runnable,
         mServiceHandler.sendEmptyMessageDelayed(MSG_1_MINUTE, TimeUnit.MINUTES.toMillis(1));
         mServiceHandler.sendEmptyMessageDelayed(MSG_1_HOUR, TimeUnit.HOURS.toMillis(1));
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        if (useTime < 0) {
+            mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+        }
     }
 
     private void registerScreenActionReceiver() {
@@ -156,9 +164,6 @@ public class VpnManageService extends Service implements Runnable,
     }
 
     private void startScheduler(TimeUnit timeUnit) {
-        if (mTimeStart == 0) {
-            mTimeStart = System.currentTimeMillis();
-        }
         try {
             mFuture = mService.scheduleAtFixedRate(this, 1, 1, timeUnit);
         } catch (Exception e) {
@@ -177,7 +182,11 @@ public class VpnManageService extends Service implements Runnable,
     public void onStatusChanged(String status, Boolean isRunning) {
         if (mSharedPreference != null) {
             stopScheduler();
+            Firebase firebase = Firebase.getInstance(this);
+            String[] parts = LocalVpnService.ProxyUrl != null ? LocalVpnService.ProxyUrl.split("@") : null;
+            String server = parts != null && parts.length > 1 ? parts[1] : "没有服务器";
             if (isRunning) {
+                mTimeStart = System.currentTimeMillis();
                 startScheduler(TimeUnit.SECONDS);
                 registerScreenActionReceiver();
                 unregisterTimeTickReceiver();
@@ -187,16 +196,35 @@ public class VpnManageService extends Service implements Runnable,
                 if (!mIsRemoteFetchSuccess) {
                     fetchRemoteConfig();
                 }
+                firebase.logEvent("VPN计时", "开始", server);
             } else {
                 unregisterScreenActionReceiver();
                 registerTimeTickReceiver();
                 if (mConnectStartTime > 0) {
                     long usetime = (System.currentTimeMillis() - mConnectStartTime) / 1000;
-                    Firebase.getInstance(this).logEvent("VPN计时", "使用", usetime);
-                } else {
-                    Firebase.getInstance(this).logEvent("VPN计时", "使用", 0);
+                    firebase.logEvent("VPN计时", server, usetime);
                 }
                 mIsRemoteFetchSuccess = false;
+                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Stopped.ordinal()).apply();
+                switch (sStopReason) {
+                    case 0:
+                        firebase.logEvent("VPN断开", "程序断开", server);
+                        break;
+                    case 1:
+                        firebase.logEvent("VPN断开", "用户主动断开", server);
+                        break;
+                    case 2:
+                        firebase.logEvent("VPN断开", "用户切换国家", server);
+                        break;
+                    case 3:
+                        firebase.logEvent("VPN断开", "自动切换服务器", server);
+                        break;
+                    case 4:
+                        firebase.logEvent("VPN断开", "自动切换服务器失败", server);
+                        break;
+                }
+                sStopReason = 0;
+
             }
         }
     }
@@ -210,6 +238,20 @@ public class VpnManageService extends Service implements Runnable,
     public void onTrafficUpdated(@Nullable TcpTrafficMonitor tcpTrafficMonitor) {
         if (tcpTrafficMonitor != null) {
             PromotionTracking.getInstance(this).reportUsageByte(tcpTrafficMonitor);
+            String[] networkErrors = getResources().getStringArray(R.array.network_errors);
+            if (tcpTrafficMonitor.pPayloadReceivedSpeed <= 0 && tcpTrafficMonitor.pNetworkError >= 0
+                    && tcpTrafficMonitor.pNetworkError < networkErrors.length) {
+                if (mLastTcpTrafficMonitor == null
+                        || mLastTcpTrafficMonitor.pNetworkError != tcpTrafficMonitor.pNetworkError) {
+                    String[] parts = LocalVpnService.ProxyUrl.split("@");
+                    if (parts.length > 1) {
+                        Firebase.getInstance(this).logEvent("连接过程错误", String.valueOf(tcpTrafficMonitor.pNetworkError), parts[1]);
+                    } else {
+                        Firebase.getInstance(this).logEvent("连接过程错误", String.valueOf(tcpTrafficMonitor.pNetworkError), "没有服务器");
+                    }
+                }
+            }
+            mLastTcpTrafficMonitor = tcpTrafficMonitor;
         }
     }
 
@@ -217,7 +259,15 @@ public class VpnManageService extends Service implements Runnable,
     public void run() {
         long start = System.currentTimeMillis();
         long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        useTime += (start - mTimeStart) / 1000;
+        long differ = (start - mTimeStart) / 1000;
+        if (differ < 0) {
+            differ = 1;
+            mTimeStart = start;
+        } else if (differ > 60) {
+            differ = 60;
+            mTimeStart = start;
+        }
+        useTime += differ;
         mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, useTime).apply();
         mTimeStart = start;
         LocalBroadcastManager.getInstance(this).sendBroadcast(mUseTimeIntent);
@@ -306,7 +356,7 @@ public class VpnManageService extends Service implements Runnable,
         try {
             Intent intent = new Intent(this, SplashActivity.class);
             intent.putExtra("source", "notificaiton_grab_speed");
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             Bitmap largeIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.notification_icon_grap_speed);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
             notificationBuilder.setSmallIcon(R.drawable.notification_icon)
@@ -316,7 +366,8 @@ public class VpnManageService extends Service implements Runnable,
                     .setContentTitle(getString(R.string.grab_speed_notification_title))
                     .setContentText(getString(R.string.grab_speed_notification_content));
             if (showFullScreenIntent) {
-                notificationBuilder.setFullScreenIntent(pendingIntent, true);
+                PendingIntent fullScreenIntent = PendingIntent.getActivity(this, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                notificationBuilder.setFullScreenIntent(fullScreenIntent, true);
             }
             NotificationManagerCompat.from(getApplicationContext()).notify(NOTIFICATION_ID_GRAP_SPEED, notificationBuilder.build());
         } catch (Exception e) {
@@ -346,5 +397,25 @@ public class VpnManageService extends Service implements Runnable,
         }
         Firebase.getInstance(this).logEvent("获取远程配置", String.valueOf(mIsRemoteFetchSuccess),
                 System.currentTimeMillis() - mRemoteFetchStartTime);
+    }
+
+    public static void stopVpnByUser() {
+        LocalVpnService.IsRunning = false;
+        sStopReason = 1;
+    }
+
+    public static void stopVpnByUserSwitchProxy() {
+        LocalVpnService.IsRunning = false;
+        sStopReason = 2;
+    }
+
+    public static void stopVpnForAutoSwitchProxy() {
+        LocalVpnService.IsRunning = false;
+        sStopReason = 3;
+    }
+
+    public static void stopVpnForSwitchProxyFailed() {
+        LocalVpnService.IsRunning = false;
+        sStopReason = 4;
     }
 }

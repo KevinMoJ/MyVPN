@@ -46,14 +46,15 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 3000);
         ServerListFetcherService.fetchServerListAsync(this);
         VpnManageService.start(this);
-        Firebase.getInstance(this).logEvent("屏幕","闪屏屏幕");
+        Firebase firebase = Firebase.getInstance(this);
+        firebase.logEvent("屏幕","闪屏屏幕");
         Intent intent = getIntent();
         if (intent != null) {
             String source = intent.getStringExtra("source");
-            if (source != null && source.equals("notificaiton")) {
-                Firebase.getInstance(this).logEvent("打开app来源","通知");
+            if (source != null) {
+                firebase.logEvent("打开app来源", source);
             } else {
-                Firebase.getInstance(this).logEvent("打开app来源","图标");
+                firebase.logEvent("打开app来源", "图标");
             }
         }
 

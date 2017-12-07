@@ -19,9 +19,10 @@ import com.vm.shadowsocks.core.VpnNotification;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
-import java.net.InetAddress;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
@@ -52,7 +53,7 @@ public class FindProxyService extends IntentService {
             Firebase.getInstance(this).logEvent("切换代理", "开始监测");
             if (serverConfig != null) {
                 try {
-                    LocalVpnService.IsRunning = false;
+                    VpnManageService.stopVpnForAutoSwitchProxy();
                     VpnNotification.gSupressNotification = true;
                     ServerConfig testConfig = testServerIpAndPort(serverConfig);
                     if (testConfig == null) {
@@ -65,7 +66,7 @@ public class FindProxyService extends IntentService {
                             serverConfig.saveInSharedPreference(mSharedPreference);
                         } else {
                             Log.d("FindProxyService", "没有可用的proxy");
-                            LocalVpnService.IsRunning = false;
+                            VpnManageService.stopVpnForSwitchProxyFailed();
                             Firebase.getInstance(this).logEvent("切换代理", "所有代理连不通");
                         }
                     } else {
@@ -148,6 +149,7 @@ public class FindProxyService extends IntentService {
                 } catch (Exception e) {
                 }
             }
+            executorService.shutdown();
         }
         return serverConfig;
     }
@@ -192,12 +194,19 @@ public class FindProxyService extends IntentService {
     }
 
     private boolean ping(String ipAddress){
-        int  timeOut =  5000 ;  //超时应该在3钞以上
         boolean status = false;
+        HttpURLConnection connection = null;
         try {
-            status = InetAddress.getByName(ipAddress).isReachable(timeOut);     // 当返回值是true时，说明host是可用的，false则不可。
-        }catch (Exception e){
+            connection = (HttpURLConnection) new URL(String.format("http://%s/ping.html", ipAddress)).openConnection();
+            connection.setConnectTimeout(1000 * 5);
+            connection.setReadTimeout(1000 * 5);
+            status = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+        } catch (Exception e) {
             ShadowsocksApplication.handleException(e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
         Log.d("MyCaller", "ping: " + ipAddress + " " + status);
         if (!status) {
