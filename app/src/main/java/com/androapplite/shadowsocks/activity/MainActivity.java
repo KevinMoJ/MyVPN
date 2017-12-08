@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private VpnState mVpnState;
     private boolean mIsRestart;
     private AlertDialog mExitAlertDialog;
+    private DisconnectFragment mDisconnectFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -246,8 +247,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
             PromotionTracking.getInstance(this).reportClickConnectButtonCount();
         } else {
-            DisconnectFragment disconnectFragment = new DisconnectFragment();
-            disconnectFragment.show(getSupportFragmentManager(), "disconnect");
+            mDisconnectFragment = new DisconnectFragment();
+            mDisconnectFragment.show(getSupportFragmentManager(), "disconnect");
             firebase.logEvent("连接VPN", "断开");
         }
     }
@@ -433,11 +434,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             ShadowsocksApplication.handleException(e);
         }
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        if (adAppHelper.isNativeLoaded()) {
+        if (adAppHelper.isNativeLoaded() && mDisconnectFragment == null) {
             addBottomAd();
-        } else {
-            adAppHelper.loadNewNative();
         }
+        adAppHelper.loadNewNative();
     }
 
     @Override
@@ -769,6 +769,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onDismiss(DisconnectFragment disconnectFragment) {
+        mDisconnectFragment = null;
         addBottomAd();
     }
 

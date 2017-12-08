@@ -159,6 +159,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void animateConnecting(){
         startAnimation();
         mConnectButton.setText(R.string.disconnect);
+        mMessageTextView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.connecting);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
@@ -188,6 +189,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void animateStopping(){
         startAnimation();
         mConnectButton.setText(R.string.connect);
+        mMessageTextView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.stopping);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
@@ -196,12 +198,15 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void connectFinish(){
         stopAnimation();
         mConnectButton.setText(R.string.disconnect);
+        mMessageTextView.setVisibility(View.GONE);
+        mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
     }
 
     private void stopFinish(){
         stopAnimation();
-        mFreeUsedTimeTextView.setVisibility(View.GONE);
         mConnectButton.setText(R.string.connect);
+        mMessageTextView.setVisibility(View.GONE);
+        mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
         updateFreeUsedTime();
     }
 
@@ -301,7 +306,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     }
     public void setConnectResult(VpnState state) {
         mVpnState = state;
-        if (getUserVisibleHint() || isVisible()) {
+        if (isVisible()) {
             updateUI();
         }
     }
