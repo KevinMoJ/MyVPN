@@ -729,7 +729,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
         Log.d("MyCaller", ip + ":" + port + " " + result);
         if (!result) {
-            Firebase.getInstance(this).logEvent("port", ip + ":" + port, String.valueOf(result));
+            Firebase.getInstance(this).logEvent("port", ip + ":" + String.valueOf(port), String.valueOf(result));
         }
         return result;
     }
