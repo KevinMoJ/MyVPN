@@ -151,9 +151,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.connect_green)),
                 freeUseTime.length() - elapsedTime.length(), freeUseTime.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        mMessageTextView.setText(spannableString);
-        mConnectButton.setBackgroundResource(R.drawable.connect_btn);
-
+        mFreeUsedTimeTextView.setText(spannableString);
     }
 
     public void animateConnecting(){
