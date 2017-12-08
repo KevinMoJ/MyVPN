@@ -69,8 +69,7 @@ public class VpnManageService extends Service implements Runnable,
     private boolean mIsRemoteFetchSuccess;
     private TcpTrafficMonitor mLastTcpTrafficMonitor;
     private static int sStopReason = 0;
-
-
+    private static final int MSG_20_MINUTE = 4;
 
     public VpnManageService() {
     }
@@ -100,6 +99,7 @@ public class VpnManageService extends Service implements Runnable,
         mServiceHandler = new Handler(mServiceLooper, this);
         mServiceHandler.sendEmptyMessageDelayed(MSG_1_MINUTE, TimeUnit.MINUTES.toMillis(1));
         mServiceHandler.sendEmptyMessageDelayed(MSG_1_HOUR, TimeUnit.HOURS.toMillis(1));
+        mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         if (useTime < 0) {
@@ -292,12 +292,15 @@ public class VpnManageService extends Service implements Runnable,
                 promotionTracking.reportUninstallDayCount();
                 promotionTracking.reportAppInstall();
                 promotionTracking.reportPhoneModelAndAndroidOS();
-                grabSppedCheck();
                 mServiceHandler.sendEmptyMessageDelayed(MSG_1_HOUR, TimeUnit.HOURS.toMillis(1));
                 break;
             case MSG_CANCEL_NOTIFICATION:
                 NotificationManagerCompat.from(getApplicationContext()).cancel(NOTIFICATION_ID_GRAP_SPEED);
                 showGrabSpeedNotification(false);
+                break;
+            case MSG_20_MINUTE:
+                grabSppedCheck();
+                mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
                 break;
         }
         return true;
