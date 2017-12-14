@@ -14,15 +14,13 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class DnsProxy implements Runnable {
 
-    private class QueryState {
+    private static class QueryState {
         public short ClientQueryID;
         public long QueryNanoTime;
         public int ClientIP;
@@ -52,9 +50,7 @@ public class DnsProxy implements Runnable {
     }
 
     public void start() {
-        m_ReceivedThread = new Thread(this);
-        m_ReceivedThread.setName("DnsProxyThread");
-        m_ReceivedThread.start();
+        start("DnsProxyThread");
     }
 
     public void stop() {
@@ -155,6 +151,7 @@ public class DnsProxy implements Runnable {
                 int realIP = getFirstIP(dnsPacket);
                 if (ProxyConfig.Instance.needProxy(question.Domain, realIP)) {
                     int fakeIP = getOrCreateFakeIP(question.Domain);
+                    mapFakeAndRealIp(fakeIP, realIP);
                     tamperDnsResponse(rawPacket, dnsPacket, fakeIP);
                     if (ProxyConfig.IS_DEBUG)
                         System.out.printf("FakeDns recv: %s=>%s(%s)\n", question.Domain, CommonMethods.ipIntToString(realIP), CommonMethods.ipIntToString(fakeIP));
@@ -164,6 +161,8 @@ public class DnsProxy implements Runnable {
         }
         return false;
     }
+
+    protected void mapFakeAndRealIp(int fakeIp, int realIP) {}
 
     private void OnDnsResponseReceived(IPHeader ipHeader, UDPHeader udpHeader, DnsPacket dnsPacket) {
         QueryState state = null;
@@ -257,52 +256,67 @@ public class DnsProxy implements Runnable {
 
     public void onDnsRequestReceived(IPHeader ipHeader, UDPHeader udpHeader, DnsPacket dnsPacket) {
         if (!interceptDns(ipHeader, udpHeader, dnsPacket)) {
-            //转发DNS
-            QueryState state = new QueryState();
-            state.ClientQueryID = dnsPacket.Header.ID;
-            state.QueryNanoTime = System.nanoTime();
-            state.ClientIP = ipHeader.getSourceIP();
-            state.ClientPort = udpHeader.getSourcePort();
-            state.RemoteIP = ipHeader.getDestinationIP();
-            state.RemotePort = udpHeader.getDestinationPort();
+            proxyDnsRequest(ipHeader, udpHeader, dnsPacket);
 
-            // 转换QueryID
-            m_QueryID++;// 增加ID
-            dnsPacket.Header.setID(m_QueryID);
+        }
+    }
 
-            synchronized (m_QueryArray) {
-                clearExpiredQueries();//清空过期的查询，减少内存开销。
-                m_QueryArray.put(m_QueryID, state);// 关联数据
-            }
+    protected void proxyDnsRequest(IPHeader ipHeader, UDPHeader udpHeader, DnsPacket dnsPacket) {
+        //转发DNS
+        QueryState state = new QueryState();
+        state.ClientQueryID = dnsPacket.Header.ID;
+        state.QueryNanoTime = System.nanoTime();
+        state.ClientIP = ipHeader.getSourceIP();
+        state.ClientPort = udpHeader.getSourcePort();
+        state.RemoteIP = ipHeader.getDestinationIP();
+        state.RemotePort = udpHeader.getDestinationPort();
 
-            if (ProxyConfig.IS_DEBUG){
-                System.out.printf("DNS send %s:%d=>%s:%d, question: %s\n",
-                        CommonMethods.ipIntToInet4Address(state.ClientIP), state.ClientPort & 0xffff,
-                        CommonMethods.ipIntToInet4Address(state.RemoteIP), state.RemotePort & 0xffff,
-                        dnsPacket.Questions[0].Domain);
-            }
-            InetSocketAddress remoteAddress = new InetSocketAddress(CommonMethods.ipIntToInet4Address(state.RemoteIP), state.RemotePort);
-            DatagramPacket packet = new DatagramPacket(udpHeader.m_Data, udpHeader.m_Offset + 8, dnsPacket.Size);
-            packet.setSocketAddress(remoteAddress);
+        // 转换QueryID
+        m_QueryID++;// 增加ID
+        dnsPacket.Header.setID(m_QueryID);
 
-            try {
-                if (LocalVpnService.Instance.protect(m_Client)) {
-                    m_Client.send(packet);
-                    if (ProxyConfig.IS_DEBUG) {
-                        System.out.printf("DNSProxy client %d\n", Port);
-                    }
-                } else {
-                    System.err.println("VPN protect udp socket failed.");
+        synchronized (m_QueryArray) {
+            clearExpiredQueries();//清空过期的查询，减少内存开销。
+            m_QueryArray.put(m_QueryID, state);// 关联数据
+        }
+
+        if (ProxyConfig.IS_DEBUG){
+            System.out.printf("DNS send %s:%d=>%s:%d, question: %s\n",
+                    CommonMethods.ipIntToInet4Address(state.ClientIP), state.ClientPort & 0xffff,
+                    CommonMethods.ipIntToInet4Address(state.RemoteIP), state.RemotePort & 0xffff,
+                    dnsPacket.Questions[0].Domain);
+        }
+        InetSocketAddress remoteAddress = new InetSocketAddress(CommonMethods.ipIntToInet4Address(state.RemoteIP), state.RemotePort);
+        DatagramPacket packet = new DatagramPacket(udpHeader.m_Data, udpHeader.m_Offset + 8, dnsPacket.Size);
+        packet.setSocketAddress(remoteAddress);
+
+        try {
+            if (LocalVpnService.Instance.protect(m_Client)) {
+                m_Client.send(packet);
+                if (ProxyConfig.IS_DEBUG) {
+                    System.out.printf("DNSProxy client %d\n", Port);
                 }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                LocalVpnService.Instance.writeLog("Error: dns send failed: %s", e);
+            } else {
+                System.err.println("VPN protect udp socket failed.");
             }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            LocalVpnService.Instance.writeLog("Error: dns send failed: %s", e);
         }
     }
 
     public Thread getThread(){
         return m_ReceivedThread;
+    }
+
+    public int translateToRealIp(int fakeIp) {
+        return fakeIp;
+    }
+
+    protected void start(String threadname) {
+        m_ReceivedThread = new Thread(this);
+        m_ReceivedThread.setName(threadname);
+        m_ReceivedThread.start();
     }
 }

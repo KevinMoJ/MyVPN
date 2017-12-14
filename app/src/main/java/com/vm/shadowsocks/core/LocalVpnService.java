@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 
 import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.MainActivity;
 import com.vm.shadowsocks.core.ProxyConfig.IPAddress;
 import com.vm.shadowsocks.dns.DnsPacket;
@@ -22,13 +23,17 @@ import com.vm.shadowsocks.tcpip.IPHeader;
 import com.vm.shadowsocks.tcpip.TCPHeader;
 import com.vm.shadowsocks.tcpip.UDPHeader;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -218,11 +223,16 @@ public class LocalVpnService extends VpnService implements Runnable {
                 writeLog("Error: Load failed with error: %s", errString);
             }
 
-            m_TcpProxyServer = new TcpProxyServer(0);
+            if (ProxyConfig.IS_DEBUG) {
+                ProxyConfig.Instance.addDomainToHashMap("iplocation.net", true);
+            }
+
+            m_TcpProxyServer = new TcpProxyServerBypassSelf(0);
             m_TcpProxyServer.start();
             writeLog("LocalTcpServer started.");
 
-            m_DnsProxy = new DnsProxy();
+//            m_DnsProxy = new DnsProxy();
+            m_DnsProxy = new DnsFullQueryProxy();
             m_DnsProxy.start();
             writeLog("LocalDnsProxy started.");
 
@@ -331,19 +341,23 @@ public class LocalVpnService extends VpnService implements Runnable {
     }
 
     void onIPPacketReceived(IPHeader ipHeader, int size) throws IOException {
+        int sourceIp = ipHeader.getSourceIP();
+        int destinationIP = ipHeader.getDestinationIP();
         if (ProxyConfig.IS_DEBUG){
             System.out.printf("Ip %s=>%s protocol %d\n",
-                    CommonMethods.ipIntToInet4Address(ipHeader.getSourceIP()),
-                    CommonMethods.ipIntToInet4Address(ipHeader.getDestinationIP()),
+                    CommonMethods.ipIntToInet4Address(sourceIp),
+                    CommonMethods.ipIntToInet4Address(destinationIP),
                     ipHeader.getProtocol());
         }
         switch (ipHeader.getProtocol()) {
             case IPHeader.TCP:
-                TCPHeader tcpHeader = m_TCPHeader;
-                tcpHeader.m_Offset = ipHeader.getHeaderLength();
-                if (ipHeader.getSourceIP() == LOCAL_IP) {
-                    if (tcpHeader.getSourcePort() == m_TcpProxyServer.Port) {// 收到本地TCP服务器数据
-                        NatSession session = NatSessionManager.getSession(tcpHeader.getDestinationPort());
+                if (sourceIp == LOCAL_IP) {
+                    TCPHeader tcpHeader = m_TCPHeader;
+                    tcpHeader.m_Offset = ipHeader.getHeaderLength();
+                    short sourcePort = tcpHeader.getSourcePort();
+                    short destinationPort = tcpHeader.getDestinationPort();
+                    if (sourcePort == m_TcpProxyServer.Port) {// 收到本地TCP服务器数据
+                        NatSession session = NatSessionManager.getSession(destinationPort);
                         if (session != null) {
                             if (ProxyConfig.IS_DEBUG) {
                                 System.out.printf("onIPPacketReceived 3 %s:%d=>%s:%d, host: %s\n",
@@ -351,7 +365,16 @@ public class LocalVpnService extends VpnService implements Runnable {
                                         CommonMethods.ipIntToString(ipHeader.getDestinationIP()), tcpHeader.getDestinationPort() & 0xffff,
                                         session.RemoteHost);
                             }
-                            ipHeader.setSourceIP(ipHeader.getDestinationIP());
+
+                            if (session.IsSelfPort == 1) {
+                                destinationIP = session.RemoteIP;
+                                if (ProxyConfig.IS_DEBUG) {
+                                    System.out.printf("onIPPacketReceived 3 vpn自己 real ip %s, fake id %s\n",
+                                            CommonMethods.ipIntToString(session.RemoteRealIP), CommonMethods.ipIntToString(session.RemoteIP));
+                                }
+                            }
+
+                            ipHeader.setSourceIP(destinationIP);
                             tcpHeader.setSourcePort(session.RemotePort);
                             ipHeader.setDestinationIP(LOCAL_IP);
 
@@ -369,23 +392,39 @@ public class LocalVpnService extends VpnService implements Runnable {
                             System.out.printf("NoSession: %s %s\n", ipHeader.toString(), tcpHeader.toString());
                         }
                     } else {
-
                         // 添加端口映射
-                        int portKey = tcpHeader.getSourcePort();
-                        NatSession session = NatSessionManager.getSession(portKey);
-                        if (session == null || session.RemoteIP != ipHeader.getDestinationIP() || session.RemotePort != tcpHeader.getDestinationPort()) {
-                            session = NatSessionManager.createSession(portKey, ipHeader.getDestinationIP(), tcpHeader.getDestinationPort());
+                        NatSession session = NatSessionManager.getSession(sourcePort);
+                        if (session == null || session.RemoteIP != destinationIP || session.RemotePort != destinationPort) {
+                            session = NatSessionManager.createSession(sourcePort, destinationIP, destinationPort);
+                        }
+
+                        if (ProxyConfig.IS_DEBUG) {
+                            System.out.printf("onIPPacketReceived 1 portKey: %d, %s:%d=>%s:%d, packetSent: %d, remote: %s\n",
+                                    sourceIp & 0xffff,
+                                    CommonMethods.ipIntToString(ipHeader.getSourceIP()), tcpHeader.getSourcePort() & 0xffff,
+                                    CommonMethods.ipIntToString(ipHeader.getDestinationIP()),  tcpHeader.getDestinationPort() & 0xffff,
+                                    session.PacketSent, session.RemoteHost != null ? session.RemoteHost : "null");
                         }
 
                         session.LastNanoTime = System.nanoTime();
                         session.PacketSent++;//注意顺序
 
-                        if (ProxyConfig.IS_DEBUG) {
-                            System.out.printf("onIPPacketReceived 1 portKey: %d, %s:%d=>%s:%d, packetSent: %d, remote: %s\n",
-                                    portKey & 0xffff,
-                                    CommonMethods.ipIntToString(ipHeader.getSourceIP()), tcpHeader.getSourcePort() & 0xffff,
-                                    CommonMethods.ipIntToString(ipHeader.getDestinationIP()),  session.RemotePort & 0xffff,
-                                    session.PacketSent, session.RemoteHost != null ? session.RemoteHost : "null");
+                        switch (session.IsSelfPort) {
+                            case 0:
+                                //vpn自己不走代理,把fake IP改为real IP
+                                if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort)) {
+                                    session.RemoteRealIP = m_DnsProxy.translateToRealIp(destinationIP);
+                                    if (ProxyConfig.IS_DEBUG) {
+                                        System.out.printf("onIPPacketReceived 1 vpn自己 real ip %s, fake id %s\n",
+                                                CommonMethods.ipIntToString(session.RemoteRealIP), CommonMethods.ipIntToString(session.RemoteIP));
+                                    }
+                                    session.IsSelfPort = 1;
+                                } else {
+                                    session.IsSelfPort = -1;
+                                }
+                            case 1:
+                                destinationIP = session.RemoteRealIP;
+                                break;
                         }
 
                         int tcpDataSize = ipHeader.getDataLength() - tcpHeader.getHeaderLength();
@@ -405,13 +444,13 @@ public class LocalVpnService extends VpnService implements Runnable {
                         }
 
                         // 转发给本地TCP服务器
-                        ipHeader.setSourceIP(ipHeader.getDestinationIP());
+                        ipHeader.setSourceIP(destinationIP);
                         ipHeader.setDestinationIP(LOCAL_IP);
                         tcpHeader.setDestinationPort(m_TcpProxyServer.Port);
 
                         if (ProxyConfig.IS_DEBUG) {
                             System.out.printf("onIPPacketReceived 2 portKey: %d, %s:%d=>%s:%d, packetSent: %d, host: %s, size: %d, tcp size: %d, ip size: %d\n",
-                                    portKey & 0xffff,
+                                    sourceIp & 0xffff,
                                     CommonMethods.ipIntToString(ipHeader.getSourceIP()), tcpHeader.getSourcePort() & 0xffff,
                                     CommonMethods.ipIntToString(ipHeader.getDestinationIP()), tcpHeader.getDestinationPort() & 0xffff,
                                     session.PacketSent, session.RemoteHost, size, tcpHeader.getHeaderLength(),
@@ -428,7 +467,7 @@ public class LocalVpnService extends VpnService implements Runnable {
             case IPHeader.UDP:
                 UDPHeader udpHeader = m_UDPHeader;
                 udpHeader.m_Offset = ipHeader.getHeaderLength();
-                if (ipHeader.getSourceIP() == LOCAL_IP) {
+                if (sourceIp == LOCAL_IP) {
                     if (udpHeader.getDestinationPort() == 53) {
                         m_DNSBuffer.clear();
                         m_DNSBuffer.limit(ipHeader.getDataLength() - 8);
@@ -632,4 +671,38 @@ public class LocalVpnService extends VpnService implements Runnable {
     public UdpProxy getUdpProxy () {
         return mUdpProxy;
     }
+
+    private boolean isSelfTcpPort(short portNumber) {
+        int pid = android.os.Process.myPid();
+        String tcpFilename = String.format(Locale.ENGLISH, "/proc/%d/net/tcp", pid);
+        File tcpFile = new File(tcpFilename);
+        Scanner scanner = null;
+        String nextLine = null;
+        boolean hasPort = false;
+        String[] parts = null;
+        String source = null;
+        String uid = null;
+        String port = String.format(Locale.ENGLISH, "%04x", portNumber);
+        int puid = android.os.Process.myUid();
+        String myUid = String.valueOf(puid);
+        try {
+            scanner = new Scanner(tcpFile);
+            while (scanner.hasNextLine()) {
+                nextLine = scanner.nextLine().toLowerCase().trim();
+                parts = nextLine.split(" ");
+                if (parts.length > 8) {
+                    source = parts[1];
+                    uid = parts[7];
+                    if (source.endsWith(port) && myUid.equals(uid)) {
+                        hasPort = true;
+                        break;
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            ShadowsocksApplication.handleException(e);
+        }
+        return hasPort;
+    }
+
 }

@@ -459,4 +459,8 @@ public class ProxyConfig {
             m_ProxyList.set(index, old);
         }
     }
+
+    public void addDomainToHashMap(String domain, boolean state) {
+        m_DomainMap.put(domain, state);
+    }
 }

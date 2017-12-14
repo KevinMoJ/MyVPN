@@ -33,9 +33,7 @@ public class TcpProxyServer implements Runnable {
     }
 
     public void start() {
-        m_ServerThread = new Thread(this);
-        m_ServerThread.setName("TcpProxyServerThread");
-        m_ServerThread.start();
+        start("TcpProxyServerThread");
     }
 
     public void stop() {
@@ -123,7 +121,7 @@ public class TcpProxyServer implements Runnable {
         short portKey = (short) localChannel.socket().getPort();
         NatSession session = NatSessionManager.getSession(portKey);
         if (session != null) {
-            if (ProxyConfig.Instance.needProxy(session.RemoteHost, session.RemoteIP)) {
+            if (needProxy(session)) {
                 if (ProxyConfig.IS_DEBUG)
                     System.out.printf("%d/%d:[PROXY] %s=>%s:%d\n", NatSessionManager.getSessionCount(), Tunnel.SessionCount, session.RemoteHost, CommonMethods.ipIntToString(session.RemoteIP), session.RemotePort & 0xFFFF);
                 return InetSocketAddress.createUnresolved(session.RemoteHost, session.RemotePort & 0xFFFF);
@@ -173,6 +171,16 @@ public class TcpProxyServer implements Runnable {
 
     public Thread getThread(){
         return m_ServerThread;
+    }
+
+    protected void start(String threadname) {
+        m_ServerThread = new Thread(this);
+        m_ServerThread.setName(threadname);
+        m_ServerThread.start();
+    }
+
+    protected boolean needProxy(NatSession session) {
+        return ProxyConfig.Instance.needProxy(session.RemoteHost, session.RemoteIP);
     }
 
 }
