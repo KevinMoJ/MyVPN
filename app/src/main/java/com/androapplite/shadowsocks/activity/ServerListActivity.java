@@ -92,7 +92,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
     private void addBottomAd(AdAppHelper adAppHelper) {
         FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
             container.addView(adAppHelper.getNative(), params);
             Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "服务器列表底部");
