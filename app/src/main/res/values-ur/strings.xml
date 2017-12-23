@@ -1,0 +1,76 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"بانٹیں"</string>
+    <string name="connecting">"منسلک"</string>
+    <string name="more">"مزید"</string>
+
+    <string name="action_choose_server">"سرور منتخب کریں"</string>
+    <string name="stopping">"روکنے"</string>
+    <string name="no_network">"کوئی نیٹ ورک نہیں"</string>
+    <string name="no_internet_message">"کوئی انٹرنیٹ کنکشن نہیں ہے. کیا آپ وائی فائی کو تبدیل کرنا چاہتے ہیں؟"</string>
+    <string name="not_available_internet">"موجودہ انٹرنیٹ کنکشن دستیاب نہیں ہے. کیا آپ وائی فائی کو تبدیل کرنا چاہتے ہیں؟"</string>
+    <string name="failed_to_open_wifi_setting">"وائی ​​فائی ترتیب پینل کھولنے میں ناکام ہوگئی، براہ کرم وائی فائی پر تبدیل کریں."</string>
+
+    <string name="vpn_nation_opt">"تیز سرور منتخب"</string>
+    <string name="vpn_nation_fr">"فرانس"</string>
+    <string name="vpn_nation_jp">"جاپان"</string>
+    <string name="vpn_nation_uk">"متحدہ قید"</string>
+    <string name="vpn_nation_au">"آسٹررا"</string>
+    <string name="vpn_nation_de">"جرمنی"</string>
+    <string name="vpn_nation_sg">"سنگاپور"</string>
+    <string name="vpn_nation_nl">"نیدرلینڈز"</string>
+    <string name="vpn_nation_us">"ریاستہائے متحدہ امریکہ"</string>
+    <string name="vpn_nation_egypt">"مصر"</string>
+
+
+    <string name="not_start_vpn">"وی پی این کنکشن شروع نہیں ہوا. دوبارہ کوشش کریں."</string>
+    <string name="server_list">"سرور مقام"</string>
+    <string name="repair">"ریپائر"</string>
+
+    <string name="facebook">"فیس بک"</string>
+    <string name="bluetooth">"بلوٹوتھ"</string>
+    <string name="scan_qr_code_download">"Google Play پر QR کوڈ \ n ڈاؤن لوڈ کریں"</string>
+
+    <string name="connecting_tip">"وی پی این کنکشنگ ہے. براہ کرم بعد میں کوشش کریں!"</string>
+    <string name="stopping_tip">"وی پی این روک رہا ہے. براہ کرم بعد میں کوشش کریں!"</string>
+    <string name="timeout_tip">"رابطے کا وقت ختم. دوبارہ کوشش کریں!"</string>
+
+    <string name="disconnect">"منسلک کریں"</string>
+    <string name="disconnect_dialog_title">"کیا آپ کو منقطع کرنا چاہتے ہیں؟"</string>
+    <string name="disconnect_to_refresh">"تازہ کاری کرنے کے لئے وی پی این منقطع کریں؟"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"سرور کی فہرست لے کر"</string>
+    <string name="fetch_server_list_failed">"سرور فہرست ٹائم آؤٹ لے کر!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"ڈاؤن لوڈ کریں: %1$d B / s، اپ لوڈ کریں: %2$d B / s"</string>
+    <string name="server_not_available">"VPN سرور ابھی دستیاب نہیں ہے. بعد میں اس کی کوشش کریں!"</string>
+    <string name="notification_vpn_stop">"آپ کے پی پی این کو روک دیا گیا ہے. کھولنے کے لئے ٹچ."</string>
+    <string name="notification_vpn_network_error1">"نیٹ ورک کی عدم استحکام کی وجہ سے،"</string>
+    <string name="notification_vpn_network_error2">"آپ کے پی پی این کو روک دیا گیا ہے. کھولنے کے لئے ٹچ."</string>
+    <string name="success_connect">"کامیابی سے منسلک: %d اوقات"</string>
+    <string name="failed_connect">"ناکام ہوگیا: %d اوقات"</string>
+    <string name="free_used_time">"مفت استعمال شدہ وقت: %s"</string>
+    <string name="enable_notification">"براہ کرم ترتیبات میں اطلاع کی اجازت کو فعال کریں."</string>
+
+    <string name="news">"خبریں"</string>
+    <string name="video">"ویڈیو"</string>
+    <string name="splash_subtitle">"تیز رفتار اور مستحکم وی پی این"</string>
+    <string name="touch_to_connect">"رابطہ قائم کریں"</string>
+    <string name="enable_vpn_connection">"برائے مہربانی VPN کنکشن کو فعال کریں."</string>
+    <string-array name="network_errors">
+        <item>"کوئی دستیاب نیٹ ورک نہیں، پر وائی فائی باری."</item>
+        <item>"مربوط، کوئی انٹرنیٹ نہیں."</item>
+    </string-array>
+    <string name="tell_your_friends">"اپنے دوستوں کو بتائیں"</string>
+    <string name="like_us">"ہماری طرح"</string>
+    <string name="feedback">"تاثرات"</string>
+    <string name="about">"کے بارے میں"</string>
+    <string name="settings">"ترتیبات"</string>
+    <string name="connect">"جڑیں"</string>
+    <string name="free_used_time2">"مفت استعمال شدہ وقت"</string>
+    <string name="navigation_drawer_open">"کھولیں نیویگیشن دراج"</string>
+    <string name="navigation_drawer_close">"بند نیویگیشن دراج"</string>
+    <string name="grab_speed_notification_title">"رفتار کو پکڑو"</string>
+    <string name="grab_speed_notification_content">"پکڑو رفتار پر کلک کریں، تاکہ آپ کی رفتار تیز اور زیادہ سیال!"</string>
+</resources>

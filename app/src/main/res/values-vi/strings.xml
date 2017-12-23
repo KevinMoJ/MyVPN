@@ -1,0 +1,76 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="share">"Chia sẻ"</string>
+    <string name="connecting">"Kết nối"</string>
+    <string name="more">"Hơn"</string>
+
+    <string name="action_choose_server">"Chọn máy chủ"</string>
+    <string name="stopping">"Dừng"</string>
+    <string name="no_network">"Không có mạng"</string>
+    <string name="no_internet_message">"Không có kết nối internet. Bạn có muốn bật WiFi không?"</string>
+    <string name="not_available_internet">"Không có kết nối internet hiện tại. Bạn có muốn bật WiFi không?"</string>
+    <string name="failed_to_open_wifi_setting">"Không thể mở bảng điều khiển WiFi, vui lòng bật WiFi."</string>
+
+    <string name="vpn_nation_opt">"Chọn máy chủ nhanh"</string>
+    <string name="vpn_nation_fr">"Pháp"</string>
+    <string name="vpn_nation_jp">"Nhật Bản"</string>
+    <string name="vpn_nation_uk">"United Kindom"</string>
+    <string name="vpn_nation_au">"Australla"</string>
+    <string name="vpn_nation_de">"nước Đức"</string>
+    <string name="vpn_nation_sg">"Singapore"</string>
+    <string name="vpn_nation_nl">"nước Hà Lan"</string>
+    <string name="vpn_nation_us">"Hoa Kỳ"</string>
+    <string name="vpn_nation_egypt">"Ai Cập"</string>
+
+
+    <string name="not_start_vpn">"Kết nối VPN không bắt đầu. Vui lòng thử lại."</string>
+    <string name="server_list">"Vị trí máy chủ"</string>
+    <string name="repair">"SỬA"</string>
+
+    <string name="facebook">"Facebook"</string>
+    <string name="bluetooth">"Bluetooth"</string>
+    <string name="scan_qr_code_download">"Quét mã QR \ ndownload trên Google Play"</string>
+
+    <string name="connecting_tip">"VPN là connectiong. Hãy thử lại sau!"</string>
+    <string name="stopping_tip">"VPN đang dừng. Hãy thử lại sau!"</string>
+    <string name="timeout_tip">"Thời gian chờ kết nối. Làm ơn hãy thử lại!"</string>
+
+    <string name="disconnect">"Ngắt kết nối"</string>
+    <string name="disconnect_dialog_title">"Bạn có muốn ngắt kết nối?"</string>
+    <string name="disconnect_to_refresh">"Ngắt kết nối vpn để làm mới?"</string>
+
+    <!-- -->
+    <string name="fetch_server_list">"Đang tìm nạp danh sách máy chủ"</string>
+    <string name="fetch_server_list_failed">"Tìm nạp thời gian chờ của danh sách máy chủ!"</string>
+    <!--dialog 注意多语言 -->
+    <string name="notification_no_time">"Tải xuống: %1$d B / s, tải lên: %2$d B / s"</string>
+    <string name="server_not_available">"Máy chủ VPN hiện không có sẵn. Plase hãy thử nó sau!"</string>
+    <string name="notification_vpn_stop">"VPN của bạn đã bị dừng. Chạm để mở."</string>
+    <string name="notification_vpn_network_error1">"Do sự không ổn định của mạng,"</string>
+    <string name="notification_vpn_network_error2">"VPN của bạn đã bị dừng. Chạm để mở."</string>
+    <string name="success_connect">"Kết nối thành công: %d times"</string>
+    <string name="failed_connect">"Không kết nối được: %d lần"</string>
+    <string name="free_used_time">"Thời gian sử dụng miễn phí: %s"</string>
+    <string name="enable_notification">"Vui lòng bật quyền thông báo trong Cài đặt."</string>
+
+    <string name="news">"Tin tức"</string>
+    <string name="video">"Video"</string>
+    <string name="splash_subtitle">"VPN nhanh và ổn định"</string>
+    <string name="touch_to_connect">"Chạm để kết nối"</string>
+    <string name="enable_vpn_connection">"Vui lòng bật kết nối VPN."</string>
+    <string-array name="network_errors">
+        <item>"Không có mạng nào có sẵn, bật Wi-Fi."</item>
+        <item>"Kết nối, không có Internet."</item>
+    </string-array>
+    <string name="tell_your_friends">"Hay noi vơi bạn be của bạn"</string>
+    <string name="like_us">"Như chúng tôi"</string>
+    <string name="feedback">"Phản hồi"</string>
+    <string name="about">"Trong khoảng"</string>
+    <string name="settings">"Cài đặt"</string>
+    <string name="connect">"Kết nối"</string>
+    <string name="free_used_time2">"Thời gian sử dụng miễn phí"</string>
+    <string name="navigation_drawer_open">"Mở ngăn điều hướng"</string>
+    <string name="navigation_drawer_close">"Đóng ngăn điều khiển điều hướng"</string>
+    <string name="grab_speed_notification_title">"Lấy tốc độ"</string>
+    <string name="grab_speed_notification_content">"Click vào lấy tốc độ, để tốc độ của bạn nhanh hơn và nhiều hơn nữa chất lỏng!"</string>
+</resources>
