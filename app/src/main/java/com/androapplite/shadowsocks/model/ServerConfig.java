@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Random;
 
@@ -102,7 +103,6 @@ public class ServerConfig implements Parcelable{
                 }
 
                 arrayList = new ArrayList<>(cityArray.length() + 1);
-                arrayList.add(addGlobalConfig(context.getResources()));
                 for(int i=0; i<cityArray.length(); i++){
                     String city = cityArray.optString(i);
                     int index = nameList.indexOf(city);
@@ -121,6 +121,9 @@ public class ServerConfig implements Parcelable{
                         arrayList.add(serverConfig);
                     }
                 }
+                Collections.shuffle(arrayList);
+                arrayList.add(0, addGlobalConfig(context.getResources()));
+
             }
 
         }catch (Exception e){
