@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -256,7 +257,7 @@ public class ServerConfig implements Parcelable{
     public String toProxyUrl() {
         try {
             String password = URLEncoder.encode("vpnnest!@#123d", "UTF-8");
-            String url = String.format("ss://%s:%s@%s:%d", "aes-256-cfb", password, server, port);
+            String url = String.format(Locale.ENGLISH, "ss://%s:%s@%s:%d", "aes-256-cfb", password, server, port);
             return url;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
