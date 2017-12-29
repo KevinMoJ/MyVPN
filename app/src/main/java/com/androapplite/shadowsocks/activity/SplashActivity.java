@@ -27,7 +27,6 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 public class SplashActivity extends AppCompatActivity implements Handler.Callback,
         Animator.AnimatorListener{
     private Handler mAdLoadedCheckHandler;
-    private ObjectAnimator mProgressbarAnimator;
     private static final int MSG_AD_LOADED_CHECK = 1;
     private AdAppHelper mAdAppHelper;
 
@@ -36,14 +35,16 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        startProgressBarAnimation();
         mAdAppHelper = AdAppHelper.getInstance(this);
         mAdAppHelper.loadNewInterstitial();
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
 
         mAdLoadedCheckHandler = new Handler(this);
-        mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 3000);
+        Message msg = Message.obtain();
+        msg.what = MSG_AD_LOADED_CHECK;
+        msg.arg1 = 1;
+
         ServerListFetcherService.fetchServerListAsync(this);
         VpnManageService.start(this);
         Firebase firebase = Firebase.getInstance(this);
@@ -58,23 +59,26 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
             }
         }
 
-        AdAppHelper.getInstance(getApplicationContext()).loadNewSplashAd();
-
         FrameLayout frameLayout = (FrameLayout)findViewById(R.id.splash_ad_ll);
         LinearLayout centerLogoLL = (LinearLayout)findViewById(R.id.center_logo_ll);
         LinearLayout bottomLogoLL = (LinearLayout)findViewById(R.id.bottom_logo_ll);
-        if (AdAppHelper.getInstance(getApplicationContext()).isSplashReady()) {
-            View view = AdAppHelper.getInstance(getApplicationContext()).getSplashAd();
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+        if (mAdAppHelper.isSplashReady()) {
+            View view = mAdAppHelper.getSplashAd();
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
             frameLayout.addView(view, layoutParams);
 
             centerLogoLL.setVisibility(View.GONE);
             frameLayout.setVisibility(View.VISIBLE);
             bottomLogoLL.setVisibility(View.VISIBLE);
+
+            mAdLoadedCheckHandler.sendMessageDelayed(msg, 3000);
         } else {
             centerLogoLL.setVisibility(View.VISIBLE);
             frameLayout.setVisibility(View.GONE);
             bottomLogoLL.setVisibility(View.GONE);
+
+            mAdLoadedCheckHandler.sendMessageDelayed(msg, 1000);
         }
 
     }
@@ -84,25 +88,18 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         switch (msg.what) {
             case MSG_AD_LOADED_CHECK:
                 Log.d("SplanshActivity", "mAdAppHelper.isFullAdLoaded() " + mAdAppHelper.isFullAdLoaded());
-                if(mAdAppHelper.isFullAdLoaded()){
-                    mProgressbarAnimator.setDuration(100);
+                if(mAdAppHelper.isFullAdLoaded() || msg.arg1 > 4){
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
                 }else{
-                    mAdLoadedCheckHandler.sendEmptyMessageDelayed(MSG_AD_LOADED_CHECK, 1000);
+                    Message message = Message.obtain();
+                    message.what = MSG_AD_LOADED_CHECK;
+                    message.arg1 = 1 + msg.arg1;
+                    mAdLoadedCheckHandler.sendMessageDelayed(message, 1000);
                 }
                 break;
         }
         return true;
-    }
-
-    private void startProgressBarAnimation(){
-        ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
-        final PropertyValuesHolder start = PropertyValuesHolder.ofInt("progress", 0);
-        PropertyValuesHolder end = PropertyValuesHolder.ofInt("progress", 100);
-        mProgressbarAnimator = ObjectAnimator.ofPropertyValuesHolder(progressBar, start, end);
-        mProgressbarAnimator.setDuration(5000);
-        mProgressbarAnimator.addListener(this);
-        mProgressbarAnimator.start();
-
     }
 
     @Override
