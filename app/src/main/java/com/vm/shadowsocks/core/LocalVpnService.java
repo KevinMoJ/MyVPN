@@ -400,7 +400,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
                         if (ProxyConfig.IS_DEBUG) {
                             System.out.printf("onIPPacketReceived 1 portKey: %d, %s:%d=>%s:%d, packetSent: %d, remote: %s\n",
-                                    sourceIp & 0xffff,
+                                    sourcePort & 0xffff,
                                     CommonMethods.ipIntToString(ipHeader.getSourceIP()), tcpHeader.getSourcePort() & 0xffff,
                                     CommonMethods.ipIntToString(ipHeader.getDestinationIP()),  tcpHeader.getDestinationPort() & 0xffff,
                                     session.PacketSent, session.RemoteHost != null ? session.RemoteHost : "null");
@@ -450,7 +450,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
                         if (ProxyConfig.IS_DEBUG) {
                             System.out.printf("onIPPacketReceived 2 portKey: %d, %s:%d=>%s:%d, packetSent: %d, host: %s, size: %d, tcp size: %d, ip size: %d\n",
-                                    sourceIp & 0xffff,
+                                    sourcePort & 0xffff,
                                     CommonMethods.ipIntToString(ipHeader.getSourceIP()), tcpHeader.getSourcePort() & 0xffff,
                                     CommonMethods.ipIntToString(ipHeader.getDestinationIP()), tcpHeader.getDestinationPort() & 0xffff,
                                     session.PacketSent, session.RemoteHost, size, tcpHeader.getHeaderLength(),
@@ -682,7 +682,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         String[] parts = null;
         String source = null;
         String uid = null;
-        String port = String.format(Locale.ENGLISH, "%04x", portNumber);
+        String port = String.format(Locale.ENGLISH, "%04x", portNumber & 0xffff);
         int puid = android.os.Process.myUid();
         String myUid = String.valueOf(puid);
         try {
