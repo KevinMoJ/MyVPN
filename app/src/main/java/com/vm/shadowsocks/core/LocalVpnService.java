@@ -689,7 +689,7 @@ public class LocalVpnService extends VpnService implements Runnable {
             scanner = new Scanner(tcpFile);
             while (scanner.hasNextLine()) {
                 nextLine = scanner.nextLine().toLowerCase().trim();
-                parts = nextLine.split(" ");
+                parts = nextLine.split("\\s+");
                 if (parts.length > 8) {
                     source = parts[1];
                     uid = parts[7];

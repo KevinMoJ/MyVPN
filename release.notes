@@ -1,3 +1,7 @@
+1.3.10
+    proxy url用英文locale生成
+    修复不走代理方法里的bug
+    国外网址不走代理
 1.3.9
     welcome native 配置错了
      adsplugin 1.0.105 dev
