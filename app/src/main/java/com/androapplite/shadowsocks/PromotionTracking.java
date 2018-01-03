@@ -9,6 +9,8 @@ import android.text.format.DateUtils;
 
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.facebook.appevents.AppEventsLogger;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 
 import java.util.Calendar;
@@ -25,115 +27,16 @@ public class PromotionTracking {
     private SharedPreferences mSharedPreference;
     private SharedPreferences.Editor mEditor;
     private HashSet<String> mPhoneModels;
+    private AppEventsLogger mFBLogger;
 
     private int mByte1M;
     private int mByte10M;
     private int mByte100M;
 
     private void initPhoneModels() {
-        String[] models = ("SM-J700F\n" +
-                "GT-I9060I\n" +
-                "SM-G935F\n" +
-                "SM-J100H\n" +
-                "SM-J710F\n" +
-                "Redmi Note 4\n" +
-                "Redmi 4X\n" +
-                "SM-G570F\n" +
-                "SM-G532F\n" +
-                "SM-J200H\n" +
-                "SM-J500H\n" +
-                "GT-I9500\n" +
-                "SM-N9005\n" +
-                "SM-G925F\n" +
-                "SM-J120F\n" +
-                "SM-J320H\n" +
-                "ALE-L21\n" +
-                "SM-G530H\n" +
-                "Redmi 4A\n" +
-                "SM-G531H\n" +
-                "SM-G955F\n" +
-                "SM-N920C\n" +
-                "SM-A310F\n" +
-                "SM-N910C\n" +
-                "SM-G900F\n" +
-                "GT-I9300\n" +
-                "SM-G950F\n" +
-                "A1601\n" +
-                "SM-G920F\n" +
-                "SM-J510FN\n" +
-                "SM-J320F\n" +
-                "SM-J500F\n" +
-                "SM-A510F\n" +
-                "SM-J200F\n" +
-                "SM-A520F\n" +
-                "SM-G930F\n" +
-                "GT-N7100\n" +
-                "m3 note\n" +
-                "A37f\n" +
-                "SM-G532G\n" +
-                "M3s\n" +
-                "SM-A500F\n" +
-                "GT-I9301I\n" +
-                "Redmi Note 3\n" +
-                "SM-G7102\n" +
-                "LUA-U22\n" +
-                "Redmi 3S\n" +
-                "SM-J510F\n" +
-                "CAM-L21\n" +
-                "CUN-U29\n" +
-                "SM-G361H\n" +
-                "SM-A720F\n" +
-                "SM-A710F\n" +
-                "TIT-U02\n" +
-                "SM-J700M\n" +
-                "PRA-LA1\n" +
-                "SM-J500M\n" +
-                "SM-G355H\n" +
-                "A6000\n" +
-                "F670S\n" +
-                "SM-N900\n" +
-                "SM-G360H\n" +
-                "A1000\n" +
-                "SM-A320F\n" +
-                "SM-G531F\n" +
-                "SM-J730F\n" +
-                "SM-J510H\n" +
-                "J701F\n" +
-                "SM-A500H\n" +
-                "Boom J8\n" +
-                "A2010-a\n" +
-                "M5c\n" +
-                "SM-J105H\n" +
-                "D855\n" +
-                "SM-J111F\n" +
-                "M5 Note\n" +
-                "C-8\n" +
-                "M5S\n" +
-                "SM-J200G\n" +
-                "X557 Lite\n" +
-                "SM-G530F\n" +
-                "W3\n" +
-                "SM-G900H\n" +
-                "GT-S7262\n" +
-                "A536\n" +
-                "SM-J710GN\n" +
-                "SM-E500H\n" +
-                "SM-A300H\n" +
-                "GT-S7582\n" +
-                "GT-I9082\n" +
-                "GT-I9300I\n" +
-                "VNS-L21\n" +
-                "A7000\n" +
-                "A6010\n" +
-                "CPH1609\n" +
-                "A37fw\n" +
-                "SM-J530F\n" +
-                "Moto G (4)\n" +
-                "SM-N950U").toLowerCase().split("\n");
-        mPhoneModels = new HashSet<>(models.length);
-        for (String model:models){
-            mPhoneModels.add(model);
-        }
+        String modelsString = "SM-J700F\\nGT-I9060I\\nSM-G935F\\nSM-J100H\\nSM-J710F\\nRedmi Note 4\\nRedmi 4X\\nSM-G570F\\nSM-G532F\\nSM-J200H\\nSM-J500H\\nGT-I9500\\nSM-N9005\\nSM-G925F\\nSM-J120F\\nSM-J320H\\nALE-L21\\nSM-G530H\\nRedmi 4A\\nSM-G531H\\nSM-G955F\\nSM-N920C\\nSM-A310F\\nSM-N910C\\nSM-G900F\\nGT-I9300\\nSM-G950F\\nA1601\\nSM-G920F\\nSM-J510FN\\nSM-J320F\\nSM-J500F\\nSM-A510F\\nSM-J200F\\nSM-A520F\\nSM-G930F\\nGT-N7100\\nm3 note\\nA37f\\nSM-G532G\\nM3s\\nSM-A500F\\nGT-I9301I\\nRedmi Note 3\\nSM-G7102\\nLUA-U22\\nRedmi 3S\\nSM-J510F\\nCAM-L21\\nCUN-U29\\nSM-G361H\\nSM-A720F\\nSM-A710F\\nTIT-U02\\nSM-J700M\\nPRA-LA1\\nSM-J500M\\nSM-G355H\\nA6000\\nF670S\\nSM-N900\\nSM-G360H\\nA1000\\nSM-A320F\\nSM-G531F\\nSM-J730F\\nSM-J510H\\nJ701F\\nSM-A500H\\nBoom J8\\nA2010-a\\nM5c\\nSM-J105H\\nD855\\nSM-J111F\\nM5 Note\\nC-8\\nM5S\\nSM-J200G\\nX557 Lite\\nSM-G530F\\nW3\\nSM-G900H\\nGT-S7262\\nA536\\nSM-J710GN\\nSM-E500H\\nSM-A300H\\nGT-S7582\\nGT-I9082\\nGT-I9300I\\nVNS-L21\\nA7000\\nA6010\\nCPH1609\\nA37fw\\nSM-J530F\\nMoto G (4)\\nvivo 1606\\nSM-N950U";
+        initPhoneModels(modelsString);
+
     }
 
     private PromotionTracking(Context context) {
@@ -145,6 +48,7 @@ public class PromotionTracking {
         mByte1M = 1024 * 1024;
         mByte10M = 10 * mByte1M;
         mByte100M = 10 * mByte10M;
+        mFBLogger = AppEventsLogger.newLogger(context);
     }
 
     public static PromotionTracking getInstance(Context context) {
@@ -175,8 +79,10 @@ public class PromotionTracking {
         count++;
         if (count == 2) {
             mFirebase.logEvent("每天2次打开主页的用户", "广告投放统计");
+            mFBLogger.logEvent("openMainPage_2_Times_EveryDay");
         } else if (count == 3){
             mFirebase.logEvent("每天3次打开主页的用户", "广告投放统计");
+            mFBLogger.logEvent("openMainPage_3_TimesEveryDay");
         }
         mEditor.putLong(SharedPreferenceKey.OPEN_MAIN_PAGE_TIME, lastCalendar.getTimeInMillis())
                 .putInt(SharedPreferenceKey.OPEN_MAIN_PAGE_COUNT, count)
@@ -206,12 +112,16 @@ public class PromotionTracking {
             lastCalendar = currentCalendar;
             if (count >= 2 && count < 8) {
                 mFirebase.logEvent("连续打开" + count + "天", "广告投放统计");
+                mFBLogger.logEvent("openApp_" + count + "_DaysContinuously");
             } else if (count >=8 && count < 14){
                 mFirebase.logEvent("连续打开7天", "广告投放统计");
+                mFBLogger.logEvent("openApp_7_DaysContinuously");
             } else if (count >=14 && count < 30) {
                 mFirebase.logEvent("连续打开14天", "广告投放统计");
+                mFBLogger.logEvent("openApp_14_DaysContinuously");
             } else if (count >= 30) {
                 mFirebase.logEvent("连续打开30天", "广告投放统计");
+                mFBLogger.logEvent("openApp_30_DaysContinuously");
             }
             mEditor.putLong(SharedPreferenceKey.CONTINOUS_DAY_TIME, lastCalendar.getTimeInMillis())
                     .putInt(SharedPreferenceKey.CONTINOUS_DAY_COUNT, count)
@@ -232,12 +142,16 @@ public class PromotionTracking {
                 int uninstallDay = day - 1;
                 if (uninstallDay >= 2 && uninstallDay < 8) {
                     mFirebase.logEvent("安装" + uninstallDay + "天未删除", "广告投放统计");
+                    mFBLogger.logEvent("uninstall_" + uninstallDay + "_Days");
                 } else if (uninstallDay >=8 && uninstallDay <14){
                     mFirebase.logEvent("安装7天未删除", "广告投放统计");
+                    mFBLogger.logEvent("uninstall_7_Days");
                 } else if (uninstallDay >=14 && uninstallDay < 30) {
                     mFirebase.logEvent("安装14天未删除", "广告投放统计");
+                    mFBLogger.logEvent("uninstall_14_Days");
                 } else if (uninstallDay >= 30) {
                     mFirebase.logEvent("安装30天未删除", "广告投放统计");
+                    mFBLogger.logEvent("uninstall_30_Days");
                 }
                 lastCalendar = currentCalendar;
                 mEditor.putLong(SharedPreferenceKey.UNINSTALL_DAY_TIME, lastCalendar.getTimeInMillis())
@@ -251,6 +165,7 @@ public class PromotionTracking {
 
     public void reportSwitchCountry() {
         mFirebase.logEvent("切换国家", "广告投放统计");
+        mFBLogger.logEvent("switchCountry");
     }
 
     public void reportUsageByte(TcpTrafficMonitor tcpTrafficMonitor) {
@@ -272,18 +187,21 @@ public class PromotionTracking {
             boolean isReport = mSharedPreference.getBoolean(SharedPreferenceKey.PAYLOAD_1M, false);
             if (!isReport) {
                 mFirebase.logEvent("每天流量1M", "广告投放统计");
+                mFBLogger.logEvent("usage_1M_EveryDay");
                 mEditor.putBoolean(SharedPreferenceKey.PAYLOAD_1M, true);
             }
         }else if (payload >= mByte10M && payload < mByte100M) {
             boolean isReport = mSharedPreference.getBoolean(SharedPreferenceKey.PAYLOAD_10M, false);
             if (!isReport) {
                 mFirebase.logEvent("每天流量10M", "广告投放统计");
+                mFBLogger.logEvent("usage_10M_EveryDay");
                 mEditor.putBoolean(SharedPreferenceKey.PAYLOAD_10M, true);
             }
         } else if (payload >= mByte100M){
             boolean isReport = mSharedPreference.getBoolean(SharedPreferenceKey.PAYLOAD_100M, false);
             if (!isReport) {
                 mFirebase.logEvent("每天流量100M", "广告投放统计");
+                mFBLogger.logEvent("usage_100M_EveryDay");
                 mEditor.putBoolean(SharedPreferenceKey.PAYLOAD_100M, true);
             }
         }
@@ -303,21 +221,25 @@ public class PromotionTracking {
             try{
                 packageManager.getPackageInfo("com.facebook.katana", 0);
                 mFirebase.logEvent("装过Facebook", "广告投放统计");
+                mFBLogger.logEvent("install_Facebook");
             } catch (Exception e) {
             }
             try{
                 packageManager.getPackageInfo("com.skype.raider", 0);
                 mFirebase.logEvent("装过Skype", "广告投放统计");
+                mFBLogger.logEvent("install_Skype");
             } catch (Exception e) {
             }
             try{
                 packageManager.getPackageInfo("com.twitter.android", 0);
                 mFirebase.logEvent("装过Twitter", "广告投放统计");
+                mFBLogger.logEvent("install_Twitter");
             } catch (Exception e) {
             }
             try{
                 packageManager.getPackageInfo("com.whatsapp", 0);
                 mFirebase.logEvent("装过Whatsapp", "广告投放统计");
+                mFBLogger.logEvent("install_Whatsapp");
             } catch (Exception e) {
             }
             mEditor.putLong(SharedPreferenceKey.INSTALL_APP_TIME, lastCalendar.getTimeInMillis()).apply();
@@ -332,10 +254,16 @@ public class PromotionTracking {
         if (isNewDay(lastCalendar, currentCalendar)) {
             lastCalendar = currentCalendar;
             String model = Build.MODEL.toLowerCase();
+            FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+            String phoneModelsString = firebaseRemoteConfig.getString("track_phone_models");
+            initPhoneModels(phoneModelsString);
             if (mPhoneModels.contains(model)) {
                 mFirebase.logEvent("手机型号" + model, "广告投放统计");
+                mFBLogger.logEvent("phoneModel_" + model);
+
             }
             mFirebase.logEvent("手机版本" + Build.VERSION.RELEASE, "广告投放统计");
+            mFBLogger.logEvent("phoneOSVersion_" + Build.VERSION.RELEASE);
             mEditor.putLong(SharedPreferenceKey.INSTALL_APP_TIME, lastCalendar.getTimeInMillis()).apply();
         }
     }
@@ -353,9 +281,20 @@ public class PromotionTracking {
         count++;
         if (count == 3){
             mFirebase.logEvent("点击连接按钮超过3次", "广告投放统计");
+            mFBLogger.logEvent("clickConnectButton3Times");
         }
         mEditor.putLong(SharedPreferenceKey.CLICK_CONNECT_BUTTON_TIME, lastCalendar.getTimeInMillis())
                 .putInt(SharedPreferenceKey.CLICK_CONNECT_BUTTON_COUNT, count)
                 .apply();
+    }
+
+    private void initPhoneModels(String phoneModelsString) {
+        if(phoneModelsString != null && !phoneModelsString.isEmpty()) {
+            String[] models = phoneModelsString.toLowerCase().split("\\\\n");
+            mPhoneModels = new HashSet<>(models.length);
+            for (String model : models) {
+                mPhoneModels.add(model);
+            }
+        }
     }
 }
