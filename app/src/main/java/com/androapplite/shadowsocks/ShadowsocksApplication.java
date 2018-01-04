@@ -26,6 +26,11 @@ import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.FirebaseApp;
 import com.vm.shadowsocks.core.VpnNotification;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Locale;
+
 import io.fabric.sdk.android.Fabric;
 
 
@@ -133,6 +138,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
             if (mIsFirstOpen) {
                 mIsFirstOpen = false;
                 PromotionTracking.getInstance(this).reportOpenMainPageCount();
+                reportTcpRecord();
             }
             PromotionTracking.getInstance(this).reportContinuousDayCount();
         }
@@ -164,5 +170,34 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
     @Override
     public void onActivityDestroyed(Activity activity) {
 
+    }
+
+    private void reportTcpRecord() {
+        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        boolean shouldReportTcpRecord = sp.getBoolean(SharedPreferenceKey.REPORT_TCP_RECORD, true);
+        if (shouldReportTcpRecord) {
+            int pid = android.os.Process.myPid();
+            String tcpFilename = String.format(Locale.ENGLISH, "/proc/%d/net/tcp", pid);
+            File tcpFile = new File(tcpFilename);
+
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(tcpFile));
+                String line = null;
+                int lineNumber = 0;
+                while (lineNumber++ < 2) {
+                    try {
+                        line = bufferedReader.readLine();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                bufferedReader.close();
+                if (lineNumber > 2 && line != null) {
+                    Firebase.getInstance(this).logEvent("TCP Record", line.trim());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
