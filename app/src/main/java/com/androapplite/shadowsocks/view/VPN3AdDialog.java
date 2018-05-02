@@ -12,7 +12,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import com.androapplite.shadowsocks.R;
 
@@ -40,10 +39,6 @@ public class VPN3AdDialog extends DialogFragment {
                 return false;
             }
         });
-
-        Window window = dialog.getWindow();
-        if (window != null)
-            window.setWindowAnimations(R.style.VPN3AdDialogAnimation);
 
         return dialog;
     }
