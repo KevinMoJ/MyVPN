@@ -27,6 +27,7 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.view.VPN3AdDialog;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.lang.ref.WeakReference;
@@ -84,6 +85,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         IntentFilter intentFilter = new IntentFilter(Action.ACTION_TIME_USE);
         mMyReceiver = new MyReceiver(this);
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMyReceiver, intentFilter);
+
+        VPN3AdDialog dialog = new VPN3AdDialog();
+        dialog.show(getFragmentManager(), "ConnectFragment");
     }
 
     @Override

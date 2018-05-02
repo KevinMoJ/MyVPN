@@ -16,6 +16,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -32,12 +33,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-
 import android.util.Log;
 import android.util.Pair;
-
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,11 +43,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-
-import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
 import com.androapplite.shadowsocks.PromotionTracking;
+import com.androapplite.shadowsocks.R;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -62,8 +59,8 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdStateListener;
 import com.bestgo.adsplugin.ads.AdType;
+import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 

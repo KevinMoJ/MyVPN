@@ -56,4 +56,9 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <!--VPN3推荐弹窗的广告-->
+    <style name="VPN3AdDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/vpn3_ad_dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/vpn3_ad_dialog_out</item>
+    </style>
 </resources>

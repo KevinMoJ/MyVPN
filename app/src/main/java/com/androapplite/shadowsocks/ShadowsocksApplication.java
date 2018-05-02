@@ -56,7 +56,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         AdAppHelper.FIREBASE = Firebase.getInstance(this);
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.init();
+        adAppHelper.init(null);
         mHomeWathcer = new HomeWatcher(this);
         mHomeWathcer.setOnHomePressedListener(this);
         checkVpnState();
