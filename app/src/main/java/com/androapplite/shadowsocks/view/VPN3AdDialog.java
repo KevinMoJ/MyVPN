@@ -62,7 +62,7 @@ public class VPN3AdDialog extends DialogFragment {
                     openGooglePlay(getContext(), VPN3_URL);
                     break;
                 case R.id.vpn3_ad_close:
-                    dismiss();
+                    dismissAllowingStateLoss();
                     break;
             }
         }

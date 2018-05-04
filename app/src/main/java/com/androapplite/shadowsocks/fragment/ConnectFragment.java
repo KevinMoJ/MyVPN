@@ -48,6 +48,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private ImageView mJaguarAnimationImageView;
     private ProgressBar mProgressBar;
     private TextView mElapseTextView;
+    private VPN3AdDialog mVPN3AdDialog;
 
 
     public ConnectFragment() {
@@ -86,14 +87,16 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mMyReceiver = new MyReceiver(this);
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMyReceiver, intentFilter);
 
-        VPN3AdDialog dialog = new VPN3AdDialog();
-        dialog.show(getFragmentManager(), "ConnectFragment");
+        mVPN3AdDialog = new VPN3AdDialog();
+        mVPN3AdDialog.show(getFragmentManager(), "ConnectFragment");
     }
 
     @Override
     public void onDestroy() {
         clearAnimation();
         super.onDestroy();
+        if (mVPN3AdDialog != null)
+            mVPN3AdDialog = null;
     }
 
     @Override
