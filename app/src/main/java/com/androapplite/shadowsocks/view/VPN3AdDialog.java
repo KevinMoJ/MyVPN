@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.R;
 
 
@@ -50,7 +51,7 @@ public class VPN3AdDialog extends DialogFragment {
 
         view.findViewById(R.id.vpn3_ad_imgv).setOnClickListener(mOnClickListener);
         view.findViewById(R.id.vpn3_ad_close).setOnClickListener(mOnClickListener);
-
+        Firebase.getInstance(getContext()).logEvent("VPN3推荐弹窗","显示","成功");
         return view;
     }
 
@@ -60,9 +61,11 @@ public class VPN3AdDialog extends DialogFragment {
             switch (v.getId()) {
                 case R.id.vpn3_ad_imgv:
                     openGooglePlay(getContext(), VPN3_URL);
+                    Firebase.getInstance(getContext()).logEvent("VPN3推荐弹窗","显示","点击跳转");
                     break;
                 case R.id.vpn3_ad_close:
                     dismissAllowingStateLoss();
+                    Firebase.getInstance(getContext()).logEvent("VPN3推荐弹窗","显示","点击关闭");
                     break;
             }
         }

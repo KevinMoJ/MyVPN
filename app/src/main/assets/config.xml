@@ -7,14 +7,14 @@
     <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=-1}</string>
     <string name="news_ctrl">{exe=1},{admob=100},{facebook=100}</string>
 
-    <string name="banner_ids">{admob=ca-app-pub-5330675173640052/3927500528},{fb=504824046367667_534985530018185}</string>
+    <string name="banner_ids">{admob=ca-app-pub-5330675173640052/3927500528},{fb=504824046367667_842334459283289}</string>
     <string name="admob_full_ids">{count=1},{id1=ca-app-pub-5330675173640052/1238580129,全屏}</string>
     <string name="admob_banner_native_ids">{count=0}</string>
-    <string name="fb_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
+    <string name="fb_full_ids">{count=2},{id1=504824046367667_842333652616703,全屏新},{id2=504824046367667_842333789283356,全屏高}</string>
     <string name="fbn_full_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
     <string name="fbn_banner_ids">{count=1},{id1=504824046367667_534980353352036,全屏}</string>
     <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/1014216123,不确定}</string>
-    <string name="fb_native_ids">{count=1},{id1=504824046367667_504825153034223,不确定}</string>
+    <string name="fb_native_ids">{count=2},{id1=504824046367667_842333505950051,},{id2=504824046367667_842333572616711,高}</string>
     <string name="native_size">{count=1},{id1=320,80}</string>
     <string name="custom_ctrl">{serverListDomain=http://c.vpnnest.com:8080/VPNServerList/fsl},{serverListIP=http://52.21.55.33:8080/VPNServerList/fsl},{exit_ad=1}</string>
     <string name="splash_ctrl">{exe=1},{fb=504824046367667_534980353352036}</string>
