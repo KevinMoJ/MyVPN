@@ -101,7 +101,7 @@ public class ServerListFetcherService extends IntentService{
             }
             mHttpClient = builder.build();
 
-            useCustomURL();
+//            useCustomURL();
             ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             ExecutorCompletionService<Pair<String, String>> ecs = new ExecutorCompletionService<>(executorService);
 

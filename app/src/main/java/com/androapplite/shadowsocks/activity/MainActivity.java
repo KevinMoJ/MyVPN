@@ -12,12 +12,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.VpnService;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -28,19 +28,15 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-
 import android.util.Log;
 import android.util.Pair;
-
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,13 +44,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-
-import com.androapplite.shadowsocks.Rotate3dAnimation;
-import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
 import com.androapplite.shadowsocks.PromotionTracking;
+import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
@@ -65,6 +58,8 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
@@ -72,6 +67,7 @@ import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 import com.vm.shadowsocks.core.VpnNotification;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
@@ -126,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         initDrawer(toolbar);
         initNavigationView();
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        notProvideServiceInChina();
         mReceiver = new MyReceiver(this);
         mIntentFilter = new IntentFilter(Action.SERVER_LIST_FETCH_FINISH);
         mForgroundHandler = new Handler(this);
@@ -152,6 +149,28 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
         adAppHelper.showFullAd();
+    }
+
+    private void notProvideServiceInChina() {
+        String countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, null);
+        if (countryCode != null && "CN".equals(countryCode)) {
+            File root = Environment.getExternalStorageDirectory();
+            File packageFolder = new File(root, "." + getPackageName());
+            File exception = new File(packageFolder, "exception.jim");
+            if (!exception.exists()) {
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setMessage(R.string.china_ip)
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .create();
+                dialog.show();
+            }
+        }
     }
 
     private void initNavigationView(){
@@ -676,7 +695,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
         ArrayList<ServerConfig> serverList = null;
         if(serverlist != null){
-            serverList = ServerConfig.createServerList(this, serverlist);
+            serverList = ServerConfig.createServerList(this, serverlist); // 返回null 内部catch
         }
         if(serverList != null && serverList.size() > 1) {
             result = serverList;

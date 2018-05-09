@@ -18,6 +18,9 @@ public final class SharedPreferenceKey {
     public static final String FAILED_CONNECT_COUNT = "FAILED_CONNECT_COUNT";
     public static final String NOTIFICATION_DISABLE_CHECK = "NOTIFICATION_DISABLE_CHECK";
     public static final String VPN_STATE = "VPN_STATE";
+    public static final String COUNTRY_CODE = "COUNTRY_CODE";
+    public static final String IP = "IP";
+
 
     //广告投放统计
     public static final String OPEN_MAIN_PAGE_TIME = "OPEN_MAIN_PAGE_TIME";

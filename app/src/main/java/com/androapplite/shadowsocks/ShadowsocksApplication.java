@@ -5,20 +5,18 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-
-import com.androapplite.vpn3.BuildConfig;
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.activity.MainActivity;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-
+import com.androapplite.shadowsocks.service.IpCountryIntentService;
+import com.androapplite.vpn3.BuildConfig;
+import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
@@ -72,10 +70,11 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         }
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.init();
+        adAppHelper.init(null);
         mHomeWathcer = new HomeWatcher(this);
         mHomeWathcer.setOnHomePressedListener(this);
         checkVpnState();
+        IpCountryIntentService.startService(this);
         VpnNotification.showVpnStoppedNotificationGlobe(this, false);
         mHomeWathcer = new HomeWatcher(this);
         mHomeWathcer.startWatch();

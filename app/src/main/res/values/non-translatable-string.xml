@@ -25,4 +25,6 @@
     <string name="vpn_name_dubai" translatable="false">Dubai</string>
 
     <string name="vpn_server_opt" translatable="false">opt.vpnnest.com</string>
+    <string name="china_ip" translatable="false">Due to police, this service is not available in China.\nThanks for your understanding!\n因政策原因，本服务暂停在中国使用，谢谢谅解。</string>
+
 </resources>

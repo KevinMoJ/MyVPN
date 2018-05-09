@@ -90,9 +90,10 @@
         <service
             android:name="com.androapplite.shadowsocks.service.FindProxyService"
             android:exported="false" />
-        <!--<service-->
-        <!--android:name="com.androapplite.shadowsocks.service.InterruptVpnIntentService"-->
-        <!--android:exported="false"></service>-->
+
+        <service
+        android:name="com.androapplite.shadowsocks.service.IpCountryIntentService"
+        android:exported="false"/>
         <receiver android:name="com.androapplite.shadowsocks.broadcast.MyMultipleReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
