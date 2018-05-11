@@ -20,6 +20,12 @@ public final class SharedPreferenceKey {
     public static final String VPN_STATE = "VPN_STATE";
     public static final String COUNTRY_CODE = "COUNTRY_CODE";
     public static final String IP = "IP";
+    public static final String WARN_DIALOG_SHOW_DATE = "WARN_DIALOG_SHOW_DATE";
+    public static final String WIFI_WARN_DIALOG_SHOW_COUNT = "WIFI_WARN_DIALOG_SHOW_COUNT";
+    public static final String NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT = "NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT";
+    public static final String DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT = "DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT";
+    public static final String UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT = "UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT";
+
 
 
     //广告投放统计

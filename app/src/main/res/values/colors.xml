@@ -23,5 +23,7 @@
     <color name="used_time_bg">#10000000</color>
     <color name="free_used_time">#69f1ed</color>
     <color name="connect_green">#5FE490</color>
+    <color name="sencodary_white_text">#8Affffff</color>
+    <color name="third_black_text">#4A000000</color>
 
 </resources>

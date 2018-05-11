@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/warn_dialog_root"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                tools:context="com.androapplite.shadowsocks.activity.WarnDialogActivity">
+
+    <ImageView
+        android:id="@+id/warn_dialog_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ad_container"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/inactive_user_bg"/>
+
+    <LinearLayout
+        android:id="@+id/warn_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/warn_dialog_message"
+        android:layout_marginLeft="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/app_name"
+            android:textColor="@color/sencodary_white_text"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/warn_dialog_close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:padding="6dp"
+            android:src="@drawable/ic_close_black_24dp"
+            android:tint="@color/primary_white_text"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/warn_dialog_message"
+        android:layout_width="match_parent"
+        android:layout_height="78dp"
+        android:layout_above="@+id/warn_dialog_btn"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/half_standard_margin"
+        android:gravity="center"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:text="The world outsafsfe  wall is. Use Speed VPN to unblock geo graphically restricted websites and chan nels. Free and fast!"
+        android:textColor="@color/primary_white_text"
+        android:textSize="16sp"/>
+
+    <Button
+        android:id="@+id/warn_dialog_btn"
+        android:layout_width="300dp"
+        android:layout_height="35dp"
+        android:layout_above="@+id/warn_dialog_cancel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:background="@drawable/button_green_bg"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:textColor="@color/primary_white_text"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/warn_dialog_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ad_container"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:gravity="center_horizontal"
+        android:textColor="@color/notification_bg_connect"
+        android:textSize="14sp"/>
+
+    <FrameLayout
+        android:id="@+id/ad_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"/>
+</RelativeLayout>
+

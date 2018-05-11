@@ -99,7 +99,23 @@
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
-
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.WarnDialogActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/InactiveUser">
+        </activity>
+        <service
+            android:name="com.androapplite.shadowsocks.service.WarnDialogShowService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+        <!--<activity-->
+            <!--android:name="com.androapplite.shadowsocks.activity.NetworkAccelerationActivity"-->
+            <!--android:label="@string/network_acceleration"-->
+            <!--android:launchMode="singleTask"-->
+            <!--android:screenOrientation="portrait">-->
+        <!--</activity>-->
     </application>
 
 </manifest>

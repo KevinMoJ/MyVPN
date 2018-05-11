@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--wifi链接没使用我们app的弹窗显示控制-->
+    <entry>
+        <key>is_wifi_dialog_show</key>
+        <value>true</value>
+    </entry>
+
+    <!--wifi链接没使用我们app的弹窗次数控制-->
+    <entry>
+        <key>wifi_dialog_show_count</key>
+        <value>2</value>
+    </entry>
+
+    <!--网速低于一定值的时候弹窗显示控制-->
+    <entry>
+        <key>is_net_speed_low_dialog_show</key>
+        <value>true</value>
+    </entry>
+
+    <!--网速低于一定值的时候弹窗次数控制-->
+    <entry>
+        <key>net_speed_low_dialog_show_count</key>
+        <value>1</value>
+    </entry>
+
+    <!--发达国家不活跃用户6点以后弹窗显示控制-->
+    <entry>
+        <key>is_developed_country_inactive_user_dialog_show</key>
+        <value>true</value>
+    </entry>
+
+    <!--发达国家不活跃用户6点以后弹窗次数控制-->
+    <entry>
+        <key>developed_country_inactive_user_dialog_show_count</key>
+        <value>1</value>
+    </entry>
+
+    <!--非发达国家不活跃用户弹窗显示控制-->
+    <entry>
+        <key>is_undeveloped_country_inactive_user_dialog_show</key>
+        <value>true</value>
+    </entry>
+
+    <!--非发达国家不活跃用户弹窗次数控制-->
+    <entry>
+        <key>undeveloped_country_inactive_user_dialog_show_count</key>
+        <value>1</value>
+    </entry>
+
+</defaultsMap>

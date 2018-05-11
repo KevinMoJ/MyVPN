@@ -1,8 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
 import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,13 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
-
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.service.WarnDialogShowService;
+import com.androapplite.shadowsocks.utils.InternetUtil;
+import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
 
@@ -40,6 +38,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
 
+        WarnDialogShowService.start(this);
         mAdLoadedCheckHandler = new Handler(this);
         Message msg = Message.obtain();
         msg.what = MSG_AD_LOADED_CHECK;
@@ -80,7 +79,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
             mAdLoadedCheckHandler.sendMessageDelayed(msg, 1000);
         }
-
+        Firebase.getInstance(this).logEvent("当前网络类型", "类型", InternetUtil.getNetworkState(SplashActivity.this));
     }
 
     @Override

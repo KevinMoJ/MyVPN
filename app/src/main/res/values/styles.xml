@@ -73,4 +73,18 @@
         <item name="android:windowBackground">@android:color/white</item>
     </style>
 
+    <style name="InactiveUser" parent="AppTheme.NoActionBar.FullScreen">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--<item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>-->
+        <item name="android:windowIsTranslucent">true</item>
+            <item name="android:windowAnimationStyle">@style/enterandentrance</item>
+    </style>
+
+    <style name="enterandentrance">
+        <item name="android:activityOpenEnterAnimation">@anim/bottom_up</item>
+        <item name="android:activityOpenExitAnimation">@anim/bottom_down</item>
+        <item name="android:activityCloseEnterAnimation">@anim/bottom_up</item>
+        <item name="android:activityCloseExitAnimation">@anim/bottom_down</item>
+    </style>
+
 </resources>

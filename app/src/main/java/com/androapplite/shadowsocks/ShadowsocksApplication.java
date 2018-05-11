@@ -22,6 +22,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.VpnNotification;
 
 import java.io.BufferedReader;
@@ -40,6 +41,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
     private int mOpenActivities;
     private boolean mIsFirstOpen;
 
+    private static Context gContext;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -58,7 +60,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
 //                    .penaltyDeath()
 //                    .build());
         }
-
+        gContext = getApplicationContext();
         FirebaseApp.initializeApp(this);
         AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
         AdAppHelper.FIREBASE = Firebase.getInstance(this);
@@ -76,6 +78,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         checkVpnState();
         IpCountryIntentService.startService(this);
         VpnNotification.showVpnStoppedNotificationGlobe(this, false);
+        FirebaseRemoteConfig.getInstance().setDefaults(R.xml.remote_config_defaults);
         mHomeWathcer = new HomeWatcher(this);
         mHomeWathcer.startWatch();
         mIsFirstOpen = true;
@@ -169,6 +172,14 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
     @Override
     public void onActivityDestroyed(Activity activity) {
 
+    }
+
+    public int getOpenActivityNumber() {
+        return mOpenActivities;
+    }
+
+    public static Context getGlobalContext() {
+        return gContext;
     }
 
     private void reportTcpRecord() {
