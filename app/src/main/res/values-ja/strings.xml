@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Close navigation drawer"</string>
     <string name="grab_speed_notification_title">"Grab The Speed"</string>
     <string name="grab_speed_notification_content">"Click grab speed, so that your speed faster and more fluid!"</string>
+    <string name="warn_dialog_wifi_connected_message">公共WIFIに接続すると個人情報が漏洩し、ハッキングやその他の攻撃に対して脆弱になります。 Speed VPNを使用してデータのプライバシーを保護することをお勧めします。</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Speed VPNを使用して、インターネットのプライバシーとセキュリティを保護し、他人がデータを盗聴するのを防ぐことをお勧めします。</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">壁の外の世界はさらにエキサイティングです。地理的に制限されたウェブサイトやチャンネルをブロック解除するには、スピードVPNを使用します。自由で速い！</string>
+    <string name="warn_dialog_net_speed_low_message">インターネット速度が遅すぎることが検出されました！スムーズで高速な体験を得るには、[VPNアクセラレーションの取得]をクリックします。</string>
+    <string name="immediate_protection">即時保護</string>
+    <string name="indifferent">無関心</string>
+    <string name="experience_now">経験を今すぐ</string>
+    <string name="ignore">無視する</string>
+    <string name="vpn_acceleration">VPNアクセラレーション</string>
+    <string name="network_acceleration">"ネットワークアクセラレーション"</string>
+    <string name="accelerate_immediately">すぐに加速する</string>
+    <string name="acceleration_completed_1">"加速完了"</string>
+    <string name="acceleration_completed_2a">"あなたのネットワークスピードと一歩早く！"</string>
 </resources>

@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"إغلاق درج التنقل"</string>
     <string name="grab_speed_notification_title">"الاستيلاء على السرعة"</string>
     <string name="grab_speed_notification_content">"انقر فوق سرعة انتزاع، بحيث سرعة أسرع وأكثر مرونة!"</string>
+    <string name="warn_dialog_wifi_connected_message">يؤدي الاتصال بـ WIFI العام إلى تعريض البيانات الشخصية ، مما يجعلك عرضة للاختراق وهجمات أخرى. يوصى باستخدام Speed ​​VPN لحماية خصوصية بياناتك.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">من المستحسن استخدام Speed ​​VPN لحماية خصوصيتك وأمانك على الإنترنت ومنع الآخرين من التطفل على بياناتك.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">العالم خارج الجدار أكثر إثارة. استخدم Speed ​​VPN لإلغاء حظر المواقع الجغرافية المقيدة رسومًا بيانية و nill nels. مجاني وسريع!</string>
+    <string name="warn_dialog_net_speed_low_message">اكتشف سرعة الإنترنت لديك بطيئة جدًا! للحصول على تجربة سلسة وسريعة ، انقر فوق الحصول على تسريع VPN!</string>
+    <string name="immediate_protection">الحماية الفورية</string>
+    <string name="indifferent">غير مبال</string>
+    <string name="experience_now">تجربة الآن</string>
+    <string name="ignore">تجاهل</string>
+    <string name="vpn_acceleration">"تسريع VPN "</string>
+    <string name="network_acceleration">"تسارع الشبكة"</string>
+    <string name="accelerate_immediately">تسريع على الفور</string>
+    <string name="acceleration_completed_1">"اكتمال تسريع"</string>
+    <string name="acceleration_completed_2a">"سرعة الشبكة الخاصة بك وخطوة واحدة أسرع!"</string>
 </resources>

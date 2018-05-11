@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Gezinme çekmecesini kapat"</string>
     <string name="grab_speed_notification_title">"Hızı Kep"</string>
     <string name="grab_speed_notification_content">"Kepçe hızını tıklayın, böylece hızınız daha hızlı ve daha akıcı olur!"</string>
+    <string name="warn_dialog_wifi_connected_message">Herkese bağlanma WIFI kişisel bilgilerinizi açığa çıkarır, bu da sizi hacking ve diğer saldırılara karşı savunmasız kılar. Veri gizliliğinizi korumak için Speed ​​VPN kullanmanız önerilir.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">İnternet gizliliğinizi ve güvenliğinizi korumak ve başkalarının verilerinizi izlemesini önlemek için Speed ​​VPN kullanmanız önerilir.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Duvarın dışındaki dünya daha da heyecan verici. Coğrafi olarak kısıtlanmış web sitelerinin ve kanalların kilidini kaldırmak için Speed ​​VPN kullanın. Özgür ve hızlı!</string>
+    <string name="warn_dialog_net_speed_low_message">Algılanan internet hızınız çok yavaş! Sorunsuz ve hızlı bir deneyim için VPN Acceleration\'ı tıklayın!</string>
+    <string name="immediate_protection">Anında Koruma</string>
+    <string name="indifferent">Kayıtsız</string>
+    <string name="experience_now">Şimdi deneyin</string>
+    <string name="ignore">Yoksay</string>
+    <string name="vpn_acceleration">VPN Hızlandırma</string>
+    <string name="network_acceleration">"Ağ hızlandırma"</string>
+    <string name="accelerate_immediately">Hemen hızlandırın</string>
+    <string name="acceleration_completed_1">"Hızlanma tamamlandı"</string>
+    <string name="acceleration_completed_2a">"Ağ hızınız ve bir adım daha hızlı!"</string>
 </resources>

@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"بند نیویگیشن دراج"</string>
     <string name="grab_speed_notification_title">"رفتار کو پکڑو"</string>
     <string name="grab_speed_notification_content">"پکڑو رفتار پر کلک کریں، تاکہ آپ کی رفتار تیز اور زیادہ سیال!"</string>
+    <string name="warn_dialog_wifi_connected_message">عوامی وائی فائی سے منسلک ذاتی ڈیٹا کو بے نقاب کر رہا ہے، آپ کو ہیکنگ اور دیگر حملوں کے لئے خطرہ بنانا ہے. یہ آپ کے ڈیٹا کی رازداری کی حفاظت کے لئے سپیڈ وی پی این کا استعمال کرنے کی سفارش کی جاتی ہے.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">یہ آپ کے انٹرنیٹ پرائیویسی اور سیکورٹی کی حفاظت اور دوسروں کو آپ کے ڈیٹا پر snooping سے روکنے کے لئے سپیڈ وی پی این کا استعمال کرنے کی سفارش کی جاتی ہے.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">دیوار سے باہر دنیا بھی زیادہ دلچسپ ہے. گرافیکی محدود پابندیوں کی ویب سائٹس کو روکنے کے لئے سپیڈ وی پی این کا استعمال کریں. مفت اور تیز!</string>
+    <string name="warn_dialog_net_speed_low_message">پتہ چلا آپ کی انٹرنیٹ کی رفتار بہت سست ہے! ہموار اور تیز رفتار تجربہ کے لئے، وی پی این ایکسلریشن حاصل کریں پر کلک کریں!</string>
+    <string name="immediate_protection">فوری تحفظ</string>
+    <string name="indifferent">بے حد</string>
+    <string name="experience_now">اب تجربہ</string>
+    <string name="ignore">نظر انداز کریں</string>
+    <string name="vpn_acceleration">وی پی این ایکسلریشن</string>
+    <string name="network_acceleration">"نیٹ ورک کی تیز رفتار"</string>
+    <string name="accelerate_immediately">فوری طور پر تیز کریں</string>
+    <string name="acceleration_completed_1">"تیز رفتار مکمل"</string>
+    <string name="acceleration_completed_2a">"آپ کے نیٹ ورک کی رفتار اور ایک قدم تیز!"</string>
 </resources>

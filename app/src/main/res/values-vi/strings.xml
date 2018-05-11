@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Đóng ngăn điều khiển điều hướng"</string>
     <string name="grab_speed_notification_title">"Lấy tốc độ"</string>
     <string name="grab_speed_notification_content">"Click vào lấy tốc độ, để tốc độ của bạn nhanh hơn và nhiều hơn nữa chất lỏng!"</string>
+    <string name="warn_dialog_wifi_connected_message">Kết nối với WIFI công cộng đang hiển thị dữ liệu cá nhân, khiến bạn dễ bị tấn công và tấn công khác. Bạn nên sử dụng Speed ​​VPN để bảo vệ quyền riêng tư dữ liệu của bạn.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Bạn nên sử dụng Tốc độ VPN để bảo vệ quyền riêng tư và bảo mật trên internet của bạn và ngăn người khác rình mò dữ liệu của bạn.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Thế giới bên ngoài bức tường thậm chí còn thú vị hơn. Sử dụng VPN tốc độ để bỏ chặn các trang web bị hạn chế về địa lý và chan chan. Miễn phí và nhanh chóng!</string>
+    <string name="warn_dialog_net_speed_low_message">Phát hiện tốc độ internet của bạn quá chậm! Để có trải nghiệm mượt mà và nhanh chóng, hãy nhấp vào Nhận tăng tốc VPN!</string>
+    <string name="immediate_protection">Bảo vệ ngay lập tức</string>
+    <string name="indifferent">Vô tư</string>
+    <string name="experience_now">Kinh nghiệm ngay</string>
+    <string name="ignore">Bỏ qua:</string>
+    <string name="vpn_acceleration">Tăng tốc VPN</string>
+    <string name="network_acceleration">"Tăng tốc mạng"</string>
+    <string name="accelerate_immediately">Tăng tốc ngay lập tức</string>
+    <string name="acceleration_completed_1">"Đã hoàn thành tăng tốc"</string>
+    <string name="acceleration_completed_2a">"Tốc độ mạng của bạn và một bước nhanh hơn!"</string>
 </resources>

@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Close navigation drawer"</string>
     <string name="grab_speed_notification_title">"Grab The Speed"</string>
     <string name="grab_speed_notification_content">"Click grab speed, so that your speed faster and more fluid!"</string>
+    <string name="warn_dialog_wifi_connected_message">공용 WIFI에 연결하면 개인 데이터가 노출되어 해킹 및 기타 공격에 취약 해집니다. Speed ​​VPN을 사용하여 데이터 프라이버시를 보호하는 것이 좋습니다.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Speed ​​VPN을 사용하여 인터넷 개인 정보 및 보안을 보호하고 다른 사람들이 귀하의 데이터를 스누핑하지 못하게하는 것이 좋습니다.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">벽 밖의 세계는 더욱 흥미 진진합니다. Speed ​​VPN을 사용하여 그래픽으로 제한된 웹 사이트 및 채널을 지리적으로 차단 해제합니다. 자유롭고 빠르다!</string>
+    <string name="warn_dialog_net_speed_low_message">인터넷 속도가 너무 느립니다. 부드럽고 빠른 경험을 원하시면 VPN Acceleration을 클릭하십시오!</string>
+    <string name="immediate_protection">즉각적인 보호</string>
+    <string name="indifferent">무관심한</string>
+    <string name="experience_now">체험하기</string>
+    <string name="ignore">무시</string>
+    <string name="vpn_acceleration">VPN 가속</string>
+    <string name="network_acceleration">"네트워크 가속"</string>
+    <string name="accelerate_immediately">즉시 가속화하십시오.</string>
+    <string name="acceleration_completed_1">"가속 완료"</string>
+    <string name="acceleration_completed_2a">"네트워크 속도가 한 단계 빨라졌습니다!"</string>
 </resources>

@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"ন্যাভিগেশন ড্রয়ারের বন্ধ করুন"</string>
     <string name="grab_speed_notification_title">"স্পীড গ্র্যাব"</string>
     <string name="grab_speed_notification_content">"আপনার গতি দ্রুত এবং আরো তরল যাতে, দখল গতি ক্লিক করুন!"</string>
+    <string name="warn_dialog_wifi_connected_message">জনসাধারণের সাথে সংযোগ করা ওয়াইফাই ব্যক্তিগত ডেটা প্রকাশ করছে, যা আপনাকে হ্যাকিং এবং অন্যান্য আক্রমণের জন্য ঝুঁকিপূর্ণ করে তোলে। এটি আপনার ডেটা গোপনীয়তা সুরক্ষার জন্য স্পিড ভিপিএন ব্যবহার করার জন্য সুপারিশ করা হয়।</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">আপনার ইন্টারনেট গোপনীয়তা এবং নিরাপত্তা রক্ষা এবং আপনার ডেটার উপর নজরদারি থেকে অন্যদের প্রতিরোধ করার জন্য স্পিড ভিপিএন ব্যবহার করার পরামর্শ দেওয়া হচ্ছে।</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">প্রাচীর বাইরে বিশ্বের এমনকি আরো উত্তেজনাপূর্ণ। জিও গ্রাফিক্যালি সীমাবদ্ধ ওয়েবসাইট এবং চন নেল অবরোধ করতে স্পিড ভিপিএন ব্যবহার করুন। বিনামূল্যে এবং দ্রুত!</string>
+    <string name="warn_dialog_net_speed_low_message">আপনার ইন্টারনেট গতি সনাক্ত খুব ধীর! একটি মসৃণ এবং দ্রুত অভিজ্ঞতা জন্য, ভিপিএন অ্যাক্সেলেশন পেতে ক্লিক করুন!</string>
+    <string name="immediate_protection">তাত্ক্ষণিক সুরক্ষা</string>
+    <string name="indifferent">উদাসীন</string>
+    <string name="experience_now">এখন অভিজ্ঞতা</string>
+    <string name="ignore">উপেক্ষা করা</string>
+    <string name="vpn_acceleration">ভিপিএন এক্সিলারেশন</string>
+    <string name="network_acceleration">"নেটওয়ার্ক ত্বরণ"</string>
+    <string name="accelerate_immediately">অবিলম্বে ত্বরান্বিত</string>
+    <string name="acceleration_completed_1">"এক্সিলারেশন সম্পন্ন হয়েছে"</string>
+    <string name="acceleration_completed_2a">"আপনার নেটওয়ার্ক গতি এবং এক ধাপ দ্রুত!"</string>
 </resources>

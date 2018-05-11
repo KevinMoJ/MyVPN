@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Закрити навігаційну панель"</string>
     <string name="grab_speed_notification_title">"Схопити швидкість"</string>
     <string name="grab_speed_notification_content">"Натисніть швидкість захоплення, щоб ваша швидкість швидше і рідше!"</string>
+    <string name="warn_dialog_wifi_connected_message">Підключення до загальнодоступного WIFI - це виявлення особистих даних, що робить вас вразливими до хакерства та інших атак. Рекомендовано використовувати Speed ​​VPN для захисту конфіденційності даних.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Рекомендовано використовувати Speed ​​VPN для захисту конфіденційності та безпеки Інтернету та запобігання стороннім спостереженням за вашими даними.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Світ поза стіною ще більш захоплюючий. Використовуйте швидкість VPN для розблокування веб-сайтів та веб-сайтів, які обмежують графічно. Вільно і швидко!</string>
+    <string name="warn_dialog_net_speed_low_message">Виявлено, що швидкість вашого Інтернету є занадто повільною! Для плавного та швидкого перегляду натисніть кнопку Отримати VPN Acceleration!</string>
+    <string name="immediate_protection">Негайний захист</string>
+    <string name="indifferent">Байдужий</string>
+    <string name="experience_now">Досвід зараз</string>
+    <string name="ignore">Ігнорувати</string>
+    <string name="vpn_acceleration">Прискорення VPN</string>
+    <string name="network_acceleration">"Мережеве прискорення"</string>
+    <string name="accelerate_immediately">Прискорення негайно</string>
+    <string name="acceleration_completed_1">"Прискорення завершено"</string>
+    <string name="acceleration_completed_2a">"Ваша швидкість мережі і один крок швидше!"</string>
 </resources>

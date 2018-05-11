@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"کشوی ناوبری را بست"</string>
     <string name="grab_speed_notification_title">"چنگ زدن به سرعت"</string>
     <string name="grab_speed_notification_content">"کلیک کنید سرعت گرفتن، به طوری که سرعت خود را سریع تر و مایع تر!"</string>
+    <string name="warn_dialog_wifi_connected_message">اتصال به WIFI عمومی، اطلاعات شخصی را در معرض قرار می دهد و شما را به هک کردن و حملات دیگر آسیب پذیر می کند. توصیه می شود برای استفاده از VPN سریع برای حفظ حریم خصوصی اطلاعات خود استفاده کنید.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">توصیه می شود برای استفاده از VPN های سریع برای محافظت از حریم خصوصی و امنیت اینترنت خود و جلوگیری از سوءاستفاده دیگران از اطلاعات خود، توصیه شود.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">جهان خارج از دیوار حتی هیجان انگیز تر است. استفاده از VPN سریع برای لغو وبسایت های گرافیکی محدود و جغرافیایی. رایگان و سریع!</string>
+    <string name="warn_dialog_net_speed_low_message">سرعت اینترنت شما تشخیص داده شده خیلی آهسته است! برای یک تجربه صاف و سریع، کلیک کنید VPN Acceleration!</string>
+    <string name="immediate_protection">حفاظت فوری</string>
+    <string name="indifferent">بي تفاوت</string>
+    <string name="experience_now">تجربه کن</string>
+    <string name="ignore">چشم پوشی</string>
+    <string name="vpn_acceleration">VPN Acceleration</string>
+    <string name="network_acceleration">"شتاب شبکه"</string>
+    <string name="accelerate_immediately">سرعت بلافاصله</string>
+    <string name="acceleration_completed_1">"شتاب کامل شد"</string>
+    <string name="acceleration_completed_2a">"سرعت شبکه شما و یک مرحله سریعتر!"</string>
 </resources>

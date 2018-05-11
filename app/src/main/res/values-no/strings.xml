@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Close navigation drawer"</string>
     <string name="grab_speed_notification_title">"Grab The Speed"</string>
     <string name="grab_speed_notification_content">"Click grab speed, so that your speed faster and more fluid!"</string>
+    <string name="warn_dialog_wifi_connected_message">Koble til offentlige WIFI er utsetting av personopplysninger, noe som gjør deg utsatt for hacking og andre angrep. Det anbefales å bruke Speed ​​VPN for å beskytte personvernet ditt.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Det anbefales å bruke Speed ​​VPN for å beskytte Internett-personvernet ditt og sikkerheten og hindre at andre snooping på dataene dine.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Verden utenfor veggen er enda mer spennende. Bruk hastighet VPN til å blokkere geografisk begrensede nettsteder og kanaler. Gratis og rask!</string>
+    <string name="warn_dialog_net_speed_low_message">Oppdaget Internett-hastigheten din er for langsom! For en jevn og rask opplevelse, klikk på få VPN Acceleration!</string>
+    <string name="immediate_protection">Umiddelbar beskyttelse</string>
+    <string name="indifferent">Likegyldig</string>
+    <string name="experience_now">Opplev nå</string>
+    <string name="ignore">Overse</string>
+    <string name="vpn_acceleration">VPN Acceleration</string>
+    <string name="network_acceleration">"Nettverk akselerasjon"</string>
+    <string name="accelerate_immediately">Fremskynde umiddelbart</string>
+    <string name="acceleration_completed_1">"Accelerasjon fullført"</string>
+    <string name="acceleration_completed_2a">"Nettverkshastigheten din og ett trinn raskere!"</string>
 </resources>

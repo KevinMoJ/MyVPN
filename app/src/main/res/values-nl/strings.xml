@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Close navigation drawer"</string>
     <string name="grab_speed_notification_title">"Grab The Speed"</string>
     <string name="grab_speed_notification_content">"Click grab speed, so that your speed faster and more fluid!"</string>
+    <string name="warn_dialog_wifi_connected_message">Verbinding maken met openbare WIFI brengt persoonlijke gegevens aan het licht, waardoor u kwetsbaar bent voor hacking en andere aanvallen. Het wordt aanbevolen om Speed ​​VPN te gebruiken om uw gegevensprivacy te beschermen.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Het wordt aanbevolen om Speed ​​VPN te gebruiken om uw privacy en beveiliging van internet te beschermen en te voorkomen dat anderen op uw gegevens snuffelen.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">De wereld buiten de muur is nog spannender. Gebruik Speed ​​VPN om geografisch beperkte websites en kanalen te deblokkeren. Gratis en snel!</string>
+    <string name="warn_dialog_net_speed_low_message">Gedetecteerd is uw internetsnelheid te traag! Klik voor een vlotte en snelle ervaring op VPN-versnelling ophalen!</string>
+    <string name="immediate_protection">Onmiddellijke bescherming</string>
+    <string name="indifferent">Onverschillig</string>
+    <string name="experience_now">Nu ervaren</string>
+    <string name="ignore">Negeren</string>
+    <string name="vpn_acceleration">VPN-versnelling</string>
+    <string name="network_acceleration">"Netwerkacceleratie"</string>
+    <string name="accelerate_immediately">Versnel meteen</string>
+    <string name="acceleration_completed_1">"Versnelling voltooid"</string>
+    <string name="acceleration_completed_2a">"Uw netwerksnelheid en een stap sneller!"</string>
 </resources>

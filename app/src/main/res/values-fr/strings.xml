@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Fermer le tiroir de navigation"</string>
     <string name="grab_speed_notification_title">"Prenez la vitesse"</string>
     <string name="grab_speed_notification_content">"Cliquez sur la vitesse de prise, pour que votre vitesse soit plus rapide et plus fluide!"</string>
+    <string name="warn_dialog_wifi_connected_message">La connexion au WIFI public expose des données personnelles, ce qui vous rend vulnérable au piratage et autres attaques. Il est recommandé d\'utiliser Speed ​​VPN pour protéger votre confidentialité des données.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Il est recommandé d\'utiliser Speed ​​VPN pour protéger votre confidentialité et votre sécurité sur Internet et empêcher les autres d\'espionner vos données.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Le monde extérieur au mur est encore plus excitant. Utilisez Speed ​​VPN pour débloquer des sites Web et des canaux géographiquement restreints. Gratuit et rapide!</string>
+    <string name="warn_dialog_net_speed_low_message">Détecté votre vitesse internet est trop lent! Pour une expérience fluide et rapide, cliquez sur Obtenir l\'accélération VPN!</string>
+    <string name="immediate_protection">Protection immédiate</string>
+    <string name="indifferent">Indifférents</string>
+    <string name="experience_now">Expérience maintenant</string>
+    <string name="ignore">Ignorer</string>
+    <string name="vpn_acceleration">Accélération VPN</string>
+    <string name="network_acceleration">"Accélération réseau"</string>
+    <string name="accelerate_immediately">Accélérer immédiatement</string>
+    <string name="acceleration_completed_1">"Accélération terminée"</string>
+    <string name="acceleration_completed_2a">"Votre vitesse de réseau et un pas plus vite!"</string>
 </resources>

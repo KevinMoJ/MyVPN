@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"नेविगेशन ड्रॉवर को बंद करें"</string>
     <string name="grab_speed_notification_title">"गति ले लो"</string>
     <string name="grab_speed_notification_content">"हड़पने की गति को क्लिक करें, ताकि आपकी गति तेज और अधिक तरल हो!"</string>
+    <string name="warn_dialog_wifi_connected_message">सार्वजनिक वाईफ़ाई से कनेक्ट करना व्यक्तिगत डेटा का खुलासा कर रहा है, जिससे आप हैकिंग और अन्य हमलों से कमजोर हो जाते हैं। आपकी डेटा गोपनीयता की सुरक्षा के लिए स्पीड वीपीएन का उपयोग करने की अनुशंसा की जाती है।</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">आपकी इंटरनेट गोपनीयता और सुरक्षा की सुरक्षा के लिए स्पीड वीपीएन का उपयोग करने और दूसरों को आपके डेटा पर स्नूप करने से रोकने की अनुशंसा की जाती है।</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">दीवार के बाहर की दुनिया और भी रोमांचक है। भौगोलिक रूप से प्रतिबंधित वेबसाइटों और चैन नेल्स को अनवरोधित करने के लिए स्पीड वीपीएन का उपयोग करें। नि: शुल्क और तेज़!</string>
+    <string name="warn_dialog_net_speed_low_message">पता चला कि आपकी इंटरनेट की गति बहुत धीमी है! एक चिकनी और तेज़ अनुभव के लिए, वीपीएन त्वरण प्राप्त करें पर क्लिक करें!</string>
+    <string name="immediate_protection">तत्काल संरक्षण</string>
+    <string name="indifferent">उदासीन</string>
+    <string name="experience_now">अब अनुभव करें</string>
+    <string name="ignore">अनदेखा करें</string>
+    <string name="vpn_acceleration">वीपीएन त्वरण</string>
+    <string name="network_acceleration">"नेटवर्क त्वरण"</string>
+    <string name="accelerate_immediately">तुरंत तेज करें</string>
+    <string name="acceleration_completed_1">"त्वरण पूर्ण"</string>
+    <string name="acceleration_completed_2a">"आपकी नेटवर्क की गति और एक कदम तेजी से!"</string>
 </resources>

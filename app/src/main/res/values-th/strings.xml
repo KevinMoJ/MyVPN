@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"ปิดลิ้นชักการนำทาง"</string>
     <string name="grab_speed_notification_title">"คว้าความเร็ว"</string>
     <string name="grab_speed_notification_content">"คลิกหยิบความเร็วเพื่อให้ความเร็วของคุณเร็วขึ้นและของเหลวมากขึ้น!"</string>
+    <string name="warn_dialog_wifi_connected_message">การเชื่อมต่อกับ WIFI สาธารณะเป็นการเปิดเผยข้อมูลส่วนบุคคลทำให้คุณเสี่ยงต่อการแฮ็กและการโจมตีอื่น ๆ ขอแนะนำให้ใช้ Speed ​​VPN เพื่อปกป้องข้อมูลส่วนบุคคลของคุณ</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">แนะนำให้ใช้ Speed ​​VPN เพื่อปกป้องข้อมูลส่วนบุคคลและความปลอดภัยบนอินเทอร์เน็ตของคุณและป้องกันไม่ให้ผู้อื่นสอดแนมข้อมูลของคุณ</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">โลกภายนอกกำแพงน่าตื่นเต้นมากยิ่งขึ้น ใช้ VPN ความเร็วเพื่อยกเลิกการปิดกั้นเว็บไซต์ที่ จำกัด กราฟิกทางภูมิศาสตร์และ nels chan ฟรีและรวดเร็ว!</string>
+    <string name="warn_dialog_net_speed_low_message">ตรวจพบความเร็วอินเทอร์เน็ตของคุณช้าเกินไป! เพื่อประสบการณ์ที่ราบรื่นและรวดเร็วให้คลิกรับ VPN Acceleration!</string>
+    <string name="immediate_protection">การป้องกันทันที</string>
+    <string name="indifferent">ไม่แยแส</string>
+    <string name="experience_now">ประสบการณ์ตอนนี้</string>
+    <string name="ignore">ละเว้น</string>
+    <string name="vpn_acceleration">การเร่งรัด VPN</string>
+    <string name="network_acceleration">"การเร่งความเร็วของเครือข่าย"</string>
+    <string name="accelerate_immediately">เร่งให้ทัน</string>
+    <string name="acceleration_completed_1">"เร่งเสร็จแล้ว"</string>
+    <string name="acceleration_completed_2a">"ความเร็วเครือข่ายของคุณและขั้นตอนเดียวเร็วกว่า!"</string>
 </resources>

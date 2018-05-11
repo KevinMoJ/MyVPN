@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Закрыть навигационный ящик"</string>
     <string name="grab_speed_notification_title">"Захват скорости"</string>
     <string name="grab_speed_notification_content">"Нажмите скорость захвата, чтобы ваша скорость была быстрее и быстрее!"</string>
+    <string name="warn_dialog_wifi_connected_message">Подключение к публичному WIFI предоставляет персональные данные, что делает вас уязвимыми для взлома и других атак. Для защиты конфиденциальности данных рекомендуется использовать Speed ​​VPN.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Рекомендуется использовать Speed ​​VPN для защиты конфиденциальности и безопасности вашего интернет-сайта, а также не позволять другим пользователям отслеживать ваши данные.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Мир за пределами стены еще более увлекателен. Используйте Speed ​​VPN, чтобы разблокировать географически ограниченные веб-сайты и каналы. Бесплатно и быстро!</string>
+    <string name="warn_dialog_net_speed_low_message">Обнаружили скорость вашего интернета слишком медленно! Для обеспечения плавного и быстрого доступа нажмите «Ускорение VPN»!</string>
+    <string name="immediate_protection">Немедленная защита</string>
+    <string name="indifferent">Мне все равно</string>
+    <string name="experience_now">Опыт сейчас</string>
+    <string name="ignore">Игнорировать</string>
+    <string name="vpn_acceleration">Ускорение VPN</string>
+    <string name="network_acceleration">"Ускорение сети"</string>
+    <string name="accelerate_immediately">Ускорить немедленно</string>
+    <string name="acceleration_completed_1">"Ускорение завершено"</string>
+    <string name="acceleration_completed_2a">"Скорость вашей сети и на один шаг быстрее!"</string>
 </resources>

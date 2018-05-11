@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Schreifweis Navigation Schacht"</string>
     <string name="grab_speed_notification_title">"Grab The Speed"</string>
     <string name="grab_speed_notification_content">"Klickt d'Schnellschnellgeschwindegkeet, fir datt Är Vitesse méi séier a méi fléissend ass!"</string>
+    <string name="warn_dialog_wifi_connected_message">D\'Verbindung mat dem öffentlechen WIFI erlaasst perséinlech Donnéeën, fir datt Dir vulnerabel ass fir Hacking an aner Attacke. Et ass recommandéiert de Speed VPN benotze fir Är Privatsphär ze schützen.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Et ass recommandéiert de Speed VPN ze benotzen fir Är Internet Privatsphär a Sécherheet ze schützen an ze verhënneren datt anerer vu snooping op Är Donnéeën.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">D\'Welt ausserhalb der Mauer ass nach méi spannend. Benotzt Geschwindegkeet VPN fir geographesch begrenzte Websäiten an Kanäl ze blockéieren. Gratis a séier!</string>
+    <string name="warn_dialog_net_speed_low_message">Detektéiert Är Internetsgeschitt ass ze lues. Fir e glat an séier Erfahrung gewënnt d\'VPN Acceleratioun!</string>
+    <string name="immediate_protection">Sofort Schutz</string>
+    <string name="indifferent">Gnäicht</string>
+    <string name="experience_now">Erlieft elo</string>
+    <string name="ignore">Ignoréieren</string>
+    <string name="vpn_acceleration">VPN Acceleratioun</string>
+    <string name="network_acceleration">"Netzbeschleunigung"</string>
+    <string name="accelerate_immediately">Acceleréiert direkt</string>
+    <string name="acceleration_completed_1">"Acceleratioun ofgeschloss"</string>
+    <string name="acceleration_completed_2a">"Är Netzschnellgeschwindigkeit an ee Schrëtt méi schnell!"</string>
 </resources>

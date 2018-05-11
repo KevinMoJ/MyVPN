@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Tutup laci navigasi"</string>
     <string name="grab_speed_notification_title">"Ambil kecepatan"</string>
     <string name="grab_speed_notification_content">"Klik grab speed, agar kecepatan anda lebih cepat dan lebih lancar!"</string>
+    <string name="warn_dialog_wifi_connected_message">Menghubungkan ke WIFI publik mengekspos data pribadi, membuat Anda rentan terhadap peretasan dan serangan lainnya. Disarankan untuk menggunakan Speed ​​VPN untuk melindungi privasi data Anda.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">Disarankan untuk menggunakan Speed ​​VPN untuk melindungi privasi dan keamanan internet Anda dan mencegah orang lain mengintip data Anda.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">Dunia di luar tembok bahkan lebih menarik. Gunakan Speed ​​VPN untuk membuka blokir situs web dan saluran terbatas yang dibatasi secara geografis. Gratis dan cepat!</string>
+    <string name="warn_dialog_net_speed_low_message">Terdeteksi kecepatan internet Anda terlalu lambat! Untuk pengalaman yang lancar dan cepat, klik dapatkan Akselerasi VPN!</string>
+    <string name="immediate_protection">Perlindungan Segera</string>
+    <string name="indifferent">Acuh tak acuh</string>
+    <string name="experience_now">Pengalaman Sekarang</string>
+    <string name="ignore">Abaikan</string>
+    <string name="vpn_acceleration">Akselerasi VPN</string>
+    <string name="network_acceleration">"Percepatan jaringan"</string>
+    <string name="accelerate_immediately">Segera dipercepat</string>
+    <string name="acceleration_completed_1">"Akselerasi selesai"</string>
+    <string name="acceleration_completed_2a">"Kecepatan jaringan Anda dan satu langkah lebih cepat!"</string>
 </resources>

@@ -73,4 +73,17 @@
     <string name="navigation_drawer_close">"Close navigation drawer"</string>
     <string name="grab_speed_notification_title">"Grab The Speed"</string>
     <string name="grab_speed_notification_content">"Click grab speed, so that your speed faster and more fluid!"</string>
+    <string name="warn_dialog_wifi_connected_message">Connecting to public WIFI is exposing personal data, making you vulnerable to hacking and other attacks. It is recommended to use Speed VPN to protect your data privacy.</string>
+    <string name="warn_dialog_developed_country_inactive_user_message">It is recommended to use Speed VPN to protect your internet privacy and security and prevent others from snooping on your data.</string>
+    <string name="warn_dialog_undeveloped_country_inactive_user_message">The world outside the wall is even more  exciting. Use Speed VPN to unblock geo graphically restricted websites and chan nels. Free and fast!</string>
+    <string name="warn_dialog_net_speed_low_message">Detected your internet speed is too slow! For a smooth and fast experience, click get VPN Acceleration!</string>
+    <string name="immediate_protection">Immediate Protection</string>
+    <string name="indifferent">Indifferent</string>
+    <string name="experience_now">Experience Now</string>
+    <string name="ignore">Ignore</string>
+    <string name="vpn_acceleration">VPN Acceleration</string>
+    <string name="network_acceleration">"Network acceleration"</string>
+    <string name="accelerate_immediately">Accelerate immediately</string>
+    <string name="acceleration_completed_1">"Acceleration completed"</string>
+    <string name="acceleration_completed_2a">"Your network speed and one step faster!"</string>
 </resources>
