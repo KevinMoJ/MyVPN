@@ -11,13 +11,13 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 
-import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.vpn3.BuildConfig;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
 import java.io.BufferedReader;
@@ -132,7 +132,7 @@ public class ServerListFetcherService extends IntentService{
             Log.d("FetchSeverList", "动态列表总时间：" + (System.currentTimeMillis() - t1));
 
             //获取远程静态服务器列表
-            if(mServerListJsonString == null){
+            if(mServerListJsonString == null || mServerListJsonString.isEmpty()){
                 tasks = new ArrayList<>(STATIC_HOST_URLS.size());
                 for (String url: STATIC_HOST_URLS) {
                     tasks.add(new MyCallable(url, firebase, mHttpClient));
@@ -165,7 +165,7 @@ public class ServerListFetcherService extends IntentService{
                 urlKey = "没有匹配的url";
             }
             //取结果
-            if(mServerListJsonString != null){
+            if(mServerListJsonString != null && !mServerListJsonString.isEmpty()){
                 Firebase.getInstance(this).logEvent("取服务器列表成功总时间", urlKey, t2-t1);
             }else{
                 Firebase.getInstance(this).logEvent("取服务器列表失败总时间", t2-t1);
@@ -180,7 +180,7 @@ public class ServerListFetcherService extends IntentService{
             }
 
             //使用旧的server list
-            if(mServerListJsonString == null) {
+            if(mServerListJsonString == null || mServerListJsonString.isEmpty()) {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
                 mServerListJsonString = sharedPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
                 if (mServerListJsonString != null) {

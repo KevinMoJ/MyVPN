@@ -42,10 +42,34 @@
         <value>true</value>
     </entry>
 
+    <!--WarnDialog弹窗底部广告显示控制-->
+    <entry>
+        <key>is_warn_dialog_bottom_ad_show</key>
+        <value>false</value>
+    </entry>
+
     <!--非发达国家不活跃用户弹窗次数控制-->
     <entry>
         <key>undeveloped_country_inactive_user_dialog_show_count</key>
         <value>1</value>
+    </entry>
+
+    <!--网速不好弹窗的上传速度控制-->
+    <entry>
+        <key>net_speed_low_upload</key>
+        <value>500</value>
+    </entry>
+
+    <!--网速不好弹窗的下载速度控制-->
+    <entry>
+        <key>net_speed_low_download</key>
+        <value>500</value>
+    </entry>
+
+    <!--误点击率-->
+    <entry>
+        <key>casual_click_rate</key>
+        <value>0.5</value>
     </entry>
 
 </defaultsMap>

@@ -98,7 +98,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 } else {
                     String text = mService.getString(R.string.notification_no_time, tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
                     try {
-                        showNetSpeedLowWarnDialog((int) tcpTrafficMonitor.pPayloadReceivedSpeed, (int) tcpTrafficMonitor.pPayloadSentSpeed);
+                        showNetSpeedLowWarnDialog(tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
                     } catch (Exception e) {}
                     mNormalNetworkStatusBuilder.setContentText(text);
                     notification = mNormalNetworkStatusBuilder.build();
@@ -110,13 +110,16 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
         }
     }
 
-    private void showNetSpeedLowWarnDialog(int receivedSpeed, int sendSpeed) {
+    private void showNetSpeedLowWarnDialog(long receivedSpeed, long sendSpeed) {
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mService);
         long lastShowTime = sharedPreferences.getLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, 0);
         //针对用户网速低于一定值的时候弹窗(暂时写上低于100的时候)，一天弹一次，有云控控制弹不弹，弹的次数也可以云控控制
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_show_count");
         int showCount = sharedPreferences.getInt(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT, 0);
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_low_dialog_show") && (receivedSpeed <= 300 || sendSpeed <= 300)) {
+        long cloudUpload = FirebaseRemoteConfig.getInstance().getLong("net_speed_low_upload");
+        long cloudDownload =  FirebaseRemoteConfig.getInstance().getLong("net_speed_low_download");
+
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_low_dialog_show") && (receivedSpeed <= cloudDownload || sendSpeed <= cloudUpload)) {
             if (DateUtils.isToday(lastShowTime) && showCount < count
                     && ((ShadowsocksApplication) ShadowsocksApplication.getGlobalContext().getApplicationContext()).getOpenActivityNumber() <= 0) {
                 showCount = showCount + 1;

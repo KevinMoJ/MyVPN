@@ -22,10 +22,11 @@ import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.lang.ref.WeakReference;
 
-public class WarnDialogActivity extends AppCompatActivity {
+public class WarnDialogActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "WarnDialogActivity";
 
     public static final String SHOW_DIALOG_TYPE = "dialog_type";
@@ -79,9 +80,9 @@ public class WarnDialogActivity extends AppCompatActivity {
         mWarnDialogCancel = (TextView) findViewById(R.id.warn_dialog_cancel);
         mAdContainer = (FrameLayout) findViewById(R.id.ad_container);
 
-        mWarnDialogClose.setOnClickListener(mOnClickListener);
-        mWarnDialogBtn.setOnClickListener(mOnClickListener);
-        mWarnDialogRoot.setOnClickListener(mOnClickListener);
+        mWarnDialogClose.setOnClickListener(this);
+        mWarnDialogBtn.setOnClickListener(this);
+        mWarnDialogRoot.setOnClickListener(this);
     }
 
     private void initUI() {
@@ -106,7 +107,8 @@ public class WarnDialogActivity extends AppCompatActivity {
             mWarnDialogCancel.setText(R.string.indifferent);
             mWarnDialogBg.setImageResource(R.drawable.inactive_user_bg);
         }
-//        addBottomAd();
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_bottom_ad_show"))
+            addBottomAd();
     }
 
     public static void start(Context context, int type) {
@@ -128,23 +130,28 @@ public class WarnDialogActivity extends AppCompatActivity {
         }
     };
 
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.warn_dialog_close:
-                    finish();
-                    break;
-                case R.id.warn_dialog_btn:
-                    Toast.makeText(WarnDialogActivity.this, "点到了按钮", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.warn_dialog_root:
-                    Toast.makeText(WarnDialogActivity.this, "点到了空白处", Toast.LENGTH_SHORT).show();
-                    break;
+    @Override
+    public void onClick(View v) {
+        Firebase firebase = Firebase.getInstance(this);
+        switch (v.getId()) {
+            case R.id.warn_dialog_close:
+                finish();
+                break;
+            case R.id.warn_dialog_btn:
+                NetworkAccelerationActivity.start(this, true);
+                break;
+            case R.id.warn_dialog_root:
+                FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+                double casualclickRate = firebaseRemoteConfig.getDouble("casual_click_rate");
+                boolean result = Math.random() < casualclickRate;
+                firebase.logEvent("大弹窗", "误点", String.valueOf(result));
+                if (result) {
+                    NetworkAccelerationActivity.start(this, true);
+                }
+                break;
 
-            }
         }
-    };
+    }
 
     private void addBottomAd() {
         if (mAdStateListener == null)
@@ -167,9 +174,6 @@ public class WarnDialogActivity extends AppCompatActivity {
             mAdAppHelper.removeAdStateListener(mAdStateListener);
             mAdStateListener = null;
         }
-
-        if (mOnClickListener != null)
-            mOnClickListener = null;
 
         if (mHomePressedListener != null)
             mHomePressedListener = null;

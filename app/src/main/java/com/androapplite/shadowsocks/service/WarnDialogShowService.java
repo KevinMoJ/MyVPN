@@ -72,9 +72,12 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, 0);
         int showCount = mSharedPreference.getInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0);
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_show_count");
-        //同一天一个弹窗弹一次，下午6点以后才可以弹
+        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        //同一天一个弹窗弹一次，下午6点以后才可以弹,并且判断为不活跃用户
         if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 18 && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 24
-                && DateUtils.isToday(lastShowTime) && showCount < count && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0) {
+                && DateUtils.isToday(lastShowTime) && showCount < count
+                && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0
+                 && isInactiveUser) {
             showCount = showCount + 1;
             mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
             mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
@@ -105,8 +108,11 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, 0);
         int showCount = mSharedPreference.getInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0);
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("undeveloped_country_inactive_user_dialog_show_count");
-        //同一天一个弹窗弹一次
-        if (DateUtils.isToday(lastShowTime) && showCount < count && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0) {
+        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        //同一天一个弹窗弹一次,非发达国家不活跃用户
+        if (DateUtils.isToday(lastShowTime) && showCount < count
+                && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0
+                && isInactiveUser) {
             showCount = showCount + 1;
             mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
             mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
