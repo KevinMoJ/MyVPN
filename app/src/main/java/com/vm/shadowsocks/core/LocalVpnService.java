@@ -131,6 +131,13 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (ProxyConfig.IS_DEBUG) {
             System.out.println(logString);
         }
+        for (Object o : args) {
+            if (o instanceof Throwable && IsRunning) {
+                Throwable throwable = (Throwable) o;
+                ShadowsocksApplication.handleException(throwable);
+                Firebase.getInstance(Instance).logEvent("Error", throwable.getMessage());
+            }
+        }
         if (mStatusGuard != null) {
             Map<String, Integer> errors = mStatusGuard.getErrors();
             if (format.startsWith("Error:")) {
