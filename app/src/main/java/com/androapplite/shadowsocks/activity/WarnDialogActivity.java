@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.HomeWatcher;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -47,7 +44,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
 
     private AdAppHelper mAdAppHelper;
     private BottomAdStateListener mAdStateListener;
-    private HomeWatcher mHomeWatcher;
+    private boolean isFullAdShow;
 
     private int type;
 
@@ -59,14 +56,12 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
         initDate();
         initView();
         initUI();
+        analysisDialogShow();
     }
-
 
     private void initDate() {
         type = getIntent().getIntExtra(SHOW_DIALOG_TYPE, UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
         mAdAppHelper = AdAppHelper.getInstance(this);
-        mHomeWatcher = new HomeWatcher(this);
-        mHomeWatcher.setOnHomePressedListener(mHomePressedListener);
     }
 
 
@@ -107,8 +102,34 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mWarnDialogCancel.setText(R.string.indifferent);
             mWarnDialogBg.setImageResource(R.drawable.inactive_user_bg);
         }
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_bottom_ad_show"))
-            addBottomAd();
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_ad_show")) {
+            if (mAdAppHelper.isFullAdLoaded()) {
+                mAdAppHelper.showFullAd();
+                Firebase.getInstance(this).logEvent("大弹窗", "广告", "全屏加载");
+                isFullAdShow = true;
+            } else if (mAdAppHelper.isNativeLoaded()) {
+                addBottomAd();
+                Firebase.getInstance(this).logEvent("大弹窗", "广告", "native加载");
+                isFullAdShow = false;
+            }
+        }
+    }
+
+    private void analysisDialogShow() {
+        switch (type) {
+            case CONNECT_PUBLIC_WIFI_DIALOG:
+                Firebase.getInstance(this).logEvent("大弹窗", "显示", "链接WiFi");
+                break;
+            case UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG:
+                Firebase.getInstance(this).logEvent("大弹窗", "显示", "不发达国家不活跃用户");
+                break;
+            case DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG:
+                Firebase.getInstance(this).logEvent("大弹窗", "显示", "发达国家不活跃用户");
+                break;
+            case NET_SPEED_LOW_DIALOG:
+                Firebase.getInstance(this).logEvent("大弹窗", "显示", "网速低");
+                break;
+        }
     }
 
     public static void start(Context context, int type) {
@@ -118,35 +139,29 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
         context.startActivity(intent);
     }
 
-    private HomeWatcher.OnHomePressedListener mHomePressedListener = new HomeWatcher.OnHomePressedListener() {
-        @Override
-        public void onHomePressed() {
-            Toast.makeText(WarnDialogActivity.this, "点击了home", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onHomeLongPressed() {
-            Toast.makeText(WarnDialogActivity.this, "长按了home", Toast.LENGTH_SHORT).show();
-        }
-    };
-
     @Override
     public void onClick(View v) {
         Firebase firebase = Firebase.getInstance(this);
         switch (v.getId()) {
             case R.id.warn_dialog_close:
                 finish();
+                firebase.logEvent("大弹窗", "取消");
                 break;
             case R.id.warn_dialog_btn:
                 NetworkAccelerationActivity.start(this, true);
+                firebase.logEvent("大弹窗", "进入APP");
                 break;
             case R.id.warn_dialog_root:
                 FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
                 double casualclickRate = firebaseRemoteConfig.getDouble("casual_click_rate");
                 boolean result = Math.random() < casualclickRate;
                 firebase.logEvent("大弹窗", "误点", String.valueOf(result));
-                if (result) {
+                firebase.logEvent("大弹窗", "点击空白处");
+                if (result && FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use")) {
                     NetworkAccelerationActivity.start(this, true);
+                    firebase.logEvent("大弹窗", "进入APP");
+                } else {
+                    finish();
                 }
                 break;
 
@@ -174,14 +189,12 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mAdAppHelper.removeAdStateListener(mAdStateListener);
             mAdStateListener = null;
         }
-
-        if (mHomePressedListener != null)
-            mHomePressedListener = null;
     }
 
     @Override
     public void onBackPressed() {
-
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use"))
+            super.onBackPressed();
     }
 
     private class BottomAdStateListener extends AdStateListener {
@@ -202,8 +215,12 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     case AdType.FACEBOOK_NATIVE:
                     case AdType.FACEBOOK_FBN_BANNER:
                     case AdType.ADMOB_NATIVE_AN:
-                        activity.addBottomAd();
-                        Log.i(TAG, "onAdLoaded: ");
+                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_ad_show")) {
+                            if (!activity.isFullAdShow) {
+                                activity.addBottomAd();
+                                Firebase.getInstance(activity).logEvent("大弹窗", "广告", "native加载");
+                            }
+                        }
                         break;
                 }
                 AdAppHelper.getInstance(activity).removeAdStateListener(this);
@@ -221,7 +238,13 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     case AdType.FACEBOOK_NATIVE:
                     case AdType.FACEBOOK_FBN_BANNER:
                     case AdType.ADMOB_NATIVE_AN:
-                        Firebase.getInstance(mReference.get()).logEvent("主界面下方广告", "显示", "点击");
+                        Firebase.getInstance(mReference.get()).logEvent("native广告", "显示", "点击");
+                        break;
+                    case AdType.ADMOB_FULL:
+                    case AdType.ADMOB_NATIVE_FULL:
+                    case AdType.FACEBOOK_FULL:
+                    case AdType.FACEBOOK_FBN:
+                        Firebase.getInstance(mReference.get()).logEvent("全屏广告", "显示", "点击");
                         break;
                 }
                 AdAppHelper.getInstance(activity).removeAdStateListener(this);

@@ -20,6 +20,7 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
@@ -35,6 +36,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     private SharedPreferences mSharedPreference;
     private WarnDialogReceiver mWarnDialogReceiver;
     private String countryCode;
+    private AdAppHelper adAppHelper;
 
     private long startTime;
 
@@ -49,6 +51,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         startTime = System.currentTimeMillis();
         mHandler = new Handler(this);
+        adAppHelper = AdAppHelper.getInstance(this);
         registerWarnDialogReceiver();
 
     }
@@ -68,39 +71,44 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         }
     }
 
-    private void monitorDevelopedCountryInactiveUserDialog() {
-        long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, 0);
-        int showCount = mSharedPreference.getInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0);
-        int count = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_show_count");
-        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
-        //同一天一个弹窗弹一次，下午6点以后才可以弹,并且判断为不活跃用户
-        if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 18 && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 24
-                && DateUtils.isToday(lastShowTime) && showCount < count
-                && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0
-                 && isInactiveUser) {
-            showCount = showCount + 1;
-            mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
-            mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-            WarnDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
-        } else if (!DateUtils.isToday(lastShowTime)) {
-            mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
-            mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0).apply();
-        }
-    }
 
     private void monitorWifiStateChangeDialog() {
         long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, 0);
         int showCount = mSharedPreference.getInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, 0);
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_count");
         //同一天一个弹窗最多弹两次 弹的次数可以云控控制
-        if (DateUtils.isToday(lastShowTime) && showCount < count && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0) {
-            showCount = showCount + 1;
-            mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-            mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
-            WarnDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
-        } else if (!DateUtils.isToday(lastShowTime)) {
-            mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, 0).apply();
-            mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+        if (adAppHelper.isFullAdLoaded() || adAppHelper.isNativeLoaded()) {
+            if (DateUtils.isToday(lastShowTime) && showCount < count && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0) {
+                showCount = showCount + 1;
+                mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+                WarnDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
+            } else if (!DateUtils.isToday(lastShowTime)) {
+                mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, 0).apply();
+                mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+            }
+        }
+    }
+
+    private void monitorDevelopedCountryInactiveUserDialog() {
+        long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, 0);
+        int showCount = mSharedPreference.getInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0);
+        int count = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_show_count");
+        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        if (adAppHelper.isFullAdLoaded() || adAppHelper.isNativeLoaded()) {
+            //同一天一个弹窗弹一次，下午6点以后才可以弹,并且判断为不活跃用户
+            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 18 && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 24
+                    && DateUtils.isToday(lastShowTime) && showCount < count
+                    && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0
+                    && isInactiveUser) {
+                showCount = showCount + 1;
+                mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+                mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                WarnDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+            } else if (!DateUtils.isToday(lastShowTime)) {
+                mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+                mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0).apply();
+            }
         }
     }
 
@@ -110,16 +118,19 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("undeveloped_country_inactive_user_dialog_show_count");
         boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
         //同一天一个弹窗弹一次,非发达国家不活跃用户
-        if (DateUtils.isToday(lastShowTime) && showCount < count
-                && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0
-                && isInactiveUser) {
-            showCount = showCount + 1;
-            mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
-            mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-            WarnDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
-        } else if (!DateUtils.isToday(lastShowTime)) {
-            mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
-            mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0).apply();
+        if (adAppHelper.isFullAdLoaded() || adAppHelper.isNativeLoaded()) {
+            if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 18 && Calendar.getInstance().get(Calendar.HOUR_OF_DAY) <= 24
+                    && DateUtils.isToday(lastShowTime) && showCount < count
+                    && ((ShadowsocksApplication) this.getApplicationContext()).getOpenActivityNumber() <= 0
+                    && isInactiveUser) {
+                showCount = showCount + 1;
+                mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+                mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                WarnDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+            } else if (!DateUtils.isToday(lastShowTime)) {
+                mSharedPreference.edit().putLong(SharedPreferenceKey.WARN_DIALOG_SHOW_DATE, System.currentTimeMillis()).apply();
+                mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0).apply();
+            }
         }
     }
 
@@ -185,19 +196,18 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                     Log.i(TAG, "onReceive:   " + "disconnected");
                 }
             } else if (Intent.ACTION_TIME_TICK.equals(action)) {
-                // 15分钟执行一次检查 云控控制开关并且针对发达国家（美国，德国，澳大利亚，英国）
+                // 15分钟执行一次检查
                 if (System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(15)) {
                     if (FirebaseRemoteConfig.getInstance().getBoolean("is_developed_country_inactive_user_dialog_show")
                             && (countryCode.equals("US") || countryCode.equals("DE") || countryCode.equals("GB") || countryCode.equals("AU"))) {
+                        //云控控制开关并且针对发达国家（美国，德国，澳大利亚，英国）
                         monitorDevelopedCountryInactiveUserDialog();
+                    } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_undeveloped_country_inactive_user_dialog_show")
+                            && !countryCode.equals("US") && !countryCode.equals("DE") && !countryCode.equals("GB") && !countryCode.equals("AU")) {
+                        //针对不发达国家不活跃用户进行的弹窗
+                        monitorUndevelopedCountryInactiveUserDialog();
                     }
                     startTime = System.currentTimeMillis();
-                }
-
-                //针对不发达国家不活跃用户进行的弹窗
-                if (FirebaseRemoteConfig.getInstance().getBoolean("is_undeveloped_country_inactive_user_dialog_show")
-                        && !countryCode.equals("US") && !countryCode.equals("DE") && !countryCode.equals("GB") && !countryCode.equals("AU")) {
-                    monitorUndevelopedCountryInactiveUserDialog();
                 }
             }
         }

@@ -42,9 +42,15 @@
         <value>true</value>
     </entry>
 
-    <!--WarnDialog弹窗底部广告显示控制-->
+    <!--WarnDialog弹窗误点和back键屏蔽控制-->
     <entry>
-        <key>is_warn_dialog_bottom_ad_show</key>
+        <key>is_warn_dialog_back_use</key>
+        <value>false</value>
+    </entry>
+
+    <!--WarnDialog弹窗广告显示控制-->
+    <entry>
+        <key>is_warn_dialog_ad_show</key>
         <value>false</value>
     </entry>
 

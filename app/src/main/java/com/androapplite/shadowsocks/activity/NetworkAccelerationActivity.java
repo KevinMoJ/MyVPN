@@ -313,7 +313,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
             if (fragment instanceof NetworkAccelerationFragment) {
                 ((NetworkAccelerationFragment)fragment).rocketFly();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
+//                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
             }
         } else {
             if (mIsRestart) {
