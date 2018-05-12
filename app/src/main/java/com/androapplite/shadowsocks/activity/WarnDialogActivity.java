@@ -157,9 +157,11 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                 boolean result = Math.random() < casualclickRate;
                 firebase.logEvent("大弹窗", "误点", String.valueOf(result));
                 firebase.logEvent("大弹窗", "点击空白处");
-                if (result && FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use")) {
-                    NetworkAccelerationActivity.start(this, true);
-                    firebase.logEvent("大弹窗", "进入APP");
+                if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use")) {
+                    if (result) {
+                        NetworkAccelerationActivity.start(this, true);
+                        firebase.logEvent("大弹窗", "进入APP");
+                    }
                 } else {
                     finish();
                 }
@@ -193,7 +195,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onBackPressed() {
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use"))
+        if (!FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use"))
             super.onBackPressed();
     }
 
