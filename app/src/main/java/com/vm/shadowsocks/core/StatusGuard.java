@@ -1,18 +1,17 @@
 package com.vm.shadowsocks.core;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.service.ConnectionTestService;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.FindProxyService;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.BindException;
@@ -20,7 +19,6 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,6 +62,8 @@ public class StatusGuard implements Runnable{
     private long mProxySentCountHourly;
     private long mProxyReceivedCountHourly;
     private int mProxyBadCountSequence;
+    private long mProxyPayloadSentByteCount5Min;
+    private long mProxyPayloadReceivedByteCount5Min;
 
     public StatusGuard(Context context, ScheduledExecutorService scheduledExecutorService) {
 //        String state = Environment.getExternalStorageState();
@@ -117,7 +117,7 @@ public class StatusGuard implements Runnable{
             int dnsProxyPort = 0;
             DatagramSocket datagramSocket = null;
             try {
-                dnsProxyPort = localVpnService.getDnsProxy().Port;
+                dnsProxyPort = localVpnService.getDnsProxy().Port & 0xffff;
                 datagramSocket = new DatagramSocket(dnsProxyPort);
             } catch (BindException e) {
                 isDnsProxyPortExist = true;
@@ -134,7 +134,7 @@ public class StatusGuard implements Runnable{
             int tcpProxyPort = 0;
             ServerSocket serverSocket = null;
             try {
-                tcpProxyPort = localVpnService.getTcpProxyServer().Port;
+                tcpProxyPort = localVpnService.getTcpProxyServer().Port & 0xffff;
                 serverSocket = new ServerSocket();
                 serverSocket.bind(new InetSocketAddress(tcpProxyPort));
             } catch (BindException e) {
@@ -156,10 +156,10 @@ public class StatusGuard implements Runnable{
             int udpProxyPort = 0;
             datagramSocket = null;
             try {
-                udpProxyPort = localVpnService.getUdpProxy().Port;
+                udpProxyPort = localVpnService.getUdpProxy().Port & 0xffff;
                 datagramSocket = new DatagramSocket(udpProxyPort);
             } catch (BindException e) {
-                isDnsProxyPortExist = true;
+                isUdpProxyPortExist = true;
             } catch (SocketException e) {
                 e.printStackTrace();
             } finally {
@@ -238,7 +238,7 @@ public class StatusGuard implements Runnable{
 
             if (mProxyBadCountSequence > 2 && LocalVpnService.IsRunning) {
                 Log.d("[heart beat]", "switchProxy");
-                FindProxyService.switchProxy(mContext);
+                FindProxyService.switchProxy(this);
                 mProxyBadCountSequence = 0;
             }
 
@@ -249,6 +249,56 @@ public class StatusGuard implements Runnable{
             if (!mErrors.isEmpty()) {
                 for (Map.Entry<String, Integer> entry : mErrors.entrySet()) {
                     println("error %d, %s", entry.getValue(), entry.getKey());
+                }
+            }
+
+            //每5秒钟
+//            if (LocalVpnService.Instance.gNeedToReportPackageType) {
+//                Firebase.getInstance(mContext).logEvent("数据包类型", "TCP", LocalVpnService.Instance.gTCPCount.get());
+//                Firebase.getInstance(mContext).logEvent("数据包类型", "UDP", LocalVpnService.Instance.gUDPCount.get());
+//                LocalVpnService.Instance.gTCPCount.set(0);
+//                LocalVpnService.Instance.gUDPCount.set(0);
+//            }
+
+            //5分钟
+            if (mScheduleCount % 60 == 0 || mScheduleCount == 12) {
+                String[] proxyParts = LocalVpnService.ProxyUrl.split("[@:]");
+                if (proxyParts.length > 2) {
+                    Firebase instance = Firebase.getInstance(mContext);
+                    String server = proxyParts[proxyParts.length - 2];
+                    instance.logEvent("延迟", server, LocalVpnService.Instance.gDelay);
+                    instance.logEvent("联通状态", "服务器", server);
+                    instance.logEvent("联通状态", "延迟", LocalVpnService.Instance.gDelay);
+
+                    SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mContext);
+                    int ip = sp.getInt(SharedPreferenceKey.IP, 0);
+                    instance.logEvent("联通状态", "ip", ip);
+
+                    String country = sp.getString(SharedPreferenceKey.COUNTRY_CODE, "");
+                    instance.logEvent("联通状态", "国家", country);
+                    long time = System.currentTimeMillis();
+                    instance.logEvent("联通状态", "时间", time);
+
+                    int count = NatSessionManager.getSessionCount();
+                    instance.logEvent("联通状态", "连接数", count);
+
+                    long send = trafficMonitor.pProxyPayloadSentByteCount - mProxyPayloadSentByteCount5Min;
+                    instance.logEvent("联通状态", "发送字节", send);
+                    long receive = trafficMonitor.pProxyPayloadReceivedByteCount - mProxyPayloadReceivedByteCount5Min;
+                    instance.logEvent("联通状态", "接收字节", receive);
+
+                    long speed = 0;
+                    if (mScheduleCount == 12) {
+                       speed = (send + receive) / 60;
+                    } else {
+                        speed = (send + receive) / 300;
+                    }
+                    instance.logEvent("联通状态", "网速", speed);
+
+                    if (mScheduleCount != 12) {
+                        mProxyPayloadSentByteCount5Min = trafficMonitor.pProxyPayloadSentByteCount;
+                        mProxyPayloadReceivedByteCount5Min = trafficMonitor.pProxyPayloadReceivedByteCount;
+                    }
                 }
             }
 
