@@ -1,5 +1,7 @@
 package com.vm.shadowsocks.core;
 
+import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.vm.shadowsocks.tcpip.CommonMethods;
 
 import java.util.Locale;
@@ -22,7 +24,6 @@ public class HttpHostHeaderParser {
                     return getSNI(buffer, offset, count);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             LocalVpnService.Instance.writeLog("Error: parseHost:%s", e);
         }
         return null;

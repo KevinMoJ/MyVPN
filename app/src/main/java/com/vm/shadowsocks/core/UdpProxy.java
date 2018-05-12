@@ -77,7 +77,6 @@ public class UdpProxy implements Runnable {
                 try {
                     onUdpResponseReceived(ipHeader, udpHeader, packet);
                 } catch (Exception e) {
-                    e.printStackTrace();
                     LocalVpnService.Instance.writeLog("Error: Udp receive error: %s", e);
                 }
             }
@@ -154,7 +153,6 @@ public class UdpProxy implements Runnable {
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
                 LocalVpnService.Instance.writeLog("Error: udp send failed: %s", e);
             }
         }

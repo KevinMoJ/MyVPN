@@ -92,7 +92,6 @@ public class TcpProxyServer implements Runnable {
                                 onAccepted(key);
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
                             String operation = "null";
                             if (key.isReadable()) {
                                 System.out.println("read");
@@ -157,7 +156,6 @@ public class TcpProxyServer implements Runnable {
                 localTunnel.dispose();
             }
         } catch (Exception e) {
-            e.printStackTrace();
             if (remoteTunnel == null) {
                 LocalVpnService.Instance.writeLog("Error: remote socket create failed: %s", e);
             } else {

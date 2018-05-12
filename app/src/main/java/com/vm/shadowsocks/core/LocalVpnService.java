@@ -280,7 +280,6 @@ public class LocalVpnService extends VpnService implements Runnable {
         } catch (InterruptedException e) {
             writeLog("Error: Interrupt error: %s", e);
         } catch (Exception e) {
-            e.printStackTrace();
             writeLog("Error: Fatal error: %s", e);
         } finally {
             writeLog("App terminated.");
