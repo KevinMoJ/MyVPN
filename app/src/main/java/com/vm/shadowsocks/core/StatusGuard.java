@@ -238,7 +238,7 @@ public class StatusGuard implements Runnable{
 
             if (mProxyBadCountSequence > 2 && LocalVpnService.IsRunning) {
                 Log.d("[heart beat]", "switchProxy");
-                FindProxyService.switchProxy(this);
+                FindProxyService.switchProxy(mContext);
                 mProxyBadCountSequence = 0;
             }
 

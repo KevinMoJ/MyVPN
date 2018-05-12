@@ -66,6 +66,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     private volatile ScheduledExecutorService mScheduleExecutorService;
     private VpnNotification mNotification;
     private volatile UdpProxy mUdpProxy;
+    public long gDelay;
 
     public LocalVpnService() {
         ID++;
