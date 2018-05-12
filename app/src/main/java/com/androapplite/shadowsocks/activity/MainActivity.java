@@ -344,6 +344,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mFetchServerListProgressDialog.setOnDismissListener(null);
             showNoInternetSnackbar(R.string.fetch_server_list_failed, false);
             Firebase.getInstance(this).logEvent("VPN连不上", "取服务器列表超时");
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo != null) {
+                Firebase.getInstance(this).logEvent("VPN连不上", "网络", networkInfo.getTypeName());
+            } else {
+                Firebase.getInstance(this).logEvent("VPN连不上", "网络", "未知");
+            }
             if(mConnectFragment != null){
                 mConnectFragment.updateUI();
             }
@@ -489,6 +496,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }else {
                     Firebase.getInstance(this).logEvent("VPN连不上", "VPN连接超时");
                 }
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                if (networkInfo != null) {
+                    Firebase.getInstance(this).logEvent("VPN连不上", "网络", networkInfo.getTypeName());
+                } else {
+                    Firebase.getInstance(this).logEvent("VPN连不上", "网络", "未知");
+                }
                 if(mConnectFragment != null){
                     mConnectFragment.updateUI();
                 }
@@ -520,6 +534,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }else{
             boolean isValidation = ServerConfig.checkServerConfigJsonString(mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null));
             Firebase.getInstance(this).logEvent("VPN连不上", "没有可用的服务器", "服务器列表合法 " + isValidation);
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo != null) {
+                Firebase.getInstance(this).logEvent("VPN连不上", "网络", networkInfo.getTypeName());
+            } else {
+                Firebase.getInstance(this).logEvent("VPN连不上", "网络", "未知");
+            }
             mForgroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
             mErrorServers.clear();
             mForgroundHandler.sendEmptyMessage(MSG_NO_AVAILABE_VPN);
