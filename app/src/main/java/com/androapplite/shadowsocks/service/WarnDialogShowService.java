@@ -20,6 +20,9 @@ import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
+import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.bestgo.adsplugin.ads.AdType;
+import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
@@ -36,6 +39,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     private String countryCode;
 
     private long startTime;
+    private boolean isWifiConnected;
 
     public WarnDialogShowService() {
 
@@ -76,6 +80,8 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_space_minutes");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+        adAppHelper.setAdStateListener(new WarnDialogAdStateListener());
 
         //同一天一个弹窗最多弹两次 弹的次数可以云控控制   默认2小时冷却,间隔可以配置   23:00 - 9:00 的时间段禁止弹
         if (WarnDialogUtil.isAdLoaded(this) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser
@@ -158,6 +164,16 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         }
     }
 
+    private class WarnDialogAdStateListener extends AdStateListener {
+        @Override
+        public void onAdLoaded(AdType adType, int index) {
+            if (isWifiConnected && !LocalVpnService.IsRunning){
+                monitorWifiStateChangeDialog();
+                AdAppHelper.getInstance(WarnDialogShowService.this).removeAdStateListener(this);
+            }
+        }
+    }
+
     public static void start(Context context) {
         context.startService(new Intent(context, WarnDialogShowService.class));
     }
@@ -214,10 +230,12 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                         Log.i(TAG, "onReceive:   " + wifiInfo.getSSID());
                         //这个状态会执行两次，没有发现解决的好办法，为了只起一个界面延迟做一下跳转，在handler里面做removeMessages
                         mHandler.sendEmptyMessageDelayed(MSG_WIFI_CONNECTED, 2000);
+                        isWifiConnected = true;
                     }
 
                 } else if (state == NetworkInfo.State.DISCONNECTED) {
                     Log.i(TAG, "onReceive:   " + "disconnected");
+                    isWifiConnected = false;
                 }
             } else if (Intent.ACTION_TIME_TICK.equals(action)) {
                 // 15分钟执行一次检查
