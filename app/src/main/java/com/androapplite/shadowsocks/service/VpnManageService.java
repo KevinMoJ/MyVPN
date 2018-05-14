@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -197,6 +199,13 @@ public class VpnManageService extends Service implements Runnable,
                     fetchRemoteConfig();
                 }
                 firebase.logEvent("VPN计时", "开始", server);
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+                if (networkInfo != null) {
+                    firebase.logEvent("VPN开始", "网络", networkInfo.getTypeName());
+                } else {
+                    firebase.logEvent("VPN开始", "网络", "未知");
+                }
             } else {
                 unregisterScreenActionReceiver();
                 registerTimeTickReceiver();

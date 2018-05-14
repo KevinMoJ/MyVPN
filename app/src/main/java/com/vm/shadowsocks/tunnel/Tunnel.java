@@ -2,6 +2,7 @@ package com.vm.shadowsocks.tunnel;
 
 import android.annotation.SuppressLint;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.ProxyConfig;
 
@@ -143,8 +144,8 @@ public abstract class Tunnel {
                 this.dispose();//连接已关闭，释放资源。
             }
         } catch (Exception e) {
-            this.dispose();
             LocalVpnService.Instance.writeLog("Error: read buffer %s failed: %s", m_ServerEP, e);
+            this.dispose();
         }
     }
 
@@ -160,6 +161,7 @@ public abstract class Tunnel {
                 }
             }
         } catch (Exception e) {
+            LocalVpnService.Instance.writeLog("Error: write buffer %s failed: %s", m_ServerEP, e);
             this.dispose();
         }
     }

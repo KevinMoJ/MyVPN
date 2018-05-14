@@ -267,4 +267,37 @@ public class ServerConfig implements Parcelable{
         }
         return null;
     }
+
+
+    public static String encodeServerList(ArrayList<ServerConfig> configs) {
+        ArrayList<String> cities = new ArrayList<>(configs.size());
+        ArrayList<String> ips = new ArrayList<>(configs.size());
+        ArrayList<Integer> signals = new ArrayList<>(configs.size());
+        ArrayList<Integer> ports = new ArrayList<>(configs.size());
+        for (ServerConfig config : configs) {
+            cities.add(config.name);
+            ips.add(config.server);
+            signals.add(config.signal);
+            ports.add(config.port);
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{")
+                .append("\"city\":").append(toJSONArrayString(cities)).append(",")
+                .append("\"ip\":").append(toJSONArrayString(ips)).append(",")
+                .append("\"signal\":").append(toJSONArrayString(signals)).append(",")
+                .append("\"port\":").append(toJSONArrayString(ports))
+                .append("}");
+        return sb.toString();
+    }
+
+    private static <T> StringBuilder toJSONArrayString(ArrayList<T> arrays) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (T v: arrays) {
+            sb.append("\"").append(v).append("\"").append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        return sb;
+    }
 }

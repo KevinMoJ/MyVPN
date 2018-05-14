@@ -66,6 +66,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     private volatile ScheduledExecutorService mScheduleExecutorService;
     private VpnNotification mNotification;
     private volatile UdpProxy mUdpProxy;
+    public long gDelay;
 
     public LocalVpnService() {
         ID++;
@@ -129,6 +130,13 @@ public class LocalVpnService extends VpnService implements Runnable {
         final String logString = String.format(format, args);
         if (ProxyConfig.IS_DEBUG) {
             System.out.println(logString);
+        }
+        for (Object o : args) {
+            if (o instanceof Throwable && IsRunning) {
+                Throwable throwable = (Throwable) o;
+                ShadowsocksApplication.handleException(throwable);
+                Firebase.getInstance(Instance).logEvent("Error", throwable.getMessage());
+            }
         }
         if (mStatusGuard != null) {
             Map<String, Integer> errors = mStatusGuard.getErrors();
@@ -279,7 +287,6 @@ public class LocalVpnService extends VpnService implements Runnable {
         } catch (InterruptedException e) {
             writeLog("Error: Interrupt error: %s", e);
         } catch (Exception e) {
-            e.printStackTrace();
             writeLog("Error: Fatal error: %s", e);
         } finally {
             writeLog("App terminated.");

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.content.res.TypedArray;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -24,6 +25,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -73,7 +76,6 @@ public class ServerListFetcherService extends IntentService{
 
     }
 
-    private static final int DELAY_MILLI = 500;
     private static final int TIMEOUT_MILLI = 3000;
 
     private String mServerListJsonString;
@@ -96,14 +98,12 @@ public class ServerListFetcherService extends IntentService{
                     .writeTimeout(TIMEOUT_MILLI, TimeUnit.MILLISECONDS)
                     .cache(cache)
                     .addInterceptor(new UnzippingInterceptor());
-            if(BuildConfig.DEBUG){
+            if (BuildConfig.DEBUG){
                 builder.addInterceptor(new LoggingInterceptor());
             }
             mHttpClient = builder.build();
 
 //            useCustomURL();
-            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            ExecutorCompletionService<Pair<String, String>> ecs = new ExecutorCompletionService<>(executorService);
 
             Firebase firebase = Firebase.getInstance(this);
             ArrayList<MyCallable> tasks = new ArrayList<>(DOMAIN_URLS.size());
@@ -111,24 +111,30 @@ public class ServerListFetcherService extends IntentService{
                 tasks.add(new MyCallable(url, firebase, mHttpClient));
             }
 
+            int min = Math.min(Runtime.getRuntime().availableProcessors(), DOMAIN_URLS.size());
+            ExecutorService executorService = Executors.newFixedThreadPool(min);
+            ExecutorCompletionService<Pair<String, String>> ecs = new ExecutorCompletionService<>(executorService);
             long t1 = System.currentTimeMillis();
             for (MyCallable callable: tasks) {
                 ecs.submit(callable);
             }
 
-            for (int i = 0; i < tasks.size(); i++) {
+            for (int i = 0; i < 3 * TIMEOUT_MILLI / 100; i++) {
                 try {
-                    Future<Pair<String, String>> future = ecs.take();
-                    Pair<String, String> result= future.get(3 * TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
-                    if (result != null && result.second != null) {
-                        mUrl = result.first;
-                        mServerListJsonString = result.second;
-                        break;
+                    Future<Pair<String, String>> future = ecs.poll(100, TimeUnit.MILLISECONDS);
+                    if (future != null) {
+                        Pair<String, String> result = future.get();
+                        if (result != null) {
+                            mUrl = result.first;
+                            mServerListJsonString = result.second;
+                            break;
+                        }
                     }
                 } catch (Exception e) {
                     ShadowsocksApplication.handleException(e);
                 }
             }
+            executorService.shutdown();
             Log.d("FetchSeverList", "动态列表总时间：" + (System.currentTimeMillis() - t1));
 
             //获取远程静态服务器列表
@@ -138,24 +144,31 @@ public class ServerListFetcherService extends IntentService{
                     tasks.add(new MyCallable(url, firebase, mHttpClient));
                 }
 
+                min = Math.min(Runtime.getRuntime().availableProcessors(), STATIC_HOST_URLS.size());
+                executorService = Executors.newFixedThreadPool(min);
+                ecs = new ExecutorCompletionService<>(executorService);
+
                 t1 = System.currentTimeMillis();
                 for (MyCallable callable: tasks) {
                     ecs.submit(callable);
                 }
 
-                for (int i = 0; i < tasks.size(); i++) {
+                for (int i = 0; i < 3 * TIMEOUT_MILLI / 100; i++) {
                     try {
-                        Future<Pair<String, String>> future = ecs.take();
-                        Pair<String, String> result= future.get(3 * TIMEOUT_MILLI, TimeUnit.MILLISECONDS);
-                        if (result != null && result.second != null) {
-                            mUrl = result.first;
-                            mServerListJsonString = result.second;
-                            break;
+                        Future<Pair<String, String>> future = ecs.poll(100, TimeUnit.MILLISECONDS);
+                        if (future != null) {
+                            Pair<String, String> result = future.get();
+                            if (result != null) {
+                                mUrl = result.first;
+                                mServerListJsonString = result.second;
+                                break;
+                            }
                         }
                     } catch (Exception e) {
                         ShadowsocksApplication.handleException(e);
                     }
                 }
+                executorService.shutdown();
                 Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
             }
 
@@ -172,7 +185,7 @@ public class ServerListFetcherService extends IntentService{
             }
 
             //使用remote config
-            if(mServerListJsonString == null){
+            if (mServerListJsonString == null){
                 mServerListJsonString = ServerConfig.shuffleRemoteConfig();
                 if(mServerListJsonString != null) {
                     urlKey = "remote_config";
@@ -189,7 +202,7 @@ public class ServerListFetcherService extends IntentService{
             }
 
             //使用本地静态服务器列表
-            if(mServerListJsonString == null){
+            if (mServerListJsonString == null){
                 AssetManager assetManager = getAssets();
                 try {
                     InputStream inputStream = assetManager.open("fsl.json");
@@ -206,7 +219,50 @@ public class ServerListFetcherService extends IntentService{
                 }
             }
 
-            if(mServerListJsonString != null) {
+//            if (mServerListJsonString != null) {
+//                ArrayList<ServerConfig> configs = ServerConfig.createServerList(this, mServerListJsonString);
+//                configs.remove(0);
+//                min = Math.min(Runtime.getRuntime().availableProcessors(), tasks.size());
+//                executorService = Executors.newFixedThreadPool(min);
+//                ExecutorCompletionService<ServerConfig> ecs2 = new ExecutorCompletionService<>(executorService);
+//
+//                ArrayList<TestServerCallable> serverConfigTasks = new ArrayList<>();
+//                for (ServerConfig config : configs) {
+//                    serverConfigTasks.add(new TestServerCallable(config));
+//                }
+//
+//                for (TestServerCallable callable : serverConfigTasks) {
+//                    ecs2.submit(callable);
+//                }
+//
+//                ArrayList<ServerConfig> availableConfigs = new ArrayList<>(configs.size());
+//                int error = 0;
+//                for (int i = 0; i < 30 * 1000 / 100; i++) {
+//                    try {
+//                        Future<ServerConfig> future = ecs2.poll(100, TimeUnit.MILLISECONDS);
+//                        if (future != null) {
+//                            ServerConfig config = future.get();
+//                            if (config != null) {
+//                                availableConfigs.add(config);
+//                            }
+//                        }
+//                    } catch (Exception e) {
+//                        error++;
+//                        ShadowsocksApplication.handleException(e);
+//                    }
+//                    if (availableConfigs.size() + error >= configs.size()) {
+//                        break;
+//                    }
+//                }
+//                executorService.shutdown();
+//                if (availableConfigs.isEmpty()) {
+//                    mServerListJsonString = null;
+//                } else {
+//                    mServerListJsonString = ServerConfig.encodeServerList(availableConfigs);
+//                }
+//            }
+
+            if (mServerListJsonString != null) {
                 SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
                 editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).apply();
             }else{
@@ -348,6 +404,46 @@ public class ServerListFetcherService extends IntentService{
                     .headers(strippedHeaders)
                     .body(new RealResponseBody(strippedHeaders, Okio.buffer(responseBody)))
                     .build();
+        }
+    }
+
+
+    private static class TestServerCallable implements Callable<ServerConfig> {
+        private ServerConfig mConfig;
+
+        TestServerCallable(ServerConfig config) {
+            mConfig = config;
+        }
+
+        @Override
+        public ServerConfig call() throws Exception {
+            return testServerIp(mConfig);
+        }
+
+        private ServerConfig testServerIp(ServerConfig config) throws Exception{
+            if (ping(config.server)) {
+                return config;
+            }
+            return null;
+        }
+
+        private boolean ping(String ipAddress){
+            boolean status = false;
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(String.format("http://%s/ping.html", ipAddress)).openConnection();
+                connection.setConnectTimeout(1000 * 5);
+                connection.setReadTimeout(1000 * 5);
+                status = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+            } catch (Exception e) {
+                //todo 上报错误
+                ShadowsocksApplication.handleException(e);
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+            return status;
         }
     }
 }

@@ -2,6 +2,7 @@ package com.vm.shadowsocks.core;
 
 import android.util.SparseArray;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.vm.shadowsocks.dns.DnsPacket;
 import com.vm.shadowsocks.dns.Question;
 import com.vm.shadowsocks.dns.Resource;
@@ -88,12 +89,11 @@ public class DnsProxy implements Runnable {
                         OnDnsResponseReceived(ipHeader, udpHeader, dnsPacket);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     LocalVpnService.Instance.writeLog("Error: Parse dns error: %s", e);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LocalVpnService.Instance.writeLog("Error: Dns: %s", e);
         } finally {
             System.out.println("DnsResolver Thread Exited.");
             this.stop();
@@ -301,7 +301,7 @@ public class DnsProxy implements Runnable {
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            ShadowsocksApplication.handleException(e);
             LocalVpnService.Instance.writeLog("Error: dns send failed: %s", e);
         }
     }

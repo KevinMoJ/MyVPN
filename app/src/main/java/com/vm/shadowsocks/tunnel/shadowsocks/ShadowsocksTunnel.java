@@ -1,5 +1,6 @@
 package com.vm.shadowsocks.tunnel.shadowsocks;
 
+import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.tunnel.Tunnel;
 
 import java.nio.ByteBuffer;
@@ -10,6 +11,7 @@ public class ShadowsocksTunnel extends Tunnel {
     private ICrypt m_Encryptor;
     private ShadowsocksConfig m_Config;
     private boolean m_TunnelEstablished;
+    private long mRead;
 
     public ShadowsocksTunnel(ShadowsocksConfig config, Selector selector) throws Exception {
         super(config.ServerAddress, selector);
@@ -62,6 +64,9 @@ public class ShadowsocksTunnel extends Tunnel {
         buffer.clear();
         buffer.put(newbytes);
         buffer.flip();
+        if (mRead == 0) {
+            mRead = System.currentTimeMillis();
+        }
     }
 
     @Override
@@ -73,6 +78,10 @@ public class ShadowsocksTunnel extends Tunnel {
         buffer.clear();
         buffer.put(newbytes);
         buffer.flip();
+        if (mRead > 0) {
+            LocalVpnService.Instance.gDelay = System.currentTimeMillis() - mRead;
+            mRead = 0;
+        }
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.androapplite.shadowsocks.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
@@ -23,10 +25,12 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.lang.ref.WeakReference;
 
-public class WarnDialogActivity extends AppCompatActivity implements View.OnClickListener {
+public class WarnDialogActivity extends AppCompatActivity implements View.OnClickListener, Handler.Callback {
     private static final String TAG = "WarnDialogActivity";
 
     public static final String SHOW_DIALOG_TYPE = "dialog_type";
+
+    private static final int MSG_DELAY_SHOW_INTERSTITIAL_AD = 100;
 
     public static final int CONNECT_PUBLIC_WIFI_DIALOG = 1001;
     public static final int DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG = 1002;
@@ -44,6 +48,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
 
     private AdAppHelper mAdAppHelper;
     private BottomAdStateListener mAdStateListener;
+    private Handler mHandler;
     private boolean isFullAdShow;
 
     private int type;
@@ -62,6 +67,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     private void initDate() {
         type = getIntent().getIntExtra(SHOW_DIALOG_TYPE, UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
         mAdAppHelper = AdAppHelper.getInstance(this);
+        mHandler = new Handler(this);
     }
 
 
@@ -104,7 +110,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
         }
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_ad_show")) {
             if (mAdAppHelper.isFullAdLoaded()) {
-                mAdAppHelper.showFullAd();
+//                mAdAppHelper.showFullAd();
+                mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INTERSTITIAL_AD, 1500);
                 Firebase.getInstance(this).logEvent("大弹窗", "广告", "全屏加载");
                 isFullAdShow = true;
             } else if (mAdAppHelper.isNativeLoaded()) {
@@ -144,7 +151,6 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
         Firebase firebase = Firebase.getInstance(this);
         switch (v.getId()) {
             case R.id.warn_dialog_close:
-                finish();
                 firebase.logEvent("大弹窗", "取消");
                 break;
             case R.id.warn_dialog_btn:
@@ -162,12 +168,10 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                         NetworkAccelerationActivity.start(this, true);
                         firebase.logEvent("大弹窗", "进入APP");
                     }
-                } else {
-                    finish();
                 }
                 break;
-
         }
+        finish();
     }
 
     private void addBottomAd() {
@@ -197,6 +201,16 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     public void onBackPressed() {
         if (!FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use"))
             super.onBackPressed();
+    }
+
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_DELAY_SHOW_INTERSTITIAL_AD:
+                mAdAppHelper.showFullAd();
+                break;
+        }
+        return true;
     }
 
     private class BottomAdStateListener extends AdStateListener {

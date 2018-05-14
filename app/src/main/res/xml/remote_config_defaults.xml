@@ -87,7 +87,7 @@
     <!--WarnDialog弹窗广告显示控制-->
     <entry>
         <key>is_warn_dialog_ad_show</key>
-        <value>false</value>
+        <value>true</value>
     </entry>
 
     <!--网速不好弹窗的上传速度控制-->
