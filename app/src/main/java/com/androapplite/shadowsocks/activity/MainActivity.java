@@ -962,6 +962,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                 adAppHelper.showFullAd();
                 mVpnState = VpnState.Connected;
+                mSharedPreference.edit().putLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, System.currentTimeMillis()).apply();
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mVpnState = VpnState.Stopped;

@@ -12,6 +12,12 @@
         <value>2</value>
     </entry>
 
+    <!--wifi链接没使用我们app的弹窗弹出后第二次弹窗的时间间隔控制-->
+    <entry>
+        <key>wifi_dialog_show_space_minutes</key>
+        <value>120</value>
+    </entry>
+
     <!--网速低于一定值的时候弹窗显示控制-->
     <entry>
         <key>is_net_speed_low_dialog_show</key>
@@ -22,6 +28,18 @@
     <entry>
         <key>net_speed_low_dialog_show_count</key>
         <value>1</value>
+    </entry>
+
+    <!--网速低于一定值的时候弹窗弹出后第二次弹窗的时间间隔控制-->
+    <entry>
+        <key>net_speed_low_dialog_space_minutes</key>
+        <value>120</value>
+    </entry>
+
+    <!--网速低于一定值的时候第一次弹窗开始弹的时间间隔-->
+    <entry>
+        <key>net_speed_low_dialog_first_show_space_minutes</key>
+        <value>120</value>
     </entry>
 
     <!--发达国家不活跃用户6点以后弹窗显示控制-->
@@ -36,10 +54,28 @@
         <value>1</value>
     </entry>
 
+    <!--发达国家不活跃用户6点以后弹窗弹出后第二次弹窗的时间间隔控制-->
+    <entry>
+        <key>developed_country_inactive_user_dialog_space_minutes</key>
+        <value>120</value>
+    </entry>
+
     <!--非发达国家不活跃用户弹窗显示控制-->
     <entry>
         <key>is_undeveloped_country_inactive_user_dialog_show</key>
         <value>true</value>
+    </entry>
+
+    <!--非发达国家不活跃用户弹窗次数控制-->
+    <entry>
+        <key>undeveloped_country_inactive_user_dialog_show_count</key>
+        <value>1</value>
+    </entry>
+
+    <!--非发达国家不活跃用户弹窗弹出后第二次弹窗的时间间隔控制-->
+    <entry>
+        <key>is_undeveloped_country_inactive_user_dialog_space_minutes</key>
+        <value>120</value>
     </entry>
 
     <!--WarnDialog弹窗误点和back键屏蔽控制-->
@@ -52,12 +88,6 @@
     <entry>
         <key>is_warn_dialog_ad_show</key>
         <value>false</value>
-    </entry>
-
-    <!--非发达国家不活跃用户弹窗次数控制-->
-    <entry>
-        <key>undeveloped_country_inactive_user_dialog_show_count</key>
-        <value>1</value>
     </entry>
 
     <!--网速不好弹窗的上传速度控制-->
