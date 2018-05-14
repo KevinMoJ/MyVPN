@@ -17,9 +17,12 @@ public class WarnDialogUtil {
 
     public static boolean isAdLoaded(Context context) {
         AdAppHelper adAppHelper = AdAppHelper.getInstance(context);
-        boolean cloudAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_ad_show");
-        if (cloudAdShow)
-            return adAppHelper.isFullAdLoaded() || adAppHelper.isNativeLoaded();
+        boolean cloudNativeAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show");
+        boolean cloudFullAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show");
+        if (cloudNativeAdShow)
+            return adAppHelper.isNativeLoaded();
+        else if (cloudFullAdShow)
+            return adAppHelper.isFullAdLoaded();
         else
             return true;
     }

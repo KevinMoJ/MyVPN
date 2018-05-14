@@ -3,7 +3,7 @@
     <!--wifi链接没使用我们app的弹窗显示控制-->
     <entry>
         <key>is_wifi_dialog_show</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
 
     <!--wifi链接没使用我们app的弹窗次数控制-->
@@ -21,7 +21,7 @@
     <!--网速低于一定值的时候弹窗显示控制-->
     <entry>
         <key>is_net_speed_low_dialog_show</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
 
     <!--网速低于一定值的时候弹窗次数控制-->
@@ -45,7 +45,7 @@
     <!--发达国家不活跃用户6点以后弹窗显示控制-->
     <entry>
         <key>is_developed_country_inactive_user_dialog_show</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
 
     <!--发达国家不活跃用户6点以后弹窗次数控制-->
@@ -63,7 +63,7 @@
     <!--非发达国家不活跃用户弹窗显示控制-->
     <entry>
         <key>is_undeveloped_country_inactive_user_dialog_show</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
 
     <!--非发达国家不活跃用户弹窗次数控制-->
@@ -84,10 +84,16 @@
         <value>false</value>
     </entry>
 
-    <!--WarnDialog弹窗广告显示控制-->
+    <!--WarnDialog弹窗native广告显示控制-->
     <entry>
-        <key>is_warn_dialog_ad_show</key>
-        <value>true</value>
+        <key>is_warn_dialog_native_ad_show</key>
+        <value>false</value>
+    </entry>
+
+    <!--WarnDialog弹窗全屏广告显示控制-->
+    <entry>
+        <key>is_warn_dialog_full_ad_show</key>
+        <value>false</value>
     </entry>
 
     <!--网速不好弹窗的上传速度控制-->
