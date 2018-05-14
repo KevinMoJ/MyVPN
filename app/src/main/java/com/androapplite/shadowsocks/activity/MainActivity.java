@@ -271,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
                 firebase.logEvent("选择国家", nation);
             }
+            if (mSharedPreference != null)
+                mSharedPreference.edit().putLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, System.currentTimeMillis()).apply();
             PromotionTracking.getInstance(this).reportClickConnectButtonCount();
         } else {
             mDisconnectFragment = new DisconnectFragment();
@@ -983,7 +985,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                 adAppHelper.showFullAd();
                 mVpnState = VpnState.Connected;
-                mSharedPreference.edit().putLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, System.currentTimeMillis()).apply();
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mVpnState = VpnState.Stopped;
