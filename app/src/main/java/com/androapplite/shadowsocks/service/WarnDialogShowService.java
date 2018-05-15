@@ -36,6 +36,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     private Handler mHandler;
     private SharedPreferences mSharedPreference;
     private WarnDialogReceiver mWarnDialogReceiver;
+    private WarnDialogAdStateListener mAdStateListener;
     private String countryCode;
 
     private long startTime;
@@ -80,13 +81,14 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_space_minutes");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
-        if (!WarnDialogUtil.isAdLoaded(this)) {
-            AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-            adAppHelper.setAdStateListener(new WarnDialogAdStateListener());
-        }
+        if (mAdStateListener == null)
+            mAdStateListener = new WarnDialogAdStateListener();
+
+        if (!WarnDialogUtil.isAdLoaded(this, true))
+            AdAppHelper.getInstance(this).setAdStateListener(mAdStateListener);
 
         //同一天一个弹窗最多弹两次 弹的次数可以云控控制   默认2小时冷却,间隔可以配置   23:00 - 9:00 的时间段禁止弹
-        if (WarnDialogUtil.isAdLoaded(this) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser
+        if (WarnDialogUtil.isAdLoaded(this, true) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser
                 && hour_of_day > 9 && hour_of_day < 23) {
             //新用户第一次没有数据的时候弹窗
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
@@ -117,7 +119,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
 
         //默认2小时冷却,间隔可以配置,并且判断为不活跃用户 显示时间为当地6:00 - 23:00
-        if (WarnDialogUtil.isAdLoaded(this) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime)
+        if (WarnDialogUtil.isAdLoaded(this, false) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime)
                 && isInactiveUser && hour_of_day >= 18 && hour_of_day <= 23) {
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
@@ -147,7 +149,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
 
         //默认2小时冷却,间隔可以配置,并且判断为不活跃用户 显示时间为当地6:00 - 23:00
-        if (WarnDialogUtil.isAdLoaded(this) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser && hour_of_day >= 18 && hour_of_day <= 23) {
+        if (WarnDialogUtil.isAdLoaded(this, false) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser && hour_of_day >= 18 && hour_of_day <= 23) {
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
                 mSharedPreference.edit().putLong(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
@@ -171,7 +173,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         public void onAdLoaded(AdType adType, int index) {
             if (isWifiConnected && !LocalVpnService.IsRunning) {
                 monitorWifiStateChangeDialog();
-                AdAppHelper.getInstance(WarnDialogShowService.this).removeAdStateListener(this);
+                AdAppHelper.getInstance(WarnDialogShowService.this).removeAdStateListener(mAdStateListener);
             }
         }
     }
@@ -232,6 +234,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                         Log.i(TAG, "onReceive:   " + wifiInfo.getSSID());
                         //这个状态会执行两次，没有发现解决的好办法，为了只起一个界面延迟做一下跳转，在handler里面做removeMessages
                         mHandler.sendEmptyMessageDelayed(MSG_WIFI_CONNECTED, 2000);
+                        AdAppHelper.getInstance(WarnDialogShowService.this).loadNewNative();
                         isWifiConnected = true;
                     }
 

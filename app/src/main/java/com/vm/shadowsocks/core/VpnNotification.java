@@ -128,7 +128,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         long vpnStartTime = sharedPreferences.getLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, 0);
 
-        if (WarnDialogUtil.isAdLoaded(ShadowsocksApplication.getGlobalContext()) && hour_of_day > 9 && hour_of_day < 23
+        if (WarnDialogUtil.isAdLoaded(ShadowsocksApplication.getGlobalContext(), false) && hour_of_day > 9 && hour_of_day < 23
                 && System.currentTimeMillis() - vpnStartTime >= TimeUnit.MINUTES.toMillis(firstShowSpaceTime)
                 && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime)
                 && (receivedSpeed <= cloudDownload || sendSpeed <= cloudUpload)) {

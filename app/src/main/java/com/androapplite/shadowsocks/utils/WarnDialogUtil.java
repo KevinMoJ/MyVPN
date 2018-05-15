@@ -15,15 +15,32 @@ import java.util.concurrent.TimeUnit;
 
 public class WarnDialogUtil {
 
-    public static boolean isAdLoaded(Context context) {
+    public static boolean isAdLoaded(Context context, boolean isLoadAd) {
         AdAppHelper adAppHelper = AdAppHelper.getInstance(context);
         boolean cloudNativeAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show");
         boolean cloudFullAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show");
-        if (cloudNativeAdShow)
-            return adAppHelper.isNativeLoaded();
-        else if (cloudFullAdShow)
-            return adAppHelper.isFullAdLoaded();
-        else
+        if (cloudNativeAdShow) {
+            if (isLoadAd) {
+                if (adAppHelper.isNativeLoaded())
+                    return true;
+                else {
+                    adAppHelper.loadNewNative();
+                    return false;
+                }
+            } else
+                return adAppHelper.isNativeLoaded();
+
+        } else if (cloudFullAdShow) {
+            if (isLoadAd) {
+                if (adAppHelper.isFullAdLoaded())
+                    return true;
+                else {
+                    adAppHelper.loadNewInterstitial();
+                    return false;
+                }
+            } else
+                return adAppHelper.isFullAdLoaded();
+        } else
             return true;
     }
 
