@@ -80,8 +80,10 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_space_minutes");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        adAppHelper.setAdStateListener(new WarnDialogAdStateListener());
+        if (!WarnDialogUtil.isAdLoaded(this)) {
+            AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+            adAppHelper.setAdStateListener(new WarnDialogAdStateListener());
+        }
 
         //同一天一个弹窗最多弹两次 弹的次数可以云控控制   默认2小时冷却,间隔可以配置   23:00 - 9:00 的时间段禁止弹
         if (WarnDialogUtil.isAdLoaded(this) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser
@@ -167,7 +169,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     private class WarnDialogAdStateListener extends AdStateListener {
         @Override
         public void onAdLoaded(AdType adType, int index) {
-            if (isWifiConnected && !LocalVpnService.IsRunning){
+            if (isWifiConnected && !LocalVpnService.IsRunning) {
                 monitorWifiStateChangeDialog();
                 AdAppHelper.getInstance(WarnDialogShowService.this).removeAdStateListener(this);
             }
@@ -241,11 +243,13 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 // 15分钟执行一次检查
                 if (System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(15)) {
                     if (FirebaseRemoteConfig.getInstance().getBoolean("is_developed_country_inactive_user_dialog_show")
-                            && (countryCode.equals("US") || countryCode.equals("DE") || countryCode.equals("GB") || countryCode.equals("AU"))) {
+                            && (countryCode.equals("US") || countryCode.equals("DE") || countryCode.equals("GB") || countryCode.equals("AU"))
+                            && !LocalVpnService.IsRunning) {
                         //云控控制开关并且针对发达国家（美国，德国，澳大利亚，英国）
                         monitorDevelopedCountryInactiveUserDialog();
                     } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_undeveloped_country_inactive_user_dialog_show")
-                            && !countryCode.equals("US") && !countryCode.equals("DE") && !countryCode.equals("GB") && !countryCode.equals("AU")) {
+                            && !countryCode.equals("US") && !countryCode.equals("DE") && !countryCode.equals("GB") && !countryCode.equals("AU")
+                            && !LocalVpnService.IsRunning) {
                         //针对不发达国家不活跃用户进行的弹窗
                         monitorUndevelopedCountryInactiveUserDialog();
                     }
