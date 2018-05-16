@@ -87,4 +87,18 @@
     <string name="acceleration_completed_1">"Aceleração concluída"</string>
     <string name="acceleration_completed_2a">"Sua velocidade de rede e um passo mais rápido!"</string>
 
+    <string name="timeout_dialog_title">"Conecte o tempo limite"</string>
+    <string name="timeout_dialog_message">"Conectar o tempo limite Possivelmente, o sinal da rede não está bom ou sua operadora de rede interrompeu essa visita. Você pode tentar novamente quando o sinal da rede estiver bom ou tentar conectar outros servidores."</string>
+    <string name="timeout_dialog_change_server">"MUDAR SERVIDOR VPN"</string>
+    <string name="timeout_dialog_connect_again">"CONECTE-SE DE NOVO"</string>
+    <string name="timeout_dialog_cancel">"CANCELAR"</string>
+
+    <string name="updating_please_try_it_later">"Atualizando, por favor tente mais tarde"</string>
+    <string name="building_tls">"Construindo o TLS ..."</string>
+    <string name="waiting_server_reply">"Aguardando resposta do servidor ..."</string>
+    <string name="requesting_connecting_configure">"Solicitando conexão configure ..."</string>
+    <string name="verifying">"Verificando ..."</string>
+    <string name="taking_a_coffee_break">"Tomando um café ..."</string>
+    <string name="building_configuration">"Configuração de construção ..."</string>
+
 </resources>

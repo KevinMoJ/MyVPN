@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Fremskynde umiddelbart</string>
     <string name="acceleration_completed_1">"Accelerasjon fullført"</string>
     <string name="acceleration_completed_2a">"Nettverkshastigheten din og ett trinn raskere!"</string>
+
+    <string name="timeout_dialog_title">"Koble timeout"</string>
+    <string name="timeout_dialog_message">"Koble timeout Muligvis nettverkssignal ikke bra, eller nettverksoperatøren stoppet dette besøket. Du kan prøve igjen når nettverkssignalet er bra, eller prøv å koble til andre servere."</string>
+    <string name="timeout_dialog_change_server">"ENDRE VPN SERVER"</string>
+    <string name="timeout_dialog_connect_again">"KOBLE IGJEN"</string>
+    <string name="timeout_dialog_cancel">"AVBRYT"</string>
+
+    <string name="updating_please_try_it_later">"Oppdaterer, prøv det senere"</string>
+    <string name="building_tls">"Bygger TLS ..."</string>
+    <string name="waiting_server_reply">"Ventereserversvar ..."</string>
+    <string name="requesting_connecting_configure">"Be om tilkobling konfigurer ..."</string>
+    <string name="verifying">"Bekrefter ..."</string>
+    <string name="taking_a_coffee_break">"Tar en kaffepause ..."</string>
+    <string name="building_configuration">"Bygg konfigurasjon ..."</string>
 </resources>

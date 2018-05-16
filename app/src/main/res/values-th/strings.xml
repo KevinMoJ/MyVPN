@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">เร่งให้ทัน</string>
     <string name="acceleration_completed_1">"เร่งเสร็จแล้ว"</string>
     <string name="acceleration_completed_2a">"ความเร็วเครือข่ายของคุณและขั้นตอนเดียวเร็วกว่า!"</string>
+
+    <string name="timeout_dialog_title">"เชื่อมต่อหมดเวลา"</string>
+    <string name="timeout_dialog_message">"เชื่อมต่อหมดเวลาอาจเป็นสัญญาณเครือข่ายที่ไม่ดีหรือผู้ให้บริการเครือข่ายของคุณหยุดการเข้าชมครั้งนี้คุณสามารถลองอีกครั้งเมื่อสัญญาณเครือข่ายดีหรือลองเชื่อมต่อกับเซิร์ฟเวอร์อื่น"</string>
+    <string name="timeout_dialog_change_server">"เปลี่ยนเซิร์ฟเวอร์ VPN"</string>
+    <string name="timeout_dialog_connect_again">"เชื่อมต่ออีกครั้ง"</string>
+    <string name="timeout_dialog_cancel">"ยกเลิก"</string>
+
+    <string name="updating_please_try_it_later">"กำลังอัปเดตโปรดลองใช้ภายหลัง"</string>
+    <string name="building_tls">"Building TLS ..."</string>
+    <string name="waiting_server_reply">"กำลังรอการตอบกลับจากเซิร์ฟเวอร์ ..."</string>
+    <string name="requesting_connecting_configure">"กำลังขอตั้งค่าการเชื่อมต่อ ..."</string>
+    <string name="verifying">"การตรวจสอบ ..."</string>
+    <string name="taking_a_coffee_break">"กำลังแบ่งกาแฟ ..."</string>
+    <string name="building_configuration">"การกำหนดค่าอาคาร ..."</string>
 </resources>

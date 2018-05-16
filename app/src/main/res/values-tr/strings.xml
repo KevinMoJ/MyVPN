@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Hemen hızlandırın</string>
     <string name="acceleration_completed_1">"Hızlanma tamamlandı"</string>
     <string name="acceleration_completed_2a">"Ağ hızınız ve bir adım daha hızlı!"</string>
+
+    <string name="timeout_dialog_title">"Bağlantı zaman aşımı"</string>
+    <string name="timeout_dialog_message">"Zaman aşımına bağlanma Muhtemelen ağ sinyali iyi değil veya şebeke operatörünüz bu ziyareti durdurdu. Ağ sinyali iyi olduğunda tekrar deneyebilir veya diğer sunucuları bağlamayı deneyebilirsiniz."</string>
+    <string name="timeout_dialog_change_server">"VPN SERVER DEĞİŞTİR"</string>
+    <string name="timeout_dialog_connect_again">"TEKRAR BAĞLAYIN"</string>
+    <string name="timeout_dialog_cancel">"İPTAL ETMEK"</string>
+
+    <string name="updating_please_try_it_later">"Güncelleniyor, lütfen daha sonra deneyin"</string>
+    <string name="building_tls">"TLS oluşturma ..."</string>
+    <string name="waiting_server_reply">"Sunucu yanıtı bekleniyor ..."</string>
+    <string name="requesting_connecting_configure">"Bağlantı isteğinde bulunuluyor ..."</string>
+    <string name="verifying">"Doğrulanıyor ..."</string>
+    <string name="taking_a_coffee_break">"Bir kahve molası ..."</string>
+    <string name="building_configuration">"Yapılandırma ..."</string>
 </resources>

@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">অবিলম্বে ত্বরান্বিত</string>
     <string name="acceleration_completed_1">"এক্সিলারেশন সম্পন্ন হয়েছে"</string>
     <string name="acceleration_completed_2a">"আপনার নেটওয়ার্ক গতি এবং এক ধাপ দ্রুত!"</string>
+
+    <string name="timeout_dialog_title">"সময়সীমা সংযুক্ত করুন"</string>
+    <string name="timeout_dialog_message">"সময়সীমা সংযুক্ত করুন সম্ভবত নেটওয়ার্ক সংকেত ভাল নয়, অথবা আপনার নেটওয়ার্ক অপারেটর এই দর্শনটি বন্ধ করেছেন। আপনি যখন নেটওয়ার্ক সংকেতটি ভাল মনে করেন তখন আবার চেষ্টা করতে পারেন, অথবা অন্যান্য সার্ভারগুলিকে সংযুক্ত করার চেষ্টা করুন।"</string>
+    <string name="timeout_dialog_change_server">"পরিবর্তন ভিপিএন সার্ভার"</string>
+    <string name="timeout_dialog_connect_again">"আবার যোগাযোগ করুন"</string>
+    <string name="timeout_dialog_cancel">"বাতিল"</string>
+
+    <string name="updating_please_try_it_later">"আপডেট হচ্ছে, দয়া করে পরে চেষ্টা করুন"</string>
+    <string name="building_tls">"বিল্ডিং টিএলএসএস ..."</string>
+    <string name="waiting_server_reply">"সার্ভারের উত্তর অপেক্ষা করছে ..."</string>
+    <string name="requesting_connecting_configure">"সংযোগ কনফিগার করার অনুরোধ করা হচ্ছে ..."</string>
+    <string name="verifying">"যাচাই করা হচ্ছে ..."</string>
+    <string name="taking_a_coffee_break">"একটি কফি বিরতি গ্রহণ ..."</string>
+    <string name="building_configuration">"বিল্ডিং কনফিগারেশন ..."</string>
 </resources>

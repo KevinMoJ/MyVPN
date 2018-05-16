@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Segera dipercepat</string>
     <string name="acceleration_completed_1">"Akselerasi selesai"</string>
     <string name="acceleration_completed_2a">"Kecepatan jaringan Anda dan satu langkah lebih cepat!"</string>
+
+    <string name="timeout_dialog_title">"Menghubungkan waktu tunggu"</string>
+    <string name="timeout_dialog_message">"Menghubungkan waktu tunggu Mungkin sinyal jaringan tidak baik, atau operator jaringan Anda menghentikan kunjungan ini. Anda dapat mencoba lagi ketika sinyal jaringan bagus, atau coba hubungkan server lain."</string>
+    <string name="timeout_dialog_change_server">"GANTI VPN SERVER"</string>
+    <string name="timeout_dialog_connect_again">"HUBUNGI LAGI"</string>
+    <string name="timeout_dialog_cancel">"MEMBATALKAN"</string>
+
+    <string name="updating_please_try_it_later">"Memperbarui, silakan coba nanti"</string>
+    <string name="building_tls">"Membangun TLS ..."</string>
+    <string name="waiting_server_reply">"Menunggu balasan server ..."</string>
+    <string name="requesting_connecting_configure">"Meminta konfigurasi koneksi ..."</string>
+    <string name="verifying">"Memverifikasi ..."</string>
+    <string name="taking_a_coffee_break">"Mengambil rehat kopi ..."</string>
+    <string name="building_configuration">"Konfigurasi bangunan ..."</string>
 </resources>

@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">すぐに加速する</string>
     <string name="acceleration_completed_1">"加速完了"</string>
     <string name="acceleration_completed_2a">"あなたのネットワークスピードと一歩早く！"</string>
+
+    <string name="timeout_dialog_title">"接続タイムアウト"</string>
+    <string name="timeout_dialog_message">"接続タイムアウト可能性のあるネットワーク信号が不十分であるか、ネットワークオペレータがこの訪問を停止しました。ネットワーク信号が良好なときに再試行するか、他のサーバに接続しようとします。"</string>
+    <string name="timeout_dialog_change_server">"VPNサーバーの変更"</string>
+    <string name="timeout_dialog_connect_again">"もう一度接続"</string>
+    <string name="timeout_dialog_cancel">"キャンセル"</string>
+
+    <string name="updating_please_try_it_later">"更新しました。後で試してください"</string>
+    <string name="building_tls">"TLSの構築..."</string>
+    <string name="waiting_server_reply">"サーバの応答を待っています..."</string>
+    <string name="requesting_connecting_configure">"接続の設定を要求しています..."</string>
+    <string name="verifying">"確認中..."</string>
+    <string name="taking_a_coffee_break">"コーヒーを飲みながら..."</string>
+    <string name="building_configuration">"ビルドの設定..."</string>
 </resources>

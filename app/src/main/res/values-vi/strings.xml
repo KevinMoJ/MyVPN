@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Tăng tốc ngay lập tức</string>
     <string name="acceleration_completed_1">"Đã hoàn thành tăng tốc"</string>
     <string name="acceleration_completed_2a">"Tốc độ mạng của bạn và một bước nhanh hơn!"</string>
+
+    <string name="timeout_dialog_title">"Hết thời gian chờ kết nối"</string>
+    <string name="timeout_dialog_message">"Thời gian chờ kết nối Có thể tín hiệu mạng không tốt hoặc nhà điều hành mạng của bạn đã dừng lần truy cập này.Bạn có thể thử lại khi tín hiệu mạng tốt hoặc thử kết nối với các máy chủ khác."</string>
+    <string name="timeout_dialog_change_server">"THAY ĐỔI VPN SERVER"</string>
+    <string name="timeout_dialog_connect_again">"CONNECT AGAIN"</string>
+    <string name="timeout_dialog_cancel">"CANCEL"</string>
+
+    <string name="updating_please_try_it_later">"Đang cập nhật, vui lòng thử lại sau"</string>
+    <string name="building_tls">"Đang xây dựng TLS ..."</string>
+    <string name="waiting_server_reply">"Đang chờ trả lời của máy chủ ..."</string>
+    <string name="requesting_connecting_configure">"Đang yêu cầu cấu hình kết nối ..."</string>
+    <string name="verifying">"Đang xác minh ..."</string>
+    <string name="taking_a_coffee_break">"Nghỉ giải lao ..."</string>
+    <string name="building_configuration">"Đang xây dựng cấu hình ..."</string>
 </resources>

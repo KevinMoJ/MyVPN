@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">فوری طور پر تیز کریں</string>
     <string name="acceleration_completed_1">"تیز رفتار مکمل"</string>
     <string name="acceleration_completed_2a">"آپ کے نیٹ ورک کی رفتار اور ایک قدم تیز!"</string>
+
+    <string name="timeout_dialog_title">"ٹائم آؤٹ سے رابطہ کریں"</string>
+    <string name="timeout_dialog_message">"کنیکٹ ٹائم آؤٹ ممکنہ طور پر نیٹ ورک سگنل اچھا نہیں ہے، یا آپ کے نیٹ ورک آپریٹر نے اس دورے کو روک دیا. آپ دوبارہ کوشش کر سکتے ہیں جب نیٹ ورک سگنل اچھا ہے، یا دوسرے سرورز سے رابطہ قائم کرنے کی کوشش کریں."</string>
+    <string name="timeout_dialog_change_server">"وی پی این سرور تبدیل کریں"</string>
+    <string name="timeout_dialog_connect_again">"رابطہ کریں"</string>
+    <string name="timeout_dialog_cancel">"کینانس"</string>
+
+    <string name="updating_please_try_it_later">"اپ ڈیٹ کرنا، بعد میں اس کی کوشش کریں"</string>
+    <string name="building_tls">"عمارت TLS ..."</string>
+    <string name="waiting_server_reply">"سرور کا جواب انتظار کر رہا ہے ..."</string>
+    <string name="requesting_connecting_configure">"کنکشن ترتیب دینے کی درخواست ..."</string>
+    <string name="verifying">"تصدیق کر رہا ہے ..."</string>
+    <string name="taking_a_coffee_break">"ایک کافی وقفے لے کر ..."</string>
+    <string name="building_configuration">"بلڈنگ ترتیب ..."</string>
 </resources>

@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">"Beschleunige sofort"</string>
     <string name="acceleration_completed_1">"Beschleunigung abgeschlossen"</string>
     <string name="acceleration_completed_2a">"Ihre Netzwerkgeschwindigkeit und einen Schritt schneller!"</string>
+
+    <string name="timeout_dialog_title">"Verbindungs ​​Timeout"</string>
+    <string name="timeout_dialog_message">"Verbindungszeitüberschreitung Möglicherweise ist das Netzwerksignal nicht gut oder Ihr Netzbetreiber hat diesen Besuch abgebrochen. Sie können es erneut versuchen, wenn das Netzwerksignal gut ist, oder versuchen, andere Server anzuschließen."</string>
+    <string name="timeout_dialog_change_server">"ÄNDERN SIE VPN-SERVER"</string>
+    <string name="timeout_dialog_connect_again">"WIEDER VERBINDEN"</string>
+    <string name="timeout_dialog_cancel">"STORNIEREN"</string>
+
+    <string name="updating_please_try_it_later">"Aktualisieren, bitte versuchen Sie es später"</string>
+    <string name="building_tls">"TLS erstellen ..."</string>
+    <string name="waiting_server_reply">"Wartende Serverantwort ..."</string>
+    <string name="requesting_connecting_configure">"Anfordern der Verbindung konfigurieren ..."</string>
+    <string name="verifying">"Überprüfen ..."</string>
+    <string name="taking_a_coffee_break">"Eine Kaffeepause machen ..."</string>
+    <string name="building_configuration">"Gebäudekonfiguration ..."</string>
 </resources>

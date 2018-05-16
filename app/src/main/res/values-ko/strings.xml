@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">즉시 가속화하십시오.</string>
     <string name="acceleration_completed_1">"가속 완료"</string>
     <string name="acceleration_completed_2a">"네트워크 속도가 한 단계 빨라졌습니다!"</string>
+
+    <string name="timeout_dialog_title">"연결 시간 초과"</string>
+    <string name="timeout_dialog_message">"연결 시간 초과 네트워크 신호가 좋지 않거나 네트워크 운영자가이 방문을 중지했습니다. 네트워크 신호가 양호하거나 다른 서버에 연결하려고 시도하면 다시 시도 할 수 있습니다."</string>
+    <string name="timeout_dialog_change_server">"VPN 서버 변경"</string>
+    <string name="timeout_dialog_connect_again">"다시 연결"</string>
+    <string name="timeout_dialog_cancel">"취소"</string>
+
+    <string name="updating_please_try_it_later">"업데이트 중입니다. 나중에 시도하십시오."</string>
+    <string name="building_tls">"건물 TLS ..."</string>
+    <string name="waiting_server_reply">"서버 응답 대기 중 ..."</string>
+    <string name="requesting_connecting_configure">"연결 구성 요청 중 ..."</string>
+    <string name="verifying">"확인 중 ..."</string>
+    <string name="taking_a_coffee_break">"커피를 마시는 중 ..."</string>
+    <string name="building_configuration">"건물 구성 ..."</string>
 </resources>

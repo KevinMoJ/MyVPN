@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">तुरंत तेज करें</string>
     <string name="acceleration_completed_1">"त्वरण पूर्ण"</string>
     <string name="acceleration_completed_2a">"आपकी नेटवर्क की गति और एक कदम तेजी से!"</string>
+
+    <string name="timeout_dialog_title">"टाइमआउट कनेक्ट करें"</string>
+    <string name="timeout_dialog_message">"टाइमआउट कनेक्ट करें संभवतः नेटवर्क सिग्नल अच्छा नहीं है, या आपके नेटवर्क ऑपरेटर ने इस यात्रा को रोक दिया है। नेटवर्क सिग्नल अच्छा होने पर आप फिर कोशिश कर सकते हैं, या अन्य सर्वर कनेक्ट करने का प्रयास कर सकते हैं।"</string>
+    <string name="timeout_dialog_change_server">"बदलें वीपीएन सर्वर"</string>
+    <string name="timeout_dialog_connect_again">"फिर से कनेक्ट करें"</string>
+    <string name="timeout_dialog_cancel">"रद्द करना"</string>
+
+    <string name="updating_please_try_it_later">"अपडेट कर रहा है, कृपया बाद में कोशिश करें"</string>
+    <string name="building_tls">"बिल्डिंग टीएलएस ..."</string>
+    <string name="waiting_server_reply">"प्रतीक्षा कर रहा सर्वर उत्तर ..."</string>
+    <string name="requesting_connecting_configure">"कनेक्शन कॉन्फ़िगरेशन का अनुरोध कर रहा है ..."</string>
+    <string name="verifying">"सत्यापन करें ..."</string>
+    <string name="taking_a_coffee_break">"कॉफी ब्रेक लेना ..."</string>
+    <string name="building_configuration">"बिल्डिंग विन्यास ..."</string>
 </resources>

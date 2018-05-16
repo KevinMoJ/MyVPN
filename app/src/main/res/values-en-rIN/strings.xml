@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Accelerate immediately</string>
     <string name="acceleration_completed_1">"Acceleration completed"</string>
     <string name="acceleration_completed_2a">"Your network speed and one step faster!"</string>
+
+    <string name="timeout_dialog_title">Connect timeout</string>
+    <string name="timeout_dialog_message">Connect timeout Possibly network signal not good,or your network operator stopped this visit.You can try again when the network signal is good,or try to connect other servers.</string>
+    <string name="timeout_dialog_change_server">CHANGE VPN SERVER</string>
+    <string name="timeout_dialog_connect_again">CONNECT AGAIN</string>
+    <string name="timeout_dialog_cancel">CANCEL</string>
+
+    <string name="updating_please_try_it_later">Updating,please try it later</string>
+    <string name="building_tls">Building TLS...</string>
+    <string name="waiting_server_reply">Waiting server reply...</string>
+    <string name="requesting_connecting_configure">Requesting connection configure...</string>
+    <string name="verifying">Verifying...</string>
+    <string name="taking_a_coffee_break">Taking a coffee break...</string>
+    <string name="building_configuration">Building configuration...</string>
 </resources>

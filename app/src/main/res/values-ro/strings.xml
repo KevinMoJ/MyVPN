@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Accelerați imediat</string>
     <string name="acceleration_completed_1">"Accelerarea a fost finalizată"</string>
     <string name="acceleration_completed_2a">"Viteza rețelei și cu un pas mai repede!"</string>
+
+    <string name="timeout_dialog_title">"Conectați timpul de expirare"</string>
+    <string name="timeout_dialog_message">"Conectarea intervalului de timp Eventual semnalul de rețea nu este bun sau operatorul de rețea a oprit această vizită. Puteți încerca din nou când semnalul de rețea este bun sau încercați să conectați alte servere."</string>
+    <string name="timeout_dialog_change_server">"CHANGE SERVER VPN"</string>
+    <string name="timeout_dialog_connect_again">"Conectați din nou"</string>
+    <string name="timeout_dialog_cancel">"ANULARE"</string>
+
+    <string name="updating_please_try_it_later">"Actualizați, încercați mai târziu"</string>
+    <string name="building_tls">"Clădire TLS ..."</string>
+    <string name="waiting_server_reply">"Se așteaptă răspunsul la server ..."</string>
+    <string name="requesting_connecting_configure">"Se solicită configurarea conexiunii ..."</string>
+    <string name="verifying">"Se verifică ..."</string>
+    <string name="taking_a_coffee_break">"Luând o pauză de cafea ..."</string>
+    <string name="building_configuration">"Configurația clădirii ..."</string>
 </resources>

@@ -87,4 +87,19 @@
     <string name="accelerate_immediately">Acelerar de inmediato</string>
     <string name="acceleration_completed_1">"Aceleración completada"</string>
     <string name="acceleration_completed_2a">"¡Tu velocidad de red y un paso más rápido!"</string>
+
+    <string name="timeout_dialog_title">"Tiempo de espera de conexión"</string>
+    <string name="timeout_dialog_message">"Tiempo de espera de conexión Posiblemente la señal de red no sea buena o su operador de red detuvo esta visita. Puede volver a intentarlo cuando la señal de la red sea buena o intentar conectar otros servidores."</string>
+    <string name="timeout_dialog_change_server">"CAMBIAR SERVIDOR VPN"</string>
+    <string name="timeout_dialog_connect_again">"CONECTAR DE NUEVO"</string>
+    <string name="timeout_dialog_cancel">"CANCELAR"</string>
+
+    <string name="updating_please_try_it_later">"Actualizando, inténtelo más tarde"</string>
+    <string name="building_tls">"Construyendo TLS ..."</string>
+    <string name="waiting_server_reply">"Esperando respuesta del servidor ..."</string>
+    <string name="requesting_connecting_configure">"Solicitud de configuración de conexión ..."</string>
+    <string name="verifying">"Verificando ..."</string>
+    <string name="taking_a_coffee_break">"Tomando un café ..."</string>
+    <string name="building_configuration">"Configuración de construcción..."</string>
+
 </resources>

@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Versnel meteen</string>
     <string name="acceleration_completed_1">"Versnelling voltooid"</string>
     <string name="acceleration_completed_2a">"Uw netwerksnelheid en een stap sneller!"</string>
+
+    <string name="timeout_dialog_title">"Verbind time-out"</string>
+    <string name="timeout_dialog_message">"Time-out aansluiten Mogelijk is het netwerksignaal niet goed of is uw netwerkoperator gestopt. U kunt het opnieuw proberen als het netwerksignaal goed is of als u andere servers probeert te verbinden."</string>
+    <string name="timeout_dialog_change_server">"CHANGE VPN SERVER"</string>
+    <string name="timeout_dialog_connect_again">"VERBIND opnieuw"</string>
+    <string name="timeout_dialog_cancel">"ANNULEER"</string>
+
+    <string name="updating_please_try_it_later">"Updaten, probeer het later nog eens"</string>
+    <string name="building_tls">"TLS bouwen ..."</string>
+    <string name="waiting_server_reply">"Wachtend serverantwoord ..."</string>
+    <string name="requesting_connecting_configure">"Verbindingsconfiguratie aanvragen ..."</string>
+    <string name="verifying">"Het verifiëren van ..."</string>
+    <string name="taking_a_coffee_break">"Een koffiepauze nemen ..."</string>
+    <string name="building_configuration">"Configuratie bouwen ..."</string>
 </resources>

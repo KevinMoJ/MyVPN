@@ -86,4 +86,19 @@
     <string name="accelerate_immediately">Pabilisin agad</string>
     <string name="acceleration_completed_1">"Nakumpleto ang pagpabilis"</string>
     <string name="acceleration_completed_2a">"Ang bilis ng iyong network at isang hakbang na mas mabilis!"</string>
+
+    <string name="timeout_dialog_title">"Ikonekta ang timeout"</string>
+    <string name="timeout_dialog_message">"Ikonekta ang pag-timeout Maaaring hindi mabuti ang signal ng network, o huminto ang pagbisita ng iyong network operator sa pagbisita na ito. Maaari mong subukang muli kapag mahusay ang network signal, o subukan upang kumonekta sa ibang mga server."</string>
+    <string name="timeout_dialog_change_server">"BAGUHIN VPN SERVER"</string>
+    <string name="timeout_dialog_connect_again">"CONNECT AGAIN"</string>
+    <string name="timeout_dialog_cancel">"CANCEL"</string>
+
+    <string name="updating_please_try_it_later">"Pag-update, mangyaring subukan ito sa ibang pagkakataon"</string>
+    <string name="building_tls">"Building TLS ..."</string>
+    <string name="waiting_server_reply">"Naghihintay sa tugon ng server ..."</string>
+    <string name="requesting_connecting_configure">"Hinihiling ang pag-configure ng koneksyon ..."</string>
+    <string name="verifying">"Pinatutunayan ..."</string>
+    <string name="taking_a_coffee_break">"Ang pagkuha ng coffee break ..."</string>
+    <string name="building_configuration">"Pagsasaayos ng gusali ..."</string>
+
 </resources>

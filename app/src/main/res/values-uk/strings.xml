@@ -86,4 +86,18 @@
     <string name="accelerate_immediately">Прискорення негайно</string>
     <string name="acceleration_completed_1">"Прискорення завершено"</string>
     <string name="acceleration_completed_2a">"Ваша швидкість мережі і один крок швидше!"</string>
+
+    <string name="timeout_dialog_title">"З'єднати тайм-аут"</string>
+    <string name="timeout_dialog_message">"Під'єднання часу очікування Можливо, мережевий сигнал поганий, або ваш оператор мережі припинив цей візит. Ви можете спробувати ще раз, коли сигнал мережі є гарним, або спробуйте підключити інші сервери."</string>
+    <string name="timeout_dialog_change_server">"ЗМІНИ VPN SERVER"</string>
+    <string name="timeout_dialog_connect_again">"З'ЄДНУТИ Знову"</string>
+    <string name="timeout_dialog_cancel">"СКАСУВАТИ"</string>
+
+    <string name="updating_please_try_it_later">"Оновлення, спробуйте це пізніше"</string>
+    <string name="building_tls">"Будівництво TLS ..."</string>
+    <string name="waiting_server_reply">"Очікування сервера відповідей ..."</string>
+    <string name="requesting_connecting_configure">"Запит налаштування з'єднання ..."</string>
+    <string name="verifying">"Перевірка ..."</string>
+    <string name="taking_a_coffee_break">"Приймаючи перерву на каву ..."</string>
+    <string name="building_configuration">"Конфігурація будинку ..."</string>
 </resources>

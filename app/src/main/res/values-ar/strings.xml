@@ -86,4 +86,19 @@
     <string name="accelerate_immediately">تسريع على الفور</string>
     <string name="acceleration_completed_1">"اكتمال تسريع"</string>
     <string name="acceleration_completed_2a">"سرعة الشبكة الخاصة بك وخطوة واحدة أسرع!"</string>
+
+    <string name="timeout_dialog_title">"ربط مهلة"</string>
+    <string name="timeout_dialog_message">"مهلة الاتصال ربما تكون إشارة الشبكة غير جيدة ، أو توقف مشغل الشبكة عن هذه الزيارة.يمكنك المحاولة مرة أخرى عندما تكون إشارة الشبكة جيدة ، أو حاول توصيل خوادم أخرى."</string>
+    <string name="timeout_dialog_change_server">"تغيير خادم VPN"</string>
+    <string name="timeout_dialog_connect_again">"الاتصال مرة أخرى"</string>
+    <string name="timeout_dialog_cancel">"إلغاء"</string>
+
+    <string name="updating_please_try_it_later">"جاري التحديث ، يرجى تجربته لاحقًا"</string>
+    <string name="building_tls">"بناء طبقة النقل الآمنة ..."</string>
+    <string name="waiting_server_reply">"انتظار الخادم الرد ..."</string>
+    <string name="requesting_connecting_configure">"طلب تكوين الاتصال ..."</string>
+    <string name="verifying">"التحقق من ..."</string>
+    <string name="taking_a_coffee_break">"أخذ استراحة قهوة ..."</string>
+    <string name="building_configuration">"بناء التكوين ..."</string>
+
 </resources>

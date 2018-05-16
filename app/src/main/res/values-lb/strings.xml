@@ -86,4 +86,19 @@
     <string name="accelerate_immediately">Acceleréiert direkt</string>
     <string name="acceleration_completed_1">"Acceleratioun ofgeschloss"</string>
     <string name="acceleration_completed_2a">"Är Netzschnellgeschwindigkeit an ee Schrëtt méi schnell!"</string>
+
+    <string name="timeout_dialog_title">"Den Timeout verbannen"</string>
+    <string name="timeout_dialog_message">"Zäitconnectioun eventuell Netzsignal net gutt ass, oder Äre Netzbetreiber huet de Besuch besicht. Dir kënnt nach eng Kéier verspriechen, wann de Réseau Signal gutt ass oder probéiert aner Serveren ze verbannen."</string>
+    <string name="timeout_dialog_change_server">"VPN SERVER ÄNNER"</string>
+    <string name="timeout_dialog_connect_again">"CONNECT AGAIN"</string>
+    <string name="timeout_dialog_cancel">"CANCEL"</string>
+
+    <string name="updating_please_try_it_later">"Aktualiséierung, probéiert et spéider"</string>
+    <string name="building_tls">"Bau vun TLS ..."</string>
+    <string name="waiting_server_reply">"Waasserreservéierter ..."</string>
+    <string name="requesting_connecting_configure">"D'Verbindung konfiguréieren konfiguréieren ..."</string>
+    <string name="verifying">"Verifizéieren ..."</string>
+    <string name="taking_a_coffee_break">"Eng Kaffispausen ..."</string>
+    <string name="building_configuration">"Chantierkonfiguratioun ..."</string>
+
 </resources>
