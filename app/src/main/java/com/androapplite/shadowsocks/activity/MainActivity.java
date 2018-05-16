@@ -63,6 +63,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -93,7 +94,7 @@ import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
 public class MainActivity extends AppCompatActivity implements ConnectFragment.OnConnectActionListener,
         Handler.Callback, View.OnClickListener, DialogInterface.OnDismissListener,
         DisconnectFragment.OnDisconnectActionListener, LocalVpnService.onStatusChangedListener,
-        NavigationView.OnNavigationItemSelectedListener, Animation.AnimationListener {
+        NavigationView.OnNavigationItemSelectedListener, Animation.AnimationListener, ConnectTimeoutDialog.OnDialogBtClickListener {
     private Snackbar mSnackbar;
     private SharedPreferences mSharedPreference;
     private ProgressDialog mFetchServerListProgressDialog;
@@ -155,8 +156,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
-        adAppHelper.showFullAd();
+        if (adAppHelper.isFullAdLoaded()) {
+            adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
+            adAppHelper.showFullAd();
+            Firebase.getInstance(this).logEvent("主界面","进入全屏","显示");
+        }
     }
 
     private void notProvideServiceInChina() {
@@ -241,6 +245,22 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
 
         @Override
+        public void onAdClick(AdType adType, int index) {
+            MainActivity activity = mActivityReference.get();
+            if (activity != null) {
+                switch (adType.getType()) {
+                    case AdType.ADMOB_FULL:
+                    case AdType.ADMOB_NATIVE_FULL:
+                    case AdType.FACEBOOK_FULL:
+                    case AdType.FACEBOOK_FBN:
+                        Firebase.getInstance(activity).logEvent("主界面", "全屏", "点击");
+                        break;
+                }
+                AdAppHelper.getInstance(activity).removeAdStateListener(this);
+            }
+        }
+
+        @Override
         public void onAdClosed(AdType adType, int index) {
             MainActivity activity = mActivityReference.get();
             if(activity != null){
@@ -260,6 +280,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onConnectButtonClick() {
+       startConnectVPN();
+    }
+
+    private void startConnectVPN() {
         Firebase firebase = Firebase.getInstance(this);
         if (mVpnState == VpnState.Init || mVpnState == VpnState.Stopped ||
                 mVpnState == VpnState.Error) {
@@ -294,6 +318,17 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public void onDismiss(DialogInterface dialog) {
         connectVpnServerAsyncCore();
+    }
+
+
+    @Override
+    public void onChangeServer() {
+        startActivityForResult(new Intent(MainActivity.this, ServerListActivity.class), OPEN_SERVER_LIST);
+    }
+
+    @Override
+    public void onTryAgain() {
+        startConnectVPN();
     }
 
     private void connectVpnServerAsyncCore(){
@@ -510,7 +545,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
                 break;
             case MSG_CONNECTION_TIMEOUT:
-                showNoInternetSnackbar(R.string.timeout_tip, false);
+//                showNoInternetSnackbar(R.string.timeout_tip, false);
+                ConnectTimeoutDialog connectTimeoutDialog = new ConnectTimeoutDialog();
+                connectTimeoutDialog.show(getSupportFragmentManager(),"connectTimeOut");
                 long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
                 mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, error+1).apply();
                 mVpnState = VpnState.Error;
@@ -904,7 +941,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
         String exitAdSwitch = adAppHelper.getCustomCtrlValue("exit_ad", "-1");
         if ("1".equals(exitAdSwitch)) {
-            adAppHelper.showFullAd();
+            if (adAppHelper.isFullAdLoaded()) {
+                adAppHelper.addAdStateListener(new InterstitialAdStateListener(this));
+                adAppHelper.showFullAd();
+                firebase.logEvent("主界面", "退出全屏", "显示");
+            }
             firebase.logEvent("主页", "退出", "后退键");
         }
     }

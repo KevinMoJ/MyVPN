@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:background="@drawable/dialog_normal_white_bg"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/timeout_dialog_title"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_18sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/timeout_dialog_message"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_15sp"/>
+
+        <TextView
+            android:id="@+id/dialog_connect_timeout_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/timeout_dialog_change_server"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/common_text_size_14sp"/>
+
+        <TextView
+            android:id="@+id/dialog_connect_timeout_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/timeout_dialog_connect_again"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/common_text_size_14sp"/>
+
+        <TextView
+            android:id="@+id/dialog_connect_timeout_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/timeout_dialog_cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/common_text_size_14sp"/>
+
+    </LinearLayout>
+</LinearLayout>
