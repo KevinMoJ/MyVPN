@@ -7,14 +7,26 @@
     <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=-1}</string>
 
     <string name="banner_ids">{admob=ca-app-pub-5330675173640052/8168752925},{fb=1207655049289960_1207657955956336}</string>
-    <string name="admob_full_ids">{count=1},{id1=ca-app-pub-5330675173640052/6692019724,全屏}</string>
+    <string name="admob_full_ids">{count=2},{id1=ca-app-pub-5330675173640052/6692019724,全屏},{id2=ca-app-pub-5330675173640052/6882449579,全屏高}</string>
     <string name="admob_banner_native_ids">{count=0}</string>
-    <string name="fb_full_ids">{count=1},{id1=1207655049289960_1207659762622822,全屏}</string>
-    <string name="fbn_full_ids">{count=1},{id1=1207655049289960_1207659762622822,全屏}</string>
-    <string name="fbn_banner_ids">{count=1},{id1=1207655049289960_1207659762622822,全屏}</string>
-    <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2484828121,不确定}</string>
-    <string name="fb_native_ids">{count=1},{id1=1207655049289960_1207656932623105,不确定}</string>
-    <string name="native_size">{count=1},{id1=320,180}</string>
-    <string name="custom_ctrl">{serverListDomain=http://c.vpnnest.com:8080/VPNServerList/fsl},{serverListIP=http://52.21.55.33:8080/VPNServerList/fsl},{exit_ad=-1},{grab_speed=-1}</string>
-    <string name="splash_ctrl">{exe=1},{fb=1207655049289960_1526577100731085}</string>
+    <string name="fb_full_ids">{count=2},{id1=1207655049289960_1207659762622822,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
+    <string name="fbn_full_ids">{count=2},{id1=1207655049289960_1207659762622822,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
+    <string name="fbn_banner_ids">{count=2},{id1=1207655049289960_1207659762622822,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
+    <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2484828121,废弃}</string>
+    <string name="fb_native_ids">{count=2},{id1=1207655049289960_1207656932623105,主页底部},{id2=1207655049289960_1661369880585139,主页底部高}</string>
+    <string name="native_size">{count=2},{id1=320,180},{id2=320,180}</string>
+    <string name="custom_ctrl">
+        {serverListDomain=http://e.vpnnest.com:8080/VPNServerList/fsle},
+        {serverListIP=http://54.91.244.196:8080/VPNServerList/fsle},
+        {exit_ad=1},{exit_ad_min=100},{exit_ad_max=100},
+        {grab_speed=-1},
+        {enter_ad=1},{enter_ad_min=500},{enter_ad_max=500},
+        {connect_ad=1},{connect_ad_min=100},{connect_ad_max=100},
+        {inactive_user_ad=1},
+        {net_acc_ad=1},{net_acc_ad_min=500},{net_acc_ad_max=500},
+        {net_acc_end_ad=1},{net_acc_ad_end_min=500},{net_acc_ad_end_max=500},
+        {welcome_ad=1},{welcome_ad_min=5000},{welcome_ad_max=0},
+    </string>
+    <string name="admob_an_ids">{count=2},{id1=ca-app-pub-5330675173640052/6161090039,主页底部},{id2=ca-app-pub-5330675173640052/2706991729,主页底部高}</string>
+    <string name="splash_ctrl">{exe=1},{fb=1207655049289960_1207656932623105},{admob=ca-app-pub-5330675173640052/2706991729}</string>
 </map>
