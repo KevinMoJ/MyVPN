@@ -114,4 +114,10 @@
         <value>0.5</value>
     </entry>
 
+    <!--闪屏页是否展示带动画的闪屏-->
+    <entry>
+        <key>is_show_animation_ad_flash</key>
+        <value>false</value>
+    </entry>
+
 </defaultsMap>
