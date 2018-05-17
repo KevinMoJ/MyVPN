@@ -101,6 +101,8 @@
     <string name="verifying">Verifying...</string>
     <string name="taking_a_coffee_break">Taking a coffee break...</string>
     <string name="building_configuration">Building configuration...</string>
+    <string name="vpn_is_connecting">VPN is connecting, please try it later</string>
+    <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
 
 
 

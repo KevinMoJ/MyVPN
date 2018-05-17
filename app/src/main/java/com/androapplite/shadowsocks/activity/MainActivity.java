@@ -47,6 +47,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private AlertDialog mExitAlertDialog;
     private DisconnectFragment mDisconnectFragment;
     private AnimationSet mMenuRocketAnimation;
+//    private TransparentView mTransparentView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +156,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
         }
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
-
+//        mTransparentView = new TransparentView();
+        getFragmentManager();
+        getSupportFragmentManager();
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         if (adAppHelper.isFullAdLoaded()) {
             adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
@@ -334,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private void connectVpnServerAsyncCore(){
         if(mConnectFragment != null){
             mConnectFragment.animateConnecting();
+            mVpnState = VpnState.Connecting;
         }
         mForegroundHandler.sendEmptyMessageDelayed(MSG_CONNECTION_TIMEOUT, TimeUnit.SECONDS.toMillis(32));
         mBackgroundHander.sendEmptyMessage(MSG_PREPARE_START_VPN_BACKGROUND);
@@ -461,8 +466,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.action_rocket:
-                Firebase.getInstance(this).logEvent("菜单", "小火箭");
-                NetworkAccelerationActivity.start(this, false);
+                if (mVpnState == VpnState.Connecting) {
+                    Toast.makeText(this, R.string.vpn_is_connecting, Toast.LENGTH_SHORT).show();
+                } else if (mVpnState == VpnState.Stopping) {
+                    Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
+                } else {
+                    Firebase.getInstance(this).logEvent("菜单", "小火箭");
+                    NetworkAccelerationActivity.start(this, false);
+                }
                 break;
             case android.support.design.R.id.snackbar_action:
                 Integer msg = (Integer) mSnackbar.getView().getTag();
@@ -862,6 +873,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         if(mConnectFragment != null){
             if (LocalVpnService.IsRunning) {
                 mConnectFragment.animateStopping();
+                mVpnState = VpnState.Stopping;
                 VpnManageService.stopVpnByUser();
             } else {
                 mVpnState = VpnState.Stopped;
@@ -981,8 +993,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_flag:
-                startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
-                Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
+                if (mVpnState == VpnState.Connecting) {
+                    Toast.makeText(this, R.string.vpn_is_connecting, Toast.LENGTH_SHORT).show();
+                } else if (mVpnState == VpnState.Stopping) {
+                    Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
+                } else {
+                    startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
+                    Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
