@@ -102,5 +102,6 @@
     <string name="building_configuration">"بناء التكوين ..."</string>
     <string name="vpn_is_connecting">الشبكة الظاهرية الخاصة متصلة ، يرجى تجربتها لاحقًا</string>
     <string name="vpn_is_stopping">الشبكة الظاهرية الخاصة تتوقف عن العمل ، يرجى تجربتها لاحقًا</string>
+    <string name="server_list_disconnect_title">افصل VPN لتحديث؟</string>
 
 </resources>

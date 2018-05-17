@@ -8,9 +8,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,22 +26,26 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
+import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ServerListActivity extends BaseShadowsocksActivity implements
         SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
-        DialogInterface.OnClickListener, AbsListView.OnScrollListener{
+        DialogInterface.OnClickListener, AbsListView.OnScrollListener, View.OnClickListener {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SharedPreferences mPreferences;
@@ -48,9 +53,11 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     private ArrayList<String> mFlags;
     private HashMap<String, Integer> mSignalResIds;
     private ListView mListView;
+    private View mTransparentView;
     private String mNation;
     private int mSelectedIndex;
     private boolean mHasServerJson;
+    private AlertDialog mDisconnectDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +75,9 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        mTransparentView = findViewById(R.id.transparent_view);
+        mTransparentView.setOnClickListener(this);
 
         mListView = (ListView)findViewById(R.id.vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
@@ -148,8 +158,13 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     }
 
     private void disconnectToRefresh(String position) {
-        mSwipeRefreshLayout.setRefreshing(true);
-        ServerListFetcherService.fetchServerListAsync(this);
+        if (LocalVpnService.IsRunning) {
+            showDissConnectDialog();
+        } else {
+            mSwipeRefreshLayout.setRefreshing(true);
+            mTransparentView.setVisibility(View.VISIBLE);
+            ServerListFetcherService.fetchServerListAsync(this);
+        }
         Firebase.getInstance(this).logEvent("刷新服务器列表", position);
     }
 
@@ -163,6 +178,55 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mForgroundReceiverIntentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
     }
 
+    private void disconnectVpnServiceAsync() {
+        if (LocalVpnService.IsRunning) {
+            VpnManageService.stopVpnByUser();
+            DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Stopped.ordinal()).apply();
+        }
+    }
+
+    private void showDissConnectDialog() {
+        final Firebase firebase = Firebase.getInstance(this);
+
+        mDisconnectDialog = new AlertDialog.Builder(this)
+                .setMessage(R.string.server_list_disconnect_title)
+                .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        disconnectVpnServiceAsync();
+                        mSwipeRefreshLayout.setRefreshing(true);
+                        mTransparentView.setVisibility(View.VISIBLE);
+                        ServerListFetcherService.fetchServerListAsync(ServerListActivity.this);
+                        firebase.logEvent("服务器列表", "断开链接", "确定");
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSwipeRefreshLayout.setRefreshing(false);
+                        mTransparentView.setVisibility(View.GONE);
+                        firebase.logEvent("服务器列表", "断开链接", "取消");
+                    }
+                })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        mDisconnectDialog = null;
+                    }
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.transparent_view:
+                Toast.makeText(this, R.string.updating_please_try_it_later, Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
     private void initForegroundBroadcastReceiver(){
         mForgroundReceiver = new BroadcastReceiver() {
             @Override
@@ -171,6 +235,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                 switch(action){
                     case Action.SERVER_LIST_FETCH_FINISH:
                         mSwipeRefreshLayout.setRefreshing(false);
+                        mTransparentView.setVisibility(View.GONE);
                         parseServerList();
                         String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.SERVER_LIST, null);
                         if(serverList != null && serverList.length() > 2){
