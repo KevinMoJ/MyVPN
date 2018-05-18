@@ -100,7 +100,7 @@ public class ReconnectIntentService extends IntentService {
             String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
             if(!name.equals(defaultName)){
 //                String serverlist = ServerListHelper.getDecryptServerList(mSharedPreference);
-                String serverlist =  mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+                String serverlist =  mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
                 if(serverlist != null && !serverlist.contains(name)){
                     nation = defaultNation;
                     mSharedPreference.edit()
@@ -175,7 +175,7 @@ public class ReconnectIntentService extends IntentService {
 
     private ArrayList<ServerConfig> loadServerList() {
         ArrayList<ServerConfig> result = null;
-        String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+        String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
         ArrayList<ServerConfig> serverList = null;
         if(serverlist != null){
             serverList = ServerConfig.createServerList(this, serverlist); // 返回null 内部catch

@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private void connectVpnServerAsync() {
-        if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+        if(mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)){
             connectVpnServerAsyncCore();
         }else{
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
@@ -357,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             MainActivity activity = mActivityReference.get();
             if(activity != null){
                 String action = intent.getAction();
-                String serverListString = intent.getStringExtra(SharedPreferenceKey.SERVER_LIST);
+                String serverListString = intent.getStringExtra(SharedPreferenceKey.FETCH_SERVER_LIST);
                 switch(action){
                     case Action.SERVER_LIST_FETCH_FINISH:
                         activity.handleServerList(serverListString);
@@ -386,12 +386,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mFetchServerListProgressDialog = null;
         }
         //双重保险
-        if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
+        if(!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             if(serverListString != null) {
-                mSharedPreference.edit().putString(SharedPreferenceKey.SERVER_LIST, serverListString).apply();
+                mSharedPreference.edit().putString(SharedPreferenceKey.FETCH_SERVER_LIST, serverListString).apply();
             }
         }
-        if(!mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)) {
+        if(!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             mFetchServerListProgressDialog.setOnDismissListener(null);
             showNoInternetSnackbar(R.string.fetch_server_list_failed, false);
             Firebase.getInstance(this).logEvent("VPN连不上", "取服务器列表超时");
@@ -636,7 +636,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mForegroundHandler.sendEmptyMessage(MSG_PREPARE_START_VPN_FORGROUND);
             Log.d("MainActivity", String.format("server config: %s:%d", serverConfig.server, serverConfig.port));
         }else{
-            boolean isValidation = ServerConfig.checkServerConfigJsonString(mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null));
+            boolean isValidation = ServerConfig.checkServerConfigJsonString(mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null));
             Firebase.getInstance(this).logEvent("VPN连不上", "没有可用的服务器", "服务器列表合法 " + isValidation);
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -742,7 +742,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             String defaultName = getString(R.string.vpn_name_opt);
             String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
             if(!name.equals(defaultName)){
-                String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+                String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
                 if(serverlist != null && !serverlist.contains(name)){
                     nation = defaultNation;
                     mSharedPreference.edit()
@@ -817,7 +817,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private ArrayList<ServerConfig> loadServerList() {
         ArrayList<ServerConfig> result = null;
-        String serverlist = mSharedPreference.getString(SharedPreferenceKey.SERVER_LIST, null);
+        String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
         ArrayList<ServerConfig> serverList = null;
         if(serverlist != null){
             serverList = ServerConfig.createServerList(this, serverlist); // 返回null 内部catch

@@ -371,7 +371,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     private void connectVpnServerAsync() {
 //        if(ServerListHelper.hasEncryptServerListPreference(mSharedPreference)){
-        if(mSharedPreference.contains(SharedPreferenceKey.SERVER_LIST)){
+        if(mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)){
             prepareStartService();
         }else{
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);

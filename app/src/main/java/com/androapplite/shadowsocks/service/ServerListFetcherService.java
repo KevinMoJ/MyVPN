@@ -5,8 +5,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
-import android.content.res.TypedArray;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -21,10 +19,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.BuildConfig;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -52,8 +47,9 @@ import okio.Okio;
 
 public class ServerListFetcherService extends IntentService{
     private boolean hasStart;
-    private static final String DOMAIN_URL = "http://c.vpnnest.com:8080/VPNServerList/fsl";
-    private static final String IP_URL = "http://52.21.55.33:8080/VPNServerList/fsl";
+//    private static final String DOMAIN_URL = "http://c.vpnnest.com:8080/VPNServerList/fsl";
+    private static final String DOMAIN_URL = "http://c2.vpnnest.com:8080/middle_server/server_list";
+    private static final String IP_URL = "http://52.15.133.178:8080/middle_server/server_list";
     private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
@@ -64,7 +60,7 @@ public class ServerListFetcherService extends IntentService{
 
     private static final ArrayList<String> STATIC_HOST_URLS = new ArrayList<>();
     static {
-        STATIC_HOST_URLS.add(GITHUB_URL);
+//        STATIC_HOST_URLS.add(GITHUB_URL);
     }
 
 
@@ -195,76 +191,33 @@ public class ServerListFetcherService extends IntentService{
             //使用旧的server list
             if(mServerListJsonString == null || mServerListJsonString.isEmpty()) {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-                mServerListJsonString = sharedPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
+                mServerListJsonString = sharedPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
                 if (mServerListJsonString != null) {
                     urlKey = "旧的server list";
                 }
             }
 
-            //使用本地静态服务器列表
-            if (mServerListJsonString == null){
-                AssetManager assetManager = getAssets();
-                try {
-                    InputStream inputStream = assetManager.open("fsl.json");
-                    InputStreamReader isr = new InputStreamReader(inputStream);
-                    BufferedReader br = new BufferedReader(isr);
-                    mServerListJsonString = br.readLine();
-                    if(mServerListJsonString != null){
-                        mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
-                        urlKey = "local_config";
-                    }
-
-                } catch (IOException e) {
-                    ShadowsocksApplication.handleException(e);
-                }
-            }
-
-//            if (mServerListJsonString != null) {
-//                ArrayList<ServerConfig> configs = ServerConfig.createServerList(this, mServerListJsonString);
-//                configs.remove(0);
-//                min = Math.min(Runtime.getRuntime().availableProcessors(), tasks.size());
-//                executorService = Executors.newFixedThreadPool(min);
-//                ExecutorCompletionService<ServerConfig> ecs2 = new ExecutorCompletionService<>(executorService);
-//
-//                ArrayList<TestServerCallable> serverConfigTasks = new ArrayList<>();
-//                for (ServerConfig config : configs) {
-//                    serverConfigTasks.add(new TestServerCallable(config));
-//                }
-//
-//                for (TestServerCallable callable : serverConfigTasks) {
-//                    ecs2.submit(callable);
-//                }
-//
-//                ArrayList<ServerConfig> availableConfigs = new ArrayList<>(configs.size());
-//                int error = 0;
-//                for (int i = 0; i < 30 * 1000 / 100; i++) {
-//                    try {
-//                        Future<ServerConfig> future = ecs2.poll(100, TimeUnit.MILLISECONDS);
-//                        if (future != null) {
-//                            ServerConfig config = future.get();
-//                            if (config != null) {
-//                                availableConfigs.add(config);
-//                            }
-//                        }
-//                    } catch (Exception e) {
-//                        error++;
-//                        ShadowsocksApplication.handleException(e);
+//            //使用本地静态服务器列表
+//            if (mServerListJsonString == null){
+//                AssetManager assetManager = getAssets();
+//                try {
+//                    InputStream inputStream = assetManager.open("fsl.json");
+//                    InputStreamReader isr = new InputStreamReader(inputStream);
+//                    BufferedReader br = new BufferedReader(isr);
+//                    mServerListJsonString = br.readLine();
+//                    if(mServerListJsonString != null){
+//                        mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
+//                        urlKey = "local_config";
 //                    }
-//                    if (availableConfigs.size() + error >= configs.size()) {
-//                        break;
-//                    }
-//                }
-//                executorService.shutdown();
-//                if (availableConfigs.isEmpty()) {
-//                    mServerListJsonString = null;
-//                } else {
-//                    mServerListJsonString = ServerConfig.encodeServerList(availableConfigs);
+//
+//                } catch (IOException e) {
+//                    ShadowsocksApplication.handleException(e);
 //                }
 //            }
 
             if (mServerListJsonString != null) {
                 SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-                editor.putString(SharedPreferenceKey.SERVER_LIST, mServerListJsonString).apply();
+                editor.putString(SharedPreferenceKey.FETCH_SERVER_LIST, mServerListJsonString).apply();
             }else{
                 urlKey = "没有任何可用的服务器列表";
             }
@@ -359,7 +312,7 @@ public class ServerListFetcherService extends IntentService{
         final Intent intent = new Intent(Action.SERVER_LIST_FETCH_FINISH);
         if(mServerListJsonString != null){
             //借用一下
-            intent.putExtra(SharedPreferenceKey.SERVER_LIST, mServerListJsonString);
+            intent.putExtra(SharedPreferenceKey.FETCH_SERVER_LIST, mServerListJsonString);
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

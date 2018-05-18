@@ -89,7 +89,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
         parseServerList();
 
-        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getString(SharedPreferenceKey.SERVER_LIST, null);
+        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
         if(serverList != null && serverList.length() > 2){
             mHasServerJson = true;
         }else{
@@ -124,7 +124,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
-        String serverListJson = mPreferences.getString(SharedPreferenceKey.SERVER_LIST, null);
+        String serverListJson = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
         ArrayList<ServerConfig> serverConfigs = null;
         if(serverListJson != null){
             serverConfigs = ServerConfig.createServerList(this, serverListJson);
@@ -237,7 +237,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                         mSwipeRefreshLayout.setRefreshing(false);
                         mTransparentView.setVisibility(View.GONE);
                         parseServerList();
-                        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.SERVER_LIST, null);
+                        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
                         if(serverList != null && serverList.length() > 2){
                             mHasServerJson = true;
                         }else{

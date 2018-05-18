@@ -7,6 +7,7 @@ public final class SharedPreferenceKey {
     public static final String VPN_NATION = "VPN_NATION";
     public static final String VPN_FLAG = "VPN_FLAG";
     public static final String SERVER_LIST = "SERVER_LIST";
+    public static final String FETCH_SERVER_LIST = "FETCH_SERVER_LIST";
     public static final String CONNECTING_VPN_NAME = "CONNECTING_VPN_NAME";
     public static final String CONNECTING_VPN_SERVER = "CONNECTING_VPN_SERVER";
     public static final String CONNECTING_VPN_FLAG = "CONNECTING_VPN_FLAG";

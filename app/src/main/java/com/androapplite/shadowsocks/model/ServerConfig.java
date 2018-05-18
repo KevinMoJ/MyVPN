@@ -6,12 +6,9 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Base64;
-import android.util.Log;
 
-import com.androapplite.vpn3.R;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONArray;
@@ -22,19 +19,20 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Random;
 
 /**
  * Created by jim on 16/11/7.
  */
 
 public class ServerConfig implements Parcelable{
+    private static final int DEFAULT_PORT = 40050;
+
     public String name; //city
-    public String server;
-    public String flag;
-    public String nation;
-    public int signal;
-    public int port;
+    public String server; // ip
+    public String flag; // icon
+    public String nation; // country
+    public int signal; // load
+    public int port;  // port
 
     public static final int[] SINAL_IMAGES = {
             R.drawable.server_signal_1,
@@ -43,148 +41,102 @@ public class ServerConfig implements Parcelable{
             R.drawable.server_signal_4
     };
 
-    private static final int DEFAULT_PORT = 40010;
-
-    private static ServerConfig addGlobalConfig(Resources resources){
-        String name = resources.getString(R.string.vpn_name_opt);
-        String server = resources.getString(R.string.vpn_server_opt);
-        String flag = resources.getResourceEntryName(R.drawable.ic_flag_global);
-        String nation = resources.getString(R.string.vpn_nation_opt);
-        return new ServerConfig(name, server, flag, nation, SINAL_IMAGES.length - 1);
+    private static ServerConfig addGlobalConfig(Resources resources) {
+        String city = resources.getString(R.string.vpn_name_opt);
+        String ip = resources.getString(R.string.vpn_server_opt);
+        String icon = resources.getResourceEntryName(R.drawable.ic_flag_global);
+        String country = resources.getString(R.string.vpn_nation_opt);
+        return new ServerConfig(city, country, ip, SINAL_IMAGES.length - 1, icon);
     }
 
-    public ServerConfig(String name, String server, String flag, String nation, int signal){
-        this(name, server, flag, nation, signal, DEFAULT_PORT);
+    public ServerConfig(String city, String country, String ip, int load, String icon) {
+        this(city, country, ip, load, DEFAULT_PORT, icon);
     }
 
-    public ServerConfig(String name, String server, String flag, String nation, int signal, int port){
-        this.name = name;
-        this.server = server;
-        this.flag = flag;
-        this.nation = nation;
-        this.signal = signal;
+    public ServerConfig(String city, String country, String ip, int load, int port, String icon) {
+        this.name = city;
+        this.nation = country;
+        this.server = ip;
+        this.signal = getLoadLevel(load);
         this.port = port;
+        this.flag = icon;
     }
 
     @Override
     public boolean equals(Object o) {
-        if(this == o){
+        if (this == o) {
             return true;
-        }else if(!(o instanceof ServerConfig)){
+        } else if (!(o instanceof ServerConfig)) {
             return false;
-        }else{
-            ServerConfig other = (ServerConfig)o;
+        } else {
+            ServerConfig other = (ServerConfig) o;
             return name.equals(other.name) && server.equals(other.server)
                     && flag.equals(other.flag) && nation.equals(other.nation);
         }
 
     }
 
-    public static ArrayList<ServerConfig> createServerList(Context context, String jsonArrayString){
-        ArrayList<ServerConfig> arrayList = null;
-        try{
-            JSONObject jsonObject = new JSONObject(jsonArrayString);
-            JSONArray cityArray = jsonObject.optJSONArray("city");
-            JSONArray ipArray = jsonObject.optJSONArray("ip");
-            JSONArray signalArray = jsonObject.optJSONArray("signal");
-            JSONArray portArray = jsonObject.optJSONArray("port");
+    // [{ "ct":"Miami","ip":"192.168.1.1","ld":80,"pt":[40050]},{"city":"Miami","ip":"192.168.1.1","ld":40, "pt":[40050, 40051]}]
+    public static ArrayList<ServerConfig> createServerList(Context context, String jsonArrayString) {
+        ArrayList<ServerConfig> arrayList = new ArrayList<>();
 
+        try {
+            JSONArray jsonArray = new JSONArray(jsonArrayString);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = (JSONObject) jsonArray.get(i);
+                String city = object.getString("ct");
+                String ip = object.getString("ip");
+                int ld = object.getInt("ld");
+                JSONArray ptJsonArray = object.getJSONArray("pt");
 
-            if(cityArray != null && ipArray != null && signalArray != null){
-                Resources resources = context.getResources();
-                TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
-                TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
-                TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
+                if (city != null && ip != null && ptJsonArray.length() != 0) {
+                    Resources resources = context.getResources();
+                    TypedArray names = resources.obtainTypedArray(R.array.vpn_names);
+                    TypedArray icons = resources.obtainTypedArray(R.array.vpn_icons);
+                    TypedArray nations = resources.obtainTypedArray(R.array.vpn_nations);
 
-                ArrayList<String> nameList = new ArrayList<>(names.length());
-                for(int i=0; i<names.length(); i++){
-                    String name = names.getString(i);
-                    nameList.add(name);
-                }
+                    ArrayList<String> nameList = new ArrayList<>();
+                    for (int k = 0; k < names.length(); k++) {
+                        String name = names.getString(k);
+                        nameList.add(name);
+                    }
 
-                arrayList = new ArrayList<>(cityArray.length() + 1);
-                for(int i=0; i<cityArray.length(); i++){
-                    String city = cityArray.optString(i);
                     int index = nameList.indexOf(city);
-                    if(index > -1) {
-                        String nation = nations.getString(index);
+                    if (index > -1) {
+                        String country = nations.getString(index);
                         String icon = resources.getResourceEntryName(icons.getResourceId(index, R.drawable.ic_flag_global));
-                        String ip = ipArray.optString(i);
-                        int signal = signalArray.optInt(i);
-                        ServerConfig serverConfig = null;
-                        if(portArray != null){
-                            int port = portArray.optInt(i);
-                            serverConfig = new ServerConfig(city, ip, icon, nation, signal, port);
-                        }else {
-                            serverConfig = new ServerConfig(city, ip, icon, nation, signal);
+                        for (int j = 0; j < ptJsonArray.length(); j++) {
+                            ServerConfig ServerConfig = new ServerConfig(city, country, ip, ld, Integer.parseInt(ptJsonArray.getString(j)), icon);
+                            arrayList.add(ServerConfig);
                         }
-                        arrayList.add(serverConfig);
                     }
                 }
-                Collections.shuffle(arrayList);
-                arrayList.add(0, addGlobalConfig(context.getResources()));
-
             }
-
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
+            Collections.shuffle(arrayList);
+            arrayList.add(0, addGlobalConfig(context.getResources()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return arrayList;
     }
 
-    public static String shuffleRemoteConfig(){
-        FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        String jsonArrayString = remoteConfig.getString("server_list");
-        return shuffleStaticServerListJson(jsonArrayString);
+    public static String shuffleRemoteConfig() {
+        return FirebaseRemoteConfig.getInstance().getString("server_list");
     }
 
-    public static String shuffleStaticServerListJson(String jsonArrayString){
-        String shuffleJsonString = null;
-        Log.d("server_list", jsonArrayString);
-        try {
-            JSONObject jsonObject = new JSONObject(jsonArrayString);
-            JSONArray cityArray = jsonObject.optJSONArray("city");
-            JSONArray ipArray = jsonObject.optJSONArray("ip");
-            JSONArray signalArray = jsonObject.optJSONArray("signal");
-            JSONArray portArray = jsonObject.optJSONArray("port");
-            if(cityArray != null && ipArray != null && signalArray != null){
-                Random random = new Random();
-                for(int i = 0; i<cityArray.length() * 3 / 4; i++){
-                    int pos = random.nextInt(cityArray.length());
-                    //新旧位置不相等才交换
-                    if(i != pos) {
-                        swipePosition(cityArray, i, pos);
-                        swipePosition(ipArray, i, pos);
-                        swipePosition(signalArray, i, pos);
-                        if (portArray != null) {
-                            swipePosition(portArray, i, pos);
-                        }
-                    }
-                }
-                shuffleJsonString = jsonObject.toString();
-                Log.d("server_list shuffle", shuffleJsonString);
-            }
-
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
-        }
-        return shuffleJsonString;
-    }
-
-
-
-    private static void swipePosition(JSONArray array, int pos1, int pos2){
-        try {
-            Object obj = array.get(pos1);
-            array.put(pos1, array.get(pos2));
-            array.put(pos2, obj);
-        }catch (Exception e){
-            ShadowsocksApplication.handleException(e);
-        }
-    }
-
-    public int getSignalResId(){
+    public int getSignalResId() {
         return SINAL_IMAGES[signal];
+    }
+
+    private int getLoadLevel(int load) {
+        if (load >= 0 && load < 25)
+            return 3;
+        else if (load >= 25 && load < 50)
+            return 2;
+        else if (load >= 50 && load < 75)
+            return 1;
+        else
+            return 0;
     }
 
     public void saveInSharedPreference(SharedPreferences sharedPreferences) {
@@ -192,36 +144,36 @@ public class ServerConfig implements Parcelable{
                 .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, name)
                 .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, server)
                 .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, flag)
-                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, nation)
+                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, name)
                 .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, signal)
                 .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT, port)
                 .apply();
     }
 
-    public static ServerConfig loadFromSharedPreference(SharedPreferences sharedPreferences){
-        String vpnName = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-        String server = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-        String flag = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-        String nation = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-        int signal = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
+    public static ServerConfig loadFromSharedPreference(SharedPreferences sharedPreferences) {
+        String city = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
+        String ip = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
+        String icon = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
+        String country = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
+        int load = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
         int port = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_PORT, DEFAULT_PORT);
-        if(vpnName != null && server != null && flag != null && nation != null){
-            return new ServerConfig(vpnName, server, flag, nation, signal, port);
-        }else{
+        if (city != null && ip != null && icon != null && country != null) {
+            return new ServerConfig(city, country, ip, load, port, icon);
+        } else {
             return null;
         }
-
     }
 
-    public static boolean checkServerConfigJsonString(String jsonString){
-        try{
-            JSONObject jsonObject = new JSONObject(jsonString);
-            return jsonObject.has("city") && jsonObject.has("ip") && jsonObject.has("signal") && jsonObject.has("port");
-        }catch (Exception e){
+    public static boolean checkServerConfigJsonString(String jsonString) {
+        try {
+//            JSONObject jsonObject = new JSONObject(jsonString);
+//            return jsonObject.has("ct") && jsonObject.has("ip") && jsonObject.has("ld") && jsonObject.has("pt");
+            new JSONArray (jsonString);
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
-
 
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(name);
@@ -233,12 +185,11 @@ public class ServerConfig implements Parcelable{
     }
 
     public static final Parcelable.Creator<ServerConfig> CREATOR = new Parcelable.Creator<ServerConfig>() {
-        public ServerConfig createFromParcel(Parcel in)
-        {
+        public ServerConfig createFromParcel(Parcel in) {
             return new ServerConfig(in);
         }
-        public ServerConfig[] newArray(int size)
-        {
+
+        public ServerConfig[] newArray(int size) {
             return new ServerConfig[size];
         }
     };
@@ -266,38 +217,5 @@ public class ServerConfig implements Parcelable{
             e.printStackTrace();
         }
         return null;
-    }
-
-
-    public static String encodeServerList(ArrayList<ServerConfig> configs) {
-        ArrayList<String> cities = new ArrayList<>(configs.size());
-        ArrayList<String> ips = new ArrayList<>(configs.size());
-        ArrayList<Integer> signals = new ArrayList<>(configs.size());
-        ArrayList<Integer> ports = new ArrayList<>(configs.size());
-        for (ServerConfig config : configs) {
-            cities.add(config.name);
-            ips.add(config.server);
-            signals.add(config.signal);
-            ports.add(config.port);
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("{")
-                .append("\"city\":").append(toJSONArrayString(cities)).append(",")
-                .append("\"ip\":").append(toJSONArrayString(ips)).append(",")
-                .append("\"signal\":").append(toJSONArrayString(signals)).append(",")
-                .append("\"port\":").append(toJSONArrayString(ports))
-                .append("}");
-        return sb.toString();
-    }
-
-    private static <T> StringBuilder toJSONArrayString(ArrayList<T> arrays) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (T v: arrays) {
-            sb.append("\"").append(v).append("\"").append(",");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("]");
-        return sb;
     }
 }
