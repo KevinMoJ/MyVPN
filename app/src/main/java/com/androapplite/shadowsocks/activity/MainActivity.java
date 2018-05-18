@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private static final int MSG_PREPARE_START_VPN_FORGROUND = 3;
     private static final int MSG_NO_AVAILABE_VPN = 4;
     private static final int MSG_REPEAT_MENU_ROCKET = 5;
+    public static final int MSG_SHOW_AD_BUTTON_RECOMMEND = 6;
+    public static final int MSG_SHOW_AD_BUTTON_FULL = 7;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private Menu mMenu;
@@ -120,7 +122,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private AlertDialog mExitAlertDialog;
     private DisconnectFragment mDisconnectFragment;
     private AnimationSet mMenuRocketAnimation;
-//    private TransparentView mTransparentView;
+    private int mAdButtonMsgType;
+    private FullAdStatusListener mFullAdStatusListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,9 +159,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
         }
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
-//        mTransparentView = new TransparentView();
-        getFragmentManager();
-        getSupportFragmentManager();
+
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         if (adAppHelper.isFullAdLoaded()) {
             adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
@@ -504,6 +505,37 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                             break;
                     }
                 }
+        }
+    }
+
+    private class FullAdStatusListener extends AdStateListener{
+        private WeakReference<MainActivity> mReference;
+
+        FullAdStatusListener(MainActivity activity) {
+            mReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onAdClick(AdType adType, int index) {
+            MainActivity activity = mReference.get();
+            switch (adType.getType()) {
+                case AdType.ADMOB_FULL:
+                case AdType.FACEBOOK_FBN:
+                case AdType.FACEBOOK_FULL:
+                case AdType.RECOMMEND_AD:
+                    switch (activity.mAdButtonMsgType) {
+                        case MSG_SHOW_AD_BUTTON_FULL:
+                            Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮全屏");
+                            Log.i("ssss", "onAdClick: 主界面广告按钮全屏");
+                            break;
+                        case MSG_SHOW_AD_BUTTON_RECOMMEND:
+                            Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮线上互推全屏");
+                            Log.i("ssss", "onAdClick: 主界面广告按钮线上互推全屏");
+                            break;
+                    }
+                    AdAppHelper.getInstance(activity).removeAdStateListener(this);
+                    break;
+            }
         }
     }
 
@@ -1000,6 +1032,29 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else {
                     startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
                     Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
+                }
+                return true;
+            case R.id.action_ad:
+                Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "点击");
+                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+                if (mFullAdStatusListener == null)
+                    mFullAdStatusListener = new FullAdStatusListener(this);
+                adAppHelper.addAdStateListener(mFullAdStatusListener);
+
+                if (adAppHelper.isFullAdLoaded()) {
+                    adAppHelper.showFullAd();
+                    mAdButtonMsgType = MSG_SHOW_AD_BUTTON_FULL;
+                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上全屏");
+                    Log.i("ssss", "onClick:   线上全屏");
+                } else if (adAppHelper.isRecommendAdLoaded()) {
+                    adAppHelper.showFullAd();
+                    mAdButtonMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
+                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上互推");
+                    Log.i("ssss", "onClick:   线上互推");
+                } else {
+                    startActivity(new Intent(this, RecommendActivity.class));
+                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "本地互推");
+                    Log.i("ssss", "onClick:   本地互推");
                 }
                 return true;
         }

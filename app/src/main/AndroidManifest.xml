@@ -121,6 +121,10 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
         </activity>
+
+        <activity android:name="com.androapplite.shadowsocks.activity.RecommendActivity"
+                  android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        </activity>
     </application>
 
 </manifest>
