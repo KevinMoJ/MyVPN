@@ -690,13 +690,15 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
                     if(networkInfo != null && networkInfo.isAvailable()){
                         if (!LocalVpnService.IsRunning) {
+                            mIsRestart = false;
                             connectVpnServerAsync();
+                        } else {
+                            mIsRestart = true;
                         }
                         VpnManageService.stopVpnByUserSwitchProxy();
                         VpnNotification.gSupressNotification = true;
                         mVpnState = VpnState.Connecting;
                         mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
-                        mIsRestart = true;
                     }
                 }
                 PromotionTracking.getInstance(this).reportSwitchCountry();
