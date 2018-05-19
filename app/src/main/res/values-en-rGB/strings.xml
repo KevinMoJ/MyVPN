@@ -100,4 +100,5 @@
     <string name="verifying">Verifying...</string>
     <string name="taking_a_coffee_break">Taking a coffee break...</string>
     <string name="building_configuration">Building configuration...</string>
+    <string name="server_list_full_toast">This server is full now，please refresh!</string>
 </resources>

@@ -120,4 +120,10 @@
         <value>false</value>
     </entry>
 
+    <!--链接负载配置-->
+    <entry>
+        <key>ping_load</key>
+        <value>80</value>
+    </entry>
+
 </defaultsMap>

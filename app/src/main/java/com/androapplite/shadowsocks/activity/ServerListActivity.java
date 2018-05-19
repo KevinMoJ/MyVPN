@@ -323,15 +323,20 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
         mListView.setItemChecked(mSelectedIndex, false);
         mSelectedIndex = position;
-        mListView.setItemChecked(position, true);
-        String nation = mNations.get(position);
-        String flag = mFlags.get(position);
-        mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
-                .putString(SharedPreferenceKey.VPN_FLAG, flag)
-                .apply();
-        setResult(RESULT_OK);
-        finish();
-        Firebase.getInstance(this).logEvent("选择国家", nation);
+        int resid = mSignalResIds.get(mNations.get(position));
+        if (resid == R.drawable.server_signal_full) {
+            Toast.makeText(this, R.string.server_list_full_toast, Toast.LENGTH_SHORT).show();
+        } else {
+            mListView.setItemChecked(position, true);
+            String nation = mNations.get(position);
+            String flag = mFlags.get(position);
+            mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
+                    .putString(SharedPreferenceKey.VPN_FLAG, flag)
+                    .apply();
+            setResult(RESULT_OK);
+            finish();
+            Firebase.getInstance(this).logEvent("选择国家", nation);
+        }
     }
 
     @Override

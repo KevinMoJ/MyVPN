@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -18,13 +19,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 
 /**
  * Created by jim on 16/11/7.
  */
 
-public class ServerConfig implements Parcelable{
+public class ServerConfig implements Parcelable {
     private static final int DEFAULT_PORT = 40050;
 
     public String name; //city
@@ -35,7 +37,7 @@ public class ServerConfig implements Parcelable{
     public int port;  // port
 
     public static final int[] SINAL_IMAGES = {
-            R.drawable.server_signal_1,
+            R.drawable.server_signal_full,
             R.drawable.server_signal_2,
             R.drawable.server_signal_3,
             R.drawable.server_signal_4
@@ -79,6 +81,7 @@ public class ServerConfig implements Parcelable{
     // [{ "ct":"Miami","ip":"192.168.1.1","ld":80,"pt":[40050]},{"city":"Miami","ip":"192.168.1.1","ld":40, "pt":[40050, 40051]}]
     public static ArrayList<ServerConfig> createServerList(Context context, String jsonArrayString) {
         ArrayList<ServerConfig> arrayList = new ArrayList<>();
+        ListCompare listCompare = new ListCompare();
 
         try {
             JSONArray jsonArray = new JSONArray(jsonArrayString);
@@ -112,7 +115,11 @@ public class ServerConfig implements Parcelable{
                     }
                 }
             }
-            Collections.shuffle(arrayList);
+            boolean isFetchToServer = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false);
+            if (isFetchToServer)
+                Collections.sort(arrayList, listCompare);
+            else
+                Collections.shuffle(arrayList);
             arrayList.add(0, addGlobalConfig(context.getResources()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,7 +128,7 @@ public class ServerConfig implements Parcelable{
     }
 
     public static String shuffleRemoteConfig() {
-        return FirebaseRemoteConfig.getInstance().getString("server_list");
+        return FirebaseRemoteConfig.getInstance().getString("fetch_server_list");
     }
 
     public int getSignalResId() {
@@ -137,6 +144,20 @@ public class ServerConfig implements Parcelable{
             return 1;
         else
             return 0;
+    }
+
+    private static class ListCompare implements Comparator<ServerConfig> {
+
+        @Override
+        public int compare(ServerConfig ar1, ServerConfig ar2) {
+            if (ar1.signal < ar2.signal)
+                return -1;
+
+            if (ar2.signal > ar1.signal)
+                return 1;
+
+            return ar1.signal = ar2.signal;
+        }
     }
 
     public void saveInSharedPreference(SharedPreferences sharedPreferences) {
@@ -168,7 +189,7 @@ public class ServerConfig implements Parcelable{
         try {
 //            JSONObject jsonObject = new JSONObject(jsonString);
 //            return jsonObject.has("ct") && jsonObject.has("ip") && jsonObject.has("ld") && jsonObject.has("pt");
-            new JSONArray (jsonString);
+            new JSONArray(jsonString);
             return true;
         } catch (Exception e) {
             return false;

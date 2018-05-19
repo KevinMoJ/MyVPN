@@ -1,22 +1,24 @@
 package com.androapplite.shadowsocks.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.util.Log;
 
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.vpn3.R;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.VpnNotification;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
@@ -187,32 +189,52 @@ public class FindProxyService extends IntentService {
     }
 
     private ServerConfig testServerIpAndPort(ServerConfig config) throws Exception{
-        if (ping(config.server) && isPortOpen(config.server, config.port, 5000)) {
+        int ping_load = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
+        boolean connect = ping(config.server) <= ping_load;
+        if (connect && isPortOpen(config.server, config.port, 5000)) {
             return config;
         }
         return null;
     }
 
-    private boolean ping(String ipAddress){
+    private int ping(String ipAddress) {
         boolean status = false;
+        int load = 0;
         HttpURLConnection connection = null;
+        InputStream inputStream = null;
+        String stringLoad = null;
         try {
-            connection = (HttpURLConnection) new URL(String.format("http://%s/ping.html", ipAddress)).openConnection();
+            connection = (HttpURLConnection) new URL(String.format("http://%s:8080/vpn_server_guard/load", ipAddress)).openConnection();
             connection.setConnectTimeout(1000 * 5);
             connection.setReadTimeout(1000 * 5);
-            status = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+//            status = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+            inputStream = connection.getInputStream();
+            int total = 0;
+            byte[] bs = new byte[100];
+            while ((total = inputStream.read(bs)) != -1) {
+                stringLoad = new String(bs, 0, total);
+            }
+
         } catch (Exception e) {
             ShadowsocksApplication.handleException(e);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
+            try {
+                if (inputStream != null)
+                    inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        Log.d("MyCaller", "ping: " + ipAddress + " " + status);
-        if (!status) {
-            Firebase.getInstance(this).logEvent("ping", ipAddress, String.valueOf(status));
+        try {
+            load = Integer.parseInt(stringLoad);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
-        return status;
+        Firebase.getInstance(this).logEvent("ping", ipAddress, stringLoad);
+        return load;
     }
 
     private boolean isPortOpen(final String ip, final int port, final int timeout) {

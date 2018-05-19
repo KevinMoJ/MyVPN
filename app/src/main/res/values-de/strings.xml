@@ -103,5 +103,6 @@
     <string name="vpn_is_connecting">VPN verbindet, bitte versuchen Sie es später</string>
     <string name="vpn_is_stopping">VPN stoppt, bitte versuchen Sie es später</string>
     <string name="server_list_disconnect_title">VPN zum Aktualisieren trennen?</string>
+    <string name="server_list_full_toast">Dieser Server ist jetzt voll, bitte aktualisieren!</string>
 
 </resources>

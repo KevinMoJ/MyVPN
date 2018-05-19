@@ -21,6 +21,7 @@ public final class SharedPreferenceKey {
     public static final String VPN_STATE = "VPN_STATE";
     public static final String COUNTRY_CODE = "COUNTRY_CODE";
     public static final String IP = "IP";
+    public static final String IS_FETCH_SERVER_LIST_AT_SERVER = "IS_FETCH_SERVER_LIST_AT_SERVER";
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";

@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -19,7 +20,10 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.BuildConfig;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,6 +55,7 @@ public class ServerListFetcherService extends IntentService{
     private static final String DOMAIN_URL = "http://c2.vpnnest.com:8080/middle_server/server_list";
     private static final String IP_URL = "http://52.15.133.178:8080/middle_server/server_list";
     private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
+    private SharedPreferences mSharedPreferences;
 
     private static final ArrayList<String> DOMAIN_URLS = new ArrayList<>();
     static {
@@ -98,7 +103,7 @@ public class ServerListFetcherService extends IntentService{
                 builder.addInterceptor(new LoggingInterceptor());
             }
             mHttpClient = builder.build();
-
+            mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
 //            useCustomURL();
 
             Firebase firebase = Firebase.getInstance(this);
@@ -123,6 +128,7 @@ public class ServerListFetcherService extends IntentService{
                         if (result != null) {
                             mUrl = result.first;
                             mServerListJsonString = result.second;
+                            mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, true).apply();
                             break;
                         }
                     }
@@ -157,6 +163,7 @@ public class ServerListFetcherService extends IntentService{
                             if (result != null) {
                                 mUrl = result.first;
                                 mServerListJsonString = result.second;
+                                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
                                 break;
                             }
                         }
@@ -183,6 +190,7 @@ public class ServerListFetcherService extends IntentService{
             //使用remote config
             if (mServerListJsonString == null){
                 mServerListJsonString = ServerConfig.shuffleRemoteConfig();
+                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
                 if(mServerListJsonString != null) {
                     urlKey = "remote_config";
                 }
@@ -192,28 +200,30 @@ public class ServerListFetcherService extends IntentService{
             if(mServerListJsonString == null || mServerListJsonString.isEmpty()) {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
                 mServerListJsonString = sharedPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
                 if (mServerListJsonString != null) {
                     urlKey = "旧的server list";
                 }
             }
 
-//            //使用本地静态服务器列表
-//            if (mServerListJsonString == null){
-//                AssetManager assetManager = getAssets();
-//                try {
-//                    InputStream inputStream = assetManager.open("fsl.json");
-//                    InputStreamReader isr = new InputStreamReader(inputStream);
-//                    BufferedReader br = new BufferedReader(isr);
-//                    mServerListJsonString = br.readLine();
-//                    if(mServerListJsonString != null){
-//                        mServerListJsonString = ServerConfig.shuffleStaticServerListJson(mServerListJsonString);
-//                        urlKey = "local_config";
-//                    }
-//
-//                } catch (IOException e) {
-//                    ShadowsocksApplication.handleException(e);
-//                }
-//            }
+            //使用本地静态服务器列表
+            if (mServerListJsonString == null) {
+                AssetManager assetManager = getAssets();
+                try {
+                    InputStream inputStream = assetManager.open("fsl.json");
+                    InputStreamReader isr = new InputStreamReader(inputStream);
+                    BufferedReader br = new BufferedReader(isr);
+                    mServerListJsonString = br.readLine();
+                    if (mServerListJsonString != null) {
+                        mServerListJsonString = ServerConfig.shuffleRemoteConfig();
+                        mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+                        urlKey = "local_config";
+                    }
+
+                } catch (IOException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
 
             if (mServerListJsonString != null) {
                 SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
