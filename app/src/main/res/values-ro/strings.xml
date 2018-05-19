@@ -100,4 +100,8 @@
     <string name="verifying">"Se verifică ..."</string>
     <string name="taking_a_coffee_break">"Luând o pauză de cafea ..."</string>
     <string name="building_configuration">"Configurația clădirii ..."</string>
+    <string name="vpn_is_connecting">VPN is connecting, please try it later</string>
+    <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
+    <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
+    <string name="server_list_full_toast">This server is full now，please refresh!</string>
 </resources>
