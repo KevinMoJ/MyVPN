@@ -395,7 +395,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
         }
         if(!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
-            mFetchServerListProgressDialog.setOnDismissListener(null);
+            if (mFetchServerListProgressDialog != null)
+                mFetchServerListProgressDialog.setOnDismissListener(null);
             showNoInternetSnackbar(R.string.fetch_server_list_failed, false);
             Firebase.getInstance(this).logEvent("VPN连不上", "取服务器列表超时");
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
