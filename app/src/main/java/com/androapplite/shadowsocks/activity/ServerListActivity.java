@@ -38,6 +38,7 @@ import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.ArrayList;
@@ -132,11 +133,16 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         }
 
         if(serverConfigs != null && !serverConfigs.isEmpty()) {
+            // 返回的服务器列表已经排序好了 是根据负载从低到高的顺序排列的，
+            // 在这里遍历每一个服务器，然后添加到相应的国家，所以默认第一个就是负载最低的，
+            // 如果负载最低的还是很高就默认为这个国家的所有服务器都满了
             for (ServerConfig serverConfig : serverConfigs) {
                 if (!mNations.contains(serverConfig.nation)) {
                     mNations.add(serverConfig.nation);
                     mFlags.add(serverConfig.flag);
                     mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
+                    if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
+                        Firebase.getInstance(this).logEvent("加载服务器列表满载", serverConfig.nation);
                 }
             }
         }
@@ -323,13 +329,14 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
 
         mListView.setItemChecked(mSelectedIndex, false);
         mSelectedIndex = position;
+        String nation = mNations.get(position);
+        String flag = mFlags.get(position);
         int resid = mSignalResIds.get(mNations.get(position));
         if (resid == R.drawable.server_signal_full) {
             Toast.makeText(this, R.string.server_list_full_toast, Toast.LENGTH_SHORT).show();
+            Firebase.getInstance(this).logEvent("点击满载服务器", nation);
         } else {
             mListView.setItemChecked(position, true);
-            String nation = mNations.get(position);
-            String flag = mFlags.get(position);
             mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
                     .putString(SharedPreferenceKey.VPN_FLAG, flag)
                     .apply();

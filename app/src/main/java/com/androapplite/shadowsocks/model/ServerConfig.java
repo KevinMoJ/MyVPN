@@ -35,6 +35,7 @@ public class ServerConfig implements Parcelable {
     public String nation; // country
     public int signal; // load
     public int port;  // port
+    private int load;
 
     public static final int[] SINAL_IMAGES = {
             R.drawable.server_signal_full,
@@ -62,6 +63,7 @@ public class ServerConfig implements Parcelable {
         this.signal = getLoadLevel(load);
         this.port = port;
         this.flag = icon;
+        this.load = load;
     }
 
     @Override
@@ -150,13 +152,11 @@ public class ServerConfig implements Parcelable {
 
         @Override
         public int compare(ServerConfig ar1, ServerConfig ar2) {
-            if (ar1.signal < ar2.signal)
-                return -1;
-
-            if (ar2.signal > ar1.signal)
+            int a = ar1.getLoad() - ar2.getLoad();
+            if (a > 0)
                 return 1;
-
-            return ar1.signal = ar2.signal;
+            else
+                return -1;
         }
     }
 
@@ -238,5 +238,9 @@ public class ServerConfig implements Parcelable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public int getLoad() {
+        return load;
     }
 }
