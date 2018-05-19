@@ -893,11 +893,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     @Override
-    public void onCancel(DisconnectFragment disconnectFragment) {
-        Firebase.getInstance(this).logEvent("连接VPN", "断开", "取消断开");
-    }
-
-    @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
         disconnectVpnServiceAsync();
@@ -1212,7 +1207,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
             AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-            container.addView(adAppHelper.getNative(), params);
+//            container.addView(adAppHelper.getNative(), params);
+            adAppHelper.getNative(container, params);
             Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "首页底部");
         } catch (Exception ex) {
             ShadowsocksApplication.handleException(ex);
