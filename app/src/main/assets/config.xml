@@ -9,9 +9,9 @@
     <string name="banner_ids">{admob=ca-app-pub-5330675173640052/8168752925},{fb=1207655049289960_1207657955956336}</string>
     <string name="admob_full_ids">{count=2},{id1=ca-app-pub-5330675173640052/6692019724,全屏},{id2=ca-app-pub-5330675173640052/6882449579,全屏高}</string>
     <string name="admob_banner_native_ids">{count=0}</string>
-    <string name="fb_full_ids">{count=2},{id1=1207655049289960_1207659762622822,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
-    <string name="fbn_full_ids">{count=2},{id1=1207655049289960_1207659762622822,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
-    <string name="fbn_banner_ids">{count=2},{id1=1207655049289960_1207659762622822,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
+    <string name="fb_full_ids">{count=2},{id1=1207655049289960_1560671607321634,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
+    <string name="fbn_full_ids">{count=2},{id1=1207655049289960_1560671607321634,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
+    <string name="fbn_banner_ids">{count=2},{id1=1207655049289960_1560671607321634,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
     <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2484828121,废弃}</string>
     <string name="fb_native_ids">{count=2},{id1=1207655049289960_1207656932623105,主页底部},{id2=1207655049289960_1661369880585139,主页底部高}</string>
     <string name="native_size">{count=2},{id1=320,180},{id2=320,180}</string>
