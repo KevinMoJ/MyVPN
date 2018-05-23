@@ -126,4 +126,11 @@
         <value>80</value>
     </entry>
 
+    <!--实时日志-->
+    <entry>
+        <key>apache_log_url</key>
+        <!--<value>http://52.14.99.239/</value>-->
+        <value>http://rtl.vpnnest.com/</value>
+    </entry>
+
 </defaultsMap>

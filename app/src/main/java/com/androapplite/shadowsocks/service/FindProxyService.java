@@ -12,6 +12,9 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.InternetUtil;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
@@ -188,11 +191,16 @@ public class FindProxyService extends IntentService {
         }
     }
 
+    //&& isPortOpen(config.server, config.port, 5000)
     private ServerConfig testServerIpAndPort(ServerConfig config) throws Exception{
         int ping_load = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
         boolean connect = ping(config.server) <= ping_load;
-        if (connect && isPortOpen(config.server, config.port, 5000)) {
+        if (connect) {
             return config;
+        } else {
+            RealTimeLogger.getInstance(this).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(config.getLoad())
+                    , "vpn_country", config.nation, "vpn_city", config.name, "net_type", InternetUtil.getNetworkState(this),
+                    "time", WarnDialogUtil.getDateTime());
         }
         return null;
     }

@@ -64,6 +64,9 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ConnectionTestService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.utils.InternetUtil;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -288,7 +291,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public void onConnectButtonClick() {
        startConnectVPN();
-//        ceshi("45.76.208.56");
     }
 
     private void startConnectVPN() {
@@ -530,11 +532,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     switch (activity.mAdButtonMsgType) {
                         case MSG_SHOW_AD_BUTTON_FULL:
                             Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮全屏");
-                            Log.i("ssss", "onAdClick: 主界面广告按钮全屏");
                             break;
                         case MSG_SHOW_AD_BUTTON_RECOMMEND:
                             Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮线上互推全屏");
-                            Log.i("ssss", "onAdClick: 主界面广告按钮线上互推全屏");
                             break;
                     }
                     AdAppHelper.getInstance(activity).removeAdStateListener(this);
@@ -814,11 +814,16 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
+    // && isPortOpen(config.server, config.port, 5000)
     private ServerConfig testServerIpAndPort(ServerConfig config) throws Exception {
         int ping_load = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
         boolean connect = ping(config.server) <= ping_load;
-        if (connect && isPortOpen(config.server, config.port, 5000)) {
+        if (connect) {
             return config;
+        } else {
+            RealTimeLogger.getInstance(this).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(config.getLoad())
+                    , "vpn_country", config.nation, "vpn_city", config.name, "net_type", InternetUtil.getNetworkState(this),
+                    "time", WarnDialogUtil.getDateTime());
         }
         return null;
     }
@@ -1066,12 +1071,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     adAppHelper.showFullAd();
                     mAdButtonMsgType = MSG_SHOW_AD_BUTTON_FULL;
                     Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上全屏");
-                    Log.i("ssss", "onClick:   线上全屏");
                 } else if (adAppHelper.isRecommendAdLoaded()) {
                     adAppHelper.showFullAd();
                     mAdButtonMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
                     Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上互推");
-                    Log.i("ssss", "onClick:   线上互推");
                 } else {
                     startActivity(new Intent(this, RecommendActivity.class));
                     Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "本地互推");
