@@ -427,8 +427,9 @@ public class LocalVpnService extends VpnService implements Runnable {
 
                         switch (session.IsSelfPort) {
                             case 0:
-                                //vpn自己不走代理,把fake IP改为real IP
-                                if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort)) {
+                                //vpn自己不走代理,把fake IP改为real IP    "www.gstatic.com" --- 让这个测试的网址也走自己的vpn
+                                if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort) && !"www.gstatic.com".equals(session.RemoteHost)) {
+//                                    if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort)) {
                                     session.RemoteRealIP = m_DnsProxy.translateToRealIp(destinationIP);
                                     if (ProxyConfig.IS_DEBUG) {
                                         System.out.printf("onIPPacketReceived 1 vpn自己 real ip %s, fake id %s\n",
