@@ -65,7 +65,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     private volatile StatusGuard mStatusGuard;
     private volatile ScheduledExecutorService mScheduleExecutorService;
     private VpnNotification mNotification;
-    private volatile UdpProxy mUdpProxy;
+    private volatile UdpProxyServer mUdpProxyServer;
     public long gDelay;
 
     public LocalVpnService() {
@@ -244,8 +244,8 @@ public class LocalVpnService extends VpnService implements Runnable {
             m_DnsProxy.start();
             writeLog("LocalDnsProxy started.");
 
-            mUdpProxy = new UdpProxy();
-            mUdpProxy.start();
+            mUdpProxyServer = new UdpProxyServer(0);
+            mUdpProxyServer.start();
             writeLog("LocalUdpProxy started.");
 
             startNotification();
@@ -335,7 +335,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         int size = 0;
         while (size != -1 && IsRunning) {
             while ((size = in.read(m_Packet)) > 0 && IsRunning) {
-                if (m_DnsProxy.Stopped || m_TcpProxyServer.Stopped || mUdpProxy.Stopped) {
+                if (m_DnsProxy.Stopped || m_TcpProxyServer.Stopped || mUdpProxyServer.Stopped) {
                     in.close();
                     throw new Exception("LocalServer stopped.");
                 }
@@ -474,6 +474,8 @@ public class LocalVpnService extends VpnService implements Runnable {
             case IPHeader.UDP:
                 UDPHeader udpHeader = m_UDPHeader;
                 udpHeader.m_Offset = ipHeader.getHeaderLength();
+                short sourcePort = udpHeader.getSourcePort();
+                short destinationPort = udpHeader.getDestinationPort();
                 if (sourceIp == LOCAL_IP) {
                     if (udpHeader.getDestinationPort() == 53) {
                         m_DNSBuffer.clear();
@@ -488,8 +490,42 @@ public class LocalVpnService extends VpnService implements Runnable {
                                 Firebase.getInstance(this).logEvent("DNS", "不走代理", dnsPacket.Questions[0].Domain);
                             }
                         }
+                    } else if (sourcePort == mUdpProxyServer.Port) {
+                        NatSession session = NatSessionManager.getSession(destinationPort);
+                        if (session != null) {
+                            ipHeader.setSourceIP(destinationIP);
+                            udpHeader.setSourcePort(session.RemotePort);
+                            ipHeader.setDestinationIP(LOCAL_IP);
+
+                            CommonMethods.ComputeUDPChecksum(ipHeader, udpHeader);
+                            m_VPNOutputStream.write(ipHeader.m_Data, ipHeader.m_Offset, size);
+//                            mTcpTrafficMonitor.updateTrafficReceive(ipHeader, tcpHeader, size);
+                        } else {
+                            System.out.printf("NoSession: %s %s\n", ipHeader.toString(), udpHeader.toString());
+                        }
                     } else {
-                        mUdpProxy.onUdpRequestReceived(ipHeader, udpHeader);
+                        // 添加端口映射
+                        NatSession session = NatSessionManager.getSession(sourcePort);
+                        if (session == null || session.RemoteIP != destinationIP || session.RemotePort != destinationPort) {
+                            session = NatSessionManager.createSession(sourcePort, destinationIP, destinationPort);
+                        }
+
+                        session.LastNanoTime = System.nanoTime();
+                        session.PacketSent++;//注意顺序
+                        //udp不判断
+                        session.IsSelfPort = -1;
+
+                        int udpDataSize = ipHeader.getDataLength() - 8;
+
+                        // 转发给本地TCP服务器
+                        ipHeader.setSourceIP(destinationIP);
+                        ipHeader.setDestinationIP(LOCAL_IP);
+                        udpHeader.setDestinationPort(mUdpProxyServer.Port);
+
+                        CommonMethods.ComputeUDPChecksum(ipHeader, udpHeader);
+                        m_VPNOutputStream.write(ipHeader.m_Data, ipHeader.m_Offset, size);
+                        session.BytesSent += udpDataSize;//注意顺序
+//                        mTcpTrafficMonitor.updateTrafficSend(ipHeader, tcpHeader, size);
                     }
                 }
                 break;
@@ -620,9 +656,9 @@ public class LocalVpnService extends VpnService implements Runnable {
         }
 
         // 停止Udp转发
-        if (mUdpProxy != null) {
-            mUdpProxy.stop();
-            mUdpProxy = null;
+        if (mUdpProxyServer != null) {
+            mUdpProxyServer.stop();
+            mUdpProxyServer = null;
             writeLog("LocalDnsProxy stopped.");
         }
 
@@ -675,8 +711,8 @@ public class LocalVpnService extends VpnService implements Runnable {
         });
     }
 
-    public UdpProxy getUdpProxy () {
-        return mUdpProxy;
+    public UdpProxyServer getUdpProxy () {
+        return mUdpProxyServer;
     }
 
     private boolean isSelfTcpPort(short portNumber) {
