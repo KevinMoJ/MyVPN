@@ -147,7 +147,7 @@ public class UdpProxyServer implements Runnable {
                                                     ShadowsocksConfig shadowsocksConfig = (ShadowsocksConfig) ProxyConfig.Instance.getDefaultProxy();
                                                     InetSocketAddress shadowsocksSocketAddress = shadowsocksConfig.ServerAddress;
                                                     InetSocketAddress clientRemoteSocketAddress = createClientRemoteSocketAddress(shadowsocksSocketAddress, session);
-                                                    if (clientRemoteSocketAddress == shadowsocksSocketAddress) {
+                                                    if (clientRemoteSocketAddress.equals(shadowsocksSocketAddress)) {
                                                         byte[] payload = new byte[size];
                                                         payloadBuffer.flip();
                                                         payloadBuffer.get(payload);
