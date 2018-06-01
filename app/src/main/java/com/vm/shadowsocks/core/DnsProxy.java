@@ -1,5 +1,6 @@
 package com.vm.shadowsocks.core;
 
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -149,10 +150,11 @@ public class DnsProxy implements Runnable {
             Question question = dnsPacket.Questions[0];
             if (question.Type == 1) {
                 int realIP = getFirstIP(dnsPacket);
-                if (ProxyConfig.Instance.needProxy(question.Domain, realIP)) {
+                if (ProxyConfig.Instance.needProxyForDnsQuery(question.Domain, realIP)) {
                     int fakeIP = getOrCreateFakeIP(question.Domain);
                     mapFakeAndRealIp(fakeIP, realIP);
                     tamperDnsResponse(rawPacket, dnsPacket, fakeIP);
+                    Log.d("udpproxy dns", question.Domain + " fake:" + CommonMethods.ipIntToString(fakeIP) + " real:" + CommonMethods.ipIntToString(realIP));
                     if (ProxyConfig.IS_DEBUG)
                         System.out.printf("FakeDns recv: %s=>%s(%s)\n", question.Domain, CommonMethods.ipIntToString(realIP), CommonMethods.ipIntToString(fakeIP));
                     return true;
@@ -212,7 +214,7 @@ public class DnsProxy implements Runnable {
         }
 
         if (question.Type == 1) {
-            if (ProxyConfig.Instance.needProxy(question.Domain, getIPFromCache(question.Domain))) {
+            if (ProxyConfig.Instance.needProxyForDnsQuery(question.Domain, getIPFromCache(question.Domain))) {
                 int fakeIP = getOrCreateFakeIP(question.Domain);
                 tamperDnsResponse(ipHeader.m_Data, dnsPacket, fakeIP);
 

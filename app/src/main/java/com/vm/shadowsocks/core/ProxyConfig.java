@@ -240,6 +240,43 @@ public class ProxyConfig {
         return false;
     }
 
+    public boolean needProxyForDnsQuery(String host, int ip) {
+        if (ProxyConfig.IS_DEBUG){
+            System.out.printf("needProxy host: %s, ip: %s, globalMode: %s, isFakeIP: %s, m_outside_china_use_proxy: %s, isIPInChina: %s\n",
+                    host != null ? host : "null",
+                    CommonMethods.ipIntToString(ip),
+                    globalMode, isFakeIP(ip), m_outside_china_use_proxy,
+                    ChinaIpMaskManager.isIPInChina(ip));
+        }
+        String proxyHostName = getDefaultProxy().ServerAddress.getHostName();
+        int proxyIp = CommonMethods.ipStringToInt(getDefaultProxy().ServerAddress.getAddress().getHostAddress());
+        if (proxyHostName.equals(host) || ip == proxyIp) {
+            return false;
+        }
+        if (globalMode) {
+            return true;
+        }
+        if (host != null) {
+            Boolean stateBoolean = getDomainState(host);
+            if (ProxyConfig.IS_DEBUG){
+                System.out.printf("needProxy getDomainState: %s\n", stateBoolean != null ? stateBoolean : "null");
+            }
+            if (stateBoolean != null) {
+                return stateBoolean.booleanValue();
+            }
+
+        }
+
+        if (isFakeIP(ip)) {
+            return true;
+        }
+
+        if (m_outside_china_use_proxy && ip != 0) {
+            return !ChinaIpMaskManager.isIPInChina(ip);
+        }
+        return false;
+    }
+
     public boolean isIsolateHttpHostHeader() {
         return m_isolate_http_host_header;
     }

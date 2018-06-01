@@ -1,5 +1,7 @@
 package com.vm.shadowsocks.core;
 
+import android.content.pm.PackageInstaller;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
@@ -167,6 +169,11 @@ public class UdpProxyServer implements Runnable {
                                                         payloadBuffer.put(payload);
                                                     }
                                                     payloadBuffer.flip();
+                                                    if (clientRemoteSocketAddress.equals(shadowsocksSocketAddress)) {
+                                                        Log.d("udpproxy->", sessionPort + "->" + CommonMethods.ipIntToString(session.RemoteIP) + ":" + session.RemotePort + " proxy(" + shadowsocksSocketAddress + ")");
+                                                    } else {
+                                                        Log.d("udpproxy->", clientRemoteSocketAddress.toString());
+                                                    }
                                                     serverChannel.send(payloadBuffer, clientRemoteSocketAddress);
                                                 }
                                             }
@@ -189,6 +196,11 @@ public class UdpProxyServer implements Runnable {
                                                     }
                                                     InetSocketAddress localRemoteSocketAddress = new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), sessionPort & 0xffff);
                                                     payloadBuffer.flip();
+                                                    if (serverRemoteAddress.equals(shadowsocksSocketAddress)) {
+                                                        Log.d("udpproxy<-", sessionPort + "<-" + CommonMethods.ipIntToString(session.RemoteIP) + ":" + session.RemotePort + " proxy(" + shadowsocksSocketAddress + ")");
+                                                    } else {
+                                                        Log.d("udpproxy<-", localRemoteSocketAddress.toString());
+                                                    }
                                                     mDatagramChannel.send(payloadBuffer, localRemoteSocketAddress);
                                                 }
                                             }
@@ -214,7 +226,7 @@ public class UdpProxyServer implements Runnable {
 
     private InetSocketAddress createClientRemoteSocketAddress(InetSocketAddress shadowsocksSocketAddress, NatSession session) {
         InetSocketAddress clientRemoteSocketAddress;
-        if (ProxyConfig.isFakeIP(session.RemoteIP)) {
+        if (ProxyConfig.Instance.needProxy(session.RemoteHost, session.RemoteIP)) {
             clientRemoteSocketAddress = shadowsocksSocketAddress;
         } else {
             clientRemoteSocketAddress = new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), session.RemotePort & 0xffff);
