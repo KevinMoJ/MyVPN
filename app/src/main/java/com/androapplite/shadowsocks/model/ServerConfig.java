@@ -155,8 +155,10 @@ public class ServerConfig implements Parcelable {
             int a = ar1.getLoad() - ar2.getLoad();
             if (a > 0)
                 return 1;
-            else
+            else if (a < 0)
                 return -1;
+            else
+                return 0;
         }
     }
 
