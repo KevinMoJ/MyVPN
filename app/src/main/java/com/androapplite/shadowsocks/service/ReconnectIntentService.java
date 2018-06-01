@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
@@ -31,6 +32,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +49,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class ReconnectIntentService extends IntentService {
     private SharedPreferences mSharedPreference;
-
+    private boolean mIsFindLocalServer; //找到与服务器匹配的国家
+    private boolean mIsPriorityConnect; //找到优先选择的国家
+    
     public ReconnectIntentService() {
         super("ReconnectIntentService");
     }
@@ -77,8 +81,8 @@ public class ReconnectIntentService extends IntentService {
 
     private ServerConfig findVPNServer(){
         ServerConfig serverConfig = null;
-//        ArrayList<ServerConfig> serverConfigs = ServerListHelper.loadServerList(this, mSharedPreference);
         ArrayList<ServerConfig> serverConfigs = loadServerList();
+        String localNation = "";
         if(serverConfigs != null && !serverConfigs.isEmpty()) {
             final String defaultNation = getString(R.string.vpn_nation_opt);
             String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, defaultNation);
@@ -104,8 +108,7 @@ public class ReconnectIntentService extends IntentService {
             String defaultName = getString(R.string.vpn_name_opt);
             String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
             if(!name.equals(defaultName)){
-//                String serverlist = ServerListHelper.getDecryptServerList(mSharedPreference);
-                String serverlist =  mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+                String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
                 if(serverlist != null && !serverlist.contains(name)){
                     nation = defaultNation;
                     mSharedPreference.edit()
@@ -117,10 +120,48 @@ public class ReconnectIntentService extends IntentService {
 
             final boolean isGlobalOption = nation.equals(defaultNation);
             ArrayList<MyCallable> tasks = new ArrayList<>();
-            if (isGlobalOption) {
-                serverConfigs.remove(0);
-                for(ServerConfig config: serverConfigs) {
-                    tasks.add(new MyCallable(this, config));
+            if (isGlobalOption) { //没有选择国家
+                String countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "unkown");
+                TypedArray nationCode = getResources().obtainTypedArray(R.array.vpn_nations_code);
+                TypedArray nations = getResources().obtainTypedArray(R.array.vpn_nations);
+
+                //测试用
+//                countryCode = "ZA";
+                for (int k = 0; k < nationCode.length(); k++) { //通过国家code找到当地有服务器
+                    String code = nationCode.getString(k);
+                    if (countryCode.equals("FR")) //单独处理法国，因为现在暂时没有法国的服务器，法国默认连接美国
+                        break;
+                    if (countryCode.toUpperCase().equals(code)) {
+                        localNation = nations.getString(k);
+                        mIsFindLocalServer = true;
+                        Firebase.getInstance(this).logEvent("找到本地服务器", countryCode, localNation);
+                        break;
+                    } else {
+                        mIsFindLocalServer = false;
+                    }
+                }
+
+                if (!mIsFindLocalServer)
+                    Firebase.getInstance(this).logEvent("没有找到本地服务器", countryCode);
+
+                //根据国家代码 有限选择当前国家的服务器
+                if (!TextUtils.isEmpty(localNation)) {
+                    for (ServerConfig config : serverConfigs) {
+                        if (localNation.equals(config.nation)) {
+                            tasks.add(new MyCallable(this, config));
+                        }
+                    }
+                } else {
+                    serverConfigs.remove(0); // 如果没有找到当前国家有服务器的话，先根据国家来优先链接服务器，
+                    nation = getPriorityNation(countryCode);
+                    for (ServerConfig config : serverConfigs) {
+                        if (mIsPriorityConnect) {
+                            if (nation.equals(config.nation))
+                                tasks.add(new MyCallable(this, config));
+                        } else {
+                            tasks.add(new MyCallable(this, config));
+                        }
+                    }
                 }
             } else {
                 for (ServerConfig config : serverConfigs) {
@@ -130,7 +171,7 @@ public class ReconnectIntentService extends IntentService {
                 }
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorService executorService = Executors.newCachedThreadPool();
             ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
             for (MyCallable callable: tasks) {
                 ecs.submit(callable);
@@ -148,10 +189,65 @@ public class ReconnectIntentService extends IntentService {
                 }
             }
             executorService.shutdown();
+            if (serverConfig == null && (mIsFindLocalServer || mIsPriorityConnect)) {
+                serverConfig = findOtherConfig(serverConfigs);
+            }
         }
         return serverConfig;
     }
 
+    private String getPriorityNation(String nationCode) { //http://www.jctrans.com/tool/gjym.htm
+        String priorityNation = "";
+        if (nationCode.equals("AE") || nationCode.equals("ZA")) { // 阿联酋 南非
+            priorityNation = getString(R.string.vpn_nation_nl);
+            mIsPriorityConnect = true;
+        } else if (nationCode.equals("TH") || nationCode.equals("PH")) { // 泰国 菲律宾
+            priorityNation = getString(R.string.vpn_nation_sg);
+            mIsPriorityConnect = true;
+        } else if (nationCode.equals("NG") || nationCode.equals("FR")) { // 尼日利亚 法国
+            priorityNation = getString(R.string.vpn_nation_us);
+            mIsPriorityConnect = true;
+        } else {
+            mIsPriorityConnect = false;
+        }
+        Firebase.getInstance(this).logEvent("默认优先链接服务器", nationCode, priorityNation);
+        return priorityNation;
+    }
+
+    //当前国家有VPN服务器，但是都链接失败了，就从头到尾再从新链接一下其他国家服务器（排除链接当前国家）
+    private ServerConfig findOtherConfig(List<ServerConfig> serverConfigs){
+        ServerConfig serverConfig = null;
+        ArrayList<MyCallable> tasks = new ArrayList<>();
+
+        serverConfigs.remove(0);
+        for (ServerConfig config : serverConfigs) {
+            tasks.add(new MyCallable(this, config));
+        }
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
+        for (MyCallable callable: tasks) {
+            ecs.submit(callable);
+        }
+
+        for (int i = 0; i < tasks.size(); i++) {
+            try {
+                Future<ServerConfig> future = ecs.take();
+                ServerConfig sc = future.get(10, TimeUnit.SECONDS);
+                if (sc != null) {
+                    serverConfig = sc;
+                    break;
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        executorService.shutdown();
+        if (serverConfig != null)
+            Firebase.getInstance(this).logEvent("优先连接服务器失败连接连接其他服务器", serverConfig.nation, serverConfig.server);
+        return serverConfig;
+    }
+    
     private static class MyCallable implements Callable<ServerConfig> {
         private WeakReference<ReconnectIntentService> mReference;
         private ServerConfig mConfig;

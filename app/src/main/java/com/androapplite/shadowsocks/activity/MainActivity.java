@@ -35,6 +35,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
@@ -88,6 +89,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -124,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private Menu mMenu;
     private VpnState mVpnState;
     private boolean mIsRestart;
+    private boolean mIsFindLocalServer; //找到与服务器匹配的国家
+    private boolean mIsPriorityConnect; //找到优先选择的国家
     private AlertDialog mExitAlertDialog;
     private DisconnectFragment mDisconnectFragment;
     private AnimationSet mMenuRocketAnimation;
@@ -723,6 +727,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private ServerConfig findVPNServer(){
         ServerConfig serverConfig = null;
         ArrayList<ServerConfig> serverConfigs = loadServerList();
+        String localNation = "";
         if(serverConfigs != null && !serverConfigs.isEmpty()) {
             final String defaultNation = getString(R.string.vpn_nation_opt);
             String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, defaultNation);
@@ -760,10 +765,48 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
             final boolean isGlobalOption = nation.equals(defaultNation);
             ArrayList<MyCallable> tasks = new ArrayList<>();
-            if (isGlobalOption) {
-                serverConfigs.remove(0);
-                for(ServerConfig config: serverConfigs) {
-                    tasks.add(new MyCallable(this, config));
+            if (isGlobalOption) { //没有选择国家
+                String countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "unkown");
+                TypedArray nationCode = getResources().obtainTypedArray(R.array.vpn_nations_code);
+                TypedArray nations = getResources().obtainTypedArray(R.array.vpn_nations);
+
+                //测试用
+//                countryCode = "ZA";
+                for (int k = 0; k < nationCode.length(); k++) { //通过国家code找到当地有服务器
+                    String code = nationCode.getString(k);
+                    if (countryCode.equals("FR")) //单独处理法国，因为现在暂时没有法国的服务器，法国默认连接美国
+                        break;
+                    if (countryCode.toUpperCase().equals(code)) {
+                        localNation = nations.getString(k);
+                        mIsFindLocalServer = true;
+                        Firebase.getInstance(this).logEvent("找到本地服务器", countryCode, localNation);
+                        break;
+                    } else {
+                        mIsFindLocalServer = false;
+                    }
+                }
+
+                if (!mIsFindLocalServer)
+                    Firebase.getInstance(this).logEvent("没有找到本地服务器", countryCode);
+
+                //根据国家代码 有限选择当前国家的服务器
+                if (!TextUtils.isEmpty(localNation)) { //单独处理法国
+                    for (ServerConfig config : serverConfigs) {
+                        if (localNation.equals(config.nation)) {
+                            tasks.add(new MyCallable(this, config));
+                        }
+                    }
+                } else {
+                    serverConfigs.remove(0); // 如果没有找到当前国家有服务器的话，先根据国家来优先链接服务器，
+                    nation = getPriorityNation(countryCode);
+                    for (ServerConfig config : serverConfigs) {
+                        if (mIsPriorityConnect) {
+                            if (nation.equals(config.nation))
+                                tasks.add(new MyCallable(this, config));
+                        } else {
+                            tasks.add(new MyCallable(this, config));
+                        }
+                    }
                 }
             } else {
                 for (ServerConfig config : serverConfigs) {
@@ -791,7 +834,62 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
             }
             executorService.shutdown();
+            if (serverConfig == null && (mIsFindLocalServer || mIsPriorityConnect)) {
+                serverConfig = findOtherConfig(serverConfigs);
+            }
         }
+        return serverConfig;
+    }
+
+    private String getPriorityNation(String nationCode) { //http://www.jctrans.com/tool/gjym.htm
+        String priorityNation = "";
+        if (nationCode.equals("AE") || nationCode.equals("ZA")) { // 阿联酋 南非
+            priorityNation = getString(R.string.vpn_nation_nl);
+            mIsPriorityConnect = true;
+        } else if (nationCode.equals("TH") || nationCode.equals("PH")) { // 泰国 菲律宾
+            priorityNation = getString(R.string.vpn_nation_sg);
+            mIsPriorityConnect = true;
+        } else if (nationCode.equals("NG") || nationCode.equals("FR")) { // 尼日利亚 法国
+            priorityNation = getString(R.string.vpn_nation_us);
+            mIsPriorityConnect = true;
+        } else {
+            mIsPriorityConnect = false;
+        }
+        Firebase.getInstance(this).logEvent("默认优先链接服务器", nationCode, priorityNation);
+        return priorityNation;
+    }
+
+    //当前国家有VPN服务器，但是都链接失败了，就从头到尾再从新链接一下其他国家服务器（排除链接当前国家）
+    private ServerConfig findOtherConfig(List<ServerConfig> serverConfigs){
+        ServerConfig serverConfig = null;
+        ArrayList<MyCallable> tasks = new ArrayList<>();
+
+        serverConfigs.remove(0);
+        for (ServerConfig config : serverConfigs) {
+            tasks.add(new MyCallable(this, config));
+        }
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
+        for (MyCallable callable: tasks) {
+            ecs.submit(callable);
+        }
+
+        for (int i = 0; i < tasks.size(); i++) {
+            try {
+                Future<ServerConfig> future = ecs.take();
+                ServerConfig sc = future.get(10, TimeUnit.SECONDS);
+                if (sc != null) {
+                    serverConfig = sc;
+                    break;
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        executorService.shutdown();
+        if (serverConfig != null)
+            Firebase.getInstance(this).logEvent("优先连接服务器失败连接连接其他服务器", serverConfig.nation, serverConfig.server);
         return serverConfig;
     }
 
@@ -1123,6 +1221,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                 adAppHelper.showFullAd();
                 mVpnState = VpnState.Connected;
+                Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mVpnState = VpnState.Stopped;

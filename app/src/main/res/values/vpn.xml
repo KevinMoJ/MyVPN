@@ -67,4 +67,26 @@
         <item>@string/vpn_nation_us</item>
     </array>
 
+    <array name="vpn_nations_code" translatable="false">
+        <item>@string/vpn_nation_opt</item>
+        <item>US</item>
+        <item>US</item>
+        <item>UK</item>
+        <item>FR</item>
+        <item>JP</item>
+        <item>AU</item>
+        <item>US</item>
+        <item>DE</item>
+        <item>SG</item>
+        <item>NL</item>
+        <item>US</item>
+        <item>US</item>
+        <item>US</item>
+        <item>US</item>
+        <item>US</item>
+        <item>US</item>
+        <item>US</item>
+        <item>US</item>
+    </array>
+
 </resources>
