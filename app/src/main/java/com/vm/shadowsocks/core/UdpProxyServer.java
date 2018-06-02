@@ -170,9 +170,9 @@ public class UdpProxyServer implements Runnable {
                                                     }
                                                     payloadBuffer.flip();
                                                     if (clientRemoteSocketAddress.equals(shadowsocksSocketAddress)) {
-                                                        Log.d("udpproxy->", sessionPort + "->" + CommonMethods.ipIntToString(session.RemoteIP) + ":" + session.RemotePort + " proxy(" + shadowsocksSocketAddress + ")");
+                                                        Log.d("udpproxy->", (sessionPort & 0xffff) + "->" + CommonMethods.ipIntToString(session.RemoteIP) + ":" + (session.RemotePort & 0xffff) + " proxy(" + shadowsocksSocketAddress + ")");
                                                     } else {
-                                                        Log.d("udpproxy->", clientRemoteSocketAddress.toString());
+                                                        Log.d("udpproxy->", (sessionPort & 0xffff) + "->" + clientRemoteSocketAddress.toString());
                                                     }
                                                     serverChannel.send(payloadBuffer, clientRemoteSocketAddress);
                                                 }
@@ -197,9 +197,9 @@ public class UdpProxyServer implements Runnable {
                                                     InetSocketAddress localRemoteSocketAddress = new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), sessionPort & 0xffff);
                                                     payloadBuffer.flip();
                                                     if (serverRemoteAddress.equals(shadowsocksSocketAddress)) {
-                                                        Log.d("udpproxy<-", sessionPort + "<-" + CommonMethods.ipIntToString(session.RemoteIP) + ":" + session.RemotePort + " proxy(" + shadowsocksSocketAddress + ")");
+                                                        Log.d("udpproxy<-", (sessionPort & 0xffff) + "<-" + CommonMethods.ipIntToString(session.RemoteIP) + ":" + (session.RemotePort & 0xffff) + " proxy(" + shadowsocksSocketAddress + ")");
                                                     } else {
-                                                        Log.d("udpproxy<-", localRemoteSocketAddress.toString());
+                                                        Log.d("udpproxy<-", (sessionPort & 0xffff) + "->" + localRemoteSocketAddress.toString());
                                                     }
                                                     mDatagramChannel.send(payloadBuffer, localRemoteSocketAddress);
                                                 }

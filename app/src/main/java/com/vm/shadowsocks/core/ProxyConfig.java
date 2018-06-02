@@ -40,7 +40,7 @@ public class ProxyConfig {
     public ArrayList<Config> m_ProxyList;
     HashMap<String, Boolean> m_DomainMap;
 
-    public boolean globalMode = true;
+    public boolean globalMode = false;
 
     int m_dns_ttl;
     String m_welcome_info;
@@ -215,6 +215,11 @@ public class ProxyConfig {
                     CommonMethods.ipIntToString(ip),
                     globalMode, isFakeIP(ip), m_outside_china_use_proxy,
                     ChinaIpMaskManager.isIPInChina(ip));
+        }
+        String proxyHostName = getDefaultProxy().ServerAddress.getHostName();
+        int proxyIp = CommonMethods.ipStringToInt(getDefaultProxy().ServerAddress.getAddress().getHostAddress());
+        if (proxyHostName.equals(host) || ip == proxyIp) {
+            return false;
         }
         if (globalMode) {
             return true;
