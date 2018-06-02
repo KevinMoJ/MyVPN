@@ -7,6 +7,7 @@ public class NatSession {
     public int BytesSent;
     public int PacketSent;
     public long LastNanoTime;
-    public int IsSelfPort;
     public int RemoteRealIP;
+    public byte IsSelfPort;
+    public byte SendTactics; //=0：初始化；=1：直连；=2：vpn连
 }
