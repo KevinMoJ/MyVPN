@@ -9,5 +9,5 @@ public class NatSession {
     public long LastNanoTime;
     public int RemoteRealIP;
     public byte IsSelfPort;
-    public byte SendTactics; //=0：初始化；=1：直连；=2：vpn连
+//    public byte SendTactics; //=0：初始化；=1：直连；=2：vpn连
 }

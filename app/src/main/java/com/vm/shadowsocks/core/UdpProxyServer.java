@@ -1,6 +1,5 @@
 package com.vm.shadowsocks.core;
 
-import android.content.pm.PackageInstaller;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -12,7 +11,6 @@ import com.vm.shadowsocks.tunnel.shadowsocks.ShadowsocksConfig;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
@@ -28,7 +26,7 @@ public class UdpProxyServer implements Runnable {
     public short Port;
     private Selector mSelector;
     private DatagramChannel mDatagramChannel;
-    private SparseArray<DatagramChannel> mClientRemoteChannelMap;
+    private SparseArray<ChannelProperty> mClientRemoteChannelMap;
 
     public UdpProxyServer(int port) throws IOException {
         mSelector = Selector.open();
@@ -67,9 +65,9 @@ public class UdpProxyServer implements Runnable {
         }
         if (mClientRemoteChannelMap != null) {
             for(int i=0; i<mClientRemoteChannelMap.size(); i++) {
-                DatagramChannel channel = mClientRemoteChannelMap.valueAt(i);
+                ChannelProperty channelProperty = mClientRemoteChannelMap.valueAt(i);
                 try {
-                    channel.close();
+                    channelProperty.channel.close();
                 } catch (IOException e) {
                     ShadowsocksApplication.handleException(e);
                 }
@@ -78,31 +76,6 @@ public class UdpProxyServer implements Runnable {
         }
         mReceivedThread.interrupt();
     }
-
-//    @Override
-//    public void run() {
-//        ByteBuffer payload = ByteBuffer.allocate(2000);
-//        while (!Stopped) {
-//            try {
-//                mSelector.select();
-//                Iterator<SelectionKey> keyIterator = mSelector.selectedKeys().iterator();
-//                while (keyIterator.hasNext()) {
-//                    SelectionKey key = keyIterator.next();
-//                    if (key.isValid()) {
-//                        if (key.isReadable()) {
-//                            DatagramChannel channel = (DatagramChannel) key.channel();
-//                            channel.receive(payload);
-//                        }
-////                        key.cancel();
-//                    }
-//                    keyIterator.remove();
-//
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     @Override
     public void run() {
@@ -128,12 +101,12 @@ public class UdpProxyServer implements Runnable {
                                             int sessionPort = (short)(serverRemoteAddress.getPort() & 0xffff);
                                             NatSession session = NatSessionManager.getSession(sessionPort);
                                             if (session != null) {
-                                                DatagramChannel clientRemoteChannel = mClientRemoteChannelMap.get(sessionPort);
-                                                if (clientRemoteChannel == null) {
-                                                    clientRemoteChannel = createRemoteChannel(sessionPort);
+                                                ChannelProperty channelProperty = mClientRemoteChannelMap.get(sessionPort);
+                                                if (channelProperty == null) {
+                                                    channelProperty = createRemoteChannel(sessionPort);
                                                 }
-                                                if (clientRemoteChannel != null) {
-                                                    InetSocketAddress clientRemoteChannelAddress = (InetSocketAddress) clientRemoteChannel.socket().getLocalSocketAddress();
+                                                if (channelProperty != null) {
+                                                    InetSocketAddress clientRemoteChannelAddress = (InetSocketAddress) channelProperty.channel.socket().getLocalSocketAddress();
                                                     payloadBuffer.flip();
                                                     serverChannel.send(payloadBuffer, clientRemoteChannelAddress);
                                                 }
@@ -145,16 +118,17 @@ public class UdpProxyServer implements Runnable {
                                             if (sessionPortInt != null) {
                                                 int sessionPort = sessionPortInt;
                                                 NatSession session = NatSessionManager.getSession(sessionPort);
-                                                Log.d("udpproxy->", (sessionPort & 0xffff) + " session.SendTactics: " + session.SendTactics);
-                                                if (session != null) {
-                                                    if (session.SendTactics == 0 || session.SendTactics == 1) {
+                                                ChannelProperty channelProperty = mClientRemoteChannelMap.get(sessionPort);
+                                                if (session != null && channelProperty != null) {
+                                                    Log.d("udpproxy->", (sessionPort & 0xffff) + " session.SendTactics: " + channelProperty.sendTactics);
+                                                    if (channelProperty.sendTactics == 0 || channelProperty.sendTactics == 1) {
                                                         InetSocketAddress clientRemoteSocketAddress =
                                                                 new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), session.RemotePort & 0xffff);
                                                         payloadBuffer.flip();
                                                         serverChannel.send(payloadBuffer, clientRemoteSocketAddress);
                                                         Log.d("udpproxy->", (sessionPort & 0xffff) + "->" + clientRemoteSocketAddress.toString());
                                                     }
-                                                    if (session.SendTactics == 0 || session.SendTactics == 2) {
+                                                    if (channelProperty.sendTactics == 0 || channelProperty.sendTactics == 2) {
                                                         ShadowsocksConfig shadowsocksConfig = (ShadowsocksConfig) ProxyConfig.Instance.getDefaultProxy();
                                                         InetSocketAddress shadowsocksSocketAddress = shadowsocksConfig.ServerAddress;
                                                         InetSocketAddress clientRemoteSocketAddress = shadowsocksSocketAddress;
@@ -186,13 +160,14 @@ public class UdpProxyServer implements Runnable {
                                             if (sessionPortInt != null) {
                                                 int sessionPort = (short)(sessionPortInt & 0xffff);
                                                 NatSession session = NatSessionManager.getSession(sessionPort);
-                                                if (session != null) {
+                                                ChannelProperty channelProperty = mClientRemoteChannelMap.get(sessionPort);
+                                                if (session != null && channelProperty != null) {
                                                     ShadowsocksConfig shadowsocksConfig = (ShadowsocksConfig) ProxyConfig.Instance.getDefaultProxy();
                                                     InetSocketAddress shadowsocksSocketAddress = shadowsocksConfig.ServerAddress;
-                                                    Log.d("udpproxy<-", (sessionPort & 0xffff) + " session.SendTactics: " + session.SendTactics);
+                                                    Log.d("udpproxy<-", (sessionPort & 0xffff) + " session.SendTactics: " + channelProperty.sendTactics);
                                                     if (serverRemoteAddress.equals(shadowsocksSocketAddress)) {
-                                                        if (session.SendTactics == 0) {
-                                                            session.SendTactics = 2;
+                                                        if (channelProperty.sendTactics == 0) {
+                                                            channelProperty.sendTactics = 2;
                                                         }
                                                         byte[] payload = new byte[size];
                                                         payloadBuffer.flip();
@@ -202,7 +177,7 @@ public class UdpProxyServer implements Runnable {
                                                         payloadBuffer.clear();
                                                         payloadBuffer.put(payload, 7, payload.length -7);
                                                     } else {
-                                                        session.SendTactics = 1;
+                                                        channelProperty.sendTactics = 1;
                                                     }
                                                     InetSocketAddress localRemoteSocketAddress = new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), sessionPort & 0xffff);
                                                     payloadBuffer.flip();
@@ -234,35 +209,36 @@ public class UdpProxyServer implements Runnable {
 
     }
 
-    private InetSocketAddress createClientRemoteSocketAddress(InetSocketAddress shadowsocksSocketAddress, NatSession session) {
-        InetSocketAddress clientRemoteSocketAddress;
-        if (ProxyConfig.Instance.needProxy(session.RemoteHost, session.RemoteIP)) {
-            clientRemoteSocketAddress = shadowsocksSocketAddress;
-        } else {
-            clientRemoteSocketAddress = new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), session.RemotePort & 0xffff);
-        }
-        return clientRemoteSocketAddress;
-    }
-
-    private DatagramChannel createRemoteChannel(int sessionPort) throws IOException {
-        DatagramChannel remoteChannel = null;
-        remoteChannel = DatagramChannel.open();
+    private ChannelProperty createRemoteChannel(int sessionPort) throws IOException {
+        ChannelProperty channelProperty = null;
+        DatagramChannel remoteChannel = DatagramChannel.open();
         remoteChannel.configureBlocking(false);
         DatagramSocket remoteSocket = remoteChannel.socket();
         remoteSocket.bind(new InetSocketAddress(0));
         remoteChannel.register(mSelector, SelectionKey.OP_READ, Integer.valueOf(sessionPort));
         if (LocalVpnService.Instance.protect(remoteSocket)) {
-            mClientRemoteChannelMap.put(sessionPort, remoteChannel);
+            channelProperty = new ChannelProperty(remoteChannel);
+            mClientRemoteChannelMap.put(sessionPort, channelProperty);
         } else {
             remoteChannel.close();
-            remoteChannel = null;
+            channelProperty = null;
         }
-        return remoteChannel;
+        return channelProperty;
     }
 
     public Thread getThread(){
         return mReceivedThread;
     }
 
+    private static class ChannelProperty {
+        DatagramChannel channel;
+        byte sendTactics;
+        //    public byte SendTactics; //=0：初始化；=1：直连；=2：vpn连
+
+
+        ChannelProperty(DatagramChannel channel) {
+            this.channel = channel;
+        }
+    }
 
 }
