@@ -790,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     Firebase.getInstance(this).logEvent("没有找到本地服务器", countryCode);
 
                 //根据国家代码 有限选择当前国家的服务器
-                if (!TextUtils.isEmpty(localNation)) { //单独处理法国
+                if (!TextUtils.isEmpty(localNation)) {
                     for (ServerConfig config : serverConfigs) {
                         if (localNation.equals(config.nation)) {
                             tasks.add(new MyCallable(this, config));

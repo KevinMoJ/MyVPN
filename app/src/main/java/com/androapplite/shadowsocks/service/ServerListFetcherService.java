@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -19,7 +20,10 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.BuildConfig;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,6 +51,7 @@ import okio.Okio;
 
 public class ServerListFetcherService extends IntentService{
     private boolean hasStart;
+//    http://c.vpnnest.com:8080/VPNServerList/fsl   旧的json 每周更新一次
     private static final String DOMAIN_URL = "http://c2.vpnnest.com:8080/middle_server/server_list";
     private static final String IP_URL = "http://52.15.133.178:8080/middle_server/server_list";
     private static final String GITHUB_URL = "https://raw.githubusercontent.com/reachjim/speedvpn/master/fsl.json";
@@ -68,7 +73,7 @@ public class ServerListFetcherService extends IntentService{
     static {
         URL_KEY_MAP.put(IP_URL, "ip");
         URL_KEY_MAP.put(DOMAIN_URL, "domain");
-        URL_KEY_MAP.put(GITHUB_URL, "github");
+//        URL_KEY_MAP.put(GITHUB_URL, "github");
 
     }
 
@@ -203,24 +208,21 @@ public class ServerListFetcherService extends IntentService{
                 }
             }
 
-//            //使用本地静态服务器列表
-//            if (mServerListJsonString == null) {
-//                AssetManager assetManager = getAssets();
-//                try {
-//                    InputStream inputStream = assetManager.open("fsl.json");
-//                    InputStreamReader isr = new InputStreamReader(inputStream);
-//                    BufferedReader br = new BufferedReader(isr);
-//                    mServerListJsonString = br.readLine();
-//                    if (mServerListJsonString != null) {
-//                        mServerListJsonString = ServerConfig.shuffleRemoteConfig();
-//                        mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
-//                        urlKey = "local_config";
-//                    }
-//
-//                } catch (IOException e) {
-//                    ShadowsocksApplication.handleException(e);
-//                }
-//            }
+            //使用本地静态服务器列表
+            if (mServerListJsonString == null) {
+                AssetManager assetManager = getAssets();
+                try {
+                    InputStream inputStream = assetManager.open("local_state.json");
+                    InputStreamReader isr = new InputStreamReader(inputStream);
+                    BufferedReader br = new BufferedReader(isr);
+                    mServerListJsonString = br.readLine();
+                    mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+                    urlKey = "local_config";
+
+                } catch (IOException e) {
+                    ShadowsocksApplication.handleException(e);
+                }
+            }
 
             if (mServerListJsonString != null) {
                 SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
