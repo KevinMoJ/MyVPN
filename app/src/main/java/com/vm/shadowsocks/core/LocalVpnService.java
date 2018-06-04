@@ -499,7 +499,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
                             CommonMethods.ComputeUDPChecksum(ipHeader, udpHeader);
                             m_VPNOutputStream.write(ipHeader.m_Data, ipHeader.m_Offset, size);
-//                            mTcpTrafficMonitor.updateTrafficReceive(ipHeader, tcpHeader, size);
+                            mTcpTrafficMonitor.updateTrafficReceive(ipHeader, udpHeader, size);
                         } else {
                             System.out.printf("NoSession: %s %s\n", ipHeader.toString(), udpHeader.toString());
                         }
@@ -525,7 +525,7 @@ public class LocalVpnService extends VpnService implements Runnable {
                         CommonMethods.ComputeUDPChecksum(ipHeader, udpHeader);
                         m_VPNOutputStream.write(ipHeader.m_Data, ipHeader.m_Offset, size);
                         session.BytesSent += udpDataSize;//注意顺序
-//                        mTcpTrafficMonitor.updateTrafficSend(ipHeader, tcpHeader, size);
+                        mTcpTrafficMonitor.updateTrafficSend(ipHeader, udpHeader, size);
                     }
                 }
                 break;

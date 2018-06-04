@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.vm.shadowsocks.tcpip.IPHeader;
 import com.vm.shadowsocks.tcpip.TCPHeader;
+import com.vm.shadowsocks.tcpip.UDPHeader;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -49,7 +49,7 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
     public volatile long pPayloadReceivedByteCountLast;
     public volatile long pProxyPayloadSentByteCountLast;
     public volatile long pProxyPayloadReceivedByteCountLast;
-    private volatile boolean mIsStoped;
+    private volatile boolean mIsStopped;
     private volatile ScheduledFuture mScheduledFuture;
     private ScheduledExecutorService mScheduledExecutorService;
     private volatile IntentFilter mIntentFilter;
@@ -72,7 +72,7 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
     }
 
     private void stop() {
-        mIsStoped = true;
+        mIsStopped = true;
         if (mScheduledFuture != null) {
             mScheduledFuture.cancel(true);
             mScheduledFuture = null;
@@ -80,7 +80,7 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
     }
 
     private void start() {
-        mIsStoped = false;
+        mIsStopped = false;
         if (mScheduledFuture == null) {
             try {
                 mScheduledFuture = mScheduledExecutorService.scheduleAtFixedRate(this, 1, 1, TimeUnit.SECONDS);
@@ -92,7 +92,7 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
 
     @Override
     public void run() {
-        if (!mIsStoped) {
+        if (!mIsStopped) {
             pSentSpeed = pSentByteCount - pSentByteCountLast;
             pSentByteCountLast = pSentByteCount;
             pReceivedSpeed = pReceivedByteCount - pReceivedByteCountLast;
@@ -227,6 +227,30 @@ public class TcpTrafficMonitor extends BroadcastReceiver implements Runnable{
             } catch (Exception e) {
                 ShadowsocksApplication.handleException(e);
             }
+        }
+    }
+
+    public void updateTrafficSend(IPHeader ipHeader, UDPHeader udpHeader, int size) {
+        pSentByteCount += size;
+        pSentCount++;
+        int payload = ipHeader.getDataLength() - 8;
+        pPayloadSentByteCount += payload;
+        if (ProxyConfig.isFakeIP(ipHeader.getSourceIP())) {
+            pProxySentByteCount += size;
+            pProxySentCount++;
+            pProxyPayloadSentByteCount += payload;
+        }
+    }
+
+    public void updateTrafficReceive(IPHeader ipHeader, UDPHeader udpHeader, int size) {
+        pReceivedByteCount += size;
+        pReceivedCount++;
+        int payload = ipHeader.getDataLength() - 8;
+        pPayloadReceivedByteCount += payload;
+        if (ProxyConfig.isFakeIP(ipHeader.getSourceIP())) {
+            pProxyReceivedByteCount += size;
+            pProxyReceivedCount++;
+            pProxyPayloadReceivedByteCount += payload;
         }
     }
 }
