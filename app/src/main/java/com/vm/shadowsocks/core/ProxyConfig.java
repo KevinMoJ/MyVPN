@@ -40,7 +40,7 @@ public class ProxyConfig {
     public ArrayList<Config> m_ProxyList;
     HashMap<String, Boolean> m_DomainMap;
 
-    public boolean globalMode = true;
+    public boolean globalMode = false;
 
     int m_dns_ttl;
     String m_welcome_info;
