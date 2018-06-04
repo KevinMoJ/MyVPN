@@ -914,12 +914,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     // && isPortOpen(config.server, config.port, 5000)
     private ServerConfig testServerIpAndPort(ServerConfig config) throws Exception {
-        int ping_load = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
-        boolean connect = ping(config.server) <= ping_load;
+        int remote_pingLoad = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
+        int pingLoad = ping(config.server);
+        boolean connect = ping(config.server) <= remote_pingLoad;
         if (connect) {
             return config;
         } else {
-            RealTimeLogger.getInstance(this).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(config.getLoad())
+            RealTimeLogger.getInstance(this).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(pingLoad)
                     , "vpn_country", config.nation, "vpn_city", config.name, "net_type", InternetUtil.getNetworkState(this),
                     "time", WarnDialogUtil.getDateTime());
         }

@@ -51,7 +51,7 @@ public class ReconnectIntentService extends IntentService {
     private SharedPreferences mSharedPreference;
     private boolean mIsFindLocalServer; //找到与服务器匹配的国家
     private boolean mIsPriorityConnect; //找到优先选择的国家
-    
+
     public ReconnectIntentService() {
         super("ReconnectIntentService");
     }
@@ -269,12 +269,13 @@ public class ReconnectIntentService extends IntentService {
 
     //&& isPortOpen(config.server, config.port, 5000)
     private ServerConfig testServerIpAndPort(ServerConfig config) throws Exception{
-        int ping_load = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
-        boolean connect = ping(config.server) <= ping_load;
+        int remote_pingLoad = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
+        int pingLoad = ping(config.server);
+        boolean connect = pingLoad <= remote_pingLoad;
         if (connect) {
             return config;
         } else {
-            RealTimeLogger.getInstance(this).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(config.getLoad())
+            RealTimeLogger.getInstance(this).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(pingLoad)
                     , "vpn_country", config.nation, "vpn_city", config.name, "net_type", InternetUtil.getNetworkState(this),
                     "time", WarnDialogUtil.getDateTime());
         }

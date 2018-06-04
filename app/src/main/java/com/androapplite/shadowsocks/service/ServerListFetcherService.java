@@ -79,7 +79,7 @@ public class ServerListFetcherService extends IntentService{
 
     private static final int TIMEOUT_MILLI = 3000;
 
-    private String mServerListJsonString;
+    private String mServerListJsonString="";
     private OkHttpClient mHttpClient;
     private String mUrl;
 
@@ -288,10 +288,9 @@ public class ServerListFetcherService extends IntentService{
             String errMsg = null;
             try {
                 Response response = mHttpClient.newCall(request).execute();
-                if(response.isSuccessful())
-                {
+                if (response.isSuccessful()) {
                     jsonString = response.body().string();
-                }else{
+                } else {
                     errMsg = response.message() + " " + response.code();
                 }
             }catch (IOException e) {
@@ -301,13 +300,15 @@ public class ServerListFetcherService extends IntentService{
                 }
             }
             long dur = System.currentTimeMillis() - t1;
-            if(jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString)) {
-                mFirebase.logEvent("访问服务器列表成功", urlKey, dur);
-            }else{
-                mFirebase.logEvent("访问服务器列表失败", urlKey, dur);
-                if(errMsg == null) errMsg = "服务器列表JSON问题";
+
+            if (errMsg != null)
                 mFirebase.logEvent("访问服务器列表失败", urlKey, errMsg);
-            }
+            else if (jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString))
+                mFirebase.logEvent("访问服务器列表成功", urlKey, dur);
+            else if (jsonString == null)
+                mFirebase.logEvent("访问服务器列表失败json是null", urlKey, dur);
+            else if (jsonString.isEmpty() || !ServerConfig.checkServerConfigJsonString(jsonString))
+                mFirebase.logEvent("服务器列表列表失败JSON问题", urlKey, jsonString);
             return new Pair<>(mUrl, jsonString);
         }
     }
