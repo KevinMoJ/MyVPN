@@ -156,7 +156,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     public void animateConnecting(){
         startAnimation();
-        mConnectButton.setText(R.string.disconnect);
+        mConnectButton.setText(R.string.connecting);
         mMessageTextView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.connecting);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
@@ -211,6 +211,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private void error(){
         stopAnimation();
         updateFailedTimes();
+        mFreeUsedTimeTextView.setVisibility(View.GONE);
+        mMessageTextView.setVisibility(View.VISIBLE);
+        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mLoadingView.setImageLevel(1);
         mConnectButton.setText(R.string.connect);
     }

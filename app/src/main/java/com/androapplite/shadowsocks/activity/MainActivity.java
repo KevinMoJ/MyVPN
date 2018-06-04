@@ -320,9 +320,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private void connectVpnServerAsync() {
-        if(mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)){
+        //当拉不到服务器列表的时候重新拉一次
+        if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST) && mConnectingConfig != null) {
             connectVpnServerAsyncCore();
-        }else{
+        } else {
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
             ServerListFetcherService.fetchServerListAsync(this);
             mFetchServerListProgressDialog.setOnDismissListener(this);
@@ -628,7 +629,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 break;
             case MSG_NO_AVAILABE_VPN:
                 showNoInternetSnackbar(R.string.server_not_available, false);
+                mVpnState = VpnState.Error;
                 if(mConnectFragment != null){
+                    mConnectFragment.setConnectResult(mVpnState);
                     mConnectFragment.updateUI();
                 }
                 break;
@@ -841,20 +844,22 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         return serverConfig;
     }
 
-    private String getPriorityNation(String nationCode) { //http://www.jctrans.com/tool/gjym.htm
+    private String getPriorityNation(String nationCode) {
         String priorityNation = "";
-        if (nationCode.equals("AE") || nationCode.equals("ZA")) { // 阿联酋 南非
-            priorityNation = getString(R.string.vpn_nation_nl);
-            mIsPriorityConnect = true;
-        } else if (nationCode.equals("TH") || nationCode.equals("PH")) { // 泰国 菲律宾
-            priorityNation = getString(R.string.vpn_nation_sg);
-            mIsPriorityConnect = true;
-        } else if (nationCode.equals("NG") || nationCode.equals("FR")) { // 尼日利亚 法国
-            priorityNation = getString(R.string.vpn_nation_us);
-            mIsPriorityConnect = true;
-        } else {
-            mIsPriorityConnect = false;
+        TypedArray nation_code = getResources().obtainTypedArray(R.array.nation_code);
+        TypedArray nation = getResources().obtainTypedArray(R.array.nation);
+
+        for (int i = 0; i < nation_code.length(); i++) {
+            String code = nation_code.getString(i);
+            if (nationCode.equals(code)) {
+                priorityNation = nation.getString(i);
+                mIsPriorityConnect = true;
+                break;
+            } else {
+                mIsPriorityConnect = false;
+            }
         }
+
         Firebase.getInstance(this).logEvent("默认优先链接服务器", nationCode, priorityNation);
         return priorityNation;
     }
