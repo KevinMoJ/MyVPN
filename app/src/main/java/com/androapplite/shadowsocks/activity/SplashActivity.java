@@ -569,6 +569,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         switch (v.getId()) {
             case R.id.skip_btn:
                 startMainActivity();
+                Firebase.getInstance(this).logEvent("广告界面点击跳过广告","跳过");
                 break;
         }
     }

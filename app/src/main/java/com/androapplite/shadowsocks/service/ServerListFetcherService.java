@@ -17,6 +17,7 @@ import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.vpn3.BuildConfig;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
@@ -81,7 +82,7 @@ public class ServerListFetcherService extends IntentService{
 
     private String mServerListJsonString="";
     private OkHttpClient mHttpClient;
-    private String mUrl;
+    private String mUrl = "";
 
     public ServerListFetcherService(){
         super("ServletListFetcher");
@@ -140,42 +141,42 @@ public class ServerListFetcherService extends IntentService{
             Log.d("FetchSeverList", "动态列表总时间：" + (System.currentTimeMillis() - t1));
 
             //获取远程静态服务器列表
-            if(mServerListJsonString == null || mServerListJsonString.isEmpty()){
-                tasks = new ArrayList<>(STATIC_HOST_URLS.size());
-                for (String url: STATIC_HOST_URLS) {
-                    tasks.add(new MyCallable(url, firebase, mHttpClient));
-                }
-
-                min = Math.min(Runtime.getRuntime().availableProcessors(), STATIC_HOST_URLS.size());
-                if (min == 0)
-                    min = 1;
-                executorService = Executors.newFixedThreadPool(min);
-                ecs = new ExecutorCompletionService<>(executorService);
-
-                t1 = System.currentTimeMillis();
-                for (MyCallable callable: tasks) {
-                    ecs.submit(callable);
-                }
-
-                for (int i = 0; i < 3 * TIMEOUT_MILLI / 100; i++) {
-                    try {
-                        Future<Pair<String, String>> future = ecs.poll(100, TimeUnit.MILLISECONDS);
-                        if (future != null) {
-                            Pair<String, String> result = future.get();
-                            if (result != null) {
-                                mUrl = result.first;
-                                mServerListJsonString = result.second;
-                                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
-                                break;
-                            }
-                        }
-                    } catch (Exception e) {
-                        ShadowsocksApplication.handleException(e);
-                    }
-                }
-                executorService.shutdown();
-                Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
-            }
+//            if(mServerListJsonString == null || mServerListJsonString.isEmpty()){
+//                tasks = new ArrayList<>(STATIC_HOST_URLS.size());
+//                for (String url: STATIC_HOST_URLS) {
+//                    tasks.add(new MyCallable(url, firebase, mHttpClient));
+//                }
+//
+//                min = Math.min(Runtime.getRuntime().availableProcessors(), STATIC_HOST_URLS.size());
+//                if (min == 0)
+//                    min = 1;
+//                executorService = Executors.newFixedThreadPool(min);
+//                ecs = new ExecutorCompletionService<>(executorService);
+//
+//                t1 = System.currentTimeMillis();
+//                for (MyCallable callable: tasks) {
+//                    ecs.submit(callable);
+//                }
+//
+//                for (int i = 0; i < 3 * TIMEOUT_MILLI / 100; i++) {
+//                    try {
+//                        Future<Pair<String, String>> future = ecs.poll(100, TimeUnit.MILLISECONDS);
+//                        if (future != null) {
+//                            Pair<String, String> result = future.get();
+//                            if (result != null) {
+//                                mUrl = result.first;
+//                                mServerListJsonString = result.second;
+//                                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+//                                break;
+//                            }
+//                        }
+//                    } catch (Exception e) {
+//                        ShadowsocksApplication.handleException(e);
+//                    }
+//                }
+//                executorService.shutdown();
+//                Log.d("FetchSeverList", "静态列表总时间：" + (System.currentTimeMillis() - t1));
+//            }
 
             long t2 = System.currentTimeMillis();
             String urlKey = URL_KEY_MAP.get(mUrl);
@@ -236,6 +237,8 @@ public class ServerListFetcherService extends IntentService{
             String simOperator = manager.getSimOperator();
             String iosCountry = manager.getSimCountryIso();
             Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", iosCountry, simOperator, localCountry));
+            Firebase.getInstance(this).logEvent("服务器url", urlKey, mUrl);
+            RealTimeLogger.getInstance(this).logEventAsync("服务器url", "url_key", urlKey, "url", mUrl, "json_string", mServerListJsonString);
             if(mUrl != null){
                 AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
                 String domain = adAppHelper.getCustomCtrlValue("serverListDomain", null);
