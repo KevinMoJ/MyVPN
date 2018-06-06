@@ -727,7 +727,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private ServerConfig findVPNServer(){
+    private ServerConfig findVPNServer() {
         ServerConfig serverConfig = null;
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         String localNation = "";
