@@ -87,9 +87,6 @@
             android:name="com.androapplite.shadowsocks.service.VpnManageService"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name="com.androapplite.shadowsocks.service.FindProxyService"
-            android:exported="false" />
 
         <service
         android:name="com.androapplite.shadowsocks.service.IpCountryIntentService"
@@ -110,9 +107,7 @@
             android:enabled="true"
             android:exported="true">
         </service>
-        <service
-            android:name="com.androapplite.shadowsocks.service.ReconnectIntentService"
-            android:exported="false"/>
+
         <activity
             android:name="com.androapplite.shadowsocks.activity.NetworkAccelerationActivity"
             android:label="@string/network_acceleration"

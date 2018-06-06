@@ -7,6 +7,7 @@ import android.os.SystemClock;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.utils.ConnectVpnHelper;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -74,7 +75,7 @@ public class ConnectionTestService extends IntentService {
                         firebase.logEvent("连接后测试成功", serverName, timeConsume);
                     } else {
                         firebase.logEvent("连接后测试失败", serverName, timeConsume);
-                        FindProxyService.switchProxy(this);
+                        ConnectVpnHelper.getInstance(this).switchProxyService();
                     }
                 } else if (url.equals(URL_BING)) {
                     firebase.logEvent("连接失败后测试", String.valueOf(result), timeConsume);

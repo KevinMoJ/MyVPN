@@ -34,8 +34,8 @@ import com.androapplite.shadowsocks.fragment.NetworkAccelerationFragment;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.service.ReconnectIntentService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.utils.ConnectVpnHelper;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -370,10 +370,10 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     }
 
     private void connectVpnServerAsync() {
-//        if(ServerListHelper.hasEncryptServerListPreference(mSharedPreference)){
-        if(mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)){
+        if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             prepareStartService();
-        }else{
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_SWITCH_PROXY, true).apply();
+        } else {
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
             ServerListFetcherService.fetchServerListAsync(this);
             mFetchServerListProgressDialog.setOnDismissListener(this);
@@ -556,7 +556,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if(requestCode == REQUEST_CONNECT){
-                ReconnectIntentService.start(this);
+                ConnectVpnHelper.getInstance(this).reconnectVpn();
             }
         }else{
             if(requestCode == REQUEST_CONNECT){
