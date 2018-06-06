@@ -721,78 +721,83 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private ServerConfig findVPNServer(){
-        ServerConfig serverConfig = null;
-        ArrayList<ServerConfig> serverConfigs = loadServerList();
-        if(serverConfigs != null && !serverConfigs.isEmpty()) {
-            final String defaultNation = getString(R.string.vpn_nation_opt);
-            String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, defaultNation);
-            //处理换语言的情况
-            if(!nation.equals(defaultNation)){
-                TypedArray array = getResources().obtainTypedArray(R.array.vpn_nations);
-                int i = 0;
-                for(;i<array.length();i++){
-                    String n = array.getString(i);
-                    if(nation.equals(n)){
-                        break;
-                    }
-                }
-                if(i >= array.length()){
-                    nation = defaultNation;
-                    mSharedPreference.edit()
-                            .putString(SharedPreferenceKey.VPN_NATION, nation)
-                            .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
-                            .apply();
-                }
-            }
-            //处理本地和服务器列表切换的问题
-            String defaultName = getString(R.string.vpn_name_opt);
-            String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
-            if(!name.equals(defaultName)){
-                String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
-                if(serverlist != null && !serverlist.contains(name)){
-                    nation = defaultNation;
-                    mSharedPreference.edit()
-                            .putString(SharedPreferenceKey.VPN_NATION, nation)
-                            .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
-                            .apply();
-                }
-            }
-
-            final boolean isGlobalOption = nation.equals(defaultNation);
-            ArrayList<MyCallable> tasks = new ArrayList<>();
-            if (isGlobalOption) {
-                serverConfigs.remove(0);
-                for(ServerConfig config: serverConfigs) {
-                    tasks.add(new MyCallable(this, config));
-                }
-            } else {
-                for (ServerConfig config : serverConfigs) {
-                    if (nation.equals(config.nation)) {
-                        tasks.add(new MyCallable(this, config));
-                    }
-                }
-            }
-
-            ExecutorService executorService = Executors.newCachedThreadPool();
-            ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
-            for (MyCallable callable: tasks) {
-                ecs.submit(callable);
-            }
-
-            for (int i = 0; i < tasks.size(); i++) {
-                try {
-                    Future<ServerConfig> future = ecs.take();
-                    ServerConfig sc = future.get(10, TimeUnit.SECONDS);
-                    if (sc != null) {
-                        serverConfig = sc;
-                        break;
-                    }
-                } catch (Exception e) {
-                }
-            }
-            executorService.shutdown();
-        }
-        return serverConfig;
+//        ServerConfig serverConfig = null;
+//        ArrayList<ServerConfig> serverConfigs = loadServerList();
+//        if(serverConfigs != null && !serverConfigs.isEmpty()) {
+//            final String defaultNation = getString(R.string.vpn_nation_opt);
+//            String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, defaultNation);
+//            //处理换语言的情况
+//            if(!nation.equals(defaultNation)){
+//                TypedArray array = getResources().obtainTypedArray(R.array.vpn_nations);
+//                int i = 0;
+//                for(;i<array.length();i++){
+//                    String n = array.getString(i);
+//                    if(nation.equals(n)){
+//                        break;
+//                    }
+//                }
+//                if(i >= array.length()){
+//                    nation = defaultNation;
+//                    mSharedPreference.edit()
+//                            .putString(SharedPreferenceKey.VPN_NATION, nation)
+//                            .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
+//                            .apply();
+//                }
+//            }
+//            //处理本地和服务器列表切换的问题
+//            String defaultName = getString(R.string.vpn_name_opt);
+//            String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
+//            if(!name.equals(defaultName)){
+//                String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+//                if(serverlist != null && !serverlist.contains(name)){
+//                    nation = defaultNation;
+//                    mSharedPreference.edit()
+//                            .putString(SharedPreferenceKey.VPN_NATION, nation)
+//                            .putString(SharedPreferenceKey.VPN_FLAG, getResources().getResourceEntryName(R.drawable.ic_flag_global))
+//                            .apply();
+//                }
+//            }
+//
+//            final boolean isGlobalOption = nation.equals(defaultNation);
+//            ArrayList<MyCallable> tasks = new ArrayList<>();
+//            if (isGlobalOption) {
+//                serverConfigs.remove(0);
+//                for(ServerConfig config: serverConfigs) {
+//                    tasks.add(new MyCallable(this, config));
+//                }
+//            } else {
+//                for (ServerConfig config : serverConfigs) {
+//                    if (nation.equals(config.nation)) {
+//                        tasks.add(new MyCallable(this, config));
+//                    }
+//                }
+//            }
+//
+//            ExecutorService executorService = Executors.newCachedThreadPool();
+//            ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
+//            for (MyCallable callable: tasks) {
+//                ecs.submit(callable);
+//            }
+//
+//            for (int i = 0; i < tasks.size(); i++) {
+//                try {
+//                    Future<ServerConfig> future = ecs.take();
+//                    ServerConfig sc = future.get(10, TimeUnit.SECONDS);
+//                    if (sc != null) {
+//                        serverConfig = sc;
+//                        break;
+//                    }
+//                } catch (Exception e) {
+//                }
+//            }
+//            executorService.shutdown();
+//        }
+//        return serverConfig;
+        ServerConfig[] configs = {
+                new ServerConfig("Miami", "United States", "45.76.208.56", 10, 40010, "ic_flag_ca"),
+                new ServerConfig("Tokyo", "Janpan", "202.182.105.220", 10, 40010, "ic_flag_jp")
+        };
+        return configs[(int) (Math.random() + 0.5)];
     }
 
     private static class MyCallable implements Callable<ServerConfig> {

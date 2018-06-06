@@ -121,13 +121,13 @@ public class UdpProxyServer implements Runnable {
                                                 ChannelProperty channelProperty = mClientRemoteChannelMap.get(sessionPort);
                                                 if (session != null && channelProperty != null) {
                                                     Log.d("udpproxy->", (sessionPort & 0xffff) + " session.SendTactics: " + channelProperty.sendTactics);
-                                                    if (channelProperty.sendTactics == 0 || channelProperty.sendTactics == 1) {
-                                                        InetSocketAddress clientRemoteSocketAddress =
-                                                                new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), session.RemotePort & 0xffff);
-                                                        payloadBuffer.flip();
-                                                        serverChannel.send(payloadBuffer, clientRemoteSocketAddress);
-                                                        Log.d("udpproxy->", (sessionPort & 0xffff) + "->" + clientRemoteSocketAddress.toString());
-                                                    }
+//                                                    if (channelProperty.sendTactics == 0 || channelProperty.sendTactics == 1) {
+//                                                        InetSocketAddress clientRemoteSocketAddress =
+//                                                                new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), session.RemotePort & 0xffff);
+//                                                        payloadBuffer.flip();
+//                                                        serverChannel.send(payloadBuffer, clientRemoteSocketAddress);
+//                                                        Log.d("udpproxy->", (sessionPort & 0xffff) + "->" + clientRemoteSocketAddress.toString());
+//                                                    }
                                                     if (channelProperty.sendTactics == 0 || channelProperty.sendTactics == 2) {
                                                         ShadowsocksConfig shadowsocksConfig = (ShadowsocksConfig) ProxyConfig.Instance.getDefaultProxy();
                                                         InetSocketAddress shadowsocksSocketAddress = shadowsocksConfig.ServerAddress;
@@ -177,7 +177,7 @@ public class UdpProxyServer implements Runnable {
                                                         payloadBuffer.clear();
                                                         payloadBuffer.put(payload, 7, payload.length -7);
                                                     } else {
-                                                        channelProperty.sendTactics = 1;
+//                                                        channelProperty.sendTactics = 1;
                                                     }
                                                     InetSocketAddress localRemoteSocketAddress = new InetSocketAddress(CommonMethods.ipIntToString(session.RemoteIP), sessionPort & 0xffff);
                                                     payloadBuffer.flip();
