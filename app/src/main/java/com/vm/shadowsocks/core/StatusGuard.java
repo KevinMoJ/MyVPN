@@ -10,7 +10,6 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.utils.ConnectVpnHelper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -238,9 +237,9 @@ public class StatusGuard implements Runnable{
 
             if (mProxyBadCountSequence > 2 && LocalVpnService.IsRunning) {
                 Log.d("[heart beat]", "switchProxy");
-                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mContext);
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_SWITCH_PROXY, false).apply();
-                ConnectVpnHelper.getInstance(mContext).switchProxyService();
+//                SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mContext);
+//                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
+//                ConnectVpnHelper.getInstance(mContext).switchProxyService();
                 mProxyBadCountSequence = 0;
             }
 

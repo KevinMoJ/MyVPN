@@ -22,7 +22,8 @@ public final class SharedPreferenceKey {
     public static final String COUNTRY_CODE = "COUNTRY_CODE";
     public static final String IP = "IP";
     public static final String IS_FETCH_SERVER_LIST_AT_SERVER = "IS_FETCH_SERVER_LIST_AT_SERVER";
-    public static final String IS_SWITCH_PROXY = "IS_SWITCH_PROXY"; //防止StatusGuard切换服务器进而一直弹广告
+    public static final String IS_AUTO_SWITCH_PROXY = "IS_AUTO_SWITCH_PROXY"; //防止StatusGuard切换服务器进而一直弹广告
+    public static final String TEST_CONNECT_FAILED_COUNT = "TEST_CONNECT_FAILED_COUNT"; //测试链接失败的次数
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";

@@ -54,9 +54,6 @@
             android:value="52a14ce59287e0edc5512692515ab0270feaef99" />
 
         <service android:name="com.androapplite.shadowsocks.service.ServerListFetcherService" />
-        <service
-            android:name="com.androapplite.shadowsocks.service.ConnectionTestService"
-            android:exported="false" />
 
         <activity
             android:name="com.androapplite.shadowsocks.activity.ServerListActivity"

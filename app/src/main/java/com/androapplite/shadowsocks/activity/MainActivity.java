@@ -60,7 +60,6 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.service.ConnectionTestService;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.ConnectVpnHelper;
@@ -102,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private static final int MSG_REPEAT_MENU_ROCKET = 5;
     public static final int MSG_SHOW_AD_BUTTON_RECOMMEND = 6;
     public static final int MSG_SHOW_AD_BUTTON_FULL = 7;
+    public static final int MSG_TEST_CONNECT_STATUS = 8;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private Menu mMenu;
@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         //当拉不到服务器列表的时候重新拉一次
         if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST) && mConnectingConfig != null) {
             connectVpnServerAsyncCore();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_SWITCH_PROXY, true).apply();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
         } else {
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
             ServerListFetcherService.fetchServerListAsync(this);
@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             if(mConnectFragment != null){
                 mConnectFragment.updateUI();
             }
-            ConnectionTestService.testConnectionWithoutVPN(this);
+            ConnectVpnHelper.getInstance(this).startTestConnectionWithOutVPN(ConnectVpnHelper.URL_BING, mConnectingConfig);
         }
     }
 
@@ -602,13 +602,17 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mConnectFragment.setConnectResult(mVpnState);
                     mConnectFragment.updateUI();
                 }
-                ConnectionTestService.testConnectionWithoutVPN(this);
+                ConnectVpnHelper.getInstance(this).startTestConnectionWithOutVPN(ConnectVpnHelper.URL_BING, mConnectingConfig);
                 break;
             case MSG_PREPARE_START_VPN_BACKGROUND:
                 prepareStartVpnBackground();
                 break;
             case MSG_PREPARE_START_VPN_FORGROUND:
                 prepareStartService();
+                break;
+            case MSG_TEST_CONNECT_STATUS:
+                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false))
+                    ConnectVpnHelper.getInstance(this).startTestConnectionWithVPN(ConnectVpnHelper.URL_GOOGLE, mConnectingConfig);
                 break;
             case MSG_NO_AVAILABE_VPN:
                 showNoInternetSnackbar(R.string.server_not_available, false);
@@ -642,8 +646,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
             mErrorServers.clear();
             mForegroundHandler.sendEmptyMessage(MSG_NO_AVAILABE_VPN);
-            ConnectionTestService.testConnectionWithoutVPN(this);
-
+            ConnectVpnHelper.getInstance(this).startTestConnectionWithOutVPN(ConnectVpnHelper.URL_BING, mConnectingConfig);
         }
     }
 
@@ -689,6 +692,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                         } else {
                             mIsRestart = true;
                         }
+                        mBackgroundHander.removeMessages(MSG_TEST_CONNECT_STATUS);
+                        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
                         VpnManageService.stopVpnByUserSwitchProxy();
                         VpnNotification.gSupressNotification = true;
                         mVpnState = VpnState.Connecting;
@@ -918,17 +923,20 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 if (!AdAppHelper.getInstance(this).isFullAdLoaded()) {
                     rotatedBottomAd();
                 }
-                ConnectionTestService.testConnectionWithVPN(this, mConnectingConfig.server);
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mErrorServers.clear();
-                if (mSharedPreference.getBoolean(SharedPreferenceKey.IS_SWITCH_PROXY, true)) { //防止StatusGuard切换服务器进而一直弹广告
+                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)) {
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
                 }
                 mVpnState = VpnState.Connected;
                 Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
+                mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
+
+                Toast.makeText(this, "" + mConnectingConfig.server + "   " + mConnectingConfig.port, Toast.LENGTH_SHORT).show();
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
+                ConnectVpnHelper.getInstance(this).release();
                 mVpnState = VpnState.Stopped;
                 if (mIsRestart) {
                     mIsRestart = false;

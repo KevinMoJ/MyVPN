@@ -372,7 +372,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     private void connectVpnServerAsync() {
         if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             prepareStartService();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_SWITCH_PROXY, true).apply();
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
         } else {
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
             ServerListFetcherService.fetchServerListAsync(this);
