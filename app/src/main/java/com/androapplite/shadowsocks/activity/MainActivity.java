@@ -62,7 +62,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.shadowsocks.utils.ConnectVpnHelper;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -932,8 +932,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 mVpnState = VpnState.Connected;
                 Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
                 mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
-
-                Toast.makeText(this, "" + mConnectingConfig.server + "   " + mConnectingConfig.port, Toast.LENGTH_SHORT).show();
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 ConnectVpnHelper.getInstance(this).release();

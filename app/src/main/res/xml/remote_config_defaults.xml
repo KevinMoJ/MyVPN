@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <defaultsMap xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--VPN是否全局翻墙-->
+    <entry>
+        <key>is_vpn_global</key>
+        <value>true</value>
+    </entry>
+
     <!--wifi链接没使用我们app的弹窗显示控制-->
     <entry>
         <key>is_wifi_dialog_show</key>
@@ -131,6 +137,18 @@
         <key>apache_log_url</key>
         <!--<value>http://52.14.99.239/</value>-->
         <value>http://rtl.vpnnest.com/</value>
+    </entry>
+
+    <!--连通检查时间间隔-->
+    <entry>
+        <key>connect_test_link_time</key>
+        <value>5</value>
+    </entry>
+
+    <!--连通检查时间间隔-->
+    <entry>
+        <key>connect_test_fail_count</key>
+        <value>3</value>
     </entry>
 
 </defaultsMap>

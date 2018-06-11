@@ -3,6 +3,7 @@ package com.vm.shadowsocks.core;
 import android.annotation.SuppressLint;
 import android.os.Build;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.tcpip.CommonMethods;
 import com.vm.shadowsocks.tunnel.Config;
 import com.vm.shadowsocks.tunnel.httpconnect.HttpConnectConfig;
@@ -208,6 +209,7 @@ public class ProxyConfig {
     }
 
     public boolean needProxy(String host, int ip) {
+        boolean isGlobalMode = FirebaseRemoteConfig.getInstance().getBoolean("is_vpn_global");
         if (ProxyConfig.IS_DEBUG){
             System.out.printf("needProxy host: %s, ip: %s, globalMode: %s, isFakeIP: %s, m_outside_china_use_proxy: %s, isIPInChina: %s\n",
                     host != null ? host : "null",
@@ -220,7 +222,7 @@ public class ProxyConfig {
         if (proxyHostName.equals(host) || ip == proxyIp) {
             return false;
         }
-        if (globalMode) {
+        if (isGlobalMode) {
             return true;
         }
         if (host != null) {
