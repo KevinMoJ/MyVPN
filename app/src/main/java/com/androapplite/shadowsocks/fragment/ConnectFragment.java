@@ -1,6 +1,7 @@
 package com.androapplite.shadowsocks.fragment;
 
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,11 +26,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.vpn3.R;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.lang.ref.WeakReference;
@@ -50,7 +51,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private boolean mIsAnimating;
     private MyReceiver mMyReceiver;
     private VpnState mVpnState;
-
+    private int[] mMessageTextStrings = {R.string.building_tls, R.string.waiting_server_reply, R.string.requesting_connecting_configure
+            , R.string.verifying, R.string.taking_a_coffee_break, R.string.building_configuration};
 
     public ConnectFragment() {
         // Required empty public constructor
@@ -158,10 +160,28 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         startAnimation();
         mConnectButton.setText(R.string.connecting);
         mMessageTextView.setVisibility(View.VISIBLE);
-        mMessageTextView.setText(R.string.connecting);
+//        mMessageTextView.setText(R.string.connecting);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
+        setConnectingText();
+    }
 
+    private int count = -1;
+
+    private void setConnectingText() {
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(0, mMessageTextStrings.length - 1);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentValue = (int) animation.getAnimatedValue();
+                if (currentValue != count) {
+                    count = currentValue;
+                    mMessageTextView.setText(mMessageTextStrings[count]);
+                }
+
+            }
+        });
+        valueAnimator.setDuration(800).start();
     }
 
     private void startAnimation(){
