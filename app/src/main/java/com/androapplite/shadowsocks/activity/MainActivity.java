@@ -54,6 +54,7 @@ import com.androapplite.shadowsocks.PromotionTracking;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
 import com.androapplite.shadowsocks.fragment.DisconnectFragment;
 import com.androapplite.shadowsocks.model.ServerConfig;
@@ -62,7 +63,6 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -107,8 +107,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private Menu mMenu;
     private VpnState mVpnState;
     private boolean mIsRestart;
-    private boolean mIsFindLocalServer; //找到与服务器匹配的国家
-    private boolean mIsPriorityConnect; //找到优先选择的国家
     private AlertDialog mExitAlertDialog;
     private DisconnectFragment mDisconnectFragment;
     private AnimationSet mMenuRocketAnimation;
@@ -731,6 +729,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
         disconnectVpnServiceAsync();
+        ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
+        ConnectVpnHelper.getInstance(MainActivity.this).release();
     }
 
     private void disconnectVpnServiceAsync(){

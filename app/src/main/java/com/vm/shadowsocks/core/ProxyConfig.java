@@ -209,7 +209,7 @@ public class ProxyConfig {
     }
 
     public boolean needProxy(String host, int ip) {
-        boolean isGlobalMode = FirebaseRemoteConfig.getInstance().getBoolean("is_vpn_global");
+        boolean isGlobalMode = FirebaseRemoteConfig.getInstance().getBoolean("is_global_proxy");
         if (ProxyConfig.IS_DEBUG){
             System.out.printf("needProxy host: %s, ip: %s, globalMode: %s, isFakeIP: %s, m_outside_china_use_proxy: %s, isIPInChina: %s\n",
                     host != null ? host : "null",

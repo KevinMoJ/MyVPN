@@ -2,7 +2,7 @@
 <defaultsMap xmlns:android="http://schemas.android.com/apk/res/android">
     <!--VPN是否全局翻墙-->
     <entry>
-        <key>is_vpn_global</key>
+        <key>is_global_proxy</key>
         <value>true</value>
     </entry>
 
@@ -142,6 +142,12 @@
     <!--连通检查时间间隔-->
     <entry>
         <key>connect_test_link_time</key>
+        <value>5</value>
+    </entry>
+
+    <!--网络访问链接超时时间-->
+    <entry>
+        <key>connect_test_time_out</key>
         <value>5</value>
     </entry>
 

@@ -11,7 +11,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.MainActivity;
-import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -84,7 +83,6 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         mHomeWathcer.startWatch();
         mIsFirstOpen = true;
         registerActivityLifecycleCallbacks(this);
-        ConnectVpnHelper.getInstance(this).clearErrorList();
     }
 
     private void checkVpnState(){

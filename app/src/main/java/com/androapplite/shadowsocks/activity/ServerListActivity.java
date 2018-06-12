@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -189,6 +190,8 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         if (LocalVpnService.IsRunning) {
             VpnManageService.stopVpnByUser();
             DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Stopped.ordinal()).apply();
+            ConnectVpnHelper.getInstance(this).clearErrorList();
+            ConnectVpnHelper.getInstance(this).release();
         }
     }
 
@@ -341,6 +344,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     .putString(SharedPreferenceKey.VPN_FLAG, flag)
                     .apply();
             setResult(RESULT_OK);
+            ConnectVpnHelper.getInstance(this).release();
             finish();
             Firebase.getInstance(this).logEvent("选择国家", nation);
         }

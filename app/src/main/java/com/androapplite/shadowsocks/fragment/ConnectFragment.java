@@ -181,7 +181,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
             }
         });
-        valueAnimator.setDuration(800).start();
+        valueAnimator.setDuration(mMessageTextStrings.length * 400).start();
     }
 
     private void startAnimation(){
