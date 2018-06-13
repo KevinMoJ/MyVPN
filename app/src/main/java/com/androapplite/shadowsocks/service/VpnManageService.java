@@ -413,21 +413,25 @@ public class VpnManageService extends Service implements Runnable,
 
     public static void stopVpnByUser() {
         LocalVpnService.IsRunning = false;
+        DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ShadowsocksApplication.getGlobalContext()).edit().putBoolean(SharedPreferenceKey.IS_USER_ACTIVE_DISCONNECT, true).apply();
         sStopReason = 1;
     }
 
     public static void stopVpnByUserSwitchProxy() {
         LocalVpnService.IsRunning = false;
+        DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ShadowsocksApplication.getGlobalContext()).edit().putBoolean(SharedPreferenceKey.IS_USER_ACTIVE_DISCONNECT, true).apply();
         sStopReason = 2;
     }
 
     public static void stopVpnForAutoSwitchProxy() {
         LocalVpnService.IsRunning = false;
+        DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ShadowsocksApplication.getGlobalContext()).edit().putBoolean(SharedPreferenceKey.IS_USER_ACTIVE_DISCONNECT, false).apply();
         sStopReason = 3;
     }
 
     public static void stopVpnForSwitchProxyFailed() {
         LocalVpnService.IsRunning = false;
+        DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(ShadowsocksApplication.getGlobalContext()).edit().putBoolean(SharedPreferenceKey.IS_USER_ACTIVE_DISCONNECT, false).apply();
         sStopReason = 4;
     }
 }

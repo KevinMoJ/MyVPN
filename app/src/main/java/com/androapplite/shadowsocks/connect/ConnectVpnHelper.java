@@ -124,15 +124,17 @@ public class ConnectVpnHelper {
                     mFirebase.logEvent("自动切换链接的服务器", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
                     RealTimeLogger.getInstance(mContext).logEventAsync("auto_switch", "fail_server", String.format("%s|%s|%s", currentConfig.server, currentConfig.port, currentConfig.nation)
                             , "switch_server", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
-                    VpnManageService.stopVpnForAutoSwitchProxy();
-                    VpnNotification.gSupressNotification = true;
-                    LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
-                    LocalVpnService.IsRunning = true;
-                    serverConfig.saveInSharedPreference(mSharedPreference);
-                    Log.i(TAG, "switchProxyService:   自动切换");
-                    currentConfig = serverConfig;
-                    SystemClock.sleep(100);
-                    startConnectAfterFirstTest();
+                    if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_USER_ACTIVE_DISCONNECT, false)) {
+                        VpnManageService.stopVpnForAutoSwitchProxy();
+                        VpnNotification.gSupressNotification = true;
+                        LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
+                        LocalVpnService.IsRunning = true;
+                        serverConfig.saveInSharedPreference(mSharedPreference);
+                        Log.i(TAG, "switchProxyService:   自动切换");
+                        currentConfig = serverConfig;
+                        SystemClock.sleep(100);
+                        startConnectAfterFirstTest();
+                    }
                 } else {
                     Log.d("FindProxyService", "没有可用的proxy");
                     VpnManageService.stopVpnForSwitchProxyFailed();
