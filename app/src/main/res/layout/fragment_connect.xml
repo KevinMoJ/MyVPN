@@ -14,18 +14,17 @@
             android:background="@drawable/big_circle"
             android:layout_gravity="center"
             />
+
         <Button
+            android:id="@+id/connect_button"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_gravity="center"
             android:background="@drawable/connect_btn"
-            android:id="@+id/connect_button"
-            android:text="@string/connect"
-            android:textSize="@dimen/small_text"
-            android:textColor="@color/primary_white_text"
             android:textAllCaps="false"
+            android:textColor="@color/primary_white_text"
+            android:textSize="@dimen/small_text"/>
 
-            />
         <ImageView
             android:layout_width="131dp"
             android:layout_height="131dp"
@@ -34,6 +33,14 @@
             android:id="@+id/loading"
             android:scaleType="fitXY"
             />
+
+        <ImageView
+            android:id="@+id/connect_status"
+            android:layout_width="@dimen/common_120"
+            android:layout_height="@dimen/common_120"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            android:src="@drawable/connect_normal_icon"/>
     </FrameLayout>
     <LinearLayout
         android:layout_width="wrap_content"
@@ -65,31 +72,4 @@
             android:layout_gravity="center_horizontal"
             />
     </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="@dimen/half_standard_margin"
-        android:layout_gravity="center_horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text"
-            android:gravity="center"
-            tools:text="@string/success_connect"
-            android:textColor="@color/success_connect"
-            android:id="@+id/success_connect" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text"
-            android:gravity="center"
-            tools:text="@string/failed_connect"
-            android:textColor="@color/failed_connect"
-            android:id="@+id/failed_connect"/>
-    </LinearLayout>
-
 </LinearLayout>

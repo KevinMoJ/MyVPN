@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Speed VPN</string>
-    <string name="facebook_app_id" translatable="false">1207655049289960</string>
+    <string name="app_name" translatable="false">Green VPN</string>
+    <string name="facebook_app_id" translatable="false">633231230382328</string>
 
     <string name="vpn_name_opt" translatable="false">Global</string>
     <string name="vpn_name_fr" translatable="false">Pairs</string>

@@ -4,15 +4,9 @@
     <item >
         <shape android:shape="rectangle">
             <gradient
-                android:startColor="#5067C4"
-                android:endColor="#54BAE0"
-                android:angle="90"
-                />
+                android:startColor="#80d196"
+                android:endColor="#0fd1bc"
+                android:angle="45"/>
         </shape>
-    </item>
-    <item
-        android:gravity="fill_horizontal|bottom"
-        >
-        <bitmap android:src="@drawable/bg_bottom" android:gravity="bottom|fill_horizontal"/>
     </item>
 </layer-list>

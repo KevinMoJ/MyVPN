@@ -554,7 +554,7 @@ public class ConnectVpnHelper {
         Log.i(TAG, "visitNetTest: timeOut    " + timeOut);
         int errorCount = 0;
         if (tasks == null)
-            tasks = new ArrayList<>(URLS.size());
+            tasks = new ArrayList<>();
 
         if (googleCallable == null)
             googleCallable = new TestConnectCallable(URL_GOOGLE, this);
@@ -563,10 +563,14 @@ public class ConnectVpnHelper {
         if (bingCallable == null)
             bingCallable = new TestConnectCallable(URL_BING, this);
 
-        tasks.add(googleCallable);
-        tasks.add(facebookCallable);
-        tasks.add(bingCallable);
+        if (!tasks.contains(googleCallable))
+            tasks.add(googleCallable);
+        if (!tasks.contains(facebookCallable))
+            tasks.add(facebookCallable);
+        if (!tasks.contains(bingCallable))
+            tasks.add(bingCallable);
 
+        Log.i(TAG, "tasks.size():" + tasks.size());
         ExecutorService executorService = Executors.newCachedThreadPool();
         ExecutorCompletionService<Boolean> ecs = new ExecutorCompletionService<>(executorService);
         for (TestConnectCallable callable : tasks) {
@@ -737,6 +741,7 @@ public class ConnectVpnHelper {
             timer.cancel();
             Log.i(TAG, "release:   关闭Timer");
         }
+        tasks.clear();
         mTimerList.clear();
     }
 

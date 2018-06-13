@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -43,10 +42,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private TextView mMessageTextView;
 
     private Button mConnectButton;
-    private TextView mSuccessConnectTextView;
-    private TextView mFailedConnectTextView;
     private SharedPreferences mSharedPreference;
     private ImageView mLoadingView;
+    private ImageView mConnectStatus;
     private TextView mFreeUsedTimeTextView;
     private boolean mIsAnimating;
     private MyReceiver mMyReceiver;
@@ -66,10 +64,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         View view = inflater.inflate(R.layout.fragment_connect, container, false);
         mMessageTextView = (TextView)view.findViewById(R.id.message);
         mConnectButton = (Button)view.findViewById(R.id.connect_button);
-        mSuccessConnectTextView = (TextView)view.findViewById(R.id.success_connect);
-        mFailedConnectTextView = (TextView)view.findViewById(R.id.failed_connect);
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
+        mConnectStatus = (ImageView)view.findViewById(R.id.connect_status);
         mFreeUsedTimeTextView = (TextView)view.findViewById(R.id.free_used_time);
         return view;
     }
@@ -78,8 +75,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mConnectButton.setOnClickListener(this);
         updateFreeUsedTime();
-        updateSuccessTimes();
-        updateFailedTimes();
         if (LocalVpnService.IsRunning) {
             mVpnState = VpnState.Connected;
             connectFinish();
@@ -150,7 +145,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         final String elapsedTime = DateUtils.formatElapsedTime(countDown);
         String freeUseTime = String.format(getString(R.string.free_used_time), elapsedTime);
         SpannableString spannableString = new SpannableString(freeUseTime);
-        spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.connect_green)),
+        spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.primary_white_text)),
                 freeUseTime.length() - elapsedTime.length(), freeUseTime.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         mFreeUsedTimeTextView.setText(spannableString);
@@ -158,7 +153,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     public void animateConnecting(){
         startAnimation();
-        mConnectButton.setText(R.string.connecting);
+//        mConnectButton.setText(R.string.connecting);
+        mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
         mMessageTextView.setVisibility(View.VISIBLE);
 //        mMessageTextView.setText(R.string.connecting);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
@@ -206,7 +202,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     public void animateStopping(){
         startAnimation();
-        mConnectButton.setText(R.string.connect);
+//        mConnectButton.setText(R.string.connect);
+        mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
         mMessageTextView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.stopping);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
@@ -215,14 +212,16 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void connectFinish(){
         stopAnimation();
-        mConnectButton.setText(R.string.disconnect);
+//        mConnectButton.setText(R.string.disconnect);
+        mConnectStatus.setImageResource(R.drawable.connect_success_icon);
         mMessageTextView.setVisibility(View.GONE);
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
     }
 
     private void stopFinish(){
         stopAnimation();
-        mConnectButton.setText(R.string.connect);
+//        mConnectButton.setText(R.string.connect);
+        mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
         mMessageTextView.setVisibility(View.GONE);
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
         updateFreeUsedTime();
@@ -230,13 +229,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
 
     private void error(){
         stopAnimation();
-        updateFailedTimes();
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mMessageTextView.setVisibility(View.VISIBLE);
         final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mLoadingView.setImageLevel(1);
-        mConnectButton.setText(R.string.connect);
+//        mConnectButton.setText(R.string.connect);
+        mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
     }
 
     @Override
@@ -274,42 +273,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                     error();
                     break;
             }
-            updateSuccessTimes();
-            updateFailedTimes();
         }
     }
-
-    private void updateSuccessTimes() {
-        long success = mSharedPreference.getLong(SharedPreferenceKey.SUCCESS_CONNECT_COUNT, 0);
-        String successTimeString = String.valueOf(success);
-        String successString = getString(R.string.success_connect, success);
-        SpannableString spannableString = new SpannableString(successString);
-        int start = successString.indexOf(successTimeString);
-        int end = start + successTimeString.length();
-        if(start >= 0 && end < successString.length()) {
-            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.connect_green)),
-                    start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-        mSuccessConnectTextView.setText(spannableString);
-
-    }
-
-    private void updateFailedTimes(){
-        long failed = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
-        String failedTimeString = String.valueOf(failed);
-        String failedString = getString(R.string.failed_connect, failed);
-        SpannableString spannableString = new SpannableString(failedString);
-        int start = failedString.indexOf(failedTimeString);
-        int end = start + failedTimeString.length();
-        if(start >= 0 && end < failedString.length()) {
-            spannableString.setSpan(new ForegroundColorSpan(Color.GRAY),
-                    start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-        mFailedConnectTextView.setText(spannableString);
-
-    }
-
-
 
     private static class MyReceiver extends BroadcastReceiver {
         private WeakReference<ConnectFragment> mReference;

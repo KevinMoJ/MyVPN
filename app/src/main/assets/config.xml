@@ -1,19 +1,21 @@
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
-    <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=-1},{admob_en=10000}</string>
+    <string name="native_ctrl">{exe=1},{withBanner=0},{withNgs=1},{admob=100},{facebook=-1},{admob_an=10000}</string>
     <string name="banner_ctrl">{exe=1},{admob=10},{facebook=-1},{fbn=-1}</string>
     <string name="ad_ctrl">{ad_delay=0},{ngsorder=before:0|1:999|adt:0|adtype=0}, {ngsorder:admob=before:2|1:999|adt:0|adtype=0},{ngspit=fake_x:0|fake_click:0|hide_x:0|hide_close:0},{banner_click=100},{ngs_click=100},{native_click=100},{home_delay_time=5000},{ad_silent=0}</string>
     <string name="resume_ctrl">{exe=0}</string>
     <string name="ngs_ctrl">{exe=1},{admob=100},{facebook=-1},{fbn=-1}</string>
 
-    <string name="banner_ids">{admob=ca-app-pub-5330675173640052/8168752925},{fb=1207655049289960_1207657955956336}</string>
-    <string name="admob_full_ids">{count=2},{id1=ca-app-pub-5330675173640052/6692019724,全屏},{id2=ca-app-pub-5330675173640052/6882449579,全屏高}</string>
-    <string name="admob_banner_native_ids">{count=0}</string>
-    <string name="fb_full_ids">{count=2},{id1=1207655049289960_1560671607321634,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
-    <string name="fbn_full_ids">{count=2},{id1=1207655049289960_1560671607321634,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
-    <string name="fbn_banner_ids">{count=2},{id1=1207655049289960_1560671607321634,全屏},{id2=1207655049289960_1661369527251841,全屏高}</string>
-    <string name="admob_native_ids">{count=1},{id1=ca-app-pub-5330675173640052/2484828121,废弃}</string>
-    <string name="fb_native_ids">{count=2},{id1=1207655049289960_1207656932623105,主页底部},{id2=1207655049289960_1661369880585139,主页底部高}</string>
+    <string name="banner_ids">{admob=ca-app-pub-9834399249058252/3127010422},{fb=633231230382328_633233977048720}</string>
+
+    <string name="admob_full_ids">{count=2},{id1=ca-app-pub-9834399249058252/1183373364,全屏},{id2=ca-app-pub-9834399249058252/2987409628,全屏高}</string>
+    <string name="fb_full_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
+    <string name="fbn_full_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
+    <string name="fbn_banner_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
+
+    <string name="admob_an_ids">{count=2},{id1=ca-app-pub-9834399249058252/3534204537,主页底部},{id2=ca-app-pub-9834399249058252/5827650796,主页底部高}</string>
+    <string name="fb_native_ids">{count=2},{id1=633231230382328_633233510382100,主页底部},{id2=633231230382328_633233697048748,主页底部高}</string>
+
     <string name="native_size">{count=2},{id1=320,180},{id2=320,180}</string>
     <string name="custom_ctrl">
         {serverListDomain=http://e.vpnnest.com:8080/VPNServerList/fsle},
@@ -27,6 +29,5 @@
         {net_acc_end_ad=1},{net_acc_ad_end_min=500},{net_acc_ad_end_max=500},
         {welcome_ad=1},{welcome_ad_min=5000},{welcome_ad_max=0},
     </string>
-    <string name="admob_an_ids">{count=2},{id1=ca-app-pub-5330675173640052/6161090039,主页底部},{id2=ca-app-pub-5330675173640052/2706991729,主页底部高}</string>
-    <string name="splash_ctrl">{exe=1},{fb=1207655049289960_1207656932623105},{admob=ca-app-pub-5330675173640052/2706991729}</string>
+    <string name="splash_ctrl">{exe=1},{fb=633231230382328_633233510382100},{admob=ca-app-pub-9834399249058252/5827650796}</string>
 </map>

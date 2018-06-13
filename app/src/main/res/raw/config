@@ -1,5 +1,5 @@
-session_name powervpn
-    welcome_info 欢迎使用powervpn!
+session_name GreenVPN
+    welcome_info 欢迎使用GreenVPN!
     ip 172.25.31.13
     dns 8.8.8.8
     dns 209.244.0.3

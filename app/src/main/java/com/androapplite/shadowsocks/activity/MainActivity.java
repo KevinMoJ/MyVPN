@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         initDrawer(toolbar);
         initNavigationView();
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        notProvideServiceInChina();
+//        notProvideServiceInChina();
         mReceiver = new MyReceiver(this);
         mIntentFilter = new IntentFilter(Action.SERVER_LIST_FETCH_FINISH);
         mForegroundHandler = new Handler(this);
@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void initNavigationView(){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setItemIconTintList(null);//取消统一着色
         navigationView.setNavigationItemSelectedListener(this);
     }
 

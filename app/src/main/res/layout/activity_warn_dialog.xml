@@ -70,7 +70,7 @@
         android:layout_above="@+id/warn_dialog_cancel"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/standard_margin"
-        android:background="@drawable/button_green_bg"
+        android:background="@drawable/warn_dialog_button_bg"
         android:gravity="center"
         android:textAllCaps="false"
         android:textColor="@color/primary_white_text"

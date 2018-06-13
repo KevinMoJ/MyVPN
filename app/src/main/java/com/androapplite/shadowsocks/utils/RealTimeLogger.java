@@ -125,8 +125,12 @@ public class RealTimeLogger implements Callback {
                 .putCustomAttribute("serverIp", serverIp)
                 .putCustomAttribute("country", country)
                 .putCustomAttribute("time", time);
-        for (int i = 0; i < (args.length / 2) * 2; i += 2) {
-            event.putCustomAttribute(args[i], args[i + 1]);
+
+        try {
+            for (int i = 0; i < (args.length / 2) * 2; i += 2) {
+                event.putCustomAttribute(args[i], args[i + 1]);
+            }
+        } catch (Exception e) {
         }
         mAnswers.logCustom(event);
     }

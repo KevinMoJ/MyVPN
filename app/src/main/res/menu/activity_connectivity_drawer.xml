@@ -6,19 +6,19 @@
         android:id="@+id/menu_bottom">
         <item
             android:id="@+id/nav_share"
-            android:icon="@drawable/ic_share_24dp"
+            android:icon="@drawable/icon_share"
             android:title="@string/tell_your_friends"
             android:checkable="false"/>
         <item
             android:id="@+id/nav_rate_us"
-            android:icon="@drawable/ic_grade_24dp"
+            android:icon="@drawable/icon_like_us"
             android:title="@string/like_us"
             android:checkable="false"
             />
 
         <item
             android:id="@+id/nav_contact_us"
-            android:icon="@drawable/ic_mode_comment_black_24dp"
+            android:icon="@drawable/icon_comment"
             android:title="@string/feedback"
             android:checkable="false"
             />
@@ -31,7 +31,7 @@
             />
         <item
             android:id="@+id/nav_about"
-            android:icon="@drawable/ic_info_black_24dp"
+            android:icon="@drawable/icon_about"
             android:title="@string/about"
             android:checkable="false"
             />

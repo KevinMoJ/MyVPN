@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#76C5E4</color>
+    <color name="colorPrimary">#FF41D0AB</color>
     <color name="colorPrimaryDark">@android:color/black</color>
     <color name="colorAccent">#41C7EE</color>
     <color name="primary_white_text">@android:color/white</color>
@@ -21,7 +21,7 @@
     <color name="success_connect">#31d6ff</color>
     <color name="failed_connect">#ff9580</color>
     <color name="used_time_bg">#10000000</color>
-    <color name="free_used_time">#69f1ed</color>
+    <color name="free_used_time">#5f6060</color>
     <color name="connect_green">#5FE490</color>
     <color name="sencodary_white_text">#8Affffff</color>
     <color name="normal_color">#C07AF6</color>
