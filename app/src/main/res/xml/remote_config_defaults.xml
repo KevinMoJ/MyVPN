@@ -142,16 +142,23 @@
     <!--连通检查时间间隔-->
     <entry>
         <key>connect_test_link_time</key>
-        <value>5</value>
+        <value>10</value>
     </entry>
+
+    <!--是否开启网络测试-->
+    <entry>
+        <key>open_connect_test</key>
+        <value>true</value>
+    </entry>
+
 
     <!--网络访问链接超时时间-->
     <entry>
         <key>connect_test_time_out</key>
-        <value>5</value>
+        <value>10</value>
     </entry>
 
-    <!--连通检查时间间隔-->
+    <!--达到失败次数去切换服务器-->
     <entry>
         <key>connect_test_fail_count</key>
         <value>3</value>

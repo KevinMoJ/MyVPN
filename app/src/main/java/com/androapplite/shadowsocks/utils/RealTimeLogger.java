@@ -110,7 +110,9 @@ public class RealTimeLogger implements Callback {
         int ip = sp.getInt(SharedPreferenceKey.IP, 0);
         String country = sp.getString(SharedPreferenceKey.COUNTRY_CODE, "");
         long time = System.currentTimeMillis();
-        String serverIp = ConnectVpnHelper.getInstance(mContext).getCurrentConfig().server;
+        String serverIp = ServerConfig.loadFromSharedPreference(sp).server;
+        if (serverIp == null)
+            serverIp = ConnectVpnHelper.getInstance(mContext).getCurrentConfig().server;
 
         answerLogEvent(name, ip, serverIp, country, time, args);
         apacheLogEvent(name, ip, serverIp, country, time, args);

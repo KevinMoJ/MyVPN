@@ -57,15 +57,17 @@ public class ConnectVpnHelper {
     private static ConnectVpnHelper instance;
     public static final String URL_BING = "https://www.bing.com/";
     public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
-    public static final String URL_FB = "http://www.facebook.com/";
+    public static final String URL_FB = "https://www.facebook.com/";
+
     private static final ArrayList<String> URLS = new ArrayList<>();
     private TestConnectCallable googleCallable;
     private TestConnectCallable facebookCallable;
-    private Thread firstTestThread;
+    private TestConnectCallable bingCallable;
 
     static {
         URLS.add(URL_FB);
         URLS.add(URL_GOOGLE);
+        URLS.add(URL_BING);
     }
 
     private Context mContext;
@@ -78,6 +80,7 @@ public class ConnectVpnHelper {
     private Request request;
     private Firebase mFirebase;
     private List<Timer> mTimerList;
+    private ArrayList<TestConnectCallable> tasks;
 
     private boolean mIsFindLocalServer; //找到与服务器匹配的国家
     private boolean mIsPriorityConnect; //找到优先选择的国家
@@ -89,11 +92,14 @@ public class ConnectVpnHelper {
 
     public static ConnectVpnHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new ConnectVpnHelper();
-            instance.mContext = context.getApplicationContext();
-            instance.initData();
+            synchronized (ConnectVpnHelper.class) {
+                if (instance == null) {
+                    instance = new ConnectVpnHelper();
+                    instance.mContext = context.getApplicationContext();
+                    instance.initData();
+                }
+            }
         }
-
         return instance;
     }
 
@@ -106,15 +112,13 @@ public class ConnectVpnHelper {
     }
 
     public void switchProxyService() {
-        mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
         if (LocalVpnService.IsRunning) {
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
-//            ServerConfig serverConfig = findOtherConfig(loadServerList(), currentConfig);
             ServerConfig serverConfig = findOtherVPNServerWithOutFailServer();
             mFirebase.logEvent("切换代理", "开始监测");
             try {
                 if (serverConfig != null) {
-                    Log.i("开始切换测试找到的服务器", String.format("%s--->%s--->%s", serverConfig.server, serverConfig.port, serverConfig.nation));
+                    Log.i(TAG + "开始切换找到的服务器", String.format("%s--->%s--->%s", serverConfig.server, serverConfig.port, serverConfig.nation));
                     Log.i(TAG + "当前失败的服务器", String.format("%s--->%s--->%s", currentConfig.server, currentConfig.port, currentConfig.nation));
                     mFirebase.logEvent("自动切换当前失败的服务器", String.format("%s|%s|%s", currentConfig.server, currentConfig.port, currentConfig.nation));
                     mFirebase.logEvent("自动切换链接的服务器", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
@@ -126,7 +130,9 @@ public class ConnectVpnHelper {
                     LocalVpnService.IsRunning = true;
                     serverConfig.saveInSharedPreference(mSharedPreference);
                     Log.i(TAG, "switchProxyService:   自动切换");
-                    startTestConnectionWithVPN(URL_GOOGLE, serverConfig);
+                    currentConfig = serverConfig;
+                    SystemClock.sleep(100);
+                    startConnectAfterFirstTest();
                 } else {
                     Log.d("FindProxyService", "没有可用的proxy");
                     VpnManageService.stopVpnForSwitchProxyFailed();
@@ -271,6 +277,9 @@ public class ConnectVpnHelper {
                 serverConfig = findOtherConfig(serverConfigs);
             }
         }
+//        serverConfig = new ServerConfig("Tokyo", "Japan", "198.13.45.183", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
+//        serverConfig = new ServerConfig("Miami", "United States", "94.177.202.43", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
+        currentConfig = serverConfig;
         return serverConfig;
     }
 
@@ -395,109 +404,99 @@ public class ConnectVpnHelper {
             mTimer = new Timer();
             if (!mTimerList.contains(mTimer))
                 mTimerList.add(mTimer);
-            mTimer.schedule(new MonitorTask(), TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(time));
+            mTimer.schedule(new MonitorTask(), 0, TimeUnit.SECONDS.toMillis(time));
             Log.i(TAG, "testConnection:  新起一个Timer ");
         }
     }
 
-    private void stopTimerMonitor() {
-        if (mTimer != null) {
-            mTimer.cancel();
-            if (mTimerList.contains(mTimer))
-                mTimerList.remove(mTimer);
-            mTimer = null;
-            Log.i(TAG, "testConnection:  结束当前timer");
-        }
-    }
-
-    public void startTestConnectionWithVPN(final String url, final ServerConfig config) {
+    public void startTestConnectionWithVPN() {
         mIsTimerCheck = false;
-        firstTestThread = new Thread() {
-            @Override
-            public void run() {
-                testConnection(url, config);
-            }
-        };
-        firstTestThread.start();
+        startTimerMonitor();
     }
 
-    public void startTestConnectionWithOutVPN(final String url, final ServerConfig config) {
-        firstTestThread = new Thread() {
-            @Override
-            public void run() {
-                testConnection(url, config);
+    public void startConnectAfterFirstTest() {
+        if (LocalVpnService.IsRunning) {
+            long start = System.currentTimeMillis();
+            boolean result = visitNetTest();
+            int count = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0);
+            if (result) {
+                if (errorsList.contains(currentConfig))
+                    errorsList.remove(currentConfig);
+                startTestConnectionWithVPN();
+            } else {
+                if (!errorsList.contains(currentConfig))
+                    errorsList.add(currentConfig);
+                mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, count + 1).apply();
+                mFirebase.logEvent("链接第一次测试失败", String.format("%s|%s|%s", currentConfig.server, currentConfig.nation, currentConfig.port), (System.currentTimeMillis() - start));
+                switchProxyService();
             }
-        };
-        firstTestThread.start();
-    }
-
-    private void testConnection(String url, ServerConfig config) { // 测试连接
-        if (currentConfig != null && !currentConfig.server.equals(config.server)) {
-            for (Timer timer : mTimerList)
-                timer.cancel();
+            if (count == 3)
+                resetFailCount();
         }
-        boolean result = false;
-        currentConfig = config;
+    }
+
+    public void startTestConnectionWithOutVPN(String url, ServerConfig config) {
         long startTime = 0;
-        if (url.equals(URL_FB) || url.equals(URL_GOOGLE)) {
+        boolean result = false;
+        try {
+            if (client == null)
+                client = new OkHttpClient();
+
+            if (request == null)
+                request = new Request.Builder()
+                        .url(url)
+                        .build();
             startTime = System.currentTimeMillis();
-            result = connectingTest();
+            for (int i = 0; i < 3; i++) {
+                if (testConnectionStatus(client, request)) {
+                    result = true;
+                    break;
+                }
+                SystemClock.sleep(50);
+            }
+        } catch (Exception e) {
+            ShadowsocksApplication.handleException(e);
+        }
+        mFirebase.logEvent("连接失败后测试", String.valueOf(result), System.currentTimeMillis() - startTime);
+    }
+
+    private boolean testConnection(ServerConfig config) { // 测试连接
+        if (LocalVpnService.IsRunning) {
+            if (currentConfig != null && !currentConfig.server.equals(config.server)) {
+                for (Timer timer : mTimerList)
+                    timer.cancel();
+            }
+            currentConfig = config;
+            long startTime = System.currentTimeMillis();
+
+            boolean result = visitNetTest();
 
             long timeConsume = System.currentTimeMillis() - startTime;
             mFirebase.logEvent("访问测试网站用时", String.valueOf(result), timeConsume);
             RealTimeLogger.getInstance(mContext).logEventAsync("request_test_url", "result", String.format("%s|%s", result, timeConsume));
-        } else {
-            try {
-                if (client == null)
-                    client = new OkHttpClient();
-
-                if (request == null)
-                    request = new Request.Builder()
-                            .url(url)
-                            .build();
-                startTime = System.currentTimeMillis();
-                for (int i = 0; i < 3; i++) {
-                    if (testConnectionStatus(client, request)) {
-                        result = true;
-                        break;
-                    }
-                    SystemClock.sleep(50);
-                }
-            } catch (Exception e) {
-                ShadowsocksApplication.handleException(e);
-            }
-        }
-        if (url.equals(URL_GOOGLE) || url.equals(URL_FB)) {
             if (result) {
                 if (errorsList.contains(config))
                     errorsList.remove(config);
-                if (config != null && !mIsTimerCheck) {
+                if (config != null) {// && !mIsTimerCheck
                     mFirebase.logEvent("连接后测试成功", String.format("%s|%s|%s", config.server, config.nation, config.port), System.currentTimeMillis() - startTime);
                     RealTimeLogger.getInstance(mContext).logEventAsync("test_success", "server",
                             String.format("%s|%s|%s", config.server, config.nation, config.port));
                 }
                 Log.i(TAG, "testConnection:  链接后测试成功     " + (System.currentTimeMillis() - startTime));
-                mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
-                // 连接成功后10秒钟开始测试，每隔5秒执行一次
-                if (!mIsTimerCheck)
-                    startTimerMonitor();
+                resetFailCount();
             } else {
-                if (config != null && !mIsTimerCheck) {
+                if (config != null) {// && !mIsTimerCheck
                     mFirebase.logEvent("连接后测试失败", String.format("%s|%s|%s", config.server, config.nation, config.name), System.currentTimeMillis() - startTime);
                     RealTimeLogger.getInstance(mContext).logEventAsync("test_fail", "server",
                             String.format("%s|%s|%s", config.server, config.nation, config.port), "time", String.valueOf(System.currentTimeMillis() - startTime));
                 }
                 Log.i(TAG, "testConnection:   链接后测试失败     " + (System.currentTimeMillis() - startTime));
                 int count = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0);
-                if (count == 0 && !mIsTimerCheck) //当第一次失败的时候建立时间检查，防止连续失败多次建立，最终变成死循环
-                    startTimerMonitor();
                 int failCount = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_fail_count");
 
                 if (count < failCount) {
                     mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, count + 1).apply();
                 } else {
-                    stopTimerMonitor();
-                    mIsTimerCheck = false;
                     if (!errorsList.contains(config))
                         errorsList.add(config);
                     switchProxyService();
@@ -506,17 +505,12 @@ public class ConnectVpnHelper {
                         RealTimeLogger.getInstance(mContext).logEventAsync("test_fail_switch", "server", String.format("%s|%s|%s", config.server, config.nation, config.port), "fail_count", String.valueOf(count));
                     }
                     Log.i(TAG, String.format("当前失败的服务器%s--->%s--->%s", currentConfig.server, currentConfig.nation, currentConfig.port));
-                    mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
+                    resetFailCount();
                 }
             }
-        } else if (url.equals(URL_BING)) {
-            mFirebase.logEvent("连接失败后测试", String.valueOf(result), System.currentTimeMillis() - startTime);
+            return result;
         }
-        client = null;
-        if (firstTestThread != null) {
-            firstTestThread.interrupt();
-            firstTestThread = null;
-        }
+        return false;
     }
 
     private boolean testConnectionStatus(OkHttpClient client, Request request) { //测试网络状态的测试，当VPN链接失败时候用
@@ -542,36 +536,34 @@ public class ConnectVpnHelper {
             if (LocalVpnService.IsRunning) {
                 mIsTimerCheck = true;
                 Log.i(TAG, "开始监控" + currentConfig.server + "  " + currentConfig.nation);
-                testConnection(URL_GOOGLE, currentConfig);
+                testConnection(currentConfig);
             }
         }
     }
 
-    public ServerConfig getCurrentConfig() {
-        return currentConfig;
-    }
-
-    public void setCurrentConfig(ServerConfig config) {
-        currentConfig = config;
-    }
-
-    private boolean connectingTest() { // 测试VPN连上了 访问两个网址的测试
+    private boolean visitNetTest() { // 测试VPN连上了 访问三个个网址的测试
         boolean result = false;
         int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_time_out");
+        int failCount = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0);
+        if (failCount >= FirebaseRemoteConfig.getInstance().getLong("connect_test_fail_count"))
+            mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0).apply();
+
+        timeOut = timeOut * (failCount + 1);
+        Log.i(TAG, "visitNetTest: timeOut    " + timeOut);
         int errorCount = 0;
-        ArrayList<TestConnectCallable> tasks = new ArrayList<>(URLS.size());
+        if (tasks == null)
+            tasks = new ArrayList<>(URLS.size());
 
         if (googleCallable == null)
-            googleCallable = new TestConnectCallable(URL_GOOGLE);
+            googleCallable = new TestConnectCallable(URL_GOOGLE, this);
         if (facebookCallable == null)
-            facebookCallable = new TestConnectCallable(URL_FB);
+            facebookCallable = new TestConnectCallable(URL_FB, this);
+        if (bingCallable == null)
+            bingCallable = new TestConnectCallable(URL_BING, this);
 
-        for (String u : URLS) {
-            if (u.equals(URL_FB))
-                tasks.add(facebookCallable);
-            else if (u.equals(URL_GOOGLE))
-                tasks.add(googleCallable);
-        }
+        tasks.add(googleCallable);
+        tasks.add(facebookCallable);
+        tasks.add(bingCallable);
 
         ExecutorService executorService = Executors.newCachedThreadPool();
         ExecutorCompletionService<Boolean> ecs = new ExecutorCompletionService<>(executorService);
@@ -589,18 +581,26 @@ public class ConnectVpnHelper {
                 Future<Boolean> future = ecs.poll(100, TimeUnit.MILLISECONDS);
                 if (future != null) {
                     result = future.get();
-                    Log.i(TAG + "6666", result + "");
+                    Log.i(TAG + "future拿到的结果    ", result + "");
                     if (result)
                         break;
                 }
             } catch (Exception e) {
                 errorCount++;
-                Log.i(TAG + "6666", "testConnection: " + errorCount);
+                Log.i(TAG + "future抛出异常", "testConnectionError: " + errorCount);
                 ShadowsocksApplication.handleException(e);
             }
         }
         executorService.shutdown();
         return result;
+    }
+
+    private void resetFailCount() {
+        mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
+    }
+
+    public ServerConfig getCurrentConfig() {
+        return currentConfig;
     }
 
     private static class MyCallable implements Callable<ServerConfig> {
@@ -619,11 +619,7 @@ public class ConnectVpnHelper {
             if (helper != null) {
                 serverConfig = helper.testServerPing(mConfig);
                 helper.resultList.add(serverConfig);
-                if (helper.connectingTest()) {
-                    return serverConfig;
-                } else
-                    return null;
-//                return serverConfig;
+                return serverConfig;
             } else {
                 throw new Exception("ConnectVpnHelper is null");
             }
@@ -734,7 +730,7 @@ public class ConnectVpnHelper {
             Log.i(TAG, "release:   关闭当前的Timer");
         }
         mIsTimerCheck = false;
-        mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
+//        resetFailCount();
         for (Timer timer : mTimerList) {
             timer.cancel();
             Log.i(TAG, "release:   关闭Timer");
@@ -744,40 +740,42 @@ public class ConnectVpnHelper {
 
     public void clearErrorList() {
         errorsList.clear();
-        mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
+        resetFailCount();
     }
 
     private static class TestConnectCallable implements Callable<Boolean> {
-        private OkHttpClient mClient;
-        private Request mRequest;
         private String mURL;
+        private ConnectVpnHelper mHelper;
 
-        TestConnectCallable(String url) {
+        TestConnectCallable(String url, ConnectVpnHelper helper) {
             mURL = url;
+            mHelper = helper;
         }
 
         @Override
         public Boolean call() throws Exception {
             boolean requestResult = getRequestResult();
-            Log.i(TAG, "call:  " + requestResult);
+            Log.i(TAG, "call:  " + requestResult + "    " + mURL);
             return requestResult;
         }
 
         private boolean getRequestResult() {
             boolean result;
-            if (mClient == null)
-                mClient = new OkHttpClient();
-            if (mRequest == null)
-                mRequest = new Request.Builder()
-                        .url(mURL)
-                        .build();
+            HttpURLConnection connection = null;
+            int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_time_out");
+            timeOut = timeOut * (mHelper.mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0) + 1);
             try {
-                Response response = mClient.newCall(mRequest).execute();
-                result = response.isSuccessful();
+                connection = (HttpURLConnection) new URL(mURL).openConnection();
+                connection.setConnectTimeout(1000 * timeOut);
+                connection.setReadTimeout(1000 * timeOut);
+                result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
             } catch (IOException e) {
                 result = false;
-                e.printStackTrace();
                 Log.i(TAG, "getRequestResult: 崩溃 " + e.getMessage());
+                e.printStackTrace();
+            } finally {
+                if (connection != null)
+                    connection.disconnect();
             }
             return result;
         }

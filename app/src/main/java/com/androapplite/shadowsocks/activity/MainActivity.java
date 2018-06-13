@@ -68,6 +68,7 @@ import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 import com.vm.shadowsocks.core.VpnNotification;
@@ -610,7 +611,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 break;
             case MSG_TEST_CONNECT_STATUS:
                 if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false))
-                    ConnectVpnHelper.getInstance(this).startTestConnectionWithVPN(ConnectVpnHelper.URL_GOOGLE, mConnectingConfig);
+                    ConnectVpnHelper.getInstance(this).startConnectAfterFirstTest();
                 break;
             case MSG_NO_AVAILABE_VPN:
                 showNoInternetSnackbar(R.string.server_not_available, false);
@@ -931,7 +932,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
                 mVpnState = VpnState.Connected;
                 Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
-                mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
+                if (FirebaseRemoteConfig.getInstance().getBoolean("open_connect_test"))
+                    mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 ConnectVpnHelper.getInstance(this).release();
