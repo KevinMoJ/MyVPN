@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -109,15 +110,17 @@ public class RealTimeLogger implements Callback {
         int ip = sp.getInt(SharedPreferenceKey.IP, 0);
         String country = sp.getString(SharedPreferenceKey.COUNTRY_CODE, "");
         long time = System.currentTimeMillis();
+        String serverIp = ConnectVpnHelper.getInstance(mContext).getCurrentConfig().server;
 
-        answerLogEvent(name, ip, country, time, args);
-        apacheLogEvent(name, ip, country, time, args);
+        answerLogEvent(name, ip, serverIp, country, time, args);
+        apacheLogEvent(name, ip, serverIp, country, time, args);
 
     }
 
-    private void answerLogEvent(String name, int ip, String country, long time, String... args) {
+    private void answerLogEvent(String name, int ip, String serverIp, String country, long time, String... args) {
         CustomEvent event = new CustomEvent(name);
         event.putCustomAttribute("ip", ip)
+                .putCustomAttribute("serverIp", serverIp)
                 .putCustomAttribute("country", country)
                 .putCustomAttribute("time", time);
         for (int i = 0; i < (args.length / 2) * 2; i += 2) {
@@ -126,10 +129,11 @@ public class RealTimeLogger implements Callback {
         mAnswers.logCustom(event);
     }
 
-    private void apacheLogEvent(String name, int ip, String country, long time, String... args) {
+    private void apacheLogEvent(String name, int ip, String serverIp, String country, long time, String... args) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(sApacheUrl).newBuilder();
         urlBuilder.addQueryParameter("name", name)
                 .addQueryParameter("ip", String.valueOf(ip))
+                .addQueryParameter("serverIp", serverIp)
                 .addQueryParameter("country", country)
                 .addQueryParameter("time", String.valueOf(time));
         for (int i = 0; i < (args.length / 2) * 2; i += 2) {
