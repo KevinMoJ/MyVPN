@@ -164,4 +164,10 @@
         <value>3</value>
     </entry>
 
+    <!--切换的时候开启检查的延迟时间-->
+    <entry>
+        <key>test_delay_check_time</key>
+        <value>1</value>
+    </entry>
+
 </defaultsMap>

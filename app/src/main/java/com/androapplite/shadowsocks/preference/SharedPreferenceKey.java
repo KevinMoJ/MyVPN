@@ -25,7 +25,6 @@ public final class SharedPreferenceKey {
     public static final String IS_AUTO_SWITCH_PROXY = "IS_AUTO_SWITCH_PROXY"; //防止StatusGuard切换服务器进而一直弹广告
     public static final String TEST_CONNECT_FAILED_COUNT = "TEST_CONNECT_FAILED_COUNT"; //测试链接失败的次数
     public static final String TEST_CONNECT_FAILED_TIME_COUNT = "TEST_CONNECT_FAILED_TIME_COUNT"; //测试链接失败的时间次数
-    public static final String IS_USER_ACTIVE_DISCONNECT = "IS_USER_ACTIVE_DISCONNECT"; //是否是用户主动断开的VPN
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";

@@ -18,6 +18,10 @@ public class NatSessionManager {
         return Sessions.size();
     }
 
+    public static void clearNatSession() {
+        Sessions.clear();
+    }
+
     static void clearExpiredSessions() {
         long now = System.nanoTime();
         for (int i = Sessions.size() - 1; i >= 0; i--) {

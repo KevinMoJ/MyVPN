@@ -261,6 +261,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
             while (true) {
                 if (IsRunning) {
+                    NatSessionManager.clearNatSession();
                     //加载配置文件
                     writeLog("set shadowsocks/(http proxy)");
                     try {
