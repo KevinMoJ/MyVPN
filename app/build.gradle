@@ -34,8 +34,8 @@ android {
         applicationId "com.androapplite.vpn10"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 63
-        versionName "1.4.23"
+        versionCode 1
+        versionName "1.0.0"
         multiDexEnabled true
     }
     dexOptions {
