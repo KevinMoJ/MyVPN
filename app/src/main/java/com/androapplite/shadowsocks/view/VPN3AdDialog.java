@@ -18,7 +18,7 @@ import com.androapplite.shadowsocks.R;
 
 
 public class VPN3AdDialog extends DialogFragment {
-    private final String VPN3_URL = "market://details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dapp%26utm_medium%3Dapp%26utm_campaign%3Dapp";
+    private final String VPN3_URL = "https://play.google.com/store/apps/details?id=com.androapplite.vpn10";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +75,7 @@ public class VPN3AdDialog extends DialogFragment {
         try {
             Uri uri = Uri.parse(url);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            intent.setPackage("com.android.vending");
+//            intent.setPackage("com.android.vending");
             context.startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();

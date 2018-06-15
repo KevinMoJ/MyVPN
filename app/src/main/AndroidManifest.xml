@@ -28,6 +28,17 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
+        <meta-data
+            android:name="app_license"
+            android:value="百度的id"/>
+
+        <provider
+            android:name="com.duapps.ad.stats.DuAdCacheProvider"
+            android:authorities="${applicationId}.DuAdCacheProvider"
+            android:exported="false">
+        </provider>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="52a14ce59287e0edc5512692515ab0270feaef99" />
