@@ -150,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
+        adAppHelper.checkUpdate(this);
         if (adAppHelper.isFullAdLoaded()) {
             adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
             adAppHelper.showFullAd();

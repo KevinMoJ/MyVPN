@@ -158,10 +158,10 @@
         <value>10</value>
     </entry>
 
-    <!--达到失败次数去切换服务器-->
+    <!--达到失败次数去切换服务器  次数为 0 1 2   2代表3次-->
     <entry>
         <key>connect_test_fail_count</key>
-        <value>3</value>
+        <value>2</value>
     </entry>
 
     <!--切换的时候开启检查的延迟时间-->

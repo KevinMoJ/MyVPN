@@ -152,10 +152,10 @@ public class ConnectVpnHelper {
         ServerConfig[] configs = {
                 new ServerConfig("Miami", "United States", "45.76.208.56", 10, 40050, "ic_flag_ca"),
                 new ServerConfig("Tokyo", "Japan", "198.13.45.183", 10, 40050, "ic_flag_jp"),
-                new ServerConfig("Singapore", "Singapore", "149.28.139.6", 10, 40050, "ic_flag_sg"),//
+//                new ServerConfig("Singapore", "Singapore", "149.28.139.6", 10, 40050, "ic_flag_sg"),//
 
         };
-        return configs[(int) (Math.random() + 1.5)];
+        return configs[(int) (Math.random() + 0.5)];
     }
 
     public void reconnectVpn() {
@@ -293,7 +293,7 @@ public class ConnectVpnHelper {
                 serverConfig = findOtherConfig(serverConfigs);
             }
         }
-//        serverConfig = new ServerConfig("Tokyo", "Japan", "198.13.45.183", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
+//        serverConfig = new ServerConfig("Tokyo", "Japan", "149.28.139.6", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
 //        serverConfig = new ServerConfig("Miami", "United States", "94.177.202.43", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
         currentConfig = serverConfig;
         return serverConfig;
@@ -531,7 +531,6 @@ public class ConnectVpnHelper {
                         mFirebase.logEvent("达到失败次数重连", String.format("%s|%s", config.server, config.nation), count); //失败的服务器，国家
                         RealTimeLogger.getInstance(mContext).logEventAsync("test_fail_switch", "server", String.format("%s|%s|%s", config.server, config.nation, config.port), "fail_count", String.valueOf(count));
                     }
-                    Log.i(TAG, String.format("当前失败的服务器%s--->%s--->%s", currentConfig.server, currentConfig.nation, currentConfig.port));
                     resetFailCount();
                 }
             }
