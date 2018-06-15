@@ -116,7 +116,6 @@ public class ConnectVpnHelper {
         if (LocalVpnService.IsRunning) {
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
             ServerConfig serverConfig = findOtherVPNServerWithOutFailServer();
-//            ServerConfig serverConfig = getTestServer();
             mFirebase.logEvent("切换代理", "开始监测");
             try {
                 if (serverConfig != null) {
@@ -128,10 +127,10 @@ public class ConnectVpnHelper {
                             , "switch_server", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
                     if (LocalVpnService.IsRunning) {
                         VpnManageService.stopVpnForAutoSwitchProxy();
+                        mContext.stopService(new Intent(mContext, LocalVpnService.class));
                         VpnNotification.gSupressNotification = true;
                         LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
-                        LocalVpnService.IsRunning = true;
-//                        mContext.startService(new Intent(mContext, LocalVpnService.class));
+                        mContext.startService(new Intent(mContext, LocalVpnService.class));
                         serverConfig.saveInSharedPreference(mSharedPreference);
                         Log.i(TAG, "switchProxyService:   自动切换");
                         currentConfig = serverConfig;
@@ -150,12 +149,9 @@ public class ConnectVpnHelper {
 
     private ServerConfig getTestServer() {
         ServerConfig[] configs = {
-                new ServerConfig("Miami", "United States", "45.76.208.56", 10, 40050, "ic_flag_ca"),
                 new ServerConfig("Tokyo", "Japan", "198.13.45.183", 10, 40050, "ic_flag_jp"),
-//                new ServerConfig("Singapore", "Singapore", "149.28.139.6", 10, 40050, "ic_flag_sg"),//
-
         };
-        return configs[(int) (Math.random() + 0.5)];
+        return configs[0];//(int) (Math.random() + 0.5)
     }
 
     public void reconnectVpn() {
@@ -294,7 +290,6 @@ public class ConnectVpnHelper {
             }
         }
 //        serverConfig = new ServerConfig("Tokyo", "Japan", "149.28.139.6", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
-//        serverConfig = new ServerConfig("Miami", "United States", "94.177.202.43", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
         currentConfig = serverConfig;
         return serverConfig;
     }
@@ -418,7 +413,7 @@ public class ConnectVpnHelper {
     }
 
     private void startTimerMonitor() {
-        if (!mIsTimerCheck && LocalVpnService.IsRunning) {
+        if (!mIsTimerCheck) {
             int time = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_link_time");
             int delayCheck = (int) FirebaseRemoteConfig.getInstance().getLong("test_delay_check_time");
             mTimer = new Timer();
@@ -456,9 +451,7 @@ public class ConnectVpnHelper {
 //            if (count == 3)
 //                resetFailCount();
 //        }
-        if (LocalVpnService.IsRunning) {
-            startTestConnectionWithVPN();
-        }
+        startTestConnectionWithVPN();
     }
 
     public void startTestConnectionWithOutVPN(String url, ServerConfig config) {
@@ -486,7 +479,7 @@ public class ConnectVpnHelper {
         mFirebase.logEvent("连接失败后测试", String.valueOf(result), System.currentTimeMillis() - startTime);
     }
 
-    private boolean testConnection(ServerConfig config) { // 测试连接
+    private void testConnection(ServerConfig config) { // 测试连接
         if (LocalVpnService.IsRunning) {
             if (currentConfig != null && !currentConfig.server.equals(config.server)) {
                 for (Timer timer : mTimerList)
@@ -534,9 +527,7 @@ public class ConnectVpnHelper {
                     resetFailCount();
                 }
             }
-            return result;
         }
-        return false;
     }
 
     private boolean testConnectionStatus(OkHttpClient client, Request request) { //测试网络状态的测试，当VPN链接失败时候用
