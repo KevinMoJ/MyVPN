@@ -55,18 +55,19 @@ public class ConnectVpnHelper {
     private static final String TAG = "测试";
 
     private static ConnectVpnHelper instance;
-    public static final String URL_BING = "https://www.bing.com/";
-    public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
-    public static final String URL_FB = "https://www.facebook.com/";
+    public static final String URL_BING = "https://www.bing.com";
+//    public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
+    public static final String URL_YOUTUBE = "https://m.youtube.com";
+    public static final String URL_FB = "https://m.facebook.com";
 
     private static final ArrayList<String> URLS = new ArrayList<>();
-    private TestConnectCallable googleCallable;
+    private TestConnectCallable youtubeCallable;
     private TestConnectCallable facebookCallable;
     private TestConnectCallable bingCallable;
 
     static {
         URLS.add(URL_FB);
-        URLS.add(URL_GOOGLE);
+        URLS.add(URL_YOUTUBE);
         URLS.add(URL_BING);
     }
 
@@ -115,6 +116,7 @@ public class ConnectVpnHelper {
         if (LocalVpnService.IsRunning) {
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
             ServerConfig serverConfig = findOtherVPNServerWithOutFailServer();
+//            ServerConfig serverConfig = getTestServer();
             mFirebase.logEvent("切换代理", "开始监测");
             try {
                 if (serverConfig != null) {
@@ -129,6 +131,7 @@ public class ConnectVpnHelper {
                         VpnNotification.gSupressNotification = true;
                         LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
                         LocalVpnService.IsRunning = true;
+//                        mContext.startService(new Intent(mContext, LocalVpnService.class));
                         serverConfig.saveInSharedPreference(mSharedPreference);
                         Log.i(TAG, "switchProxyService:   自动切换");
                         currentConfig = serverConfig;
@@ -143,6 +146,16 @@ public class ConnectVpnHelper {
                 e.printStackTrace();
             }
         }
+    }
+
+    private ServerConfig getTestServer() {
+        ServerConfig[] configs = {
+                new ServerConfig("Miami", "United States", "45.76.208.56", 10, 40050, "ic_flag_ca"),
+                new ServerConfig("Tokyo", "Japan", "198.13.45.183", 10, 40050, "ic_flag_jp"),
+                new ServerConfig("Singapore", "Singapore", "149.28.139.6", 10, 40050, "ic_flag_sg"),//
+
+        };
+        return configs[(int) (Math.random() + 1.5)];
     }
 
     public void reconnectVpn() {
@@ -165,7 +178,9 @@ public class ConnectVpnHelper {
 
     public ServerConfig findVPNServer() {
         ServerConfig serverConfig = null;
-        resultList.clear();
+        synchronized (ConnectVpnHelper.class) {
+            resultList.clear();
+        }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         String localNation = "";
         if (serverConfigs != null && !serverConfigs.isEmpty()) {
@@ -315,11 +330,14 @@ public class ConnectVpnHelper {
             errorsList.clear();
             return null;
         }
-
-        if (!resultList.isEmpty()) {
-            for (ServerConfig config : resultList) {
-                if (!errorsList.contains(config)) {
-                    Log.i(TAG + "得到当前国家其他的服务器", String.format("%s--->%s--->%s", config.server, config.nation, config.port));
+        ArrayList<ServerConfig> copy = null;
+        synchronized (ConnectVpnHelper.class) {
+            copy = new ArrayList<>(resultList.size());
+            copy.addAll(resultList);
+        }
+        if (!copy.isEmpty()) {
+            for (ServerConfig config : copy) {
+                if (config != null && !errorsList.contains(config)) {
                     try {
                         serverConfig = testServerPing(config);
                     } catch (Exception e) {
@@ -507,6 +525,7 @@ public class ConnectVpnHelper {
                 } else {
                     if (!errorsList.contains(config))
                         errorsList.add(config);
+                    release();
                     switchProxyService();
                     if (config != null) {
                         mFirebase.logEvent("达到失败次数重连", String.format("%s|%s", config.server, config.nation), count); //失败的服务器，国家
@@ -563,15 +582,15 @@ public class ConnectVpnHelper {
         if (tasks == null)
             tasks = new ArrayList<>();
 
-        if (googleCallable == null)
-            googleCallable = new TestConnectCallable(URL_GOOGLE, this);
+        if (youtubeCallable == null)
+            youtubeCallable = new TestConnectCallable(URL_YOUTUBE, this);
         if (facebookCallable == null)
             facebookCallable = new TestConnectCallable(URL_FB, this);
         if (bingCallable == null)
             bingCallable = new TestConnectCallable(URL_BING, this);
 
-        if (!tasks.contains(googleCallable))
-            tasks.add(googleCallable);
+        if (!tasks.contains(youtubeCallable))
+            tasks.add(youtubeCallable);
         if (!tasks.contains(facebookCallable))
             tasks.add(facebookCallable);
         if (!tasks.contains(bingCallable))
@@ -631,7 +650,11 @@ public class ConnectVpnHelper {
             ServerConfig serverConfig;
             if (helper != null) {
                 serverConfig = helper.testServerPing(mConfig);
-                helper.resultList.add(serverConfig);
+                if (serverConfig != null) {
+                    synchronized (ConnectVpnHelper.class) {
+                        helper.resultList.add(serverConfig);
+                    }
+                }
                 return serverConfig;
             } else {
                 throw new Exception("ConnectVpnHelper is null");
@@ -678,7 +701,6 @@ public class ConnectVpnHelper {
             connection.setConnectTimeout(1000 * 5);
             connection.setReadTimeout(1000 * 5);
             status = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
-                mFirebase.logEvent("ping网站访问结果", String.valueOf(status));
             if (!status)
                 stringLoad = "120";// 网站失败访问失败
             inputStream = connection.getInputStream();
@@ -708,7 +730,7 @@ public class ConnectVpnHelper {
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
-        mFirebase.logEvent("ping", ipAddress, stringLoad);
+        mFirebase.logEvent("ping", String.format("%s|%s", ipAddress, stringLoad), String.valueOf(status));
         return load;
     }
 
@@ -789,8 +811,10 @@ public class ConnectVpnHelper {
             timeOut = timeOut * (mHelper.mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0) + 1);
             try {
                 connection = (HttpURLConnection) new URL(mURL).openConnection();
+                connection.setUseCaches(false);
                 connection.setConnectTimeout(1000 * timeOut);
                 connection.setReadTimeout(1000 * timeOut);
+                connection.connect();
                 result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
             } catch (IOException e) {
                 result = false;

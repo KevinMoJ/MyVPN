@@ -430,8 +430,8 @@ public class LocalVpnService extends VpnService implements Runnable {
                             case 0:
                                 //vpn自己不走代理,把fake IP改为real IP    "www.gstatic.com" "www.facebook.com" --- 让这两个测试的网址也走自己的vpn
                                 if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort) &&
-                                        !"www.gstatic.com".equals(session.RemoteHost) &&
-                                        !"www.facebook.com".equals(session.RemoteHost) &&
+                                        !"m.youtube.com".equals(session.RemoteHost) &&
+                                        !"m.facebook.com".equals(session.RemoteHost) &&
                                         !"www.bing.com".equals(session.RemoteHost)) {
 
 //                                    if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort)) {
