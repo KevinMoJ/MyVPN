@@ -56,7 +56,7 @@ public class ConnectVpnHelper {
 
     private static ConnectVpnHelper instance;
     public static final String URL_BING = "https://www.bing.com";
-//    public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
+    //    public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
     public static final String URL_YOUTUBE = "https://m.youtube.com";
     public static final String URL_FB = "https://m.facebook.com";
 
@@ -161,11 +161,11 @@ public class ConnectVpnHelper {
             release();
         }
         ServerConfig serverConfig = findVPNServer();
-        currentConfig = serverConfig;
         if (serverConfig != null) {
             LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
             LocalVpnService.IsRunning = true;
             mContext.startService(new Intent(mContext, LocalVpnService.class));
+            currentConfig = serverConfig;
             serverConfig.saveInSharedPreference(mSharedPreference);
         } else {
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Action.ACTION_NO_AVAILABLE_VPN));
@@ -759,7 +759,7 @@ public class ConnectVpnHelper {
         }
         mIsTimerCheck = false;
 //        resetFailCount();
-        if (mTimerList != null) {
+        if (mTimerList != null && !mTimerList.isEmpty()) {
             for (Timer timer : mTimerList) {
                 timer.cancel();
                 Log.i(TAG, "release:   关闭Timer");

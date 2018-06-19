@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     public static final int MSG_SHOW_AD_BUTTON_RECOMMEND = 6;
     public static final int MSG_SHOW_AD_BUTTON_FULL = 7;
     public static final int MSG_TEST_CONNECT_STATUS = 8;
+    public static final int MSG_SHOW_INTERSTITIAL_ENTER = 9;
+    public static final int MSG_SHOW_INTERSTITIAL_EXIT = 10;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private Menu mMenu;
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private AlertDialog mExitAlertDialog;
     private DisconnectFragment mDisconnectFragment;
     private AnimationSet mMenuRocketAnimation;
-    private int mAdButtonMsgType;
+    private int mAdMsgType;
     private FullAdStatusListener mFullAdStatusListener;
 
     @Override
@@ -151,10 +153,40 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
-        if (adAppHelper.isFullAdLoaded()) {
-            adAppHelper.setAdStateListener(new InterstitialAdStateListener(this));
-            adAppHelper.showFullAd();
-            Firebase.getInstance(this).logEvent("主界面","进入全屏","显示");
+        showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
+    }
+
+    private void showInterstitialWithDelay(int msg, String adShowRate, String adDelayMin, String adDelayMinDefault, String adDelayMax, String adDelayMaxDefault ) {
+        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+        String enterAdSwitch = adAppHelper.getCustomCtrlValue(adShowRate, "1");
+        float enterAdRate;
+        try {
+            enterAdRate = Float.parseFloat(enterAdSwitch);
+        } catch (Exception e) {
+            enterAdRate = 0;
+        }
+        if (Math.random() < enterAdRate) {
+            if (adAppHelper.isFullAdLoaded()) {
+                String enterAdMinS = adAppHelper.getCustomCtrlValue(adDelayMin, adDelayMinDefault);
+                int enterAdMin;
+                try{
+                    enterAdMin = Integer.valueOf(enterAdMinS);
+                } catch (Exception e) {
+                    enterAdMin = 0;
+                }
+                String enterAdMaxS = adAppHelper.getCustomCtrlValue(adDelayMax, adDelayMaxDefault);
+                int enterAdMax;
+                try{
+                    enterAdMax = Integer.valueOf(enterAdMaxS);
+                } catch (Exception e) {
+                    enterAdMax = 0;
+                }
+                mForegroundHandler.sendEmptyMessageDelayed(msg, (long) (Math.random() * enterAdMax + enterAdMin));
+                if (mFullAdStatusListener == null)
+                    mFullAdStatusListener = new FullAdStatusListener(this);
+                mAdMsgType = msg;
+                adAppHelper.addAdStateListener(mFullAdStatusListener);
+            }
         }
     }
 
@@ -502,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private class FullAdStatusListener extends AdStateListener{
+    private class FullAdStatusListener extends AdStateListener {
         private WeakReference<MainActivity> mReference;
 
         FullAdStatusListener(MainActivity activity) {
@@ -517,12 +549,18 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 case AdType.FACEBOOK_FBN:
                 case AdType.FACEBOOK_FULL:
                 case AdType.RECOMMEND_AD:
-                    switch (activity.mAdButtonMsgType) {
+                    switch (activity.mAdMsgType) {
                         case MSG_SHOW_AD_BUTTON_FULL:
                             Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮全屏");
                             break;
                         case MSG_SHOW_AD_BUTTON_RECOMMEND:
                             Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮线上互推全屏");
+                            break;
+                        case MSG_SHOW_INTERSTITIAL_ENTER:
+                            Firebase.getInstance(activity).logEvent("主界面", "进入全屏", "点击");
+                            break;
+                        case MSG_SHOW_INTERSTITIAL_EXIT:
+                            Firebase.getInstance(activity).logEvent("主界面", "退出全屏", "点击");
                             break;
                     }
                     AdAppHelper.getInstance(activity).removeAdStateListener(this);
@@ -570,6 +608,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public boolean handleMessage(Message msg) {
+        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
         switch (msg.what){
             case MSG_REPEAT_MENU_ROCKET:
                 if (mMenu != null) {
@@ -623,6 +662,15 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mConnectFragment.updateUI();
                 }
                 break;
+            case MSG_SHOW_INTERSTITIAL_ENTER:
+                adAppHelper.showFullAd();
+                Firebase.getInstance(this).logEvent("主界面", "进入全屏", "显示");
+                break;
+            case MSG_SHOW_INTERSTITIAL_EXIT:
+                adAppHelper.showFullAd();
+                Firebase.getInstance(this).logEvent("主界面", "退出全屏", "显示");
+                break;
+
         }
 
         return true;
@@ -818,17 +866,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 })
                 .setCancelable(false)
                 .show();
-
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        String exitAdSwitch = adAppHelper.getCustomCtrlValue("exit_ad", "-1");
-        if ("1".equals(exitAdSwitch)) {
-            if (adAppHelper.isFullAdLoaded()) {
-                adAppHelper.addAdStateListener(new InterstitialAdStateListener(this));
-                adAppHelper.showFullAd();
-                firebase.logEvent("主界面", "退出全屏", "显示");
-            }
-            firebase.logEvent("主页", "退出", "后退键");
-        }
+        showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
     }
 
     @Override
@@ -880,11 +918,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
                 if (adAppHelper.isFullAdLoaded()) {
                     adAppHelper.showFullAd();
-                    mAdButtonMsgType = MSG_SHOW_AD_BUTTON_FULL;
+                    mAdMsgType = MSG_SHOW_AD_BUTTON_FULL;
                     Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上全屏");
                 } else if (adAppHelper.isRecommendAdLoaded()) {
                     adAppHelper.showFullAd();
-                    mAdButtonMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
+                    mAdMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
                     Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上互推");
                 } else {
                     startActivity(new Intent(this, RecommendActivity.class));
