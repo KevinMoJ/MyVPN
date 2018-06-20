@@ -12,6 +12,7 @@ import android.util.Log;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.model.PriorityConfig;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -23,6 +24,9 @@ import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.VpnNotification;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -305,18 +309,31 @@ public class ConnectVpnHelper {
     }
 
     private String getPriorityNation(String nationCode) {
+//      http://www.jctrans.com/tool/gjym.htm
         String priorityNation = "";
-        TypedArray nation_code = mContext.getResources().obtainTypedArray(R.array.nation_code);
-        TypedArray nation = mContext.getResources().obtainTypedArray(R.array.nation);
-
-        for (int i = 0; i < nation_code.length(); i++) {
-            String code = nation_code.getString(i);
-            if (nationCode.equals(code)) {
-                priorityNation = nation.getString(i);
-                mIsPriorityConnect = true;
-                break;
-            } else {
-                mIsPriorityConnect = false;
+        String priorityList = FirebaseRemoteConfig.getInstance().getString("priority_connect_nation_list");
+        ArrayList<PriorityConfig> configs = new ArrayList<>();
+        try {
+            JSONArray rootJsonArray = new JSONArray(priorityList);
+            for (int i = 0; i < rootJsonArray.length(); i++) {
+                JSONObject jsonObject = (JSONObject) rootJsonArray.get(i);
+                String code = jsonObject.getString("code");
+                String nation = jsonObject.getString("nation");
+                PriorityConfig config = new PriorityConfig(code, nation);
+                configs.add(config);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!configs.isEmpty()) {
+            for (PriorityConfig config : configs) {
+                if (config.getCode().equals(nationCode)) {
+                    priorityNation = config.getNation();
+                    mIsPriorityConnect = true;
+                    break;
+                } else {
+                    mIsPriorityConnect = false;
+                }
             }
         }
 
@@ -663,7 +680,7 @@ public class ConnectVpnHelper {
     }
 
     // && isPortOpen(config.server, config.port, 5000)
-    public ServerConfig testServerPing(ServerConfig config) throws Exception {
+    private ServerConfig testServerPing(ServerConfig config) throws Exception {
         int remote_pingLoad = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
         int pingLoad = ping(config.server);
         boolean connect = pingLoad <= remote_pingLoad;
@@ -732,33 +749,6 @@ public class ConnectVpnHelper {
         }
         mFirebase.logEvent("ping", String.format("%s|%s", ipAddress, stringLoad), String.valueOf(status));
         return load;
-    }
-
-    private boolean isPortOpen(final String ip, final int port, final int timeout) {
-        Socket socket = null;
-        OutputStreamWriter osw;
-        boolean result = false;
-        try {
-            socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), timeout);
-            osw = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
-            osw.write(ip, 0, ip.length());
-            osw.flush();
-            result = true;
-        } catch (Exception ex) {
-            ShadowsocksApplication.handleException(ex);
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                ShadowsocksApplication.handleException(e);
-            }
-        }
-        Log.d("MyCaller", ip + ":" + port + " " + result);
-        if (!result) {
-            mFirebase.logEvent("port", ip + ":" + String.valueOf(port), String.valueOf(result));
-        }
-        return result;
     }
 
     public void release() {
