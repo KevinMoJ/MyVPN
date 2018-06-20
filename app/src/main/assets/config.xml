@@ -29,5 +29,5 @@
         {net_acc_end_ad=1},{net_acc_ad_end_min=500},{net_acc_ad_end_max=500},
         {welcome_ad=1},{welcome_ad_min=5000},{welcome_ad_max=0},
     </string>
-    <string name="splash_ctrl">{exe=0},{fb=633231230382328_633233510382100},{admob=ca-app-pub-9834399249058252/5827650796}</string>
+    <string name="splash_ctrl">{exe=1},{fb=},{admob=ca-app-pub-9834399249058252/5827650796}</string>
 </map>
