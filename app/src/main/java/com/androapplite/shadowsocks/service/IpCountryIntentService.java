@@ -77,6 +77,7 @@ public class IpCountryIntentService extends IntentService {
             } else {
                 Firebase.getInstance(this).logEvent("国家", "代码", "未知");
             }
+            Firebase.getInstance(this).logEvent("国家", "ip", sharedPreferences.getInt(SharedPreferenceKey.IP, 0));
         }
     }
 

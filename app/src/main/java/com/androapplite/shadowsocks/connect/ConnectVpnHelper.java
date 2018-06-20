@@ -19,6 +19,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.ShadowSocksProxyRunnable;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -30,11 +31,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,14 +59,16 @@ public class ConnectVpnHelper {
 
     private static ConnectVpnHelper instance;
     public static final String URL_BING = "https://www.bing.com";
-    //    public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
+    public static final String URL_GOOGLE = "http://www.gstatic.com/generate_204";
     public static final String URL_YOUTUBE = "https://m.youtube.com";
     public static final String URL_FB = "https://m.facebook.com";
+    public static final String URL_FB_IP = "https://157.240.22.35";
 
     private static final ArrayList<String> URLS = new ArrayList<>();
     private TestConnectCallable youtubeCallable;
     private TestConnectCallable facebookCallable;
     private TestConnectCallable bingCallable;
+    private ShadowSocksProxyRunnable mSocksProxyRunnable;
 
     static {
         URLS.add(URL_FB);
@@ -114,6 +115,7 @@ public class ConnectVpnHelper {
         resultList = new ArrayList<>();
         mTimerList = new ArrayList<>();
         mFirebase = Firebase.getInstance(mContext);
+        mSocksProxyRunnable = new ShadowSocksProxyRunnable();
     }
 
     public void switchProxyService() {
@@ -192,6 +194,7 @@ public class ConnectVpnHelper {
             resultList.clear();
         }
         ArrayList<ServerConfig> serverConfigs = loadServerList();
+        mSocksProxyRunnable.start();
         String localNation = "";
         if (serverConfigs != null && !serverConfigs.isEmpty()) {
             final String defaultNation = mContext.getString(R.string.vpn_nation_opt);
@@ -299,6 +302,7 @@ public class ConnectVpnHelper {
                 }
             }
             executorService.shutdown();
+            mSocksProxyRunnable.stop();
             if (serverConfig == null && (mIsFindLocalServer || mIsPriorityConnect)) {
                 serverConfig = findOtherConfig(serverConfigs);
             }
@@ -346,7 +350,7 @@ public class ConnectVpnHelper {
         ServerConfig serverConfig = null;
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         ArrayList<MyCallable> tasks = new ArrayList<>();
-
+        mSocksProxyRunnable.start();
         if (errorsList.size() == serverConfigs.size() - 1) { //当错误列表和服务器列表大小一样的话，表示所有服务器都测试失败，-1为移除服务器列表第一个全局
             mFirebase.logEvent("失败列表和服务器列表大小一样", "所有的服务器都测试过");
             errorsList.clear();
@@ -400,6 +404,7 @@ public class ConnectVpnHelper {
             }
         }
         executorService.shutdown();
+        mSocksProxyRunnable.stop();
 
         return serverConfig;
     }
@@ -408,7 +413,7 @@ public class ConnectVpnHelper {
     private ServerConfig findOtherConfig(List<ServerConfig> serverConfigs) {
         ServerConfig serverConfig = null;
         ArrayList<MyCallable> tasks = new ArrayList<>();
-
+        mSocksProxyRunnable.start();
         serverConfigs.remove(0);
         for (ServerConfig config : serverConfigs) {
             tasks.add(new MyCallable(this, config));
@@ -433,6 +438,7 @@ public class ConnectVpnHelper {
         }
 
         executorService.shutdown();
+        mSocksProxyRunnable.stop();
 
         if (serverConfig != null)
             Firebase.getInstance(mContext).logEvent("优先连接服务器失败连接连接其他服务器", serverConfig.nation, serverConfig.server);
@@ -685,13 +691,30 @@ public class ConnectVpnHelper {
         int pingLoad = ping(config.server);
         boolean connect = pingLoad <= remote_pingLoad;
         if (connect) {
-            return config;
+            return beforeConnectTestStatus(config) ? config : null;
         } else {
             RealTimeLogger.getInstance(mContext).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(pingLoad)
                     , "vpn_country", config.nation, "vpn_city", config.name, "net_type", InternetUtil.getNetworkState(mContext),
                     "time", WarnDialogUtil.getDateTime());
         }
         return null;
+    }
+
+    private boolean beforeConnectTestStatus(ServerConfig config) {
+        boolean result = false;
+        String testURL = FirebaseRemoteConfig.getInstance().getString("before_connect_test_net");
+        try {
+            Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
+            HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
+            connection.setDoInput(true);
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+            Firebase.getInstance(mContext).logEvent("连接前测试访问网站", "结果", String.valueOf(result));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     private ArrayList<ServerConfig> loadServerList() {

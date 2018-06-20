@@ -176,5 +176,10 @@
         <value>[{"code":"AE","nation":"Netherlands"},{"code":"ZA","nation":"Netherlands"},{"code":"TH","nation":"Singapore"},{"code":"PH","nation":"Singapore"},{"code":"NG","nation":"United States"},{"code":"FR","nation":"United States"}]</value>
     </entry>
 
+    <!--连接前测试网站-->
+    <entry>
+        <key>before_connect_test_net</key>
+        <value>https://www.bing.com</value>
+    </entry>
 
 </defaultsMap>

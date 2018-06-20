@@ -179,7 +179,7 @@ public class RealTimeLogger implements Callback {
 
     @Override
     public void onResponse(Call call, Response response) throws IOException {
-
+            response.body().close();
     }
 
 
