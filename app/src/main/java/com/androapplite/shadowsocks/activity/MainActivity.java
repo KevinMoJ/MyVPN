@@ -978,7 +978,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
-                ConnectVpnHelper.getInstance(this).release();
                 mVpnState = VpnState.Stopped;
                 if (mIsRestart) {
                     mIsRestart = false;

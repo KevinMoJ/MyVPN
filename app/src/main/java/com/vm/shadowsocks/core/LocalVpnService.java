@@ -47,6 +47,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     public static LocalVpnService Instance;
     public static String ProxyUrl;
     public static volatile boolean IsRunning = false;
+    public static volatile boolean IsStopped = true;
 
     private static int ID;
     private static int LOCAL_IP;
@@ -262,6 +263,7 @@ public class LocalVpnService extends VpnService implements Runnable {
             while (true) {
                 if (IsRunning) {
                     NatSessionManager.clearNatSession();
+                    IsStopped = false;
                     //加载配置文件
                     writeLog("set shadowsocks/(http proxy)");
                     try {
@@ -290,6 +292,7 @@ public class LocalVpnService extends VpnService implements Runnable {
                     runVPN();
                     //停止定时服务和通知
                     stopSchedule();
+                    IsStopped = true;
                 } else {
                     Thread.sleep(100);
                 }

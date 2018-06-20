@@ -127,10 +127,9 @@ public class ConnectVpnHelper {
                             , "switch_server", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
                     if (LocalVpnService.IsRunning) {
                         VpnManageService.stopVpnForAutoSwitchProxy();
-                        mContext.stopService(new Intent(mContext, LocalVpnService.class));
                         VpnNotification.gSupressNotification = true;
                         LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
-                        mContext.startService(new Intent(mContext, LocalVpnService.class));
+                        monitorVpnState();
                         serverConfig.saveInSharedPreference(mSharedPreference);
                         Log.i(TAG, "switchProxyService:   自动切换");
                         currentConfig = serverConfig;
@@ -143,6 +142,17 @@ public class ConnectVpnHelper {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void monitorVpnState() {
+        for (int i = 0; i < (10 * 1000) / 10; i++) {
+            if (LocalVpnService.IsStopped) {
+                LocalVpnService.IsRunning = true;
+                break;
+            } else {
+                SystemClock.sleep(10);
             }
         }
     }
