@@ -151,10 +151,15 @@
         <value>true</value>
     </entry>
 
-
-    <!--网络访问链接超时时间-->
+    <!--连接后测试网络访问链接超时时间-->
     <entry>
-        <key>connect_test_time_out</key>
+        <key>before_connect_test_time_out</key>
+        <value>10</value>
+    </entry>
+
+    <!--连接前测试网络访问链接超时时间-->
+    <entry>
+        <key>after_connect_test_time_out</key>
         <value>10</value>
     </entry>
 
@@ -180,6 +185,12 @@
     <entry>
         <key>before_connect_test_net</key>
         <value>https://www.bing.com</value>
+    </entry>
+
+    <!--连接前测试功能开关-->
+    <entry>
+        <key>is_before_connect_test</key>
+        <value>true</value>
     </entry>
 
 </defaultsMap>

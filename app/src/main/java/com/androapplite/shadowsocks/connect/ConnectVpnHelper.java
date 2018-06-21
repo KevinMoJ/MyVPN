@@ -593,7 +593,7 @@ public class ConnectVpnHelper {
 
     private boolean visitNetTest() { // 测试VPN连上了 访问三个个网址的测试
         boolean result = false;
-        int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_time_out");
+        int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("before_connect_test_time_out");
 //        int failCount = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0);
         int failCount = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0);
 //        if (failCount >= FirebaseRemoteConfig.getInstance().getLong("connect_test_fail_count"))
@@ -688,10 +688,14 @@ public class ConnectVpnHelper {
     // && isPortOpen(config.server, config.port, 5000)
     private ServerConfig testServerPing(ServerConfig config) throws Exception {
         int remote_pingLoad = (int) FirebaseRemoteConfig.getInstance().getLong("ping_load");
+        boolean isBeforeConnectTest = FirebaseRemoteConfig.getInstance().getBoolean("is_before_connect_test");
         int pingLoad = ping(config.server);
         boolean connect = pingLoad <= remote_pingLoad;
         if (connect) {
-            return beforeConnectTestStatus(config) ? config : null;
+            if (isBeforeConnectTest)
+                return beforeConnectTestStatus(config) ? config : null;
+            else
+                return config;
         } else {
             RealTimeLogger.getInstance(mContext).logEventAsync("ping", "vpn_ip", config.server, "vpn_load", String.valueOf(pingLoad)
                     , "vpn_country", config.nation, "vpn_city", config.name, "net_type", InternetUtil.getNetworkState(mContext),
@@ -702,17 +706,46 @@ public class ConnectVpnHelper {
 
     private boolean beforeConnectTestStatus(ServerConfig config) {
         boolean result = false;
+        int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("after_connect_test_time_out");
         String testURL = FirebaseRemoteConfig.getInstance().getString("before_connect_test_net");
+        OkHttpClient okHttpClient = null;
+        Request request = null;
+        Response response = null;
+
         try {
-            Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
-            HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
-            connection.setDoInput(true);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
-            Firebase.getInstance(mContext).logEvent("连接前测试访问网站", "结果", String.valueOf(result));
-        } catch (IOException e) {
-            e.printStackTrace();
+            okHttpClient = new OkHttpClient.Builder()
+                    .proxy(mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port))
+                    .connectTimeout(1000 * timeOut, TimeUnit.MILLISECONDS)
+                    .readTimeout(1000 * timeOut, TimeUnit.MILLISECONDS)
+                    .build();
+            request = new Request.Builder()
+                    .url(testURL)//请求接口。如果需要传参拼接到接口后面。
+                    .build();//创建Request 对象
+            response = okHttpClient.newCall(request).execute();
+            result = response.isSuccessful();
+            mFirebase.logEvent("连接前测试okHttp", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+        } catch (Exception e) {
+            mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            try {
+                Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
+                HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
+                connection.setDoInput(true);
+                connection.setConnectTimeout(1000 * timeOut);
+                connection.setReadTimeout(1000 * timeOut);
+//                connection.setRequestProperty("accept", "*/*");
+//                connection.setRequestProperty("connection", "Keep-Alive");
+//                //浏览器表明自己的身份（是哪种浏览器）
+//                connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14)");
+                result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+                mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            }
+        } finally {
+            if (response != null){
+                response.body().close();
+            }
         }
         return result;
     }
@@ -819,7 +852,7 @@ public class ConnectVpnHelper {
         private boolean getRequestResult() {
             boolean result;
             HttpURLConnection connection = null;
-            int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_time_out");
+            int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("before_connect_test_time_out");
 //            timeOut = timeOut * (mHelper.mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0) + 1);
             timeOut = timeOut * (mHelper.mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0) + 1);
             try {

@@ -47,10 +47,11 @@ public class ShadowSocksProxyRunnable implements Runnable {
     private static final byte REP_COMMAND_NOT_SUPPORT = 0X07;
     private static final byte REP_ADDRESS_TYPE_NOT_SUPPORTED = 0X08;
     private static final byte REP_UNASSIGNED = 0X09;
-
     private static final byte RESERVE = 0X00;
-
     private static final byte NO_AUTHENTICATION_REQUIRED = 0x00;
+    private static final byte SOCKS_4_REPLY_VN = 0X00;
+    private static final byte SOCKS_4_REP_SUCCESS = 90;
+
     private Selector mSelector;
 //            private ServerSocketChannel mLocalServerSocketChannel;
     private boolean mRunning;
@@ -142,6 +143,9 @@ public class ShadowSocksProxyRunnable implements Runnable {
                                                 case Tunnel.STEP_3_REMOTE_RESPONSE:
                                                     tunnel.handleStep3(byteBuffer);
                                                     break;
+                                                case Tunnel.STEP_3_REMOTE_RESPONSE_SOCKS_4:
+                                                    tunnel.handleStep3Socks4(byteBuffer);
+                                                    break;
                                             }
                                         } else if (socketChannel.equals(tunnel.innerChannel)) {
 
@@ -159,13 +163,23 @@ public class ShadowSocksProxyRunnable implements Runnable {
                                             if (socketChannel.equals(tunnel.innerChannel)) {
                                                 switch (tunnel.nextStep) {
                                                     case Tunnel.STEP_1_HANDSHAKE:
-                                                        tunnel.handStep1(byteBuffer);
+//                                                        System.out.println(">>>>>>>>handshake>>>>>>>>>>>>");
+//                                                        for(byte b:bufferBytes) {
+//                                                            System.out.println(b + "\t->\t" + Character.toString((char)b));
+//                                                        }
+//                                                        System.out.println("<<<<<<<<<<<<<<<<<<<<");
+                                                        byte vn = bufferBytes[0];
+                                                        switch (vn) {
+                                                            case SOCKS_PROTOCOL_4:
+                                                                tunnel.handleStep1Socks4(mSelector, bufferBytes, byteBuffer);
+                                                                break;
+                                                            case SOCKS_PROTOCOL_5:
+                                                                tunnel.handStep1(byteBuffer);
+                                                                break;
+                                                        }
                                                         break;
                                                     case Tunnel.STEP_2_REMOTE_HOST:
-                                                        byte reqCmd = bufferBytes[1];
-                                                        byte reqAtyp = bufferBytes[3];
-                                                        InetSocketAddress remoteAddress = createRemoteSocketAddress(bufferBytes, byteBuffer, reqAtyp);
-                                                        tunnel.handleStep2(mSelector, reqCmd, remoteAddress);
+                                                        tunnel.handleStep2(mSelector, bufferBytes, byteBuffer);
                                                         break;
                                                     case Tunnel.STEP_4_SEND_DATA:
                                                         tunnel.handleStep4SendOut(byteBuffer);
@@ -197,39 +211,6 @@ public class ShadowSocksProxyRunnable implements Runnable {
         }
     }
 
-    @Nullable
-    private InetSocketAddress createRemoteSocketAddress(byte[] bufferBytes, ByteBuffer byteBuffer, byte reqAtyp) throws UnknownHostException {
-        InetSocketAddress address = null;
-        int port = 0;
-        byteBuffer.flip().position(4);
-        switch (reqAtyp) {
-            case TYPE_IPV4:
-                byte[] ipv4Address = new byte[4];
-                byteBuffer.get(ipv4Address);
-                InetAddress ipv4 = InetAddress.getByAddress(ipv4Address);
-                port = byteBuffer.getShort() & 0xffff;
-                address = new InetSocketAddress(ipv4, port);
-                break;
-            case TYPE_HOST:
-                byte hostLen = bufferBytes[4];
-                byte[] hostBytes = new byte[hostLen];
-                byteBuffer.position(5);
-                byteBuffer.get(hostBytes);
-                String host = new String(hostBytes);
-                port = byteBuffer.getShort() & 0xffff;
-                address = new InetSocketAddress(host, port);
-                break;
-            case TYPE_IPV6:
-                byte[] ipv6Address = new byte[16];
-                byteBuffer.get(ipv6Address);
-                InetAddress ipv6 = InetAddress.getByAddress(ipv6Address);
-                port = byteBuffer.getShort() & 0xffff;
-                address = new InetSocketAddress(ipv6, port);
-                break;
-        }
-        return address;
-    }
-
     private static class Tunnel {
         byte nextStep;
         SocketChannel outerChannel;
@@ -242,6 +223,8 @@ public class ShadowSocksProxyRunnable implements Runnable {
         SocketAddress ssRemoteAddress;
         ICrypt crypt;
         ShadowsocksConfig ssConfig;
+        byte aType;
+        static final byte STEP_3_REMOTE_RESPONSE_SOCKS_4 = 100;
 
 
         Tunnel(ShadowsocksConfig config, SocketChannel socketChannel) {
@@ -267,11 +250,13 @@ public class ShadowSocksProxyRunnable implements Runnable {
             }
         }
 
-        private void handleStep2(Selector selector, byte reqCmd, InetSocketAddress socketAddress) throws IOException {
+        private void handleStep2(Selector selector, byte[] bufferBytes, ByteBuffer byteBuffer) throws IOException {
+            byte reqCmd = bufferBytes[1];
+            byte reqAtyp = bufferBytes[3];
+            remoteAddress = createRemoteSocketAddress(bufferBytes, byteBuffer, reqAtyp);
+
             switch (reqCmd) {
                 case CMD_CONNECT:
-                    remoteAddress = socketAddress;
-//                        ssRemoteAddress = new InetSocketAddress("45.76.208.56", 40010);
                     ssRemoteAddress = new InetSocketAddress(ssConfig.server, ssConfig.port);
                     SocketChannel remoteSocketChannel = SocketChannel.open();
                     remoteSocketChannel.configureBlocking(false);
@@ -285,16 +270,62 @@ public class ShadowSocksProxyRunnable implements Runnable {
                 case CMD_UDP:
                     break;
             }
-            return;
+            aType = reqAtyp;
+        }
+
+        @Nullable
+        private InetSocketAddress createRemoteSocketAddress(byte[] bufferBytes, ByteBuffer byteBuffer, byte reqAtyp) throws UnknownHostException {
+            InetSocketAddress address = null;
+            int port = 0;
+            byteBuffer.flip().position(4);
+            switch (reqAtyp) {
+                case TYPE_IPV4:
+                    byte[] ipv4Address = new byte[4];
+                    byteBuffer.get(ipv4Address);
+                    InetAddress ipv4 = InetAddress.getByAddress(ipv4Address);
+                    port = byteBuffer.getShort() & 0xffff;
+                    address = new InetSocketAddress(ipv4, port);
+                    break;
+                case TYPE_HOST:
+                    byte hostLen = bufferBytes[4];
+                    byte[] hostBytes = new byte[hostLen];
+                    byteBuffer.position(5);
+                    byteBuffer.get(hostBytes);
+                    String host = new String(hostBytes);
+                    port = byteBuffer.getShort() & 0xffff;
+//                address = new InetSocketAddress(host, port);
+                    address = InetSocketAddress.createUnresolved(host, port);
+                    break;
+                case TYPE_IPV6:
+                    byte[] ipv6Address = new byte[16];
+                    byteBuffer.get(ipv6Address);
+                    InetAddress ipv6 = InetAddress.getByAddress(ipv6Address);
+                    port = byteBuffer.getShort() & 0xffff;
+                    address = new InetSocketAddress(ipv6, port);
+                    break;
+            }
+            return address;
         }
 
 
         private void handleStep3(ByteBuffer byteBuffer) throws IOException {
             //向vpn server发送连接数据，告诉需要连接的网址
             ((ByteBuffer) byteBuffer.clear())
-                    .put(TYPE_IPV4)
-                    .put(remoteAddress.getAddress().getAddress())
-                    .putShort((short) (remoteAddress.getPort() & 0xffff));
+                    .put(aType);
+            switch (aType) {
+                case TYPE_IPV4:
+                    byteBuffer.put(remoteAddress.getAddress().getAddress());
+                    break;
+                case TYPE_HOST:
+                    String domain = remoteAddress.getHostName();
+                    byteBuffer.put((byte) domain.length())
+                            .put(domain.getBytes());
+                    break;
+                case TYPE_IPV6:
+                    byteBuffer.put(remoteAddress.getAddress().getAddress());
+                    break;
+            }
+            byteBuffer.putShort((short) (remoteAddress.getPort() & 0xffff));
             byteBuffer.flip();
             byte[] raw = new byte[byteBuffer.limit()];
             byteBuffer.get(raw);
@@ -345,6 +376,74 @@ public class ShadowSocksProxyRunnable implements Runnable {
             byteBuffer.clear();
             byteBuffer.put(decrypt);
             send(byteBuffer, innerChannel);
+        }
+
+        private void handleStep1Socks4(Selector selector, byte[] bufferBytes, ByteBuffer byteBuffer) throws Exception {
+            byte reqCmd = bufferBytes[1];
+            switch (reqCmd) {
+                case CMD_CONNECT:
+                    remoteAddress = createRemoteSocketAddress(byteBuffer);
+                    ssRemoteAddress = new InetSocketAddress(ssConfig.server, ssConfig.port);
+                    SocketChannel remoteSocketChannel = SocketChannel.open();
+                    remoteSocketChannel.configureBlocking(false);
+                    remoteSocketChannel.connect(ssRemoteAddress);
+                    remoteSocketChannel.register(selector, SelectionKey.OP_CONNECT, this);
+                    outerChannel = remoteSocketChannel;
+                    nextStep = Tunnel.STEP_3_REMOTE_RESPONSE_SOCKS_4;
+                    break;
+                case CMD_BIND:
+                    break;
+                case CMD_UDP:
+                    break;
+            }
+            aType = TYPE_IPV4;
+        }
+
+        private InetSocketAddress createRemoteSocketAddress(ByteBuffer byteBuffer) throws UnknownHostException {
+            byteBuffer.flip().position(2);
+            int port = byteBuffer.getShort() & 0xffff;
+            byte[] ipv4Address = new byte[4];
+            byteBuffer.get(ipv4Address);
+            InetAddress ipv4 = InetAddress.getByAddress(ipv4Address);
+            return new InetSocketAddress(ipv4, port);
+        }
+
+        private void handleStep3Socks4(ByteBuffer byteBuffer) throws IOException {
+            //向vpn server发送连接数据，告诉需要连接的网址
+            ((ByteBuffer) byteBuffer.clear())
+                    .put(aType);
+            switch (aType) {
+                case TYPE_IPV4:
+                    byteBuffer.put(remoteAddress.getAddress().getAddress());
+                    break;
+                case TYPE_HOST:
+                    String domain = remoteAddress.getHostName();
+                    byteBuffer.put((byte) domain.length())
+                            .put(domain.getBytes());
+                    break;
+                case TYPE_IPV6:
+                    byteBuffer.put(remoteAddress.getAddress().getAddress());
+                    break;
+            }
+            byteBuffer.putShort((short) (remoteAddress.getPort() & 0xffff));
+            byteBuffer.flip();
+            byte[] raw = new byte[byteBuffer.limit()];
+            byteBuffer.get(raw);
+//                crypt = CryptFactory.get("aes-256-cfb", "vpnnest!@#123d");
+            crypt = CryptFactory.get(ssConfig.method, ssConfig.password);
+            byte[] encrypt = crypt.encrypt(raw);
+            byteBuffer.clear();
+            byteBuffer.put(encrypt);
+            send(byteBuffer, outerChannel);
+
+            //向内部连接发送数据，告诉连接成功
+            ((ByteBuffer) byteBuffer.clear())
+                    .put(SOCKS_4_REPLY_VN)
+                    .put(SOCKS_4_REP_SUCCESS)
+                    .putShort((short) (outerChannel.socket().getLocalPort() & 0xFFFF))
+                    .put(outerChannel.socket().getLocalAddress().getAddress());
+            send(byteBuffer, innerChannel);
+            nextStep = Tunnel.STEP_4_SEND_DATA;
         }
     }
 
