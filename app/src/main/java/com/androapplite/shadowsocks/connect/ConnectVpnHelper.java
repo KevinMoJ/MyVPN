@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -153,7 +154,7 @@ public class ConnectVpnHelper {
     }
 
     private void monitorVpnState() {
-        for (int i = 0; i < (10 * 1000) / 10; i++) {
+        for (int i = 0; i < (15 * 1000) / 10; i++) {
             if (LocalVpnService.IsStopped) {
                 LocalVpnService.IsRunning = true;
                 break;
@@ -692,7 +693,7 @@ public class ConnectVpnHelper {
         int pingLoad = ping(config.server);
         boolean connect = pingLoad <= remote_pingLoad;
         if (connect) {
-            if (isBeforeConnectTest)
+            if (isBeforeConnectTest && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) // 系统6.0以上的才进行测试
                 return beforeConnectTestStatus(config) ? config : null;
             else
                 return config;
@@ -712,20 +713,7 @@ public class ConnectVpnHelper {
         Request request = null;
         Response response = null;
 
-        try {
-            okHttpClient = new OkHttpClient.Builder()
-                    .proxy(mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port))
-                    .connectTimeout(1000 * timeOut, TimeUnit.MILLISECONDS)
-                    .readTimeout(1000 * timeOut, TimeUnit.MILLISECONDS)
-                    .build();
-            request = new Request.Builder()
-                    .url(testURL)//请求接口。如果需要传参拼接到接口后面。
-                    .build();//创建Request 对象
-            response = okHttpClient.newCall(request).execute();
-            result = response.isSuccessful();
-            mFirebase.logEvent("连接前测试okHttp", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
-        } catch (Exception e) {
-            mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) { // 系统6.0以上 6开头的用HttpURLConnection  7.0以上的话用okHttpClient
             try {
                 Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
                 HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
@@ -738,13 +726,30 @@ public class ConnectVpnHelper {
 //                connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14)");
                 result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
                 mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
                 mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             }
-        } finally {
-            if (response != null){
-                response.body().close();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统6.0以下
+            try {
+                okHttpClient = new OkHttpClient.Builder()
+                        .proxy(mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port))
+                        .connectTimeout(1000 * timeOut, TimeUnit.MILLISECONDS)
+                        .readTimeout(1000 * timeOut, TimeUnit.MILLISECONDS)
+                        .build();
+                request = new Request.Builder()
+                        .url(testURL)//请求接口。如果需要传参拼接到接口后面。
+                        .build();//创建Request 对象
+                response = okHttpClient.newCall(request).execute();
+                result = response.isSuccessful();
+                mFirebase.logEvent("连接前测试okHttp", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                RealTimeLogger.getInstance(mContext).logEventAsync("before_connect_test", "serverConfig", String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            } catch (Exception e) {
+                mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            } finally {
+                if (response != null) {
+                    response.body().close();
+                }
             }
         }
         return result;
