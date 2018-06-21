@@ -6,21 +6,33 @@ import android.content.pm.ApplicationInfo;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
+import com.androapplite.shadowsocks.model.ServerConfig;
+import com.androapplite.vpn3.R;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 
 import java.io.File;
 
 public class ShareActivity extends AppCompatActivity {
+    public static final int CLICK_MESSAGE_TEXT = 0;
+    public static final int MAX_CLICK_TIME = 4;
+    public static final int CLICK_DURING_TIME = 2000;
+
+    private TextView mShareMessage;
+    private int mCurClickTimes = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +44,31 @@ public class ShareActivity extends AppCompatActivity {
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
+        mShareMessage = (TextView) findViewById(R.id.share_message);
+        mShareMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurClickTimes++;
+                if (mCurClickTimes >= MAX_CLICK_TIME) {
+                    mCurClickTimes = 0;
+                    ServerConfig currentConfig = ConnectVpnHelper.getInstance(ShareActivity.this).getCurrentConfig();
+                    if (currentConfig != null)
+                        Toast.makeText(ShareActivity.this, "当前服务器: " + currentConfig.server + "   " + currentConfig.port + "    " + currentConfig.nation, Toast.LENGTH_SHORT).show();
+                } else {
+                    mClickTimeCountHandler.sendEmptyMessageDelayed(CLICK_MESSAGE_TEXT, CLICK_DURING_TIME);
+                }
+            }
+        });
         Firebase.getInstance(this).logEvent("屏幕","分享屏幕");
     }
     //https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dqrcode
+
+    private Handler mClickTimeCountHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            mCurClickTimes = 0;
+        }
+    };
 
     public void shareByFacebook(View view){
         ShareLinkContent content = new ShareLinkContent.Builder()
