@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.connect;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.SystemClock;
@@ -30,8 +31,10 @@ import com.vm.shadowsocks.core.VpnNotification;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
@@ -91,7 +94,6 @@ public class ConnectVpnHelper {
 
     private boolean mIsFindLocalServer; //找到与服务器匹配的国家
     private boolean mIsPriorityConnect; //找到优先选择的国家
-    private boolean mIsTimerCheck; //是每隔5s的检查连接
 
 
     private ConnectVpnHelper() {
@@ -119,7 +121,7 @@ public class ConnectVpnHelper {
         mSocksProxyRunnable = new ShadowSocksProxyRunnable();
     }
 
-    public void switchProxyService() {
+    private void switchProxyService() {
         if (LocalVpnService.IsRunning) {
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
             ServerConfig serverConfig = findOtherVPNServerWithOutFailServer();
@@ -309,6 +311,9 @@ public class ConnectVpnHelper {
             }
         }
 //        serverConfig = new ServerConfig("Tokyo", "Japan", "149.28.139.6", 2, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_ca));
+        if (serverConfig == null)
+            serverConfig = useLocalVpnServer();
+
         currentConfig = serverConfig;
         return serverConfig;
     }
@@ -407,6 +412,34 @@ public class ConnectVpnHelper {
         executorService.shutdown();
         mSocksProxyRunnable.stop();
 
+        if (serverConfig == null)
+            serverConfig = useLocalVpnServer();
+
+        return serverConfig;
+    }
+
+    //使用本地亚马逊服务器列表里的服务器
+    private ServerConfig useLocalVpnServer() {
+        ServerConfig serverConfig = null;
+        AssetManager assetManager = mContext.getAssets();
+        try {
+            InputStream inputStream = assetManager.open("local_state.json");
+            InputStreamReader isr = new InputStreamReader(inputStream);
+            BufferedReader br = new BufferedReader(isr);
+            ArrayList<ServerConfig> serverList = ServerConfig.createServerList(mContext, br.readLine());
+            for (ServerConfig config : serverList) {
+                if (config != null && !errorsList.contains(config)) {
+                    serverConfig = testServerPing(config);
+                    if (serverConfig != null) {
+                        mFirebase.logEvent("使用本地找到的服务器", String.format("%s--->%s--->%s", serverConfig.server, serverConfig.port, serverConfig.nation));
+                        return serverConfig;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            ShadowsocksApplication.handleException(e);
+        }
+
         return serverConfig;
     }
 
@@ -447,19 +480,16 @@ public class ConnectVpnHelper {
     }
 
     private void startTimerMonitor() {
-        if (!mIsTimerCheck) {
-            int time = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_link_time");
-            int delayCheck = (int) FirebaseRemoteConfig.getInstance().getLong("test_delay_check_time");
-            mTimer = new Timer();
-            if (!mTimerList.contains(mTimer))
-                mTimerList.add(mTimer);
-            mTimer.schedule(new MonitorTask(), delayCheck * 1000, TimeUnit.SECONDS.toMillis(time));
-            Log.i(TAG, "testConnection:  新起一个Timer ");
-        }
+        int time = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_link_time");
+        int delayCheck = (int) FirebaseRemoteConfig.getInstance().getLong("test_delay_check_time");
+        mTimer = new Timer();
+        if (!mTimerList.contains(mTimer))
+            mTimerList.add(mTimer);
+        mTimer.schedule(new MonitorTask(), delayCheck * 1000, TimeUnit.SECONDS.toMillis(time));
+        Log.i(TAG, "testConnection:  新起一个Timer ");
     }
 
     public void startTestConnectionWithVPN() {
-        mIsTimerCheck = false;
         startTimerMonitor();
     }
 
@@ -530,7 +560,7 @@ public class ConnectVpnHelper {
             if (result) {
                 if (errorsList.contains(config))
                     errorsList.remove(config);
-                if (config != null) {// && !mIsTimerCheck
+                if (config != null) {
                     mFirebase.logEvent("连接后测试成功", String.format("%s|%s|%s", config.server, config.nation, config.port), System.currentTimeMillis() - startTime);
                     RealTimeLogger.getInstance(mContext).logEventAsync("test_success", "server",
                             String.format("%s|%s|%s", config.server, config.nation, config.port));
@@ -538,7 +568,7 @@ public class ConnectVpnHelper {
                 Log.i(TAG, "testConnection:  链接后测试成功     " + (System.currentTimeMillis() - startTime));
                 resetFailCount();
             } else {
-                if (config != null) {// && !mIsTimerCheck
+                if (config != null) {
                     mFirebase.logEvent("连接后测试失败", String.format("%s|%s|%s", config.server, config.nation, config.name), System.currentTimeMillis() - startTime);
                     RealTimeLogger.getInstance(mContext).logEventAsync("test_fail", "server",
                             String.format("%s|%s|%s", config.server, config.nation, config.port), "time", String.valueOf(System.currentTimeMillis() - startTime));
@@ -585,7 +615,6 @@ public class ConnectVpnHelper {
         @Override
         public void run() {
             if (LocalVpnService.IsRunning) {
-                mIsTimerCheck = true;
                 Log.i(TAG, "开始监控" + currentConfig.server + "  " + currentConfig.nation);
                 testConnection(currentConfig);
             }
@@ -728,7 +757,8 @@ public class ConnectVpnHelper {
                 mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             } catch (Exception e) {
                 e.printStackTrace();
-                mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                if (!LocalVpnService.IsRunning)
+                    mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统6.0以下
             try {
@@ -745,7 +775,8 @@ public class ConnectVpnHelper {
                 mFirebase.logEvent("连接前测试okHttp", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
                 RealTimeLogger.getInstance(mContext).logEventAsync("before_connect_test", "serverConfig", String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             } catch (Exception e) {
-                mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                if (!LocalVpnService.IsRunning)
+                    mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             } finally {
                 if (response != null) {
                     response.body().close();
@@ -818,7 +849,6 @@ public class ConnectVpnHelper {
             mTimer = null;
             Log.i(TAG, "release:   关闭当前的Timer");
         }
-        mIsTimerCheck = false;
 //        resetFailCount();
         if (mTimerList != null && !mTimerList.isEmpty()) {
             for (Timer timer : mTimerList) {
