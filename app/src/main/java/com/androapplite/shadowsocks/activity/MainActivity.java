@@ -962,6 +962,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         Log.d("MainActivity", "isRunning " + isRunning);
         if (mConnectingConfig != null && mSharedPreference != null) {
             if (isRunning) {
+                mConnectingConfig = ConnectVpnHelper.getInstance(this).getCurrentConfig();
                 mConnectingConfig.saveInSharedPreference(mSharedPreference);
                 if (!AdAppHelper.getInstance(this).isFullAdLoaded()) {
                     rotatedBottomAd();
