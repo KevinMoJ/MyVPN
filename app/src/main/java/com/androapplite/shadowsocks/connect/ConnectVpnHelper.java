@@ -40,7 +40,9 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -91,6 +93,7 @@ public class ConnectVpnHelper {
     private Firebase mFirebase;
     private List<Timer> mTimerList;
     private ArrayList<TestConnectCallable> tasks;
+    private Set<String> vpnServerSet; //存放vpn服务器的ip，在ProxyConfig.needProxy的方法里面通过ip来判断让我们访问load的网站不走代理
 
     private boolean mIsFindLocalServer; //找到与服务器匹配的国家
     private boolean mIsPriorityConnect; //找到优先选择的国家
@@ -119,6 +122,7 @@ public class ConnectVpnHelper {
         mTimerList = new ArrayList<>();
         mFirebase = Firebase.getInstance(mContext);
         mSocksProxyRunnable = new ShadowSocksProxyRunnable();
+        vpnServerSet = new HashSet<>();
     }
 
     private void switchProxyService() {
@@ -355,7 +359,6 @@ public class ConnectVpnHelper {
     private ServerConfig findOtherVPNServerWithOutFailServer() {
         ServerConfig serverConfig = null;
         ArrayList<ServerConfig> serverConfigs = loadServerList();
-        ArrayList<MyCallable> tasks = new ArrayList<>();
         mSocksProxyRunnable.start();
         if (errorsList.size() == serverConfigs.size() - 1) { //当错误列表和服务器列表大小一样的话，表示所有服务器都测试失败，-1为移除服务器列表第一个全局
             mFirebase.logEvent("失败列表和服务器列表大小一样", "所有的服务器都测试过");
@@ -367,12 +370,14 @@ public class ConnectVpnHelper {
             copy = new ArrayList<>(resultList.size());
             copy.addAll(resultList);
         }
+
         if (!copy.isEmpty()) {
             for (ServerConfig config : copy) {
                 if (config != null && !errorsList.contains(config)) {
                     try {
                         serverConfig = testServerPing(config);
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     if (serverConfig != null)
                         return serverConfig;
@@ -380,42 +385,39 @@ public class ConnectVpnHelper {
             }
         }
 
-        if (serverConfig == null && serverConfigs != null && !serverConfigs.isEmpty()) {
-            serverConfigs.remove(0);
+        if (serverConfig == null && !serverConfigs.isEmpty()) {
+            serverConfigs.remove(0); // 移除第一个全球连
+            synchronized (ConnectVpnHelper.class) {
+                resultList.clear();
+            }
             for (ServerConfig config : serverConfigs) {
-                if (!errorsList.isEmpty()) {
-                    if (!errorsList.get(0).nation.equals(config.nation))
-                        tasks.add(new MyCallable(this, config));
-                } else {
-                    tasks.add(new MyCallable(this, config));
+                if (config != null && !errorsList.contains(config)) {
+                    try {
+                        serverConfig = testServerPing(config);
+                        if (serverConfig != null) {
+                            if (errorsList.contains(config))
+                                errorsList.remove(config);
+                            return serverConfig;
+                        } else {
+                            if (!errorsList.contains(config))
+                                errorsList.add(config);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
-
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
-        for (MyCallable callable : tasks) {
-            ecs.submit(callable);
-        }
-
-        for (int i = 0; i < tasks.size(); i++) {
-            try {
-                Future<ServerConfig> future = ecs.take();
-                ServerConfig sc = future.get(10, TimeUnit.SECONDS);
-                if (sc != null) {
-                    serverConfig = sc;
-                    break;
-                }
-            } catch (Exception e) {
-            }
-        }
-        executorService.shutdown();
-        mSocksProxyRunnable.stop();
 
         if (serverConfig == null)
             serverConfig = useLocalVpnServer();
 
+        mSocksProxyRunnable.stop();
         return serverConfig;
+    }
+
+    public Set<String> getVpnServerSet() {
+        return vpnServerSet;
     }
 
     //使用本地亚马逊服务器列表里的服务器
@@ -428,6 +430,8 @@ public class ConnectVpnHelper {
             BufferedReader br = new BufferedReader(isr);
             ArrayList<ServerConfig> serverList = ServerConfig.createServerList(mContext, br.readLine());
             for (ServerConfig config : serverList) {
+                if (config != null)
+                    vpnServerSet.add(config.server);//本地亚马逊服务器的ip添加到集合让其访问load不走代理
                 if (config != null && !errorsList.contains(config)) {
                     serverConfig = testServerPing(config);
                     if (serverConfig != null) {
@@ -703,10 +707,8 @@ public class ConnectVpnHelper {
             ServerConfig serverConfig;
             if (helper != null) {
                 serverConfig = helper.testServerPing(mConfig);
-                if (serverConfig != null) {
-                    synchronized (ConnectVpnHelper.class) {
-                        helper.resultList.add(serverConfig);
-                    }
+                synchronized (ConnectVpnHelper.class) {
+                    helper.resultList.add(serverConfig);
                 }
                 return serverConfig;
             } else {
@@ -796,6 +798,11 @@ public class ConnectVpnHelper {
         if (serverList != null && serverList.size() > 1) {
             result = serverList;
         }
+        if (result != null) {
+            for (ServerConfig config : result) {
+                vpnServerSet.add(config.server); //每次加载服务器列表的时候都添加一次
+            }
+        }
         return result;
     }
 
@@ -857,6 +864,9 @@ public class ConnectVpnHelper {
             }
             mTimerList.clear();
         }
+
+        if (vpnServerSet != null)
+            vpnServerSet.clear();
 
         if (tasks != null)
             tasks.clear();

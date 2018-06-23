@@ -3,6 +3,8 @@ package com.vm.shadowsocks.core;
 import android.annotation.SuppressLint;
 import android.os.Build;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.tcpip.CommonMethods;
 import com.vm.shadowsocks.tunnel.Config;
@@ -222,6 +224,11 @@ public class ProxyConfig {
         if (proxyHostName.equals(host) || ip == proxyIp) {
             return false;
         }
+
+        //让自己的vpn发送的去load的时候不走vpn代理，防止当当前服务器没网的时候，走代理去load其他服务器都load不通
+        if (ConnectVpnHelper.getInstance(ShadowsocksApplication.getGlobalContext()).getVpnServerSet().contains(host))
+            return false;
+
         if (isGlobalMode) {
             return true;
         }
