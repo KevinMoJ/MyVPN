@@ -229,6 +229,9 @@ public class ProxyConfig {
         if (ConnectVpnHelper.getInstance(ShadowsocksApplication.getGlobalContext()).getVpnServerSet().contains(host))
             return false;
 
+        if (host.equals("rtl.vpnnest.com")) // 自己后台采集不走代理
+            return false;
+
         if (isGlobalMode) {
             return true;
         }
