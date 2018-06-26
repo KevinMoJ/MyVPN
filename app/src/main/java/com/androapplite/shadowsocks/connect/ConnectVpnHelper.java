@@ -133,11 +133,13 @@ public class ConnectVpnHelper {
             try {
                 if (serverConfig != null) {
                     Log.i(TAG + "开始切换找到的服务器", String.format("%s--->%s--->%s", serverConfig.server, serverConfig.port, serverConfig.nation));
-                    Log.i(TAG + "当前失败的服务器", String.format("%s--->%s--->%s", currentConfig.server, currentConfig.port, currentConfig.nation));
-                    mFirebase.logEvent("自动切换当前失败的服务器", String.format("%s|%s|%s", currentConfig.server, currentConfig.port, currentConfig.nation));
-                    mFirebase.logEvent("自动切换链接的服务器", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
-                    RealTimeLogger.getInstance(mContext).logEventAsync("auto_switch", "fail_server", String.format("%s|%s|%s", currentConfig.server, currentConfig.port, currentConfig.nation)
-                            , "switch_server", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
+                    if (currentConfig != null) {
+                        Log.i(TAG + "当前失败的服务器", String.format("%s--->%s--->%s", currentConfig.server, currentConfig.port, currentConfig.nation));
+                        mFirebase.logEvent("自动切换当前失败的服务器", String.format("%s|%s|%s", currentConfig.server, currentConfig.port, currentConfig.nation));
+                        mFirebase.logEvent("自动切换链接的服务器", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
+                        RealTimeLogger.getInstance(mContext).logEventAsync("auto_switch", "fail_server", String.format("%s|%s|%s", currentConfig.server, currentConfig.port, currentConfig.nation)
+                                , "switch_server", String.format("%s|%s|%s", serverConfig.server, serverConfig.port, serverConfig.nation));
+                    }
                     if (LocalVpnService.IsRunning) {
                         VpnManageService.stopVpnForAutoSwitchProxy();
                         VpnNotification.gSupressNotification = true;
@@ -619,7 +621,8 @@ public class ConnectVpnHelper {
         @Override
         public void run() {
             if (LocalVpnService.IsRunning) {
-                Log.i(TAG, "开始监控" + currentConfig.server + "  " + currentConfig.nation);
+                if (currentConfig != null)
+                    Log.i(TAG, "开始监控" + currentConfig.server + "  " + currentConfig.nation);
                 testConnection(currentConfig);
             }
         }
