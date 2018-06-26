@@ -64,6 +64,7 @@ public class IpCountryIntentService extends IntentService {
                 }
                 try {
                     String ipString = jsonObject.getString("query");
+                    Firebase.getInstance(this).logEvent("国家", "本机ip", ipString);
                     int ip = convertIpStringToLong(ipString);
                     sharedPreferences.edit().putInt(SharedPreferenceKey.IP, ip).apply();
                 } catch (Exception e) {
@@ -77,7 +78,6 @@ public class IpCountryIntentService extends IntentService {
             } else {
                 Firebase.getInstance(this).logEvent("国家", "代码", "未知");
             }
-            Firebase.getInstance(this).logEvent("国家", "本机ip", sharedPreferences.getInt(SharedPreferenceKey.IP, 0));
         }
     }
 
