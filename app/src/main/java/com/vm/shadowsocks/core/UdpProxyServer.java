@@ -67,7 +67,8 @@ public class UdpProxyServer implements Runnable {
             for(int i=0; i<mClientRemoteChannelMap.size(); i++) {
                 ChannelProperty channelProperty = mClientRemoteChannelMap.valueAt(i);
                 try {
-                    channelProperty.channel.close();
+                    if (channelProperty != null && channelProperty.channel != null)
+                        channelProperty.channel.close();
                 } catch (IOException e) {
                     ShadowsocksApplication.handleException(e);
                 }
