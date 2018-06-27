@@ -370,6 +370,23 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         return getSupportFragmentManager().findFragmentById(R.id.content);
     }
 
+    private class SwitchServerBackground implements Runnable {
+        private Thread mThread;
+
+        public SwitchServerBackground() {
+            mThread = new Thread(this);
+        }
+
+        public void start() {
+            mThread.start();
+        }
+
+        @Override
+        public void run() {
+            ConnectVpnHelper.getInstance(NetworkAccelerationActivity.this).reconnectVpn();
+        }
+    }
+
     private void connectVpnServerAsync() {
         if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             prepareStartService();
@@ -560,7 +577,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if(requestCode == REQUEST_CONNECT){
-                ConnectVpnHelper.getInstance(this).reconnectVpn();
+                new SwitchServerBackground().start();
             }
         }else{
             if(requestCode == REQUEST_CONNECT){
