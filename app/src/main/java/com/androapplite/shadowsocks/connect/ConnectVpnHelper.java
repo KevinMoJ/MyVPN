@@ -16,6 +16,7 @@ import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.PriorityConfig;
 import com.androapplite.shadowsocks.model.ServerConfig;
+import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.VpnManageService;
@@ -180,18 +181,19 @@ public class ConnectVpnHelper {
     }
 
     public void reconnectVpn() {
-        if (LocalVpnService.IsRunning) {
-            VpnManageService.stopVpnForAutoSwitchProxy();
-            VpnNotification.gSupressNotification = true;
-            release();
-        }
+        release();
         ServerConfig serverConfig = findVPNServer();
         if (serverConfig != null) {
-            LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
-            LocalVpnService.IsRunning = true;
-            mContext.startService(new Intent(mContext, LocalVpnService.class));
             currentConfig = serverConfig;
+            if (LocalVpnService.IsRunning) {
+                VpnManageService.stopVpnForAutoSwitchProxy();
+                VpnNotification.gSupressNotification = true;
+            }
+            LocalVpnService.ProxyUrl = serverConfig.toProxyUrl();
+//            LocalVpnService.IsRunning = true;
+            mContext.startService(new Intent(mContext, LocalVpnService.class));
             serverConfig.saveInSharedPreference(mSharedPreference);
+            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
         } else {
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Action.ACTION_NO_AVAILABLE_VPN));
         }
@@ -362,10 +364,12 @@ public class ConnectVpnHelper {
         ServerConfig serverConfig = null;
         ArrayList<ServerConfig> serverConfigs = loadServerList();
         mSocksProxyRunnable.start();
-        if (errorsList.size() == serverConfigs.size() - 1) { //当错误列表和服务器列表大小一样的话，表示所有服务器都测试失败，-1为移除服务器列表第一个全局
-            mFirebase.logEvent("失败列表和服务器列表大小一样", "所有的服务器都测试过");
-            errorsList.clear();
-            return null;
+        if (serverConfigs != null && !serverConfigs.isEmpty()) {
+            if (errorsList.size() == serverConfigs.size() - 1) { //当错误列表和服务器列表大小一样的话，表示所有服务器都测试失败，-1为移除服务器列表第一个全局
+                mFirebase.logEvent("失败列表和服务器列表大小一样", "所有的服务器都测试过");
+                errorsList.clear();
+                return null;
+            }
         }
         ArrayList<ServerConfig> copy = null;
         synchronized (ConnectVpnHelper.class) {
@@ -387,7 +391,7 @@ public class ConnectVpnHelper {
             }
         }
 
-        if (serverConfig == null && !serverConfigs.isEmpty()) {
+        if (serverConfig == null && serverConfigs != null && !serverConfigs.isEmpty()) {
             serverConfigs.remove(0); // 移除第一个全球连
             synchronized (ConnectVpnHelper.class) {
                 resultList.clear();
@@ -747,7 +751,7 @@ public class ConnectVpnHelper {
         Request request = null;
         Response response = null;
 
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) { // 系统6.0以上 6开头的用HttpURLConnection  7.0以上的话用okHttpClient
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) { // 系统6.0  6开头的用HttpURLConnection
             try {
                 Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
                 HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
@@ -765,7 +769,7 @@ public class ConnectVpnHelper {
                 if (!LocalVpnService.IsRunning)
                     mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统6.0以下
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统7.0以上的话用okHttpClient
             try {
                 okHttpClient = new OkHttpClient.Builder()
                         .proxy(mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port))

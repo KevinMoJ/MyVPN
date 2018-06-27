@@ -36,12 +36,14 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
+import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
+import com.vm.shadowsocks.core.VpnNotification;
 
 import java.lang.ref.WeakReference;
 
@@ -63,7 +65,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     private Handler mHandler;
     private static final int MSG_DELAY_SHOW_INSTITIAL_AD = 1;
     private static int REQUEST_CONNECT = 1;
-    private boolean mIsAnimating;
     private static final String EXTRA_AUTO = "EXTRA_AUTO";
     private InterstitialADDelayShow mInterstitialAdDelayShow;
     private boolean mIsInterstitialAdShowed;
@@ -121,12 +122,10 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             Intent intent = getIntent();
             boolean autoAccelerate = intent.getBooleanExtra(EXTRA_AUTO, false);
             if (autoAccelerate) {
-                if (adAppHelper.isFullAdLoaded()) {
-                    adAppHelper.showFullAd();
-                } else {
-                    startAccelerate();
-                }
-            }else {
+                adAppHelper.showFullAd();
+                ((NetworkAccelerationFragment) fragment).rocketShake();
+                startAccelerate();
+            } else {
                 String netAccAdS = adAppHelper.getCustomCtrlValue("net_acc_ad", "1");
                 float netAccAd;
                 try {
@@ -270,7 +269,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onAnimationFinish() {
+    public void onAnimationFinish() { // 小火箭起飞动画结束的回调
         AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
         String netAccAdEndS = adAppHelper.getCustomCtrlValue("net_acc_end_ad", "1");
         float netAccAdEnd;
@@ -310,20 +309,20 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     @Override
     public void onStatusChanged(String status, Boolean isRunning) {
         if (isRunning) {
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
+            Fragment fragment = getCurrentFragment();
             if (fragment instanceof NetworkAccelerationFragment) {
                 ((NetworkAccelerationFragment)fragment).rocketFly();
-//                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
             }
+            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
         } else {
             if (mIsRestart) {
                 mIsRestart = false;
+                connectVpnServerAsync();
             } else {
-                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
-                if (fragment instanceof NetworkAccelerationFragment) {
+                Fragment fragment = getCurrentFragment();
+                if (getCurrentFragment() instanceof NetworkAccelerationFragment) {
                     ((NetworkAccelerationFragment)fragment).stopShake();
                 }
-                mIsAnimating = false;
             }
         }
 
@@ -341,32 +340,34 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     @Override
     public void onAccelerateImmediately() {
-        Firebase.getInstance(this).logEvent("网络加速", "立即加速", String.valueOf(mIsAnimating));
+        Firebase.getInstance(this).logEvent("网络加速", "立即加速");
         startAccelerate();
     }
 
     private void startAccelerate() {
-        if(!mIsAnimating) {
-            mIsAnimating = true;
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
-            if (fragment instanceof NetworkAccelerationFragment) {
-                ((NetworkAccelerationFragment)fragment).rocketShake();
-            }
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (connectivityManager != null) {
-                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isAvailable()) {
-                    if (LocalVpnService.IsRunning) {
-                        mIsRestart = true;
-                    }
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isAvailable()) {
+                if (!LocalVpnService.IsRunning) {
+                    mIsRestart = false;
                     connectVpnServerAsync();
                 } else {
-                    showNoInternetSnackbar(R.string.no_internet_message, false);
-                    mIsAnimating = false;
+                    mIsRestart = true;
+                    VpnManageService.stopVpnByUserSwitchProxy();
+                    VpnNotification.gSupressNotification = true;
                 }
+                mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
+                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connecting.ordinal()).apply();
+            } else {
+                showNoInternetSnackbar(R.string.no_internet_message, false);
             }
-            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connecting.ordinal()).apply();
         }
+        mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connecting.ordinal()).apply();
+    }
+
+    private Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentById(R.id.content);
     }
 
     private void connectVpnServerAsync() {
@@ -420,7 +421,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     case ADMOB_FULL:
                     case FACEBOOK_FBN:
                     case FACEBOOK_FULL:
-                        Fragment fragment = activity.getSupportFragmentManager().findFragmentById(R.id.content);
+                        Fragment fragment = activity.getCurrentFragment();
                         if (fragment instanceof NetworkAccelerationFinishFragment) {
                             ((NetworkAccelerationFinishFragment)fragment).animate();
                         } else if (fragment instanceof NetworkAccelerationFragment) {
@@ -443,7 +444,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     case ADMOB_FULL:
                     case FACEBOOK_FBN:
                     case FACEBOOK_FULL:
-                        Fragment fragment = activity.getSupportFragmentManager().findFragmentById(R.id.content);
+                        Fragment fragment = activity.getCurrentFragment();
                         if (fragment instanceof NetworkAccelerationFinishFragment) {
                             ((NetworkAccelerationFinishFragment)fragment).animate();
                         }
@@ -454,6 +455,11 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     }
 
     private void showNoInternetSnackbar(@StringRes int messageId, boolean hasAction) {
+        Fragment fragment = getCurrentFragment();
+        if (fragment instanceof NetworkAccelerationFragment){
+            ((NetworkAccelerationFragment) fragment).mNeedToShake = true;
+            ((NetworkAccelerationFragment) fragment).stopShake();
+        }
         final View decorView = findViewById(android.R.id.content);
         clearSnackbar();
         mSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_LONG);
@@ -494,8 +500,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                         break;
                     case  Action.ACTION_NO_AVAILABLE_VPN:
                         activity.showNoInternetSnackbar(R.string.timeout_tip, false);
-                        activity.mIsAnimating = false;
-                        Fragment fragment = activity.getSupportFragmentManager().findFragmentById(R.id.content);
+                        Fragment fragment = activity.getCurrentFragment();
                         if (fragment instanceof NetworkAccelerationFragment) {
                             ((NetworkAccelerationFragment)fragment).stopShake();
                         }
@@ -544,8 +549,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             showNoInternetSnackbar(R.string.not_start_vpn, false);
             ShadowsocksApplication.handleException(e);
             Firebase.getInstance(this).logEvent("VPN连不上", "VPN Prepare错误", e.getMessage());
-            mIsAnimating = false;
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
+            Fragment fragment = getCurrentFragment();
             if (fragment instanceof NetworkAccelerationFragment) {
                 ((NetworkAccelerationFragment)fragment).stopShake();
             }
@@ -561,87 +565,13 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         }else{
             if(requestCode == REQUEST_CONNECT){
                 showNoInternetSnackbar(R.string.enable_vpn_connection, true);
-                mIsAnimating = false;
-                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.content);
+                Fragment fragment = getCurrentFragment();
                 if (fragment instanceof NetworkAccelerationFragment) {
                     ((NetworkAccelerationFragment)fragment).stopShake();
                 }
 
             }
         }
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        if (mNeedShowInterstitialAd) {
-//            AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-//            String netAccAdS = adAppHelper.getCustomCtrlValue("net_acc_ad", "1");
-//            float netAccAd;
-//            try {
-//                netAccAd = Float.parseFloat(netAccAdS);
-//            } catch (Exception e) {
-//                netAccAd = 0;
-//            }
-//            if (Math.random() < netAccAd) {
-//                mNeedShowInterstitialAd = true;
-//                if (adAppHelper.isFullAdLoaded()) {
-//                    String netAccAdMinS = adAppHelper.getCustomCtrlValue("net_acc_ad_min", "500");
-//                    int netAccAdMin;
-//                    try{
-//                        netAccAdMin = Integer.valueOf(netAccAdMinS);
-//                    } catch (Exception e) {
-//                        netAccAdMin = 0;
-//                    }
-//                    String netAccAdMaxS = adAppHelper.getCustomCtrlValue("net_acc_ad_max", "500");
-//                    int netAccAdMax;
-//                    try{
-//                        netAccAdMax = Integer.valueOf(netAccAdMaxS);
-//                    } catch (Exception e) {
-//                        netAccAdMax = 0;
-//                    }
-//                    mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdMax + netAccAdMin));
-//                } else {
-//                    mInterstitialAdDelayShow = new InterstitialADDelayShow(this);
-//                    adAppHelper.addAdStateListener(mInterstitialAdDelayShow);
-//                    adAppHelper.loadNewInterstitial();
-//                }
-//            }
-//        } else if (mNeedShowInterstitialAdAnimateFinish) {
-//            AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-//            String netAccAdEndS = adAppHelper.getCustomCtrlValue("net_acc_end_ad", "1");
-//            float netAccAdEnd;
-//            try {
-//                netAccAdEnd = Float.parseFloat(netAccAdEndS);
-//            } catch (Exception e) {
-//                netAccAdEnd = 0;
-//            }
-//            if (Math.random() < netAccAdEnd) {
-//                mNeedShowInterstitialAdAnimateFinish = true;
-//                if (adAppHelper.isFullAdLoaded()) {
-//                    String netAccAdEndMinS = adAppHelper.getCustomCtrlValue("net_acc_ad_end_min", "500");
-//                    int netAccAdEndMin;
-//                    try{
-//                        netAccAdEndMin = Integer.valueOf(netAccAdEndMinS);
-//                    } catch (Exception e) {
-//                        netAccAdEndMin = 0;
-//                    }
-//                    String netAccAdEndMaxS = adAppHelper.getCustomCtrlValue("net_acc_ad_end_max", "500");
-//                    int netAccAdEndMax;
-//                    try{
-//                        netAccAdEndMax = Integer.valueOf(netAccAdEndMaxS);
-//                    } catch (Exception e) {
-//                        netAccAdEndMax = 0;
-//                    }
-//                    mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdEndMax + netAccAdEndMin));
-//                } else {
-//                    mInterstitialAdDelayShowAnimateFinish = new InterstitialADDelayShow(this);
-//                    adAppHelper.addAdStateListener(mInterstitialAdDelayShowAnimateFinish);
-//                    adAppHelper.loadNewInterstitial();
-//                }
-//            }
-//        }
     }
 
     @Override

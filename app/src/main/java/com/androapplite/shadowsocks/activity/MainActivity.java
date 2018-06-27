@@ -587,6 +587,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             addBottomAd();
         }
         adAppHelper.loadNewNative();
+        int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
+        mVpnState = VpnState.values()[state];
+        if (mConnectFragment != null)
+            mConnectFragment.setConnectResult(mVpnState);
     }
 
     @Override
@@ -960,10 +964,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public void onStatusChanged(String status, Boolean isRunning) {
         Log.d("MainActivity", "isRunning " + isRunning);
+        if (ConnectVpnHelper.getInstance(this).getCurrentConfig() != null)
+            mConnectingConfig = ConnectVpnHelper.getInstance(this).getCurrentConfig();
         if (mConnectingConfig != null && mSharedPreference != null) {
             if (isRunning) {
-                if (ConnectVpnHelper.getInstance(this).getCurrentConfig() != null)
-                    mConnectingConfig = ConnectVpnHelper.getInstance(this).getCurrentConfig();
                 mConnectingConfig.saveInSharedPreference(mSharedPreference);
                 if (!AdAppHelper.getInstance(this).isFullAdLoaded()) {
                     rotatedBottomAd();

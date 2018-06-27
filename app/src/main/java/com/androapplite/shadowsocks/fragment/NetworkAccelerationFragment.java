@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.Toast;
 
 import com.androapplite.vpn3.R;
 
@@ -25,7 +27,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
         Animator.AnimatorListener{
     private AnimatorSet mRocketShake;
     private NetworkAccelerationFragmentListener mListener;
-    private boolean mNeedToShake;
+    public boolean mNeedToShake = true; // 小火箭是否需要抖动
 
     public NetworkAccelerationFragment() {
         // Required empty public constructor
@@ -42,18 +44,22 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         view.findViewById(R.id.acc_btn).setOnClickListener(this);
-        if(mNeedToShake) {
-            rocketShake();
-        }
+//        if(mNeedToShake) {
+//            rocketShake();
+//        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.acc_btn:
-                rocketShake();
-                if (mListener != null) {
-                    mListener.onAccelerateImmediately();
+                if (mNeedToShake) {
+                    rocketShake();
+                    if (mListener != null) {
+                        mListener.onAccelerateImmediately();
+                    }
+                } else {
+                    Toast.makeText(getContext(), R.string.updating_please_try_it_later, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -89,6 +95,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
     }
 
     public void rocketFly() {
+        mNeedToShake = true;
         if (mRocketShake != null) {
             mRocketShake.cancel();
         }
@@ -135,6 +142,14 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
         super.onAttach(context);
         if (context instanceof NetworkAccelerationFragmentListener) {
             mListener = (NetworkAccelerationFragmentListener)context;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof NetworkAccelerationFragmentListener) {
+            mListener = (NetworkAccelerationFragmentListener) activity;
         }
     }
 
