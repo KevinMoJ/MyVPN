@@ -24,15 +24,14 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.androapplite.vpn3.R;
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.PromotionTracking;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -246,7 +245,7 @@ public class VpnManageService extends Service implements Runnable,
     @Override
     public void onTrafficUpdated(@Nullable TcpTrafficMonitor tcpTrafficMonitor) {
         if (tcpTrafficMonitor != null) {
-            PromotionTracking.getInstance(this).reportUsageByte(tcpTrafficMonitor);
+//            PromotionTracking.getInstance(this).reportUsageByte(tcpTrafficMonitor);
             String[] networkErrors = getResources().getStringArray(R.array.network_errors);
             if (tcpTrafficMonitor.pPayloadReceivedSpeed <= 0 && tcpTrafficMonitor.pNetworkError >= 0
                     && tcpTrafficMonitor.pNetworkError < networkErrors.length) {
@@ -289,18 +288,18 @@ public class VpnManageService extends Service implements Runnable,
 
     @Override
     public boolean handleMessage(Message msg) {
-        PromotionTracking promotionTracking = PromotionTracking.getInstance(this);
+//        PromotionTracking promotionTracking = PromotionTracking.getInstance(this);
         switch (msg.what) {
             case MSG_1_MINUTE:
-                promotionTracking.reportUninstallDayCount();
-                promotionTracking.reportAppInstall();
-                promotionTracking.reportPhoneModelAndAndroidOS();
+//                promotionTracking.reportUninstallDayCount();
+//                promotionTracking.reportAppInstall();
+//                promotionTracking.reportPhoneModelAndAndroidOS();
                 grabSppedCheck();
                 break;
             case MSG_1_HOUR:
-                promotionTracking.reportUninstallDayCount();
-                promotionTracking.reportAppInstall();
-                promotionTracking.reportPhoneModelAndAndroidOS();
+//                promotionTracking.reportUninstallDayCount();
+//                promotionTracking.reportAppInstall();
+//                promotionTracking.reportPhoneModelAndAndroidOS();
                 mServiceHandler.sendEmptyMessageDelayed(MSG_1_HOUR, TimeUnit.HOURS.toMillis(1));
                 break;
             case MSG_CANCEL_NOTIFICATION:
@@ -412,22 +411,22 @@ public class VpnManageService extends Service implements Runnable,
     }
 
     public static void stopVpnByUser() {
-        LocalVpnService.IsRunning = false;
         sStopReason = 1;
+        LocalVpnService.IsRunning = false;
     }
 
     public static void stopVpnByUserSwitchProxy() {
-        LocalVpnService.IsRunning = false;
         sStopReason = 2;
+        LocalVpnService.IsRunning = false;
     }
 
     public static void stopVpnForAutoSwitchProxy() {
-        LocalVpnService.IsRunning = false;
         sStopReason = 3;
+        LocalVpnService.IsRunning = false;
     }
 
     public static void stopVpnForSwitchProxyFailed() {
-        LocalVpnService.IsRunning = false;
         sStopReason = 4;
+        LocalVpnService.IsRunning = false;
     }
 }

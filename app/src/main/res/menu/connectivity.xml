@@ -6,14 +6,14 @@
     <!--android:orderInCategory="100"-->
     <!--android:title="@string/action_settings"-->
     <!--app:showAsAction="never" />-->
-    <item
-        android:id="@+id/action_ad"
-        android:icon="@drawable/main_ad_icon"
-        android:orderInCategory="100"
-        android:title=""
-        app:showAsAction="always"
-        >
-    </item>
+    <!--<item-->
+        <!--android:id="@+id/action_ad"-->
+        <!--android:icon="@drawable/main_ad_icon"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title=""-->
+        <!--app:showAsAction="always"-->
+        <!--&gt;-->
+    <!--</item>-->
 
     <item
         android:id="@+id/action_rocket"

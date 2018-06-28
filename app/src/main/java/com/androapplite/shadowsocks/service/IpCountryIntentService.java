@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.telephony.TelephonyManager;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -64,7 +63,7 @@ public class IpCountryIntentService extends IntentService {
                 }
                 try {
                     String ipString = jsonObject.getString("query");
-                    Firebase.getInstance(this).logEvent("国家", "本机ip", ipString);
+//                    Firebase.getInstance(this).logEvent("国家", "本机ip", ipString);
                     int ip = convertIpStringToLong(ipString);
                     sharedPreferences.edit().putInt(SharedPreferenceKey.IP, ip).apply();
                 } catch (Exception e) {
@@ -74,9 +73,9 @@ public class IpCountryIntentService extends IntentService {
 
             if (countryCode != null) {
                 sharedPreferences.edit().putString(SharedPreferenceKey.COUNTRY_CODE, countryCode.toUpperCase()).apply();
-                Firebase.getInstance(this).logEvent("国家", "代码", countryCode.toUpperCase());
+//                Firebase.getInstance(this).logEvent("国家", "代码", countryCode.toUpperCase());
             } else {
-                Firebase.getInstance(this).logEvent("国家", "代码", "未知");
+//                Firebase.getInstance(this).logEvent("国家", "代码", "未知");
             }
         }
     }

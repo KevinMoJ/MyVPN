@@ -193,4 +193,34 @@
         <value>true</value>
     </entry>
 
+    <!--进入全屏开关-->
+    <entry>
+        <key>is_full_enter_ad</key>
+        <value>true</value>
+    </entry>
+
+    <!--退出全屏开关-->
+    <entry>
+        <key>is_full_exit_ad</key>
+        <value>true</value>
+    </entry>
+
+    <!--连接成功全屏-->
+    <entry>
+        <key>is_full_connect_success_ad</key>
+        <value>false</value>
+    </entry>
+
+    <!--点击小火箭进入加速界面的全屏-->
+    <entry>
+        <key>is_full_rocket_enter_ad</key>
+        <value>true</value>
+    </entry>
+
+    <!--小火箭加速完成全屏-->
+    <entry>
+        <key>is_full_rocket_success_ad</key>
+        <value>true</value>
+    </entry>
+
 </defaultsMap>

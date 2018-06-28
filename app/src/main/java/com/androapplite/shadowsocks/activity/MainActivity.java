@@ -50,7 +50,6 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
-import com.androapplite.shadowsocks.PromotionTracking;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -153,7 +152,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
-        showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad")) {
+            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
+        }
     }
 
     private void showInterstitialWithDelay(int msg, String adShowRate, String adDelayMin, String adDelayMinDefault, String adDelayMax, String adDelayMaxDefault ) {
@@ -181,7 +182,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } catch (Exception e) {
                     enterAdMax = 0;
                 }
-                mForegroundHandler.sendEmptyMessageDelayed(msg, (long) (Math.random() * enterAdMax + enterAdMin));
+//                mForegroundHandler.sendEmptyMessageDelayed(msg, (long) (Math.random() * enterAdMax + enterAdMin));
+                mForegroundHandler.sendEmptyMessage(msg);
                 if (mFullAdStatusListener == null)
                     mFullAdStatusListener = new FullAdStatusListener(this);
                 mAdMsgType = msg;
@@ -325,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
             if (mSharedPreference != null)
                 mSharedPreference.edit().putLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, System.currentTimeMillis()).apply();
-            PromotionTracking.getInstance(this).reportClickConnectButtonCount();
+//            PromotionTracking.getInstance(this).reportClickConnectButtonCount();
         } else {
             mDisconnectFragment = new DisconnectFragment();
             mDisconnectFragment.show(getSupportFragmentManager(), "disconnect");
@@ -755,7 +757,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                         mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
                     }
                 }
-                PromotionTracking.getInstance(this).reportSwitchCountry();
+//                PromotionTracking.getInstance(this).reportSwitchCountry();
             }
         }else{
             if(requestCode == REQUEST_CONNECT){
@@ -870,7 +872,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 })
                 .setCancelable(false)
                 .show();
-        showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad"))
+            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
     }
 
     @Override
@@ -913,27 +916,27 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
                 }
                 return true;
-            case R.id.action_ad:
-                Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "点击");
-                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-                if (mFullAdStatusListener == null)
-                    mFullAdStatusListener = new FullAdStatusListener(this);
-                adAppHelper.addAdStateListener(mFullAdStatusListener);
-
-                if (adAppHelper.isFullAdLoaded()) {
-                    adAppHelper.showFullAd();
-                    mAdMsgType = MSG_SHOW_AD_BUTTON_FULL;
-                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上全屏");
-                } else if (adAppHelper.isRecommendAdLoaded()) {
-                    adAppHelper.showFullAd();
-                    mAdMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
-                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上互推");
-                } else {
-                    startActivity(new Intent(this, RecommendActivity.class));
-                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "本地互推");
-                    Log.i("ssss", "onClick:   本地互推");
-                }
-                return true;
+//            case R.id.action_ad:
+//                Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "点击");
+//                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+//                if (mFullAdStatusListener == null)
+//                    mFullAdStatusListener = new FullAdStatusListener(this);
+//                adAppHelper.addAdStateListener(mFullAdStatusListener);
+//
+//                if (adAppHelper.isFullAdLoaded()) {
+//                    adAppHelper.showFullAd();
+//                    mAdMsgType = MSG_SHOW_AD_BUTTON_FULL;
+//                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上全屏");
+//                } else if (adAppHelper.isRecommendAdLoaded()) {
+//                    adAppHelper.showFullAd();
+//                    mAdMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
+//                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上互推");
+//                } else {
+//                    startActivity(new Intent(this, RecommendActivity.class));
+//                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "本地互推");
+//                    Log.i("ssss", "onClick:   本地互推");
+//                }
+//                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -963,7 +966,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onStatusChanged(String status, Boolean isRunning) {
-        Log.d("MainActivity", "isRunning " + isRunning);
         if (ConnectVpnHelper.getInstance(this).getCurrentConfig() != null)
             mConnectingConfig = ConnectVpnHelper.getInstance(this).getCurrentConfig();
         if (mConnectingConfig != null && mSharedPreference != null) {
@@ -974,7 +976,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mErrorServers.clear();
-                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)) {
+                boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
+                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false) && isFullConnectSuccessAdShow) {
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
                 }

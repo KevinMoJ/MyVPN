@@ -128,8 +128,11 @@ public class ConnectVpnHelper {
 
     private void switchProxyService() {
         if (LocalVpnService.IsRunning) {
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
+            if (mSharedPreference != null)
+                mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
             ServerConfig serverConfig = findOtherVPNServerWithOutFailServer();
+            if (!errorsList.contains(currentConfig)) // 我们测试失败切换服务器还没找到合适的，用户主动点击切换服务器，我们的这块的代码继续执行就又给切换了
+                return;
             mFirebase.logEvent("切换代理", "开始监测");
             try {
                 if (serverConfig != null) {
@@ -400,14 +403,16 @@ public class ConnectVpnHelper {
                 if (config != null && !errorsList.contains(config)) {
                     try {
                         serverConfig = testServerPing(config);
-                        if (serverConfig != null) {
-                            if (errorsList.contains(config))
-                                errorsList.remove(config);
+                        if (serverConfig != null)
                             return serverConfig;
-                        } else {
-                            if (!errorsList.contains(config))
-                                errorsList.add(config);
-                        }
+//                        if (serverConfig != null) {
+//                            if (errorsList.contains(config))
+//                                errorsList.remove(config);
+//                            return serverConfig;
+//                        } else {
+//                            if (!errorsList.contains(config))
+//                                errorsList.add(config);
+//                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

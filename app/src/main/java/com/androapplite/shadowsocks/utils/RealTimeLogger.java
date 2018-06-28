@@ -114,15 +114,14 @@ public class RealTimeLogger implements Callback {
         if (serverIp == null)
             serverIp = ConnectVpnHelper.getInstance(mContext).getCurrentConfig().server;
 
-        answerLogEvent(name, ip, serverIp, country, time, args);
-        apacheLogEvent(name, ip, serverIp, country, time, args);
+        answerLogEvent(name, serverIp, country, time, args);
+        apacheLogEvent(name, serverIp, country, time, args);
 
     }
 
-    private void answerLogEvent(String name, int ip, String serverIp, String country, long time, String... args) {
+    private void answerLogEvent(String name, String serverIp, String country, long time, String... args) {
         CustomEvent event = new CustomEvent(name);
-        event.putCustomAttribute("ip", ip)
-                .putCustomAttribute("serverIp", serverIp)
+        event.putCustomAttribute("serverIp", serverIp)
                 .putCustomAttribute("country", country)
                 .putCustomAttribute("time", time);
 
@@ -135,10 +134,9 @@ public class RealTimeLogger implements Callback {
         mAnswers.logCustom(event);
     }
 
-    private void apacheLogEvent(String name, int ip, String serverIp, String country, long time, String... args) {
+    private void apacheLogEvent(String name, String serverIp, String country, long time, String... args) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(sApacheUrl).newBuilder();
         urlBuilder.addQueryParameter("name", name)
-                .addQueryParameter("ip", String.valueOf(ip))
                 .addQueryParameter("serverIp", serverIp)
                 .addQueryParameter("country", country)
                 .addQueryParameter("time", String.valueOf(time));

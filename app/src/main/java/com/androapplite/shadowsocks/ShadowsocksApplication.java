@@ -139,10 +139,10 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         if (activity instanceof MainActivity) {
             if (mIsFirstOpen) {
                 mIsFirstOpen = false;
-                PromotionTracking.getInstance(this).reportOpenMainPageCount();
+//                PromotionTracking.getInstance(this).reportOpenMainPageCount();
                 reportTcpRecord();
             }
-            PromotionTracking.getInstance(this).reportContinuousDayCount();
+//            PromotionTracking.getInstance(this).reportContinuousDayCount();
         }
     }
 

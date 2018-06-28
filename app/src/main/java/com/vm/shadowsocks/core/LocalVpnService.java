@@ -66,7 +66,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     private ByteBuffer m_DNSBuffer;
     private Handler m_Handler;
     private volatile TcpTrafficMonitor mTcpTrafficMonitor;
-    private volatile StatusGuard mStatusGuard;
+//    private volatile StatusGuard mStatusGuard;
     private volatile ScheduledExecutorService mScheduleExecutorService;
     private VpnNotification mNotification;
     private volatile UdpProxyServer mUdpProxyServer;
@@ -148,28 +148,28 @@ public class LocalVpnService extends VpnService implements Runnable {
                 }
             }
         } catch (Exception e) {}
-        if (mStatusGuard != null) {
-            Map<String, Integer> errors = mStatusGuard.getErrors();
-            if (format.startsWith("Error:")) {
-                if (format.startsWith("Error: read buffer")) {
-                    args[0] = "";
-                    String logString2 = String.format(format, args);
-                    Integer count = errors.get(logString2);
-                    if (count == null) {
-                        errors.put(logString2, 1);
-                    } else {
-                        errors.put(logString2, ++count);
-                    }
-                } else {
-                    Integer count = errors.get(logString);
-                    if (count == null) {
-                        errors.put(logString, 1);
-                    } else {
-                        errors.put(logString, ++count);
-                    }
-                }
-            }
-        }
+//        if (mStatusGuard != null) {
+//            Map<String, Integer> errors = mStatusGuard.getErrors();
+//            if (format.startsWith("Error:")) {
+//                if (format.startsWith("Error: read buffer")) {
+//                    args[0] = "";
+//                    String logString2 = String.format(format, args);
+//                    Integer count = errors.get(logString2);
+//                    if (count == null) {
+//                        errors.put(logString2, 1);
+//                    } else {
+//                        errors.put(logString2, ++count);
+//                    }
+//                } else {
+//                    Integer count = errors.get(logString);
+//                    if (count == null) {
+//                        errors.put(logString, 1);
+//                    } else {
+//                        errors.put(logString, ++count);
+//                    }
+//                }
+//            }
+//        }
 
         m_Handler.post(new Runnable() {
             @Override
@@ -319,7 +319,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (mScheduleExecutorService != null) {
             mScheduleExecutorService.shutdown();
             mScheduleExecutorService = null;
-            mStatusGuard = null;
+//            mStatusGuard = null;
             mTcpTrafficMonitor.unscheduleAndUnregisterReceiver(this);
             mTcpTrafficMonitor = null;
         }
@@ -337,7 +337,7 @@ public class LocalVpnService extends VpnService implements Runnable {
             mScheduleExecutorService = Executors.newSingleThreadScheduledExecutor();
             mTcpTrafficMonitor = new TcpTrafficMonitor(mScheduleExecutorService);
             mTcpTrafficMonitor.scheduleAndRegisterReceiver(this);
-            mStatusGuard = new StatusGuard(this, mScheduleExecutorService);
+//            mStatusGuard = new StatusGuard(this, mScheduleExecutorService);
         }
     }
 
@@ -501,12 +501,12 @@ public class LocalVpnService extends VpnService implements Runnable {
                         DnsPacket dnsPacket = DnsPacket.FromBytes(m_DNSBuffer);
                         if (dnsPacket != null && dnsPacket.Header.QuestionCount > 0) {
                             m_DnsProxy.onDnsRequestReceived(ipHeader, udpHeader, dnsPacket);
-                            String question = dnsPacket.Questions[0].Domain;
-                            if (ProxyConfig.Instance.needProxy(question, m_DnsProxy.getIPFromCache(question))) {
-                                Firebase.getInstance(this).logEvent("DNS", "走代理", dnsPacket.Questions[0].Domain);
-                            } else {
-                                Firebase.getInstance(this).logEvent("DNS", "不走代理", dnsPacket.Questions[0].Domain);
-                            }
+//                            String question = dnsPacket.Questions[0].Domain;
+//                            if (ProxyConfig.Instance.needProxy(question, m_DnsProxy.getIPFromCache(question))) {
+//                                Firebase.getInstance(this).logEvent("DNS", "走代理", dnsPacket.Questions[0].Domain);
+//                            } else {
+//                                Firebase.getInstance(this).logEvent("DNS", "不走代理", dnsPacket.Questions[0].Domain);
+//                            }
                         }
                     } else if (sourcePort == mUdpProxyServer.Port) {
                         NatSession session = NatSessionManager.getSession(destinationPort);
