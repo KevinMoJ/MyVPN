@@ -178,7 +178,7 @@
     <!--优先链接国家列表-->
     <entry>
         <key>priority_connect_nation_list</key>
-        <value>[{"code":"AE","nation":"Netherlands"},{"code":"ZA","nation":"Netherlands"},{"code":"TH","nation":"Singapore"},{"code":"PH","nation":"Singapore"},{"code":"NG","nation":"United States"},{"code":"FR","nation":"United States"}]</value>
+        <value>[{"code":"ZA","nation":"Netherlands"},{"code":"TH","nation":"Singapore"},{"code":"PH","nation":"Singapore"},{"code":"NG","nation":"United States"},{"code":"FR","nation":"United States"}]</value>
     </entry>
 
     <!--连接前测试网站-->

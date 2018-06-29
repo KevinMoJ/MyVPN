@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.beforeConnnectTest.ShadowSocksProxyRunnable;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.PriorityConfig;
 import com.androapplite.shadowsocks.model.ServerConfig;
@@ -22,7 +23,6 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
-import com.androapplite.shadowsocks.utils.ShadowSocksProxyRunnable;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -38,7 +38,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -405,14 +404,6 @@ public class ConnectVpnHelper {
                         serverConfig = testServerPing(config);
                         if (serverConfig != null)
                             return serverConfig;
-//                        if (serverConfig != null) {
-//                            if (errorsList.contains(config))
-//                                errorsList.remove(config);
-//                            return serverConfig;
-//                        } else {
-//                            if (!errorsList.contains(config))
-//                                errorsList.add(config);
-//                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -736,7 +727,7 @@ public class ConnectVpnHelper {
         int pingLoad = ping(config.server);
         boolean connect = pingLoad <= remote_pingLoad;
         if (connect) {
-            if (isBeforeConnectTest && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) // 系统6.0以上的才进行测试
+            if (isBeforeConnectTest && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) // 系统6.0以上的才进行测试  && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 return beforeConnectTestStatus(config) ? config : null;
             else
                 return config;
@@ -756,23 +747,11 @@ public class ConnectVpnHelper {
         Request request = null;
         Response response = null;
 
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) { // 系统6.0  6开头的用HttpURLConnection
-            try {
-                Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
-                HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
-                connection.setDoInput(true);
-                connection.setConnectTimeout(1000 * timeOut);
-                connection.setReadTimeout(1000 * timeOut);
-//                connection.setRequestProperty("accept", "*/*");
-//                connection.setRequestProperty("connection", "Keep-Alive");
-//                //浏览器表明自己的身份（是哪种浏览器）
-//                connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.8.1.14)");
-                result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
-                mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (!LocalVpnService.IsRunning)
-                    mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) { // 6.0及以前的系统用自己写的服务器测试
+            result = mSocksProxyRunnable.connectionTest(config.server, config.port);
+            if (!LocalVpnService.IsRunning) {
+                mFirebase.logEvent("连接前测试6.0及以下系统", String.valueOf(result) + String.format("%s|%s|%s", config.server, config.port, config.nation));
+//                Log.i(TAG, "连接前测试6.0及以下系统:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统7.0以上的话用okHttpClient
             try {
@@ -786,11 +765,16 @@ public class ConnectVpnHelper {
                         .build();//创建Request 对象
                 response = okHttpClient.newCall(request).execute();
                 result = response.isSuccessful();
-                mFirebase.logEvent("连接前测试okHttp", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
-                RealTimeLogger.getInstance(mContext).logEventAsync("before_connect_test", "serverConfig", String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                if (!LocalVpnService.IsRunning) {
+                    mFirebase.logEvent("连接前测试okHttp", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                    RealTimeLogger.getInstance(mContext).logEventAsync("before_connect_test", "serverConfig", String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+//                Log.i("连接前测试okHttp", String.valueOf(result) + "    " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                }
             } catch (Exception e) {
-                if (!LocalVpnService.IsRunning)
+                if (!LocalVpnService.IsRunning) {
                     mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+//                    Log.i("okHttp测试失败", String.valueOf(result) + "    " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                }
             } finally {
                 if (response != null) {
                     response.body().close();
