@@ -106,4 +106,15 @@
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
 
+    <string name="connect_result_success_title">"VPN conectado"</string>
+    <string name="connect_result_success_message">"Por favor, disfrutar de una conexión segura"</string>
+    <string name="connect_result_ad_bt">"VISITAR"</string>
+    <string name="connect_result_disconnect_title">"Detalles de conexión"</string>
+    <string name="connect_result_disconnect_server">"Servidor"</string>
+    <string name="connect_result_disconnect_fastest">"Lo más rápido"</string>
+    <string name="connect_result_disconnect_free">"gratis"</string>
+    <string name="connect_result_disconnect_duration">"Duración"</string>
+    <string name="main_bt_get_more">"OBTENER MÁS"</string>
+    <string name="main_bt_toast_content">"Por favor, inténtelo de nuevo más tarde"</string>
+
 </resources>

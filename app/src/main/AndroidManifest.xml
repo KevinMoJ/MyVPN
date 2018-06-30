@@ -126,6 +126,11 @@
         <activity android:name="com.androapplite.shadowsocks.activity.RecommendActivity"
                   android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.VPNConnectResultActivity"
+            android:label=""
+            android:launchMode="singleTop">
+        </activity>
     </application>
 
 </manifest>

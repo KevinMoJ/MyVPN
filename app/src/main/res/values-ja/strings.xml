@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"VPN接続済み"</string>
+    <string name="connect_result_success_message">"安全な接続をお楽しみください"</string>
+    <string name="connect_result_ad_bt">"訪問"</string>
+    <string name="connect_result_disconnect_title">"接続の詳細"</string>
+    <string name="connect_result_disconnect_server">"サーバ"</string>
+    <string name="connect_result_disconnect_fastest">"最速"</string>
+    <string name="connect_result_disconnect_free">"無料"</string>
+    <string name="connect_result_disconnect_duration">"期間"</string>
+    <string name="main_bt_get_more">"多くを得る"</string>
+    <string name="main_bt_toast_content">"後でもう一度お試しください"</string>
 </resources>

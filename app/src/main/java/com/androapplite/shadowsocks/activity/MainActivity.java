@@ -62,6 +62,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.utils.NetWorkSpeedUtils;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private AnimationSet mMenuRocketAnimation;
     private int mAdMsgType;
     private FullAdStatusListener mFullAdStatusListener;
+    private NetWorkSpeedUtils netWorkSpeedUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad")) {
-            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
+//            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
+            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);
+            mAdMsgType = MSG_SHOW_INTERSTITIAL_ENTER;
         }
     }
 
@@ -317,6 +321,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         Firebase firebase = Firebase.getInstance(this);
         if (mVpnState == VpnState.Init || mVpnState == VpnState.Stopped ||
                 mVpnState == VpnState.Error) {
+            if (netWorkSpeedUtils == null) {
+                netWorkSpeedUtils = new NetWorkSpeedUtils(this);
+            }
+            netWorkSpeedUtils.startShowNetSpeed();
             if(checkConnection(isConnectionAvailable())) {
                 connectVpnServerAsync();
             }
@@ -577,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         checkNotificationAndShowRemainder();
         checkConnection(isConnectionAvailable());
         registerReceiver();
-        AdAppHelper.getInstance(this).onResume();
+//        AdAppHelper.getInstance(this).onResume();
         updateFlagMenuIcon();
         try {
             VpnService.prepare(this);
@@ -788,6 +796,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
         disconnectVpnServiceAsync();
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full"))
+            startResultActivity(VPNConnectResultActivity.VPN_RESULT_DISCONNECT);
+
+        if (netWorkSpeedUtils != null) {
+            netWorkSpeedUtils.release();
+            netWorkSpeedUtils = null;
+        }
         ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
         ConnectVpnHelper.getInstance(MainActivity.this).release();
     }
@@ -872,8 +887,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 })
                 .setCancelable(false)
                 .show();
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad"))
-            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
+//            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
+            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
+            mAdMsgType = MSG_SHOW_INTERSTITIAL_EXIT;
+        }
     }
 
     @Override
@@ -980,6 +998,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false) && isFullConnectSuccessAdShow) {
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
+                } else if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
+                        && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")) {
+                    //记录VPN连接开始的时间
+                    mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
+                    startResultActivity(VPNConnectResultActivity.VPN_RESULT_CONNECT);
                 }
                 mVpnState = VpnState.Connected;
                 Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
@@ -1001,6 +1024,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
             updateFlagMenuIcon();
         }
+    }
+
+    private void startResultActivity(int type) {
+        Intent intent = new Intent(this, VPNConnectResultActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(VPNConnectResultActivity.VPV_RESULT_TYPE, type);
+        startActivity(intent);
     }
 
     @Override

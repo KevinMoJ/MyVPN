@@ -126,7 +126,7 @@ public class ServerListFetcherService extends IntentService{
                     Future<Pair<String, String>> future = ecs.poll(100, TimeUnit.MILLISECONDS);
                     if (future != null) {
                         Pair<String, String> result = future.get();
-                        if (result != null) {
+                        if (result != null && result.second != null) {
                             mUrl = result.first;
                             mServerListJsonString = result.second;
                             mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, true).apply();

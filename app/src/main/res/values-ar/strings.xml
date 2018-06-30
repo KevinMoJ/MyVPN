@@ -105,4 +105,15 @@
     <string name="server_list_disconnect_title">افصل VPN لتحديث؟</string>
     <string name="server_list_full_toast">هذا الخادم ممتلئ الآن ， يرجى التحديث!</string>
 
+    <string name="connect_result_success_title">"VPN متصل"</string>
+    <string name="connect_result_success_message">"يرجى التمتع اتصال آمن"</string>
+    <string name="connect_result_ad_bt">"يزور"</string>
+    <string name="connect_result_disconnect_title">"تفاصيل الاتصال"</string>
+    <string name="connect_result_disconnect_server">"الخادم"</string>
+    <string name="connect_result_disconnect_fastest">"أسرع"</string>
+    <string name="connect_result_disconnect_free">"حر"</string>
+    <string name="connect_result_disconnect_duration">"المدة الزمنية"</string>
+    <string name="main_bt_get_more">"خذ المزيد"</string>
+    <string name="main_bt_toast_content">"الرجاء معاودة المحاولة في وقت لاحق"</string>
+
 </resources>

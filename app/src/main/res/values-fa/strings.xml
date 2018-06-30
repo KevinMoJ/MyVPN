@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"VPN متصل شده است"</string>
+    <string name="connect_result_success_message">"لطفا از اتصال امن لذت ببرید"</string>
+    <string name="connect_result_ad_bt">"بازدید کنید"</string>
+    <string name="connect_result_disconnect_title">"جزئیات اتصال"</string>
+    <string name="connect_result_disconnect_server">"سرور"</string>
+    <string name="connect_result_disconnect_fastest">"سریعترین"</string>
+    <string name="connect_result_disconnect_free">"رایگان"</string>
+    <string name="connect_result_disconnect_duration">"مدت زمان"</string>
+    <string name="main_bt_get_more">"دریافت کنید"</string>
+    <string name="main_bt_toast_content">"لطفا بعدا دوباره امتحان کنید"</string>
 </resources>

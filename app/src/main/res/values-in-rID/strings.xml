@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"VPN Terhubung"</string>
+    <string name="connect_result_success_message">"Silakan menikmati koneksi aman"</string>
+    <string name="connect_result_ad_bt">"MENGUNJUNGI"</string>
+    <string name="connect_result_disconnect_title">"Detail koneksi"</string>
+    <string name="connect_result_disconnect_server">"Server"</string>
+    <string name="connect_result_disconnect_fastest">"Tercepat"</string>
+    <string name="connect_result_disconnect_free">"bebas"</string>
+    <string name="connect_result_disconnect_duration">"Lamanya"</string>
+    <string name="main_bt_get_more">"MENDAPATKAN LEBIH BANYAK"</string>
+    <string name="main_bt_toast_content">"Silakan coba lagi nanti"</string>
 </resources>

@@ -105,4 +105,15 @@
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
 
+    <string name="connect_result_success_title">"Konektado ang VPN"</string>
+    <string name="connect_result_success_message">"Mangyaring tamasahin ang mga secure na koneksyon"</string>
+    <string name="connect_result_ad_bt">"Bisitahin"</string>
+    <string name="connect_result_disconnect_title">"Mga detalye ng koneksyon"</string>
+    <string name="connect_result_disconnect_server">"Server"</string>
+    <string name="connect_result_disconnect_fastest">"Pinakamabilis"</string>
+    <string name="connect_result_disconnect_free">"libre"</string>
+    <string name="connect_result_disconnect_duration">"Tagal"</string>
+    <string name="main_bt_get_more">"KUHA PA"</string>
+    <string name="main_bt_toast_content">"Subukang muli mamaya"</string>
+
 </resources>

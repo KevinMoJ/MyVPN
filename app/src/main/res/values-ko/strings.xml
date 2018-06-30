@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"VPN 연결됨"</string>
+    <string name="connect_result_success_message">"안전한 연결을 즐기세요."</string>
+    <string name="connect_result_ad_bt">"방문"</string>
+    <string name="connect_result_disconnect_title">"연결 세부 정보"</string>
+    <string name="connect_result_disconnect_server">"섬기는 사람"</string>
+    <string name="connect_result_disconnect_fastest">"가장 빠른"</string>
+    <string name="connect_result_disconnect_free">"비어 있는"</string>
+    <string name="connect_result_disconnect_duration">"지속"</string>
+    <string name="main_bt_get_more">"더 입수하십시오"</string>
+    <string name="main_bt_toast_content">"나중에 다시 시도 해주십시오"</string>
 </resources>

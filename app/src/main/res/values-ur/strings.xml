@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"وی پی این منسلک"</string>
+    <string name="connect_result_success_message">"براہ کرم محفوظ کنکشن کا لطف اٹھائیں"</string>
+    <string name="connect_result_ad_bt">"ملاحظہ کریں"</string>
+    <string name="connect_result_disconnect_title">"کنکشن کی تفصیلات"</string>
+    <string name="connect_result_disconnect_server">"سرور"</string>
+    <string name="connect_result_disconnect_fastest">"سب سے تیز"</string>
+    <string name="connect_result_disconnect_free">"مفت"</string>
+    <string name="connect_result_disconnect_duration">"دورانیہ"</string>
+    <string name="main_bt_get_more">"مزید ہو جاؤ"</string>
+    <string name="main_bt_toast_content">"براہ کرم کچھ دیر بعد کوشش کریں"</string>
 </resources>

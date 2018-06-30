@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">VPN connecté</string>
+    <string name="connect_result_success_message">Veuillez profiter d\'une connexion sécurisée</string>
+    <string name="connect_result_ad_bt">VISITER</string>
+    <string name="connect_result_disconnect_title">Détails de connexion</string>
+    <string name="connect_result_disconnect_server">Serveur</string>
+    <string name="connect_result_disconnect_fastest">Le plus rapide</string>
+    <string name="connect_result_disconnect_free">gratuit</string>
+    <string name="connect_result_disconnect_duration">Durée</string>
+    <string name="main_bt_get_more">OBTENEZ PLUS</string>
+    <string name="main_bt_toast_content">S\'il vous plaît réessayez plus tard</string>
 </resources>

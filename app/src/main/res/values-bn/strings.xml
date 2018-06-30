@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"ভিপিএন সংযুক্ত"</string>
+    <string name="connect_result_success_message">"দয়া করে নিরাপদ সংযোগটি উপভোগ করুন"</string>
+    <string name="connect_result_ad_bt">"পরিদর্শন"</string>
+    <string name="connect_result_disconnect_title">"সংযোগ বিশদ"</string>
+    <string name="connect_result_disconnect_server">"সার্ভার"</string>
+    <string name="connect_result_disconnect_fastest">"দ্রুততম"</string>
+    <string name="connect_result_disconnect_free">"বিনামূল্যে"</string>
+    <string name="connect_result_disconnect_duration">"স্থিতিকাল"</string>
+    <string name="main_bt_get_more">"আরও পাবেন"</string>
+    <string name="main_bt_toast_content">"অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন"</string>
 </resources>

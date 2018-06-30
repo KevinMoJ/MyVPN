@@ -105,4 +105,15 @@
     <string name="server_list_disconnect_title">VPN zum Aktualisieren trennen?</string>
     <string name="server_list_full_toast">Dieser Server ist jetzt voll, bitte aktualisieren!</string>
 
+    <string name="connect_result_success_title">"VPN verbunden"</string>
+    <string name="connect_result_success_message">"Bitte genießen Sie eine sichere Verbindung"</string>
+    <string name="connect_result_ad_bt">"BESUCH"</string>
+    <string name="connect_result_disconnect_title">"Verbindungsdetails"</string>
+    <string name="connect_result_disconnect_server">"Server"</string>
+    <string name="connect_result_disconnect_fastest">"Schnellste"</string>
+    <string name="connect_result_disconnect_free">"frei"</string>
+    <string name="connect_result_disconnect_duration">"Dauer"</string>
+    <string name="main_bt_get_more">"MEHR BEKOMMEN"</string>
+    <string name="main_bt_toast_content">"Bitte versuche es später erneut"</string>
+
 </resources>

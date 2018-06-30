@@ -32,6 +32,7 @@ import com.androapplite.shadowsocks.view.RoundProgress;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.vm.shadowsocks.core.LocalVpnService;
 
 
 public class SplashActivity extends AppCompatActivity implements Handler.Callback,
@@ -88,7 +89,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         }
 
         WarnDialogShowService.start(this);
-        ServerListFetcherService.fetchServerListAsync(this);
+        if (!LocalVpnService.IsRunning)
+            ServerListFetcherService.fetchServerListAsync(this);
         VpnManageService.start(this);
         Firebase firebase = Firebase.getInstance(this);
         firebase.logEvent("屏幕", "闪屏屏幕");

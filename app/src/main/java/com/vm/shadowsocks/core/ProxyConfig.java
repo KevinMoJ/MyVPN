@@ -225,6 +225,10 @@ public class ProxyConfig {
             return false;
         }
 
+        //让获取我们服务器列表的网址不走代理
+        if (host.equals("c2.vpnnest.com") || host.equals("52.15.133.178"))
+            return false;
+
         //让自己的vpn发送的去load的时候不走vpn代理，防止当当前服务器没网的时候，走代理去load其他服务器都load不通
         if (ConnectVpnHelper.getInstance(ShadowsocksApplication.getGlobalContext()).getVpnServerSet().contains(host))
             return false;

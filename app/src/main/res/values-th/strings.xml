@@ -104,4 +104,15 @@
     <string name="vpn_is_stopping">VPN is stopping, please try it later</string>
     <string name="server_list_disconnect_title">Disconnect VPN to refresh?</string>
     <string name="server_list_full_toast">This server is full now，please refresh!</string>
+
+    <string name="connect_result_success_title">"เชื่อมต่อ VPN แล้ว"</string>
+    <string name="connect_result_success_message">"โปรดเพลิดเพลินกับการเชื่อมต่อที่ปลอดภัย"</string>
+    <string name="connect_result_ad_bt">"เยี่ยมชม"</string>
+    <string name="connect_result_disconnect_title">"รายละเอียดการเชื่อมต่อ"</string>
+    <string name="connect_result_disconnect_server">"เซิร์ฟเวอร์"</string>
+    <string name="connect_result_disconnect_fastest">"ที่เร็วที่สุด"</string>
+    <string name="connect_result_disconnect_free">"ฟรี"</string>
+    <string name="connect_result_disconnect_duration">"ระยะเวลา"</string>
+    <string name="main_bt_get_more">"ได้รับเพิ่มเติม"</string>
+    <string name="main_bt_toast_content">"กรุณาลองใหม่อีกครั้งในภายหลัง"</string>
 </resources>

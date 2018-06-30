@@ -98,6 +98,7 @@ public class ConnectVpnHelper {
     private boolean mIsFindLocalServer; //找到与服务器匹配的国家
     private boolean mIsPriorityConnect; //找到优先选择的国家
 
+    private int beforeConnectTestFailCount;
 
     private ConnectVpnHelper() {
     }
@@ -727,7 +728,7 @@ public class ConnectVpnHelper {
         int pingLoad = ping(config.server);
         boolean connect = pingLoad <= remote_pingLoad;
         if (connect) {
-            if (isBeforeConnectTest && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) // 系统6.0以上的才进行测试  && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+            if (isBeforeConnectTest && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) // 系统5.0以上的才进行测试  && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 return beforeConnectTestStatus(config) ? config : null;
             else
                 return config;
@@ -742,6 +743,9 @@ public class ConnectVpnHelper {
     private boolean beforeConnectTestStatus(ServerConfig config) {
         boolean result = false;
         int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("after_connect_test_time_out");
+        if (beforeConnectTestFailCount >= (int) FirebaseRemoteConfig.getInstance().getLong("after_connect_test_fail_count"))
+            timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("after_connect_test_second_time_out");
+
         String testURL = FirebaseRemoteConfig.getInstance().getString("before_connect_test_net");
         OkHttpClient okHttpClient = null;
         Request request = null;
@@ -771,6 +775,8 @@ public class ConnectVpnHelper {
 //                Log.i("连接前测试okHttp", String.valueOf(result) + "    " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
                 }
             } catch (Exception e) {
+                if (e.getMessage().equals("Connect_timed_out") || e.getMessage().contains("timed_out"))
+                    beforeConnectTestFailCount++;
                 if (!LocalVpnService.IsRunning) {
                     mFirebase.logEvent("okHttp测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
 //                    Log.i("okHttp测试失败", String.valueOf(result) + "    " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
@@ -866,6 +872,7 @@ public class ConnectVpnHelper {
 
         if (tasks != null)
             tasks.clear();
+        beforeConnectTestFailCount = 0;
     }
 
     public void clearErrorList() {
@@ -906,6 +913,7 @@ public class ConnectVpnHelper {
             } catch (IOException e) {
                 result = false;
                 Log.i(TAG, "getRequestResult: 崩溃 " + e.getMessage());
+                mHelper.mFirebase.logEvent("连接后测试catch", e.getMessage(), mURL);
                 e.printStackTrace();
             } finally {
                 if (connection != null)
