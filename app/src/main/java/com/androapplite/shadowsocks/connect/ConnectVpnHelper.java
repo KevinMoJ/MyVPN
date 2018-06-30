@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -298,7 +299,7 @@ public class ConnectVpnHelper {
                 }
             }
 
-            ExecutorService executorService = Executors.newCachedThreadPool();
+            ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
             for (MyCallable callable : tasks) {
                 ecs.submit(callable);
@@ -751,11 +752,32 @@ public class ConnectVpnHelper {
         Request request = null;
         Response response = null;
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) { // 6.0及以前的系统用自己写的服务器测试
-            result = mSocksProxyRunnable.connectionTest(config.server, config.port);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) { // 5.0 用户
+            long start = System.currentTimeMillis();
+            if (FirebaseRemoteConfig.getInstance().getBoolean("is_before_connect_test_five"))
+                result = mSocksProxyRunnable.connectionTest(config.server, config.port, timeOut * 1000);
+            else
+                result = true;
             if (!LocalVpnService.IsRunning) {
-                mFirebase.logEvent("连接前测试6.0及以下系统", String.valueOf(result) + String.format("%s|%s|%s", config.server, config.port, config.nation));
-//                Log.i(TAG, "连接前测试6.0及以下系统:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                mFirebase.logEvent("连接前测试6.0及以下系统", String.format("%s|%s", result, (System.currentTimeMillis() - start)) + String.format("%s|%s|%s", config.server, config.port, config.nation));
+//                Log.i(TAG, "连接前测试5.0系统:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            }
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) { // 6.0用户用自己写的服务器测试
+            try {
+                Proxy proxy = mSocksProxyRunnable.createShadowsocksProxy(config.server, config.port);
+                HttpURLConnection connection = (HttpURLConnection) new URL(testURL).openConnection(proxy);
+                connection.setDoInput(true);
+                connection.setConnectTimeout(1000 * timeOut);
+                connection.setReadTimeout(1000 * timeOut);
+                result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
+                mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+//                Log.i(TAG, "连接前测试HttpURLConnection:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (!LocalVpnService.IsRunning) {
+                    mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                    Log.i(TAG, "HttpURLConnection测试失败:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                }
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统7.0以上的话用okHttpClient
             try {

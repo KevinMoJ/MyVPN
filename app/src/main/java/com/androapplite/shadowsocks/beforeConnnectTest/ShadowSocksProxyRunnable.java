@@ -239,38 +239,83 @@ public class ShadowSocksProxyRunnable implements Runnable {
         }
     }
 
-    public boolean connectionTest(String server, int port) {
-        while(true) {
-            synchronized (this) {
-                if (mConnectionTestServerSocketChannel != null) {
-                    break;
+    public boolean connectionTest(final String server, final int port, long timeoutMilli) {
+        ConnectionTestRunnable connectionTestRunnable = new ConnectionTestRunnable(server, port, this);
+        new Thread(connectionTestRunnable).start();
+        connectionTestRunnable.waitResult(timeoutMilli);
+        return connectionTestRunnable.getResult();
+    }
+
+    private static class ConnectionTestRunnable implements Runnable {
+        private String mServer;
+        private int mPort;
+        private Object mLock;
+        private ShadowSocksProxyRunnable mProxyServer;
+        private boolean mResult;
+
+
+        ConnectionTestRunnable(String server, int port, ShadowSocksProxyRunnable proxyServer) {
+            mServer = server;
+            mPort = port;
+            mProxyServer = proxyServer;
+            mLock = new Object();
+        }
+
+        void waitResult(long timeoutMillis){
+            synchronized (mLock) {
+                try {
+                    mLock.wait(timeoutMillis);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+        }
+
+        @Override
+        public void run() {
+            while(true) {
+                synchronized (this) {
+                    if (mProxyServer.mConnectionTestServerSocketChannel != null) {
+                        break;
+                    }
+                }
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            ShadowsocksConfig config = new ShadowsocksConfig(mServer, mPort);
             try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
+                SocketChannel socketChannel = SocketChannel.open();
+                socketChannel.configureBlocking(true);
+                socketChannel.connect(new InetSocketAddress(InetAddress.getLocalHost().getHostName(), mProxyServer.mConnectionTestServerSocketChannel.socket().getLocalPort()));
+                ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
+                buffer.put(TYPE_IPV4)
+                        .put(config.address().getAddress().getAddress())
+                        .putShort((short) (config.address().getPort() & 0xffff))
+                        .flip();
+                socketChannel.write(buffer);
+                buffer.clear();
+                socketChannel.read(buffer);
+                mResult = ConnectionTestSession.isResponseOk(buffer);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+            synchronized (mLock) {
+                try {
+                    mLock.notify();
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        ShadowsocksConfig config = new ShadowsocksConfig(server, port);
-        try {
-            SocketChannel socketChannel = SocketChannel.open();
-            socketChannel.configureBlocking(true);
-            socketChannel.connect(new InetSocketAddress(InetAddress.getLocalHost().getHostName(), mConnectionTestServerSocketChannel.socket().getLocalPort()));
-            ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-            buffer.put(TYPE_IPV4)
-                    .put(config.address().getAddress().getAddress())
-                    .putShort((short) (config.address().getPort() & 0xffff))
-                    .flip();
-            socketChannel.write(buffer);
-            buffer.clear();
-            socketChannel.read(buffer);
-            return ConnectionTestSession.isResponseOk(buffer);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        boolean getResult() {
+            return mResult;
         }
-        return false;
     }
+
 
     public boolean isConnectionTest(SelectionKey key) {
         return key.channel().equals(mConnectionTestServerSocketChannel);

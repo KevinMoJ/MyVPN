@@ -663,6 +663,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mConnectFragment.updateUI();
                 }
                 ConnectVpnHelper.getInstance(this).startTestConnectionWithOutVPN(ConnectVpnHelper.URL_BING, mConnectingConfig);
+                ConnectVpnHelper.getInstance(this).release();
                 break;
             case MSG_PREPARE_START_VPN_BACKGROUND:
                 prepareStartVpnBackground();
@@ -801,14 +802,24 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
+        if (!LocalVpnService.IsRunning){
+            //记录VPN连接开始的时间
+            mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
+        }
         disconnectVpnServiceAsync();
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full"))
             startResultActivity(VPNConnectResultActivity.VPN_RESULT_DISCONNECT);
-
+        mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
         if (netWorkSpeedUtils != null) {
             netWorkSpeedUtils.release();
             netWorkSpeedUtils = null;
         }
+        mVpnState = VpnState.Stopped;
+        mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+        if (mConnectFragment != null) {
+            mConnectFragment.setConnectResult(mVpnState);
+        }
+
         ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
         ConnectVpnHelper.getInstance(MainActivity.this).release();
     }

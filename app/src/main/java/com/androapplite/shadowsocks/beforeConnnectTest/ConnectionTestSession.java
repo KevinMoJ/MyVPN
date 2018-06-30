@@ -78,6 +78,9 @@ public class ConnectionTestSession extends Session {
         if (buffer.position() > 0) {
             buffer.flip();
         }
+        if (buffer.limit() == 0) {
+            return false;
+        }
         byte[] raw = new byte[buffer.limit()];
         buffer.get(raw);
         return raw.length == RES_OK.length && raw[0] == RES_OK[0] && raw[1] == RES_OK[1];

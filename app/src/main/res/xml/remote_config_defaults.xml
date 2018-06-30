@@ -254,4 +254,10 @@
         <value>false</value>
     </entry>
 
+    <!--5.0一下是否测试-->
+    <entry>
+        <key>is_before_connect_test_five</key>
+        <value>true</value>
+    </entry>
+
 </defaultsMap>
