@@ -134,6 +134,19 @@ public class RealTimeLogger implements Callback {
         mAnswers.logCustom(event);
     }
 
+    //edg: answerLogEvent(error,connectError,e.getMessage());
+    public static void answerLogEvent(String name, String... args) {
+        CustomEvent event = new CustomEvent(name);
+        try {
+            for (int i = 0; i < (args.length / 2) * 2; i += 2) {
+                event.putCustomAttribute(args[i], args[i + 1]);
+                Log.i("answerLogEvent", "answerLogEvent:  " + args[i] + "    " + args[i + 1]);
+            }
+        } catch (Exception e) {
+        }
+        Answers.getInstance().logCustom(event);
+    }
+
     private void apacheLogEvent(String name, String serverIp, String country, long time, String... args) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(sApacheUrl).newBuilder();
         urlBuilder.addQueryParameter("name", name)

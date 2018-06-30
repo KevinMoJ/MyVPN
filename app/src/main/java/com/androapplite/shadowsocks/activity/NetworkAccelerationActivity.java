@@ -37,6 +37,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -346,6 +347,9 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     @Override
     public void onAccelerateImmediately() {
         Firebase.getInstance(this).logEvent("网络加速", "立即加速");
+        mSharedPreference.edit().putInt("CLICK_SPEED_BT_COUNT", mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0) + 1).apply();
+        RealTimeLogger.answerLogEvent("click_speed_bt_count", "speed", "click_count:" + mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0));
+        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, true).apply();
         startAccelerate();
     }
 

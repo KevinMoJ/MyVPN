@@ -26,6 +26,7 @@ public final class SharedPreferenceKey {
     public static final String TEST_CONNECT_FAILED_COUNT = "TEST_CONNECT_FAILED_COUNT"; //测试链接失败的次数
     public static final String TEST_CONNECT_FAILED_TIME_COUNT = "TEST_CONNECT_FAILED_TIME_COUNT"; //测试链接失败的时间次数
     public static final String CONNECTING_START_TIME = "CONNECTING_START_TIME"; // VPN开始连接的开始时间
+    public static final String IS_ROCKET_SPEED_CONNECT = "IS_ROCKET_SPEED_CONNECT"; // 是否是小火箭加速
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";

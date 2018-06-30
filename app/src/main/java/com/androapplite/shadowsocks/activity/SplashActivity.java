@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,11 +23,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.service.WarnDialogShowService;
 import com.androapplite.shadowsocks.utils.DensityUtil;
 import com.androapplite.shadowsocks.utils.InternetUtil;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.shadowsocks.view.RoundProgress;
 import com.androapplite.vpn3.R;
@@ -89,6 +92,9 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         }
 
         WarnDialogShowService.start(this);
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        sharedPreferences.edit().putInt("SPLASH_OPEN_COUNT", sharedPreferences.getInt("SPLASH_OPEN_COUNT", 0) + 1).apply();
+        RealTimeLogger.answerLogEvent("splash_open", "open", "open_count:" + sharedPreferences.getInt("SPLASH_OPEN_COUNT", 0));
         if (!LocalVpnService.IsRunning)
             ServerListFetcherService.fetchServerListAsync(this);
         VpnManageService.start(this);

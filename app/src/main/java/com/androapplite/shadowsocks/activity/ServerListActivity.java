@@ -37,6 +37,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -345,6 +346,10 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
                     .apply();
             setResult(RESULT_OK);
             ConnectVpnHelper.getInstance(this).release();
+            mPreferences.edit().putInt("CLICK_SERVER_LIST_COUNT", mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0) + 1).apply();
+            RealTimeLogger.answerLogEvent("server_list_click_connect_count", "click", "click_count:" + mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0));
+            //不是小火箭加速的链接
+            mPreferences.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
             finish();
             Firebase.getInstance(this).logEvent("选择国家", nation);
         }

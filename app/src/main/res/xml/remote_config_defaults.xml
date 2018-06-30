@@ -197,7 +197,7 @@
     <!--连接前测试超时失败的次数-->
     <entry>
         <key>after_connect_test_fail_count</key>
-        <value>10</value>
+        <value>5</value>
     </entry>
 
     <!--连接前测试第二次超时时间-->

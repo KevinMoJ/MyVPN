@@ -63,6 +63,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.NetWorkSpeedUtils;
+import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -151,12 +152,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
         }
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
-
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad")) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
-            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);
+//            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);
+            AdAppHelper.getInstance(this).showFullAd();
+            Firebase.getInstance(this).logEvent("主界面", "进入全屏", "显示");
             mAdMsgType = MSG_SHOW_INTERSTITIAL_ENTER;
         }
     }
@@ -329,6 +331,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 connectVpnServerAsync();
             }
             firebase.logEvent("连接VPN", "连接");
+            mSharedPreference.edit().putInt("CLICK_CONNECT_BT_COUNT", mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0) + 1).apply();
+            RealTimeLogger.answerLogEvent("click_connect_bt_count", "connect", "connect_count:" + mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0));
+            //不是小火箭加速的链接
+            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
             if(mSharedPreference != null) {
                 String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
                 firebase.logEvent("选择国家", nation);
@@ -376,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mConnectFragment.animateConnecting();
             mVpnState = VpnState.Connecting;
         }
-        mForegroundHandler.sendEmptyMessageDelayed(MSG_CONNECTION_TIMEOUT, TimeUnit.SECONDS.toMillis(32));
+        mForegroundHandler.sendEmptyMessageDelayed(MSG_CONNECTION_TIMEOUT, TimeUnit.SECONDS.toMillis(60));
         mBackgroundHander.sendEmptyMessage(MSG_PREPARE_START_VPN_BACKGROUND);
     }
 
@@ -889,7 +895,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 .show();
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
-            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
+//            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
+            AdAppHelper.getInstance(this).showFullAd();
+            Firebase.getInstance(this).logEvent("主界面", "退出全屏", "显示");
             mAdMsgType = MSG_SHOW_INTERSTITIAL_EXIT;
         }
     }
@@ -999,7 +1007,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
                 } else if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
-                        && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")) {
+                        && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")
+                        && !mSharedPreference.getBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false)) {
                     //记录VPN连接开始的时间
                     mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
                     startResultActivity(VPNConnectResultActivity.VPN_RESULT_CONNECT);
