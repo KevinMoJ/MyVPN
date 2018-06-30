@@ -139,6 +139,9 @@ public class ShadowSocksProxyRunnable implements Runnable {
             }catch (Exception e) {
                 e.printStackTrace();
             }
+            if (!mRunning || Thread.currentThread().isInterrupted()) {
+                break;
+            }
             synchronized (this) {
                 if (mSelector != null && mSelector.isOpen())
                     iterator = mSelector.selectedKeys().iterator();
