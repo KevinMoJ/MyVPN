@@ -350,8 +350,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private void connectVpnServerAsync() {
-        //当拉不到服务器列表的时候重新拉一次
-        if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST) && mConnectingConfig != null) {
+        //当拉不到服务器列表的时候重新拉一次  && mConnectingConfig != null
+        if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             connectVpnServerAsyncCore();
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
         } else {

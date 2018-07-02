@@ -28,6 +28,7 @@ import com.bestgo.adsplugin.ads.AdConfig;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.NativeAdGroup;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
+import com.bestgo.adsplugin.utils.GlobalInstance;
 import com.facebook.ads.AdChoicesView;
 import com.facebook.ads.MediaView;
 import com.facebook.ads.NativeAd;
@@ -36,7 +37,6 @@ import com.google.android.gms.ads.formats.NativeAppInstallAd;
 import com.google.android.gms.ads.formats.NativeAppInstallAdView;
 import com.google.android.gms.ads.formats.NativeContentAd;
 import com.google.android.gms.ads.formats.NativeContentAdView;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,10 +120,9 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
 
         mediaView.setNativeAd(facebookAd);
 
-        ImageLoader imageLoader = ImageLoader.getInstance();
         NativeAd.Image adIcon = facebookAd.getAdIcon();
         if (adIcon != null)
-            imageLoader.displayImage(adIcon.getUrl(), icon);
+            GlobalInstance.getImageLoader(getContext()).displayImage(adIcon.getUrl(), icon);
         else
             icon.setImageResource(R.drawable.vpn_result_default_icon);
 
@@ -268,12 +267,12 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         Button cancelBt = (Button) adView.findViewById(R.id.disconnect_ad_recommend_cancel);
 
         if (item.image_url != null)
-            ImageLoader.getInstance().displayImage(item.image_url, poster);
+            GlobalInstance.getImageLoader(getContext()).displayImage(item.image_url, poster);
         else
             poster.setImageResource(R.drawable.vpn_result_default_power);
 
         if (item.icon_url != null)
-            ImageLoader.getInstance().displayImage(item.icon_url, icon);
+            GlobalInstance.getImageLoader(getContext()).displayImage(item.icon_url, icon);
         else
             poster.setImageResource(R.drawable.vpn_result_default_icon);
 
