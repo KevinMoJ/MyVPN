@@ -16,6 +16,10 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
 }
 
 
@@ -33,7 +37,7 @@ android {
     defaultConfig {
         applicationId "com.androapplite.vpn10"
         minSdkVersion 16
-        targetSdkVersion 22
+        targetSdkVersion 26
         versionCode 5
         versionName "1.0.4"
         multiDexEnabled true
@@ -41,6 +45,15 @@ android {
 //    dexOptions {
 //        javaMaxHeapSize "4g"
 //    }
+
+    dexOptions {
+        preDexLibraries true
+        maxProcessCount 8
+        // Instead of setting the heap size for the DEX process, increase Gradle's
+        // heap size to enable dex-in-process. To learm more, read the next section.
+        // javaMaxHeapSize "2048m"
+    }
+
     project.archivesBaseName = defaultConfig.applicationId + "-" + defaultConfig.versionName;
     //添加NDK自定义android.mk 支持
     sourceSets.main {
@@ -65,9 +78,10 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
+    //noinspection GradleCompatible
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:support-v4:26.1.0'
     compile 'com.google.android.gms:play-services-ads:10.0.1'
     compile 'com.facebook.android:facebook-android-sdk:4.23.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
