@@ -461,7 +461,7 @@ public class ConnectVpnHelper {
             tasks.add(new MyCallable(this, config));
         }
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         ExecutorCompletionService<ServerConfig> ecs = new ExecutorCompletionService<>(executorService);
         for (MyCallable callable : tasks) {
             ecs.submit(callable);
@@ -658,7 +658,7 @@ public class ConnectVpnHelper {
         if (!tasks.contains(bingCallable))
             tasks.add(bingCallable);
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         ExecutorCompletionService<Boolean> ecs = new ExecutorCompletionService<>(executorService);
         for (TestConnectCallable callable : tasks) {
             ecs.submit(callable);
@@ -770,13 +770,16 @@ public class ConnectVpnHelper {
                 connection.setConnectTimeout(1000 * timeOut);
                 connection.setReadTimeout(1000 * timeOut);
                 result = connection.getResponseCode() == HttpURLConnection.HTTP_OK;
-                mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                if (!LocalVpnService.IsRunning) {
+                    mFirebase.logEvent("连接前测试HttpURLConnection", String.valueOf(result), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
 //                Log.i(TAG, "连接前测试HttpURLConnection:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                if (e.getMessage().equals("Connect_timed_out") || e.getMessage().contains("timed_out"))
+                    beforeConnectTestFailCount++;
                 if (!LocalVpnService.IsRunning) {
                     mFirebase.logEvent("HttpURLConnection测试失败", e.getMessage(), String.format("%s--->%s--->%s", config.server, config.port, config.nation));
-                    Log.i(TAG, "HttpURLConnection测试失败:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
+//                    Log.i(TAG, "HttpURLConnection测试失败:   " + String.valueOf(result) + "   " + String.format("%s--->%s--->%s", config.server, config.port, config.nation));
                 }
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // 系统7.0以上的话用okHttpClient

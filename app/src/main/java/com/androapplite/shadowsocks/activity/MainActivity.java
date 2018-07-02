@@ -806,9 +806,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             //记录VPN连接开始的时间
             mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
         }
+
+        ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
+        ConnectVpnHelper.getInstance(MainActivity.this).release();
         disconnectVpnServiceAsync();
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full"))
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")) {
             startResultActivity(VPNConnectResultActivity.VPN_RESULT_DISCONNECT);
+        }
         mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
         if (netWorkSpeedUtils != null) {
             netWorkSpeedUtils.release();
@@ -819,9 +823,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         if (mConnectFragment != null) {
             mConnectFragment.setConnectResult(mVpnState);
         }
-
-        ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
-        ConnectVpnHelper.getInstance(MainActivity.this).release();
     }
 
     private void disconnectVpnServiceAsync(){
