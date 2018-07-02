@@ -113,6 +113,8 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         updateDuration(System.currentTimeMillis() - startConnectDuration);
         if (type == VPN_RESULT_DISCONNECT)
             mActionBar.setTitle(R.string.connect_result_disconnect_title);
+        else if (type == VPN_RESULT_CONNECT)
+            mActionBar.setTitle("");
         FillAdContent();
     }
 
