@@ -27,6 +27,7 @@ import com.bestgo.adsplugin.ads.AdConfig;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.NativeAdGroup;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
+import com.bestgo.adsplugin.utils.GlobalInstance;
 import com.facebook.ads.AdChoicesView;
 import com.facebook.ads.MediaView;
 import com.facebook.ads.NativeAd;
@@ -36,7 +37,6 @@ import com.google.android.gms.ads.formats.NativeAppInstallAdView;
 import com.google.android.gms.ads.formats.NativeContentAd;
 import com.google.android.gms.ads.formats.NativeContentAdView;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -158,10 +158,9 @@ public class VPNConnectResultActivity extends AppCompatActivity {
 
         mediaView.setNativeAd(facebookAd);
 
-        ImageLoader imageLoader = ImageLoader.getInstance();
         NativeAd.Image adIcon = facebookAd.getAdIcon();
         if (adIcon != null)
-            imageLoader.displayImage(adIcon.getUrl(), icon);
+            GlobalInstance.getImageLoader(this).displayImage(adIcon.getUrl(), icon);
         else
             icon.setImageResource(R.drawable.vpn_result_default_icon);
 
@@ -297,12 +296,12 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         Button button = (Button) adView.findViewById(R.id.activity_result_ad_bt);
 
         if (item.image_url != null)
-            ImageLoader.getInstance().displayImage(item.image_url, poster);
+            GlobalInstance.getImageLoader(this).displayImage(item.image_url, poster);
         else
             poster.setImageResource(R.drawable.vpn_result_default_power);
 
         if (item.icon_url != null)
-            ImageLoader.getInstance().displayImage(item.icon_url, icon);
+            GlobalInstance.getImageLoader(getApplicationContext()).displayImage(item.icon_url, icon);
         else
             poster.setImageResource(R.drawable.vpn_result_default_icon);
 
