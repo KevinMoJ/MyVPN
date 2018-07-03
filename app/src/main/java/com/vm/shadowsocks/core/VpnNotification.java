@@ -1,6 +1,8 @@
 package com.vm.shadowsocks.core;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -9,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
@@ -37,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 public class VpnNotification implements LocalVpnService.onStatusChangedListener {
     private NotificationCompat.Builder mNormalNetworkStatusBuilder;
     private NotificationCompat.Builder mErrorNetworkStatusBuilder;
+    private static String channelId = "channel_1";
     private static final int VPN_NOTIFICATION_ID = 1;
     private Service mService;
     public static boolean gSupressNotification = false;
@@ -48,7 +52,15 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
         intent.putExtra("source", "notificaiton");
         PendingIntent pendingIntent = PendingIntent.getActivity(service, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Bitmap largeIcon = BitmapFactory.decodeResource(service.getResources(), R.drawable.notification_icon_large);
-        mNormalNetworkStatusBuilder = new NotificationCompat.Builder(service);
+        NotificationManager notificationManager = (NotificationManager) mService.getSystemService(Service.NOTIFICATION_SERVICE);
+        if (isAndroidO()) {
+            NotificationChannel channel = new NotificationChannel(channelId, "123", NotificationManager.IMPORTANCE_LOW);
+            channel.enableVibration(false);
+
+            if (notificationManager != null)
+                notificationManager.createNotificationChannel(channel);
+        }
+        mNormalNetworkStatusBuilder = new NotificationCompat.Builder(service, channelId);
         mNormalNetworkStatusBuilder.setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(largeIcon)
                 .setContentIntent(pendingIntent)
@@ -56,7 +68,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 .setOngoing(true)
                 .setShowWhen(false)
                 .setContentTitle(mService.getString(R.string.app_name));
-        mErrorNetworkStatusBuilder = new NotificationCompat.Builder(service);
+        mErrorNetworkStatusBuilder = new NotificationCompat.Builder(service, channelId);
         mErrorNetworkStatusBuilder.setSmallIcon(R.drawable.notification_icon)
                 .setLargeIcon(largeIcon)
                 .setContentIntent(pendingIntent)
@@ -178,14 +190,23 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
         }
     }
 
-    public static void showVpnStoppedNotificationGlobe(Context context, boolean showFullScreenIntent){
+    private static boolean isAndroidO() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+    }
+
+    public static void showVpnStoppedNotificationGlobe(Context context, boolean showFullScreenIntent) {
         try {
             final Context applicationContext = context.getApplicationContext();
             Intent intent = new Intent(applicationContext, SplashActivity.class);
             intent.putExtra("source", "notificaiton");
             PendingIntent pendingIntent = PendingIntent.getActivity(applicationContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            NotificationCompat.Builder errorNetworkStatusBuilder;
+            if (isAndroidO()) {
+                errorNetworkStatusBuilder = new NotificationCompat.Builder(applicationContext, channelId);
+            } else {
+                errorNetworkStatusBuilder = new NotificationCompat.Builder(applicationContext);
+            }
             Bitmap largeIcon = BitmapFactory.decodeResource(applicationContext.getResources(), R.drawable.notification_icon_large);
-            NotificationCompat.Builder errorNetworkStatusBuilder = new NotificationCompat.Builder(applicationContext);
             errorNetworkStatusBuilder.setSmallIcon(R.drawable.notification_icon)
                     .setLargeIcon(largeIcon)
                     .setContentIntent(pendingIntent)
