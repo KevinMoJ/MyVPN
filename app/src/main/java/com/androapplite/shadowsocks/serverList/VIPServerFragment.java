@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
@@ -64,8 +65,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     private int mSelectedIndex;
     private boolean mHasServerJson;
     private AlertDialog mDisconnectDialog;
-    private BroadcastReceiver mBackgroundReceiver;
-    private IntentFilter mBackgroundReceiverIntentFilter;
     private BroadcastReceiver mForgroundReceiver;
     private IntentFilter mForgroundReceiverIntentFilter;
 
@@ -87,6 +86,7 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     private void initData(View view) {
         initForegroundBroadcastIntentFilter();
         initForegroundBroadcastReceiver();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mForgroundReceiver, mForgroundReceiverIntentFilter);
 
         parseServerList();
 
@@ -97,7 +97,8 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             mHasServerJson = false;
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
-        addBottomAd(view);
+        if (!VIPActivity.isVIPUser(getContext()))
+            addBottomAd(view);
         Firebase.getInstance(getContext()).logEvent("屏幕", "服务器列表屏幕");
     }
 
@@ -137,40 +138,41 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     private void parseServerList() {
-        mNations = new ArrayList<>();
-        mFlags = new ArrayList<>();
-        mSignalResIds = new HashMap<>();
-        mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
+        if (isAdded()) {
+            mNations = new ArrayList<>();
+            mFlags = new ArrayList<>();
+            mSignalResIds = new HashMap<>();
+            mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
+            mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
 
-        String serverListJson = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
-        ArrayList<ServerConfig> serverConfigs = null;
-        if (serverListJson != null) {
-            serverConfigs = ServerConfig.createServerList(getContext(), serverListJson);
-        }
+            String serverListJson = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+            ArrayList<ServerConfig> serverConfigs = null;
+            if (serverListJson != null) {
+                serverConfigs = ServerConfig.createServerList(getContext(), serverListJson);
+            }
 
-        if (serverConfigs != null && !serverConfigs.isEmpty()) {
-            // 返回的服务器列表已经排序好了 是根据负载从低到高的顺序排列的，
-            // 在这里遍历每一个服务器，然后添加到相应的国家，所以默认第一个就是负载最低的，
-            // 如果负载最低的还是很高就默认为这个国家的所有服务器都满了
-            for (ServerConfig serverConfig : serverConfigs) {
-                if (!mNations.contains(serverConfig.nation)) {
-                    mNations.add(serverConfig.nation);
-                    mFlags.add(serverConfig.flag);
-                    mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
-                    if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
-                        Firebase.getInstance(getContext()).logEvent("加载服务器列表满载", serverConfig.nation);
+            if (serverConfigs != null && !serverConfigs.isEmpty()) {
+                // 返回的服务器列表已经排序好了 是根据负载从低到高的顺序排列的，
+                // 在这里遍历每一个服务器，然后添加到相应的国家，所以默认第一个就是负载最低的，
+                // 如果负载最低的还是很高就默认为这个国家的所有服务器都满了
+                for (ServerConfig serverConfig : serverConfigs) {
+                    if (!mNations.contains(serverConfig.nation)) {
+                        mNations.add(serverConfig.nation);
+                        mFlags.add(serverConfig.flag);
+                        mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
+                        if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
+                            Firebase.getInstance(getContext()).logEvent("加载服务器列表满载", serverConfig.nation);
+                    }
                 }
             }
-        }
 
-        mSelectedIndex = mNations.indexOf(mNation);
-        if (mSelectedIndex == -1) mSelectedIndex = 0;
-        mListView.setItemChecked(mSelectedIndex, true);
+            mSelectedIndex = mNations.indexOf(mNation);
+            if (mSelectedIndex == -1) mSelectedIndex = 0;
+            mListView.setItemChecked(mSelectedIndex, true);
+        }
     }
 
-
-    private void disconnectToRefresh(String position) {
+    public void disconnectToRefresh(String position) {
         if (LocalVpnService.IsRunning) {
             showDissConnectDialog();
         } else {
@@ -253,7 +255,7 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
                         mSwipeRefreshLayout.setRefreshing(false);
                         mTransparentView.setVisibility(View.GONE);
                         parseServerList();
-                        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+                        String serverList = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
                         if (serverList != null && serverList.length() > 2) {
                             mHasServerJson = true;
                         } else {
@@ -381,6 +383,14 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mForgroundReceiver != null) {
+            LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mForgroundReceiver);
+        }
     }
 }
 

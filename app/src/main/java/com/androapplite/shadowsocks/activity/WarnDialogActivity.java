@@ -111,10 +111,10 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mWarnDialogBg.setImageResource(R.drawable.inactive_user_bg);
         }
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded()) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded() && !VIPActivity.isVIPUser(this)) {
             mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INTERSTITIAL_AD, 800);
             isFullAdShow = true;
-        } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show") && mAdAppHelper.isNativeLoaded()) {
+        } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show") && mAdAppHelper.isNativeLoaded() && !VIPActivity.isVIPUser(this)) {
             addBottomAd();
             Firebase.getInstance(this).logEvent("大弹窗", "广告", "native加载");
             isFullAdShow = false;
@@ -254,7 +254,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     case AdType.FACEBOOK_FBN_BANNER:
                     case AdType.ADMOB_NATIVE_AN:
                         if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show")) {
-                            if (!activity.isFullAdShow) {
+                            if (!activity.isFullAdShow && !VIPActivity.isVIPUser(WarnDialogActivity.this)) {
                                 activity.addBottomAd();
                                 Firebase.getInstance(activity).logEvent("大弹窗", "广告", "native加载");
                             }

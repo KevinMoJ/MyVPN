@@ -160,7 +160,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.splash_ad_ll);
         LinearLayout centerLogoLL = (LinearLayout) findViewById(R.id.center_logo_ll);
         LinearLayout bottomLogoLL = (LinearLayout) findViewById(R.id.bottom_logo_ll);
-        if (mAdAppHelper.isSplashReady()) {
+        if (mAdAppHelper.isSplashReady() && !VIPActivity.isVIPUser(this)) {
             View view = mAdAppHelper.getSplashAd();
             FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
@@ -191,7 +191,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
             } catch (Exception e) {
                 welcomeAdRate = 0;
             }
-            if (Math.random() < welcomeAdRate) {
+            if (Math.random() < welcomeAdRate && !VIPActivity.isVIPUser(this)) {
                 View view = adAppHelper.getSplashAd();
                 Firebase.getInstance(this).logEvent("闪屏广告", "准备好", "显示");
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);

@@ -79,8 +79,8 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="@dimen/common_1"
-            android:background="@color/normal_color"/>
+            android:layout_height="@dimen/common_5"
+            android:background="@drawable/server_list_top_line_bg"/>
     </LinearLayout>
 
     <android.support.v4.view.ViewPager

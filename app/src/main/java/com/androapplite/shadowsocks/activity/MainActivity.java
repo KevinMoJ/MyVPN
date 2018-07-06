@@ -60,6 +60,7 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.serverList.ServerListActivity;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.NetWorkSpeedUtils;
@@ -154,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad")) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad") && !VIPActivity.isVIPUser(this)) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
 //            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);
             AdAppHelper.getInstance(this).showFullAd();
@@ -910,7 +911,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 })
                 .setCancelable(false)
                 .show();
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad") && !VIPActivity.isVIPUser(this)) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
 //            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
             AdAppHelper.getInstance(this).showFullAd();
@@ -1020,7 +1021,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mErrorServers.clear();
                 boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
-                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false) && isFullConnectSuccessAdShow) {
+                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
+                        && isFullConnectSuccessAdShow && !VIPActivity.isVIPUser(this)) {
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
                 } else if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
@@ -1155,15 +1157,20 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void addBottomAd() {
         FrameLayout container = (FrameLayout) findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+        if (!VIPActivity.isVIPUser(this)) {
+            container.setVisibility(View.VISIBLE);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+            try {
+                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
 //            container.addView(adAppHelper.getNative(), params);
-            adAppHelper.getNative(container, params);
-            Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "首页底部");
-        } catch (Exception ex) {
-            ShadowsocksApplication.handleException(ex);
-            Firebase.getInstance(this).logEvent("NATIVE广告", "显示失败", "首页底部");
+                adAppHelper.getNative(container, params);
+                Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "首页底部");
+            } catch (Exception ex) {
+                ShadowsocksApplication.handleException(ex);
+                Firebase.getInstance(this).logEvent("NATIVE广告", "显示失败", "首页底部");
+            }
+        } else {
+            container.setVisibility(View.GONE);
         }
     }
 

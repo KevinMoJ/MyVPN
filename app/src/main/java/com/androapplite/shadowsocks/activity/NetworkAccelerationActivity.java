@@ -152,7 +152,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                             netAccAdMax = 0;
                         }
 //                        mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdMax + netAccAdMin));
-                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad"))
+                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !VIPActivity.isVIPUser(this))
                             mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
                     } else {
                         mInterstitialAdDelayShow = new InterstitialADDelayShow(this);
@@ -299,7 +299,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     netAccAdEndMax = 0;
                 }
 //                mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdEndMax + netAccAdEndMin));
-                if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad")) {
+                if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad") && !VIPActivity.isVIPUser(this)) {
                     mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
                 }
             } else {

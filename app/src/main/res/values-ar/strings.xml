@@ -123,5 +123,6 @@
     <string name="month">شهر</string>
     <string name="free_time_limit_experience">تجربة الحد من الوقت مجانا</string>
     <string name="faster_servers">أسرع الخوادم</string>
+    <string name="successful_disconnect">نجاح الانفصال</string>
 
 </resources>

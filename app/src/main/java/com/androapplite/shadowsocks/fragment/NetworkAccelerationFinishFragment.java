@@ -15,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
+import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.utils.Rotate3dAnimation;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -45,11 +46,13 @@ public class NetworkAccelerationFinishFragment extends Fragment implements Abstr
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        FrameLayout container = (FrameLayout)view.findViewById(R.id.ad_view_fl);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        Context context = view.getContext();
-        if (container != null) {
-            AdAppHelper.getInstance(context).getNative(container, params, this);
+        if (!VIPActivity.isVIPUser(getContext())) {
+            FrameLayout container = (FrameLayout) view.findViewById(R.id.ad_view_fl);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+            Context context = view.getContext();
+            if (container != null) {
+                AdAppHelper.getInstance(context).getNative(container, params, this);
+            }
         }
     }
 

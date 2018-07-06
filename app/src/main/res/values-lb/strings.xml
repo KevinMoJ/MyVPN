@@ -123,5 +123,6 @@
     <string name="month">Month</string>
     <string name="free_time_limit_experience">Free time limit experience</string>
     <string name="faster_servers">FASTER SERVERS</string>
+    <string name="successful_disconnect">Successful Disconnect</string>
 
 </resources>

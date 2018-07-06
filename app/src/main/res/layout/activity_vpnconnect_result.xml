@@ -9,6 +9,31 @@
     android:orientation="vertical"
     tools:context="com.androapplite.shadowsocks.activity.VPNConnectResultActivity">
 
+    <ImageView
+        android:id="@+id/activity_result_vip_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/common_20"
+        android:layout_marginTop="@dimen/common_20"
+        android:src="@drawable/vip_connect_success_icon"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/activity_result_vip_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:text="@string/successful_disconnect"
+        android:textColor="@color/primary_white_text"
+        android:textSize="@dimen/common_text_size_25sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/activity_result_connect_root"
         android:layout_width="match_parent"

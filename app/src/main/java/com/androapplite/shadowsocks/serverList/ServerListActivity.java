@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.activity;
+package com.androapplite.shadowsocks.serverList;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -8,15 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.androapplite.shadowsocks.serverList.FreeServerFragment;
-import com.androapplite.shadowsocks.serverList.VIPServerFragment;
+import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
 import com.androapplite.vpn3.R;
 import com.ironsource.sdk.utils.Logger;
 
@@ -33,14 +31,15 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
     private LinearLayout mServerListVipLinear;
     private FrameLayout mTabLineView;
 
+    private Fragment mFreeServerFragment;
+    private Fragment mVIPServerFragment;
+
     private List<Fragment> mFragmentList;
     private List<LinearLayout> mTabLinearViewList;
 
     private int screenWidth;
     private int screenHeight;
     private int mCurrentIndex;
-
-    private Fragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +52,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
         actionBar.setTitle(getResources().getString(R.string.app_name).toUpperCase());
+        actionBar.setElevation(0);
 
         initView();
         initData();
@@ -98,9 +98,12 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         tabLineParams.width = screenWidth / PAGE_COUNT;
         mTabLineView.setLayoutParams(tabLineParams);
 
+        mFreeServerFragment = new FreeServerFragment();
+        mVIPServerFragment = new VIPServerFragment();
+
         mFragmentList = new ArrayList<Fragment>();
-        mFragmentList.add(new FreeServerFragment());
-        mFragmentList.add(new VIPServerFragment());
+        mFragmentList.add(mFreeServerFragment);
+        mFragmentList.add(mVIPServerFragment);
     }
 
     private void selectPage(int position, int currentPosition) {
@@ -121,15 +124,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         }
 
         mContentViewPager.setCurrentItem(position);
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-        if (fragment instanceof FreeServerFragment)
-            mCurrentFragment = fragment;
-        else if (fragment instanceof VIPServerFragment)
-            mCurrentFragment = fragment;
     }
 
     private void refreshTextColor(int position) {
@@ -184,7 +178,11 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
             finish();
             return true;
         } else if (itemId == R.id.menu_repair) {
-//            disconnectToRefresh("菜单");
+            Fragment fragment = mFragmentList.get(mContentViewPager.getCurrentItem());
+            if (fragment instanceof FreeServerFragment)
+                ((FreeServerFragment) fragment).disconnectToRefresh("免费菜单");
+            else if (fragment instanceof VIPServerFragment)
+                ((VIPServerFragment) fragment).disconnectToRefresh("vip菜单");
         }
         return super.onOptionsItemSelected(item);
     }
@@ -205,7 +203,16 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
                 selectPage(1, mContentViewPager.getCurrentItem());
                 break;
         }
+    }
 
-        Log.i(TAG, "onClick: " + (mCurrentFragment instanceof FreeServerFragment) + "     " + (mCurrentFragment instanceof VIPServerFragment));
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mFreeServerFragment != null) {
+            mFreeServerFragment = null;
+        }
+        if (mVIPServerFragment != null) {
+            mVIPServerFragment = null;
+        }
     }
 }

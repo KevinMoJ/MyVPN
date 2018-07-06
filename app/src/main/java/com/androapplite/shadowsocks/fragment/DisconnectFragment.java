@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -67,7 +68,8 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         mAdLayout = (FrameLayout) v.findViewById(R.id.adContainer);
         mAdAppHelper = AdAppHelper.getInstance(getContext());
         mAdAppHelper.setAdStateListener(new InterstitialADLoaded());
-        fillAdContent();
+        if (!VIPActivity.isVIPUser(getContext()))
+            fillAdContent();
         return v;
     }
 

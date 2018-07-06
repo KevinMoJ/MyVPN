@@ -51,9 +51,10 @@ public class VPNConnectResultActivity extends AppCompatActivity {
     public static final int VPN_RESULT_CONNECT = 1;
     public static final int VPN_RESULT_DISCONNECT = 0;
 
-    private TextView mDisconnectHour, mDisconnectMinute, mDisconnectSecond;
+    private TextView mDisconnectHour, mDisconnectMinute, mDisconnectSecond, mVIPResultText;
     private LinearLayout mResultConnectRoot, mResultDisconnectRoot;
     private FrameLayout mResultAdRoot;
+    private ImageView mVIPResultImage;
 
     private SharedPreferences mSharedPreference;
     private AdAppHelper mAdAppHelper;
@@ -92,10 +93,13 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         mDisconnectHour = (TextView) findViewById(R.id.activity_disconnect_hour);
         mDisconnectMinute = (TextView) findViewById(R.id.activity_disconnect_minute);
         mDisconnectSecond = (TextView) findViewById(R.id.activity_disconnect_second);
+        mVIPResultText = (TextView) findViewById(R.id.activity_result_vip_text);
 
         mResultConnectRoot = (LinearLayout) findViewById(R.id.activity_result_connect_root);
         mResultDisconnectRoot = (LinearLayout) findViewById(R.id.activity_result_disconnect_root);
         mResultAdRoot = (FrameLayout) findViewById(R.id.activity_result_ad_root);
+
+        mVIPResultImage = (ImageView) findViewById(R.id.activity_result_vip_icon);
     }
 
     private void initUI() {
@@ -115,7 +119,20 @@ public class VPNConnectResultActivity extends AppCompatActivity {
             mActionBar.setTitle(R.string.connect_result_disconnect_title);
         else if (type == VPN_RESULT_CONNECT)
             mActionBar.setTitle("");
-        FillAdContent();
+
+        if (!VIPActivity.isVIPUser(this))
+            FillAdContent();
+        else {
+
+            if (type == VPN_RESULT_CONNECT) {
+                mVIPResultImage.setImageResource(R.drawable.vip_connect_success_icon);
+                mVIPResultText.setVisibility(View.GONE);
+            } else if (type == VPN_RESULT_DISCONNECT) {
+                mVIPResultImage.setImageResource(R.drawable.vip_disconnect_success_icon);
+                mVIPResultText.setVisibility(View.VISIBLE);
+            }
+            mVIPResultImage.setVisibility(View.VISIBLE);
+        }
     }
 
     private void FillAdContent() {
