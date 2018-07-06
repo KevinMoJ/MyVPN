@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -20,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,7 +40,8 @@ import java.lang.ref.WeakReference;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConnectFragment extends Fragment implements View.OnClickListener{
+public class ConnectFragment extends Fragment implements View.OnClickListener, Animation.AnimationListener {
+    public static final int MSG_REPEAT_VIP_ROCKET = 100;
     private OnConnectActionListener mListener;
     private TextView mMessageTextView;
 
@@ -45,10 +49,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
     private SharedPreferences mSharedPreference;
     private ImageView mLoadingView;
     private ImageView mConnectStatus;
+    private ImageView mVIPImage;
     private TextView mFreeUsedTimeTextView;
+//    private TextView mConnectStatusText;
     private boolean mIsAnimating;
     private MyReceiver mMyReceiver;
     private VpnState mVpnState;
+    private AnimationSet mVIPAnimation;
     private int[] mMessageTextStrings = {R.string.building_tls, R.string.waiting_server_reply, R.string.requesting_connecting_configure
             , R.string.verifying, R.string.taking_a_coffee_break, R.string.building_configuration};
 
@@ -67,13 +74,18 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
         mLoadingView = (ImageView)view.findViewById(R.id.loading);
         mConnectStatus = (ImageView)view.findViewById(R.id.connect_status);
-        mFreeUsedTimeTextView = (TextView)view.findViewById(R.id.free_used_time);
+        mVIPImage = (ImageView)view.findViewById(R.id.vip_start_image);
+//        mConnectStatusText = (TextView) view.findViewById(R.id.connect_status_text);
+        mFreeUsedTimeTextView = (TextView) view.findViewById(R.id.free_used_time);
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mConnectButton.setOnClickListener(this);
+        mVIPImage.setOnClickListener(this);
+
+        startVIPAnimation();
         updateFreeUsedTime();
         if (LocalVpnService.IsRunning) {
             mVpnState = VpnState.Connected;
@@ -86,6 +98,18 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         IntentFilter intentFilter = new IntentFilter(Action.ACTION_TIME_USE);
         mMyReceiver = new MyReceiver(this);
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mMyReceiver, intentFilter);
+    }
+
+    private void startVIPAnimation() {
+//        mVIPImage.setScaleX(0.7f);
+//        mVIPImage.setScaleY(0.7f);
+        mVIPImage.setImageResource(R.drawable.main_vip_pao);
+        mVIPAnimation = (AnimationSet) AnimationUtils.loadAnimation(getContext(), R.anim.rocket_anim);
+        mVIPAnimation.setAnimationListener(this);
+        mVIPAnimation.getAnimations().get(0).setRepeatCount(5);
+        mVIPAnimation.getAnimations().get(0).setRepeatMode(Animation.REVERSE);
+        mVIPAnimation.getAnimations().get(0).setFillAfter(true);
+        mVIPImage.startAnimation(mVIPAnimation);
     }
 
     @Override
@@ -101,12 +125,45 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
                 case R.id.connect_button:
                     mListener.onConnectButtonClick();
                     break;
+
+                case R.id.vip_start_image:
+                    mListener.onVIPImageClick();
+                    break;
             }
         }
     }
 
+    @Override
+    public void onAnimationStart(Animation animation) {
+
+    }
+
+    @Override
+    public void onAnimationEnd(Animation animation) {
+//        mVIPImage.setScaleX(0.7f);
+//        mVIPImage.setScaleY(0.7f);
+        mHandler.sendEmptyMessageDelayed(MSG_REPEAT_VIP_ROCKET, 5000);
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation) {
+
+    }
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REPEAT_VIP_ROCKET:
+                    mVIPImage.startAnimation(mVIPAnimation);
+                    break;
+            }
+        }
+    };
+
     public interface OnConnectActionListener{
         void onConnectButtonClick();
+        void onVIPImageClick();
     }
 
     @Override
@@ -216,6 +273,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener{
         mConnectStatus.setImageResource(R.drawable.connect_success_icon);
         mMessageTextView.setVisibility(View.GONE);
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
+        mLoadingView.setImageLevel(0);
     }
 
     private void stopFinish(){

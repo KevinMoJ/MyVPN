@@ -5,6 +5,12 @@
     <group android:checkableBehavior="single"
         android:id="@+id/menu_bottom">
         <item
+            android:id="@+id/nav_vip"
+            android:icon="@drawable/icon_nav_vip"
+            android:title="VIP"
+            android:checkable="false"/>
+
+        <item
             android:id="@+id/nav_share"
             android:icon="@drawable/icon_share"
             android:title="@string/tell_your_friends"

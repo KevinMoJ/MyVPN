@@ -130,6 +130,10 @@
             android:name="com.androapplite.shadowsocks.activity.VPNConnectResultActivity"
             android:launchMode="singleTop">
         </activity>
+    <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity"
+        android:launchMode="singleTop">
+
+    </activity>
     </application>
 
 </manifest>

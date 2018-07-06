@@ -319,6 +319,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
        startConnectVPN();
     }
 
+    @Override
+    public void onVIPImageClick() {
+        jumpToVip();
+    }
+
     private void startConnectVPN() {
         Firebase firebase = Firebase.getInstance(this);
         if (mVpnState == VpnState.Init || mVpnState == VpnState.Stopped ||
@@ -333,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             firebase.logEvent("连接VPN", "连接");
             mSharedPreference.edit().putInt("CLICK_CONNECT_BT_COUNT", mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0) + 1).apply();
             RealTimeLogger.answerLogEvent("click_connect_bt_count", "connect", "connect_count:" + mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0));
-            //不是小火箭加速的链接
+            //不是小火箭加速的连接
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
             if(mSharedPreference != null) {
                 String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
@@ -1081,11 +1086,17 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         } else if (id == R.id.nav_about) {
             about();
             firebase.logEvent("菜单", "关于");
+        } else if (id == R.id.nav_vip) {
+            jumpToVip();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void jumpToVip() {
+        startActivity(new Intent(this, VIPActivity.class));
     }
 
     private void rateUs(){

@@ -22,7 +22,6 @@
     <string name="vpn_nation_us">United States</string>
     <string name="vpn_nation_egypt">Egypt</string>
 
-
     <string name="not_start_vpn">VPN connection not start. Please try again.</string>
     <string name="server_list">Server Location</string>
     <string name="repair">REPAIR</string>
@@ -117,5 +116,12 @@
     <string name="main_bt_get_more">GET MORE</string>
     <string name="main_bt_toast_content">Please try again later</string>
 
+    <string name="tap_to_connect">Tap to connect</string>
+    <string name="no_ads_at_all">No ads at all</string>
+    <string name="fast_secure_and_stable_servers">Fast,secure and stable servers</string>
+    <string name="more_than_countries">More than %s countries</string>
+    <string name="month">Month</string>
+    <string name="free_time_limit_experience">Free time limit experience</string>
+    <string name="faster_servers">FASTER SERVERS</string>
 
 </resources>

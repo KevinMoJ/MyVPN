@@ -20,7 +20,7 @@
             tools:layout="@layout/fragment_connect"
             android:id="@+id/connect_fragment"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/twice_margin"
+            android:layout_marginTop="@dimen/common_15"
             />
         <FrameLayout
             android:layout_width="match_parent"

@@ -260,4 +260,15 @@
         <value>true</value>
     </entry>
 
+    <!--vip支付一个月的商品id-->
+    <entry>
+        <key>vip_pay_one_money_id</key>
+        <value>greenvpn10</value>
+    </entry>
+
+    <!--vip支付半年的商品id-->
+    <entry>
+        <key>vip_pay_half_year_id</key>
+        <value>greenvpn10</value>
+    </entry>
 </defaultsMap>

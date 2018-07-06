@@ -1,66 +1,46 @@
 package com.androapplite.shadowsocks.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.broadcast.Action;
-import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
-import com.androapplite.shadowsocks.model.ServerConfig;
-import com.androapplite.shadowsocks.model.VpnState;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.service.ServerListFetcherService;
-import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.serverList.FreeServerFragment;
+import com.androapplite.shadowsocks.serverList.VIPServerFragment;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.vm.shadowsocks.core.LocalVpnService;
+import com.ironsource.sdk.utils.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
-public class ServerListActivity extends BaseShadowsocksActivity implements
-        SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
-        DialogInterface.OnClickListener, AbsListView.OnScrollListener, View.OnClickListener {
+public class ServerListActivity extends BaseShadowsocksActivity implements View.OnClickListener {
+    private static final String TAG = "ServerListActivity";
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private SharedPreferences mPreferences;
-    private ArrayList<String> mNations;
-    private ArrayList<String> mFlags;
-    private HashMap<String, Integer> mSignalResIds;
-    private ListView mListView;
-    private View mTransparentView;
-    private String mNation;
-    private int mSelectedIndex;
-    private boolean mHasServerJson;
-    private AlertDialog mDisconnectDialog;
+    private static final int PAGE_COUNT = 2;
+
+    private ViewPager mContentViewPager;
+    private LinearLayout mServerListFreeLinear;
+    private LinearLayout mServerListVipLinear;
+    private FrameLayout mTabLineView;
+
+    private List<Fragment> mFragmentList;
+    private List<LinearLayout> mTabLinearViewList;
+
+    private int screenWidth;
+    private int screenHeight;
+    private int mCurrentIndex;
+
+    private Fragment mCurrentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,254 +52,141 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
         final Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back_black_24dp);
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
+        actionBar.setTitle(getResources().getString(R.string.app_name).toUpperCase());
 
+        initView();
+        initData();
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
-        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        FragmentPagerAdapter mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
 
-        mTransparentView = findViewById(R.id.transparent_view);
-        mTransparentView.setOnClickListener(this);
+            @Override
+            public int getCount() {
+                return 2;
+            }
 
-        mListView = (ListView)findViewById(R.id.vpn_server_list);
-        mListView.setAdapter(new ServerListAdapter());
-        mListView.setOnItemClickListener(this);
-        mListView.setOnScrollListener(this);
+            @Override
+            public Fragment getItem(int arg0) {
+                return mFragmentList.get(arg0);
+            }
+        };
 
-        initForegroundBroadcastIntentFilter();
-        initForegroundBroadcastReceiver();
-
-        parseServerList();
-
-        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
-        if(serverList != null && serverList.length() > 2){
-            mHasServerJson = true;
-        }else{
-            mHasServerJson = false;
-        }
-//        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
-        addBottomAd(AdAppHelper.getInstance(this));
-        Firebase.getInstance(this).logEvent("屏幕","服务器列表屏幕");
+        mContentViewPager.setAdapter(mAdapter);
+        mContentViewPager.setCurrentItem(0);
+        mContentViewPager.setOffscreenPageLimit(PAGE_COUNT - 1);
+        mContentViewPager.setOnPageChangeListener(mOnPageChangeListener);
     }
 
-    private void addBottomAd(AdAppHelper adAppHelper) {
-        FrameLayout container = (FrameLayout)findViewById(R.id.ad_view_container);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-//            container.addView(adAppHelper.getNative(), params);
-            adAppHelper.getNative(container, params);
-            Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "服务器列表底部");
+    private void initView() {
+        mServerListFreeLinear = (LinearLayout) findViewById(R.id.server_list_free_linear);
+        mServerListVipLinear = (LinearLayout) findViewById(R.id.server_list_vip_linear);
+        mTabLineView = (FrameLayout) findViewById(R.id.server_list_tab_line);
+        mContentViewPager = (ViewPager) findViewById(R.id.activity_server_view_pager);
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Firebase.getInstance(this).logEvent("NATIVE广告", "显示失败", "服务器列表底部");
-
-        }
-
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.bottom_up);
-        container.startAnimation(animation);
+        mServerListFreeLinear.setOnClickListener(this);
+        mServerListVipLinear.setOnClickListener(this);
     }
 
-    private void parseServerList() {
-        mNations = new ArrayList<>();
-        mFlags = new ArrayList<>();
-        mSignalResIds = new HashMap<>();
-        mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
+    private void initData() {
+        mTabLinearViewList = new ArrayList<>();
+        mTabLinearViewList.add(mServerListFreeLinear);
+        mTabLinearViewList.add(mServerListVipLinear);
 
-        String serverListJson = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
-        ArrayList<ServerConfig> serverConfigs = null;
-        if(serverListJson != null){
-            serverConfigs = ServerConfig.createServerList(this, serverListJson);
+        screenWidth = getResources().getDisplayMetrics().widthPixels;
+        screenHeight = getResources().getDisplayMetrics().heightPixels;
+
+        LinearLayout.LayoutParams tabLineParams = (LinearLayout.LayoutParams) mTabLineView.getLayoutParams();
+        tabLineParams.width = screenWidth / PAGE_COUNT;
+        mTabLineView.setLayoutParams(tabLineParams);
+
+        mFragmentList = new ArrayList<Fragment>();
+        mFragmentList.add(new FreeServerFragment());
+        mFragmentList.add(new VIPServerFragment());
+    }
+
+    private void selectPage(int position, int currentPosition) {
+        if (position == currentPosition)
+            return;
+
+        refreshTextColor(position);
+
+        int count = Math.abs(position - currentPosition) * 50;
+        int startMargin = screenWidth / PAGE_COUNT * currentPosition;
+        int endMargin = screenWidth / PAGE_COUNT * position;
+        Logger.e("tag", "selectPage " + startMargin + " " + endMargin);
+        float offset = (endMargin - startMargin) * 1f / count;
+        for (int i = 0; i <= count; i++) {
+            LinearLayout.LayoutParams tabLineParams = (LinearLayout.LayoutParams) mTabLineView.getLayoutParams();
+            tabLineParams.leftMargin = (int) (startMargin + offset * i);
+            mTabLineView.setLayoutParams(tabLineParams);
         }
 
-        if(serverConfigs != null && !serverConfigs.isEmpty()) {
-            // 返回的服务器列表已经排序好了 是根据负载从低到高的顺序排列的，
-            // 在这里遍历每一个服务器，然后添加到相应的国家，所以默认第一个就是负载最低的，
-            // 如果负载最低的还是很高就默认为这个国家的所有服务器都满了
-            for (ServerConfig serverConfig : serverConfigs) {
-                if (!mNations.contains(serverConfig.nation)) {
-                    mNations.add(serverConfig.nation);
-                    mFlags.add(serverConfig.flag);
-                    mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
-                    if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
-                        Firebase.getInstance(this).logEvent("加载服务器列表满载", serverConfig.nation);
-                }
+        mContentViewPager.setCurrentItem(position);
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        if (fragment instanceof FreeServerFragment)
+            mCurrentFragment = fragment;
+        else if (fragment instanceof VIPServerFragment)
+            mCurrentFragment = fragment;
+    }
+
+    private void refreshTextColor(int position) {
+//        for (int i = 0; i < mTabTextViewList.size(); i++) {
+//            if (position == i) {
+//                mTabTextViewList.get(i).setTextColor(getResources().getColor(R.color.app_mamage_tab_text_normal));
+//            } else {
+//                mTabTextViewList.get(i).setTextColor(getResources().getColor(R.color.app_mamage_tab_text_unselected));
+//            }
+//        }
+    }
+
+    private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageSelected(int position) {
+            refreshTextColor(position);
+            mCurrentIndex = position;
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            double tabWidth = screenWidth * 1.0 / PAGE_COUNT;
+            if (mCurrentIndex == position) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mTabLineView
+                        .getLayoutParams();
+                if (Build.VERSION.SDK_INT >= 17)
+                    lp.setMarginStart((int) (positionOffset * tabWidth + mCurrentIndex * tabWidth));
+                else
+                    lp.leftMargin = (int) (positionOffset * tabWidth + mCurrentIndex * tabWidth);
+                mTabLineView.setLayoutParams(lp);
+            } else if (mCurrentIndex - position == 1) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mTabLineView
+                        .getLayoutParams();
+                if (Build.VERSION.SDK_INT >= 17)
+                    lp.setMarginStart((int) ((positionOffset - 1) * tabWidth + mCurrentIndex * tabWidth));
+                else
+                    lp.leftMargin = (int) ((positionOffset - 1) * tabWidth + mCurrentIndex * tabWidth);
+                mTabLineView.setLayoutParams(lp);
             }
         }
 
-        mSelectedIndex = mNations.indexOf(mNation);
-        if(mSelectedIndex == -1) mSelectedIndex = 0;
-        mListView.setItemChecked(mSelectedIndex, true);
-    }
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int itemId = item.getItemId();
-        if(itemId == android.R.id.home){
+        if (itemId == android.R.id.home) {
             finish();
             return true;
-        }else if(itemId == R.id.menu_repair){
-            disconnectToRefresh("菜单");
+        } else if (itemId == R.id.menu_repair) {
+//            disconnectToRefresh("菜单");
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void disconnectToRefresh(String position) {
-        if (LocalVpnService.IsRunning) {
-            showDissConnectDialog();
-        } else {
-            mSwipeRefreshLayout.setRefreshing(true);
-            mTransparentView.setVisibility(View.VISIBLE);
-            ServerListFetcherService.fetchServerListAsync(this);
-        }
-        Firebase.getInstance(this).logEvent("刷新服务器列表", position);
-    }
-
-    @Override
-    public void onRefresh() {
-        disconnectToRefresh("下拉刷新");
-    }
-
-    private void initForegroundBroadcastIntentFilter(){
-        mForgroundReceiverIntentFilter = new IntentFilter();
-        mForgroundReceiverIntentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
-    }
-
-    private void disconnectVpnServiceAsync() {
-        if (LocalVpnService.IsRunning) {
-            VpnManageService.stopVpnByUser();
-            DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Stopped.ordinal()).apply();
-            ConnectVpnHelper.getInstance(this).clearErrorList();
-            ConnectVpnHelper.getInstance(this).release();
-        }
-    }
-
-    private void showDissConnectDialog() {
-        final Firebase firebase = Firebase.getInstance(this);
-
-        mDisconnectDialog = new AlertDialog.Builder(this)
-                .setMessage(R.string.server_list_disconnect_title)
-                .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        disconnectVpnServiceAsync();
-                        mSwipeRefreshLayout.setRefreshing(true);
-                        mTransparentView.setVisibility(View.VISIBLE);
-                        ServerListFetcherService.fetchServerListAsync(ServerListActivity.this);
-                        firebase.logEvent("服务器列表", "断开链接", "确定");
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        mTransparentView.setVisibility(View.GONE);
-                        firebase.logEvent("服务器列表", "断开链接", "取消");
-                    }
-                })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        mDisconnectDialog = null;
-                    }
-                })
-                .setCancelable(false)
-                .show();
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.transparent_view:
-                Toast.makeText(this, R.string.updating_please_try_it_later, Toast.LENGTH_SHORT).show();
-                break;
-        }
-    }
-
-    private void initForegroundBroadcastReceiver(){
-        mForgroundReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                switch(action){
-                    case Action.SERVER_LIST_FETCH_FINISH:
-                        mSwipeRefreshLayout.setRefreshing(false);
-                        mTransparentView.setVisibility(View.GONE);
-                        parseServerList();
-                        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
-                        if(serverList != null && serverList.length() > 2){
-                            mHasServerJson = true;
-                        }else{
-                            mHasServerJson = false;
-                        }
-                        ((BaseAdapter)mListView.getAdapter()).notifyDataSetChanged();
-                        break;
-                }
-            }
-        };
-    }
-
-    class ServerListAdapter extends BaseAdapter{
-        @Override
-        public int getCount() {
-            return mNations != null ? mNations.size() : 0;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-            ViewHolder holder;
-            final Context context = parent.getContext();
-            if(convertView != null){
-                view = convertView;
-                holder = (ViewHolder)view.getTag();
-            }else{
-                view = View.inflate(context, R.layout.item_popup_vpn_server, null);
-                holder = new ViewHolder();
-                holder.mFlagImageView = (ImageView)view.findViewById(R.id.vpn_icon);
-                holder.mNationTextView = (TextView)view.findViewById(R.id.vpn_name);
-                holder.mItemView = view.findViewById(R.id.vpn_server_list_item);
-                holder.mSignalImageView =(ImageView)view.findViewById(R.id.signal);
-                view.setTag(holder);
-            }
-            String flag = mFlags.get(position);
-            int resid = context.getResources().getIdentifier(flag, "drawable", getPackageName());
-            holder.mFlagImageView.setImageResource(resid);
-            String nation = mNations.get(position);
-            holder.mNationTextView.setText(nation);
-//            if(nation.equals(mNation)) {
-//                holder.mItemView.setSelected(true);
-//                mSelectedIndex = position;
-//            }else{
-//                holder.mItemView.setSelected(false);
-//            }
-            if(mHasServerJson) {
-                holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
-                holder.mSignalImageView.setVisibility(View.VISIBLE);
-            }else{
-                holder.mSignalImageView.setVisibility(View.INVISIBLE);
-            }
-            return view;
-        }
-
-        class ViewHolder{
-            ImageView mFlagImageView;
-            TextView mNationTextView;
-            View mItemView;
-            ImageView mSignalImageView;
-        }
     }
 
     @Override
@@ -329,51 +196,16 @@ public class ServerListActivity extends BaseShadowsocksActivity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        mListView.setItemChecked(mSelectedIndex, false);
-        mSelectedIndex = position;
-        String nation = mNations.get(position);
-        String flag = mFlags.get(position);
-        int resid = mSignalResIds.get(mNations.get(position));
-        if (resid == R.drawable.server_signal_full) {
-            Toast.makeText(this, R.string.server_list_full_toast, Toast.LENGTH_SHORT).show();
-            Firebase.getInstance(this).logEvent("点击满载服务器", nation);
-        } else {
-            mListView.setItemChecked(position, true);
-            mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
-                    .putString(SharedPreferenceKey.VPN_FLAG, flag)
-                    .apply();
-            setResult(RESULT_OK);
-            ConnectVpnHelper.getInstance(this).release();
-            mPreferences.edit().putInt("CLICK_SERVER_LIST_COUNT", mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0) + 1).apply();
-            RealTimeLogger.answerLogEvent("server_list_click_connect_count", "click", "click_count:" + mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0));
-            //不是小火箭加速的链接
-            mPreferences.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
-            finish();
-            Firebase.getInstance(this).logEvent("选择国家", nation);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.server_list_free_linear:
+                selectPage(0, mContentViewPager.getCurrentItem());
+                break;
+            case R.id.server_list_vip_linear:
+                selectPage(1, mContentViewPager.getCurrentItem());
+                break;
         }
-    }
 
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-        if(which == DialogInterface.BUTTON_POSITIVE){
-            mSwipeRefreshLayout.setRefreshing(true);
-            Firebase.getInstance(this).logEvent("刷新服务器列表", "断开");
-        }else if(which == DialogInterface.BUTTON_NEGATIVE){
-            mSwipeRefreshLayout.setRefreshing(false);
-            Firebase.getInstance(this).logEvent("刷新服务器列表", "取消");
-
-        }
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        mSwipeRefreshLayout.setEnabled(scrollState == SCROLL_STATE_IDLE && view.getFirstVisiblePosition() == 0);
-    }
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
+        Log.i(TAG, "onClick: " + (mCurrentFragment instanceof FreeServerFragment) + "     " + (mCurrentFragment instanceof VIPServerFragment));
     }
 }

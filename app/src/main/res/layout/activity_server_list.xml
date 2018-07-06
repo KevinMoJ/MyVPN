@@ -1,40 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swipe_refresh"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    tools:context="com.androapplite.shadowsocks.activity.ServerListActivity">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/main_bg"
+              android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary_white_text"
         android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/vpn_server_list"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/ad_view_container"
-            android:layout_marginBottom="@dimen/common_5"
-            android:divider="@null"/>
+            android:layout_height="@dimen/common_41"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/server_list_free_linear"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|bottom"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/common_5">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal|bottom"
+                    android:text="FREE"
+                    android:textColor="@color/normal_color"
+                    android:textSize="@dimen/common_text_size_15sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/server_list_vip_linear"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|bottom"
+                android:orientation="horizontal"
+                android:paddingBottom="@dimen/common_5">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal|bottom"
+                    android:text="@string/faster_servers"
+                    android:textColor="@color/normal_color"
+                    android:textSize="@dimen/common_text_size_15sp"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/common_5"
+                    android:layout_marginStart="@dimen/common_5"
+                    android:gravity="center_horizontal|bottom"
+                    android:src="@drawable/icon_server_king"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
         <FrameLayout
-            android:id="@+id/ad_view_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/standard_margin"/>
+            android:id="@+id/server_list_tab_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="@dimen/common_100"
+                android:layout_height="@dimen/common_3"
+                android:layout_gravity="center"
+                android:layout_marginTop="1dp"
+                android:background="@color/normal_color"/>
+        </FrameLayout>
 
         <View
-            android:id="@+id/transparent_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent"
-            android:visibility="gone"/>
-    </RelativeLayout>
+            android:layout_height="@dimen/common_1"
+            android:background="@color/normal_color"/>
+    </LinearLayout>
 
-</android.support.v4.widget.SwipeRefreshLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/activity_server_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </android.support.v4.view.ViewPager>
+
+</LinearLayout>
