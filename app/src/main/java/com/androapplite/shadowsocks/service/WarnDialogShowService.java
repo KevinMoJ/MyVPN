@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.service;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -56,6 +58,12 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         mHandler = new Handler(this);
         registerWarnDialogReceiver();
 
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        startForeground(1001, new Notification());
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void registerWarnDialogReceiver() {
@@ -189,7 +197,11 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     }
 
     public static void start(Context context) {
-        context.startService(new Intent(context, WarnDialogShowService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(new Intent(context, WarnDialogShowService.class));
+        } else {
+            context.startService(new Intent(context, WarnDialogShowService.class));
+        }
     }
 
     @Override

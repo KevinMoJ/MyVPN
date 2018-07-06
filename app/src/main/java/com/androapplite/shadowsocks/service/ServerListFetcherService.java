@@ -2,10 +2,13 @@ package com.androapplite.shadowsocks.service;
 
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -256,6 +259,12 @@ public class ServerListFetcherService extends IntentService{
 
     }
 
+    @Override
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+        startForeground(1001,new Notification());
+        return super.onStartCommand(intent, flags, startId);
+    }
+
     private void useCustomURL(){
         AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
         String url = adAppHelper.getCustomCtrlValue("serverListDomain", DOMAIN_URL);
@@ -316,9 +325,12 @@ public class ServerListFetcherService extends IntentService{
         }
     }
 
-    public static void fetchServerListAsync(Context context){
-        Intent intent = new Intent(context, ServerListFetcherService.class);
-        context.startService(intent);
+    public static void fetchServerListAsync(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(new Intent(context, ServerListFetcherService.class));
+        } else {
+            context.startService(new Intent(context, ServerListFetcherService.class));
+        }
     }
 
     private void broadcastServerListFetchFinish(){

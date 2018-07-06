@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.service;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -283,7 +285,11 @@ public class VpnManageService extends Service implements Runnable,
     }
 
     public static void start(Context context) {
-        context.startService(new Intent(context, VpnManageService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(new Intent(context, VpnManageService.class));
+        } else {
+            context.startService(new Intent(context, VpnManageService.class));
+        }
     }
 
     @Override
@@ -391,6 +397,7 @@ public class VpnManageService extends Service implements Runnable,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        startForeground(1001,new Notification());
         fetchRemoteConfig();
         return super.onStartCommand(intent, flags, startId);
     }
