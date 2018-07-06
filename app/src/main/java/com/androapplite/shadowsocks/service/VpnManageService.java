@@ -1,6 +1,5 @@
 package com.androapplite.shadowsocks.service;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -12,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -35,6 +33,7 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.bestgo.adsplugin.utils.ServiceUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -285,11 +284,7 @@ public class VpnManageService extends Service implements Runnable,
     }
 
     public static void start(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(new Intent(context, VpnManageService.class));
-        } else {
-            context.startService(new Intent(context, VpnManageService.class));
-        }
+        ServiceUtils.startService(context, new Intent(context, VpnManageService.class));
     }
 
     @Override
@@ -397,7 +392,7 @@ public class VpnManageService extends Service implements Runnable,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(1001,new Notification());
+        ServiceUtils.startForgound(this);
         fetchRemoteConfig();
         return super.onStartCommand(intent, flags, startId);
     }

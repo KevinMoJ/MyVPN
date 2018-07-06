@@ -1,6 +1,5 @@
 package com.androapplite.shadowsocks.service;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +9,6 @@ import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -26,6 +24,7 @@ import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
 import com.bestgo.adsplugin.ads.listener.AdStateListener;
+import com.bestgo.adsplugin.utils.ServiceUtils;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
@@ -62,7 +61,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(1001, new Notification());
+        ServiceUtils.startForgound(this);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -197,11 +196,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     }
 
     public static void start(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(new Intent(context, WarnDialogShowService.class));
-        } else {
-            context.startService(new Intent(context, WarnDialogShowService.class));
-        }
+        ServiceUtils.startService(context, new Intent(context, WarnDialogShowService.class));
     }
 
     @Override

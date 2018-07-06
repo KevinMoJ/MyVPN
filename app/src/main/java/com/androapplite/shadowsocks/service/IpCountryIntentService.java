@@ -1,17 +1,16 @@
 package com.androapplite.shadowsocks.service;
 
 import android.app.IntentService;
-import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.bestgo.adsplugin.utils.ServiceUtils;
 
 import org.json.JSONObject;
 
@@ -85,7 +84,7 @@ public class IpCountryIntentService extends IntentService {
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        startForeground(1001, new Notification());
+        ServiceUtils.startForgound(this);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -174,11 +173,7 @@ public class IpCountryIntentService extends IntentService {
     }
 
     public static void startService(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(new Intent(context, IpCountryIntentService.class));
-        } else {
-            context.startService(new Intent(context, IpCountryIntentService.class));
-        }
+        ServiceUtils.startService(context, new Intent(context, IpCountryIntentService.class));
     }
 
     private String getCountryByTelephonyManager() {
