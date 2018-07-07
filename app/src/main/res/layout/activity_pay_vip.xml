@@ -184,7 +184,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/common_20"
             android:layout_marginRight="@dimen/common_20"
-            android:text="$ 6.95 / Month"
+            android:text="$ 5.95 / Month"
             android:textColor="@color/notification_bg_disconnect"
             android:textSize="@dimen/common_text_size_14sp"/>
 
