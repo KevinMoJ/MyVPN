@@ -87,6 +87,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
     private IabHelper mIabHelper;
     private IabBroadcastReceiver mBroadcastReceiver;
+    /*标记hhelper 是否启动*/
+    private boolean isStartHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +143,10 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
             public void onIabSetupFinished(IabResult result) {
                 if (!result.isSuccess()) {
                     //helper设置失败是没法支付的，此处可以弹出提示框
+                    isStartHelper = false;
                     return;
+                } else {
+                    isStartHelper = true;
                 }
 
                 if (mIabHelper == null) return;
@@ -615,15 +620,15 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
         if (mRpClose != null)
             mRpClose.cancelAnimator();
-        if (mBroadcastReceiver != null)
-            unregisterReceiver(mBroadcastReceiver);
-        if (mIabHelper != null) {
-            try {
-                mIabHelper.dispose();
-            } catch (IabHelper.IabAsyncInProgressException e) {
+
+        if (isStartHelper) {
+            if (mBroadcastReceiver != null)
+                unregisterReceiver(mBroadcastReceiver);
+            if (mIabHelper != null) {
+                mIabHelper.disposeWhenFinished();
+                mIabHelper = null;
             }
         }
-        mIabHelper = null;
     }
 
     @Override

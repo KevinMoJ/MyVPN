@@ -55,6 +55,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private TextView mServerMessageText;
     private Button mVipFreeBt;
     private ActionBar mActionBar;
+        /*标记hhelper 是否启动*/
+    private boolean isStartHelper;
 
     List<String> skuList = new ArrayList<>();
 
@@ -103,7 +105,10 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 
                 if (!result.isSuccess()) {
                     //helper设置失败是没法支付的，此处可以弹出提示框
+                    isStartHelper = false;
                     return;
+                } else {
+                    isStartHelper = true;
                 }
 
                 if (mHelper == null) return;
@@ -191,17 +196,15 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mHelper != null) {
-            try {
-                mHelper.dispose();
-            } catch (IabAsyncInProgressException e) {
-                e.printStackTrace();
+        if (isStartHelper) {
+            if (mBroadcastReceiver != null) {
+                unregisterReceiver(mBroadcastReceiver);
             }
-        }
-        mHelper = null;
 
-        if (mBroadcastReceiver != null) {
-            unregisterReceiver(mBroadcastReceiver);
+            if (mHelper != null) {
+                mHelper.disposeWhenFinished();
+                mHelper = null;
+            }
         }
 
         if (LocalVpnService.Instance != null) {
