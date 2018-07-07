@@ -71,6 +71,7 @@ public class LocalVpnService extends VpnService implements Runnable {
     private VpnNotification mNotification;
     private volatile UdpProxyServer mUdpProxyServer;
     public long gDelay;
+    public boolean isPayLoadInterface; // 是否是支付界面
 
     public LocalVpnService() {
         ID++;
@@ -428,28 +429,29 @@ public class LocalVpnService extends VpnService implements Runnable {
 
                         session.LastNanoTime = System.nanoTime();
                         session.PacketSent++;//注意顺序
-
-                        switch (session.IsSelfPort) {
-                            case 0:
-                                //vpn自己不走代理,把fake IP改为real IP    "www.gstatic.com" "www.facebook.com" --- 让这两个测试的网址也走自己的vpn
-                                if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort) &&
-                                        !"m.youtube.com".equals(session.RemoteHost) &&
-                                        !"m.facebook.com".equals(session.RemoteHost) &&
-                                        !"www.bing.com".equals(session.RemoteHost)) {
+                        if (!isPayLoadInterface) {
+                            switch (session.IsSelfPort) {
+                                case 0:
+                                    //vpn自己不走代理,把fake IP改为real IP    "www.gstatic.com" "www.facebook.com" --- 让这两个测试的网址也走自己的vpn
+                                    if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort) &&
+                                            !"m.youtube.com".equals(session.RemoteHost) &&
+                                            !"m.facebook.com".equals(session.RemoteHost) &&
+                                            !"www.bing.com".equals(session.RemoteHost)) {
 
 //                                    if (ProxyConfig.isFakeIP(destinationIP) && isSelfTcpPort(sourcePort)) {
-                                    session.RemoteRealIP = m_DnsProxy.translateToRealIp(destinationIP);
-                                    if (ProxyConfig.IS_DEBUG) {
-                                        System.out.printf("onIPPacketReceived 1 vpn自己 real ip %s, fake id %s\n",
-                                                CommonMethods.ipIntToString(session.RemoteRealIP), CommonMethods.ipIntToString(session.RemoteIP));
+                                        session.RemoteRealIP = m_DnsProxy.translateToRealIp(destinationIP);
+                                        if (ProxyConfig.IS_DEBUG) {
+                                            System.out.printf("onIPPacketReceived 1 vpn自己 real ip %s, fake id %s\n",
+                                                    CommonMethods.ipIntToString(session.RemoteRealIP), CommonMethods.ipIntToString(session.RemoteIP));
+                                        }
+                                        session.IsSelfPort = 1;
+                                    } else {
+                                        session.IsSelfPort = -1;
                                     }
-                                    session.IsSelfPort = 1;
-                                } else {
-                                    session.IsSelfPort = -1;
-                                }
-                            case 1:
-                                destinationIP = session.RemoteRealIP;
-                                break;
+                                case 1:
+                                    destinationIP = session.RemoteRealIP;
+                                    break;
+                            }
                         }
 
                         int tcpDataSize = ipHeader.getDataLength() - tcpHeader.getHeaderLength();

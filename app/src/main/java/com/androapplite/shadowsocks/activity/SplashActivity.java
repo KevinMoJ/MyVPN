@@ -134,7 +134,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         skuList.add(VIPActivity.PAY_ONE_MONTH);
         skuList.add(VIPActivity.PAY_HALF_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
 
-        mIabHelper = new IabHelper(this, VIPActivity.PUBLICK_KEY.trim());
+        mIabHelper = new IabHelper(this, VIPActivity.PUBLIC_KEY.trim());
         mIabHelper.enableDebugLogging(true);
 
         mIabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {

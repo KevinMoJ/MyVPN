@@ -124,5 +124,6 @@
     <string name="free_time_limit_experience">Free time limit experience</string>
     <string name="faster_servers">FASTER SERVERS</string>
     <string name="successful_disconnect">Successful Disconnect</string>
+    <string name="you_have_become_a_vip">You have become a VIP</string>
 
 </resources>

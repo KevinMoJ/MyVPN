@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         initDrawer(toolbar);
         initNavigationView();
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        notProvideServiceInChina();
+//        notProvideServiceInChina();
         mReceiver = new MyReceiver(this);
         mIntentFilter = new IntentFilter(Action.SERVER_LIST_FETCH_FINISH);
         mForegroundHandler = new Handler(this);
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onVIPImageClick() {
-        jumpToVip();
+        jumpToVip(VIPActivity.TYPE_MAIN_PAO);
     }
 
     private void startConnectVPN() {
@@ -1093,7 +1093,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             firebase.logEvent("菜单", "关于");
         } else if (id == R.id.nav_vip) {
             if (!isVIP)
-                jumpToVip();
+                jumpToVip(VIPActivity.TYPE_NAV);
+            else
+                Toast.makeText(this, getResources().getString(R.string.you_have_become_a_vip), Toast.LENGTH_SHORT).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1101,8 +1103,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         return true;
     }
 
-    private void jumpToVip() {
-        startActivity(new Intent(this, VIPActivity.class));
+    private void jumpToVip(int type) {
+        VIPActivity.startVIPActivity(this, type);
     }
 
     private void rateUs(){

@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -27,17 +28,23 @@ import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.vpn3.R;
+import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VIPActivity extends AppCompatActivity implements IabBroadcastListener, View.OnClickListener {
     private static final String TAG = "VIPActivity";
-    public static final String PUBLICK_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhHtkULOFh9/C7v27NwL4/RSke/jvbzM8w42+Rul4s59fVPz3QYRop7VA5m6ds37nHAOHgZs4Uc+CbXo4hgoQwZKFc+yIMyImKA3KPhWWh/yUQQuCdYWM3G1QfS5KdZfWULFXKyEZo6HfRbT8+Nu0tNaPbTqVzaDGsPeUMv+8G72cY8BnsJUv6PwyM/lGtHDQMjy8+dawVghj23OxmRZCTkAG9oM9ksOKN9vw5ToZ1wQOyhe78iePzOnLGIpjgV4G68C4wnoFyESf06dAsJSN//gAajZZv1SJVA8yB7o+RtIAEluZFr11XRqProziWE7buwjErWpQoAvZw27HxXNgCwIDAQAB";
+    public static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhHtkULOFh9/C7v27NwL4/RSke/jvbzM8w42+Rul4s59fVPz3QYRop7VA5m6ds37nHAOHgZs4Uc+CbXo4hgoQwZKFc+yIMyImKA3KPhWWh/yUQQuCdYWM3G1QfS5KdZfWULFXKyEZo6HfRbT8+Nu0tNaPbTqVzaDGsPeUMv+8G72cY8BnsJUv6PwyM/lGtHDQMjy8+dawVghj23OxmRZCTkAG9oM9ksOKN9vw5ToZ1wQOyhe78iePzOnLGIpjgV4G68C4wnoFyESf06dAsJSN//gAajZZv1SJVA8yB7o+RtIAEluZFr11XRqProziWE7buwjErWpQoAvZw27HxXNgCwIDAQAB";
+
+    public static final String TYPE = "TYPE";
+    public static final int TYPE_SERVER_LIST = 101;
+    public static final int TYPE_MAIN_PAO = 102;
+    public static final int TYPE_NAV = 103;
 
     private static final int RC_REQUEST = 10001;
-    public static String PAY_ONE_MONTH = "greenvpn10";
-    public static String PAY_HALF_YEAR = "test";
+    public static String PAY_ONE_MONTH = "one_2";
+    public static String PAY_HALF_YEAR = "half_1";
 
     private IabBroadcastReceiver mBroadcastReceiver;
     private IabHelper mHelper;
@@ -67,13 +74,27 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         initView();
         initUI();
         initGooglePayHelper();
+        analysisSource();
+        if (LocalVpnService.Instance != null) {
+            LocalVpnService.Instance.isPayLoadInterface = true;
+        }
+    }
+
+    private void analysisSource() {
+        int type = getIntent().getIntExtra(TYPE, TYPE_MAIN_PAO);
+        if (type == TYPE_SERVER_LIST)
+            Firebase.getInstance(this).logEvent("进入vip界面来源","服务器列表点击");
+        else if (type == TYPE_MAIN_PAO)
+            Firebase.getInstance(this).logEvent("进入vip界面来源","主界面小泡泡");
+        else if (type == TYPE_NAV)
+            Firebase.getInstance(this).logEvent("进入vip界面来源","侧边栏");
     }
 
     private void initGooglePayHelper() {
         skuList.add(PAY_ONE_MONTH);
         skuList.add(PAY_HALF_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
 
-        mHelper = new IabHelper(this, PUBLICK_KEY.trim());
+        mHelper = new IabHelper(this, PUBLIC_KEY.trim());
         mHelper.enableDebugLogging(true);
 
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
@@ -119,6 +140,13 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 
     private void initUI() {
         mServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
+    }
+
+    public static void startVIPActivity(Context context, int type) {
+        Intent intent = new Intent(context, VIPActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(TYPE, type);
+        context.startActivity(intent);
     }
 
     @Override
@@ -174,6 +202,10 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 
         if (mBroadcastReceiver != null) {
             unregisterReceiver(mBroadcastReceiver);
+        }
+
+        if (LocalVpnService.Instance != null) {
+            LocalVpnService.Instance.isPayLoadInterface = false;
         }
     }
 
@@ -261,6 +293,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                         finish();
+                        Toast.makeText(VIPActivity.this, getResources().getString(R.string.you_have_become_a_vip), Toast.LENGTH_SHORT).show();
                     }
                 }
             }, "dddd");
@@ -301,6 +334,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                         finish();
+                        Toast.makeText(VIPActivity.this, getResources().getString(R.string.you_have_become_a_vip), Toast.LENGTH_SHORT).show();
                     }
                 }
             }, "ffff");

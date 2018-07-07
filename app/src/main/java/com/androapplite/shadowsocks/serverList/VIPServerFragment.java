@@ -360,7 +360,7 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     private void jumpToVip() {
-        startActivity(new Intent(getContext(), VIPActivity.class));
+        VIPActivity.startVIPActivity(getContext(), VIPActivity.TYPE_SERVER_LIST);
     }
 
     @Override

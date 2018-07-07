@@ -124,5 +124,6 @@
     <string name="free_time_limit_experience">تجربة الحد من الوقت مجانا</string>
     <string name="faster_servers">أسرع الخوادم</string>
     <string name="successful_disconnect">نجاح الانفصال</string>
+    <string name="you_have_become_a_vip">لقد أصبحت VIP</string>
 
 </resources>
