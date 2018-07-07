@@ -158,7 +158,8 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
                 // 不是VIP的界面就让他展示美国和德国的两个国家服务器
                 for (ServerConfig serverConfig : serverConfigs) {
                     if (serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_us))
-                            || serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_de))) {
+                            || serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_de))
+                            || serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_opt))) {
 
                         if (!mNations.contains(serverConfig.nation)) {
                             mNations.add(serverConfig.nation);

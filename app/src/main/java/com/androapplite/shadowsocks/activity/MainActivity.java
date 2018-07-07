@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private int mAdMsgType;
     private FullAdStatusListener mFullAdStatusListener;
     private NetWorkSpeedUtils netWorkSpeedUtils;
+    private boolean isVIP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,10 +153,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mVpnState = VpnState.Stopped;
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
         }
+        isVIP = mSharedPreference.getBoolean(SharedPreferenceKey.VIP, false);
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad") && !VIPActivity.isVIPUser(this)) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad") && !isVIP) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
 //            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);
             AdAppHelper.getInstance(this).showFullAd();
@@ -415,14 +417,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private void updateFlagMenuIcon() {
-        if(mMenu != null) {
-            final String globalFlag = getResources().getResourceEntryName(R.drawable.ic_flag_global);
+        if (mMenu != null) {
+            final String globalFlag = getResources().getResourceEntryName(isVIP ? R.drawable.icon_vip_server : R.drawable.ic_flag_global);
             final String flagKey = mVpnState == VpnState.Connected ? SharedPreferenceKey.CONNECTING_VPN_FLAG : SharedPreferenceKey.VPN_FLAG;
             final String flag = mSharedPreference.getString(flagKey, globalFlag);
             int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
             MenuItem item = mMenu.findItem(R.id.action_flag);
             if (item != null) {
-                item.setIcon(resId);
+                item.setIcon(isVIP ? R.drawable.icon_vip_server : resId);
             }
         }
     }
@@ -598,6 +600,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         checkConnection(isConnectionAvailable());
         registerReceiver();
 //        AdAppHelper.getInstance(this).onResume();
+        isVIP = mSharedPreference.getBoolean(SharedPreferenceKey.VIP, false);
         updateFlagMenuIcon();
         try {
             VpnService.prepare(this);
@@ -911,7 +914,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 })
                 .setCancelable(false)
                 .show();
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad") && !VIPActivity.isVIPUser(this)) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad") && !isVIP) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
 //            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
             AdAppHelper.getInstance(this).showFullAd();
@@ -1022,7 +1025,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 mErrorServers.clear();
                 boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
                 if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
-                        && isFullConnectSuccessAdShow && !VIPActivity.isVIPUser(this)) {
+                        && isFullConnectSuccessAdShow && !isVIP) {
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
                 } else if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
@@ -1089,7 +1092,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             about();
             firebase.logEvent("菜单", "关于");
         } else if (id == R.id.nav_vip) {
-            jumpToVip();
+            if (!isVIP)
+                jumpToVip();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1157,7 +1161,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void addBottomAd() {
         FrameLayout container = (FrameLayout) findViewById(R.id.ad_view_container);
-        if (!VIPActivity.isVIPUser(this)) {
+        if (!isVIP) {
             container.setVisibility(View.VISIBLE);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
             try {

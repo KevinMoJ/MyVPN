@@ -7,6 +7,8 @@ import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.R;
@@ -47,7 +49,7 @@ public class ServerConfig implements Parcelable {
     private static ServerConfig addGlobalConfig(Resources resources) {
         String city = resources.getString(R.string.vpn_name_opt);
         String ip = resources.getString(R.string.vpn_server_opt);
-        String icon = resources.getResourceEntryName(R.drawable.ic_flag_global);
+        String icon = resources.getResourceEntryName(VIPActivity.isVIPUser(ShadowsocksApplication.getGlobalContext()) ? R.drawable.icon_vip_server : R.drawable.ic_flag_global);
         String country = resources.getString(R.string.vpn_nation_opt);
         return new ServerConfig(city, country, ip, SINAL_IMAGES.length - 1, icon);
     }
@@ -109,7 +111,7 @@ public class ServerConfig implements Parcelable {
                     int index = nameList.indexOf(city);
                     if (index > -1) {
                         String country = nations.getString(index);
-                        String icon = resources.getResourceEntryName(icons.getResourceId(index, R.drawable.ic_flag_global));
+                        String icon = resources.getResourceEntryName(icons.getResourceId(index, VIPActivity.isVIPUser(ShadowsocksApplication.getGlobalContext()) ? R.drawable.icon_vip_server : R.drawable.ic_flag_global));
                         for (int j = 0; j < ptJsonArray.length(); j++) {
                             ServerConfig ServerConfig = new ServerConfig(city, country, ip, ld, Integer.parseInt(ptJsonArray.getString(j)), icon);
                             arrayList.add(ServerConfig);

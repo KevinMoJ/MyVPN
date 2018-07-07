@@ -231,7 +231,7 @@ public class ConnectVpnHelper {
                     nation = defaultNation;
                     mSharedPreference.edit()
                             .putString(SharedPreferenceKey.VPN_NATION, nation)
-                            .putString(SharedPreferenceKey.VPN_FLAG, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_global))
+                            .putString(SharedPreferenceKey.VPN_FLAG, mContext.getResources().getResourceEntryName(isVIPUser ? R.drawable.icon_vip_server : R.drawable.ic_flag_global))
                             .apply();
                 }
             }
@@ -244,7 +244,7 @@ public class ConnectVpnHelper {
                     nation = defaultNation;
                     mSharedPreference.edit()
                             .putString(SharedPreferenceKey.VPN_NATION, nation)
-                            .putString(SharedPreferenceKey.VPN_FLAG, mContext.getResources().getResourceEntryName(R.drawable.ic_flag_global))
+                            .putString(SharedPreferenceKey.VPN_FLAG, mContext.getResources().getResourceEntryName(isVIPUser ? R.drawable.icon_vip_server : R.drawable.ic_flag_global))
                             .apply();
                 }
             }

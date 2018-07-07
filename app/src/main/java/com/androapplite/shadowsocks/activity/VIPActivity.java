@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
@@ -26,18 +27,17 @@ import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.vpn3.R;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VIPActivity extends AppCompatActivity implements IabBroadcastListener, View.OnClickListener {
     private static final String TAG = "VIPActivity";
-    private static final String PUBLICK_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhHtkULOFh9/C7v27NwL4/RSke/jvbzM8w42+Rul4s59fVPz3QYRop7VA5m6ds37nHAOHgZs4Uc+CbXo4hgoQwZKFc+yIMyImKA3KPhWWh/yUQQuCdYWM3G1QfS5KdZfWULFXKyEZo6HfRbT8+Nu0tNaPbTqVzaDGsPeUMv+8G72cY8BnsJUv6PwyM/lGtHDQMjy8+dawVghj23OxmRZCTkAG9oM9ksOKN9vw5ToZ1wQOyhe78iePzOnLGIpjgV4G68C4wnoFyESf06dAsJSN//gAajZZv1SJVA8yB7o+RtIAEluZFr11XRqProziWE7buwjErWpQoAvZw27HxXNgCwIDAQAB";
+    public static final String PUBLICK_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhHtkULOFh9/C7v27NwL4/RSke/jvbzM8w42+Rul4s59fVPz3QYRop7VA5m6ds37nHAOHgZs4Uc+CbXo4hgoQwZKFc+yIMyImKA3KPhWWh/yUQQuCdYWM3G1QfS5KdZfWULFXKyEZo6HfRbT8+Nu0tNaPbTqVzaDGsPeUMv+8G72cY8BnsJUv6PwyM/lGtHDQMjy8+dawVghj23OxmRZCTkAG9oM9ksOKN9vw5ToZ1wQOyhe78iePzOnLGIpjgV4G68C4wnoFyESf06dAsJSN//gAajZZv1SJVA8yB7o+RtIAEluZFr11XRqProziWE7buwjErWpQoAvZw27HxXNgCwIDAQAB";
 
     private static final int RC_REQUEST = 10001;
-    private static String PAY_ONE_MONTH = "greenvpn10";
-    private static String PAY_HALF_YEAR = "greenvpn10";
+    public static String PAY_ONE_MONTH = "greenvpn10";
+    public static String PAY_HALF_YEAR = "test";
 
     private IabBroadcastReceiver mBroadcastReceiver;
     private IabHelper mHelper;
@@ -49,15 +49,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private Button mVipFreeBt;
     private ActionBar mActionBar;
 
-    List<String> productNameList = new ArrayList<>();
+    List<String> skuList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay_vip);
-
-        PAY_ONE_MONTH = FirebaseRemoteConfig.getInstance().getString("vip_pay_one_money_id");
-        PAY_HALF_YEAR = FirebaseRemoteConfig.getInstance().getString("vip_pay_half_year_id");
 
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -69,10 +66,16 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 
         initView();
         initUI();
+        initGooglePayHelper();
+    }
+
+    private void initGooglePayHelper() {
+        skuList.add(PAY_ONE_MONTH);
+        skuList.add(PAY_HALF_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
 
         mHelper = new IabHelper(this, PUBLICK_KEY.trim());
-//        productNameList.add("diyici");
-//        productNameList.add("dierci"); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付
+        mHelper.enableDebugLogging(true);
+
         mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
             public void onIabSetupFinished(IabResult result) {
                 Log.d(TAG, "Setup finished.");
@@ -90,12 +93,11 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 
                 // IAB is fully set up. Now, let's get an inventory of stuff we own.
                 Log.d(TAG, "Setup successful. Querying inventory.");
-//                try {
-//                    //必须查询是否有未消费的订单
-//                    mHelper.queryInventoryAsync(mGotInventoryListener);
-//                } catch (IabAsyncInProgressException e) {
-//                    complain("Error querying inventory. Another async operation in progress.");
-//                }
+                try {
+                    //查询库存并查询可售商品详细信息
+                    mHelper.queryInventoryAsync(true, skuList, null, mGotInventoryListener);
+                } catch (IabAsyncInProgressException e) {
+                }
             }
         });
 
@@ -143,10 +145,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         return super.onOptionsItemSelected(item);
     }
 
-    void complain(String message) {
-        Log.e(TAG, "**** TrivialDrive Error: " + message);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
@@ -184,31 +182,33 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
             if (mHelper == null) return;
 
-//            String diyici = inv.getSkuDetails("diyici").getPrice();
-
             if (result.isFailure()) {
                 //在商品仓库中查询失败
-                complain("Failed to queryinventory: " + result);
+                Log.i(TAG, "onIabPurchaseFinished: 查询失败");
+                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询失败");
                 return;
             }
-            //获取未消费的订单对象Inventory
-            Purchase purchase = inventory.getPurchase(PAY_ONE_MONTH);
-            if (purchase != null && verifyDeveloperPayload(purchase)) {
-                Log.e(TAG, "We have goods.");
-//                try {
-//                    mHelper.consumeAsync(inventory.getPurchase(SKU_GAS), mConsumeFinishedListener);
-//                } catch (IabHelper.IabAsyncInProgressException e) {
-//                    Log.e(TAG,"Error consuming gas. Another async operation in progress.");
-//                }
+            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
+            Purchase oneMonthPurchase = inventory.getPurchase(VIPActivity.PAY_ONE_MONTH);
+            Purchase halfYearPurchase = inventory.getPurchase(VIPActivity.PAY_HALF_YEAR);
+            if (oneMonthPurchase != null) {
+                Log.i("", "onIabPurchaseFinishedMain: We have goods");
+                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一个月");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                finish();
                 return;
+            } else if (halfYearPurchase != null) {
+                Log.i("", "onIabPurchaseFinishedMain: We have goods");
+                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "半年");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                finish();
+                return;
+            } else {
+                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "没查询到");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
             }
         }
     };
-
-    boolean verifyDeveloperPayload(Purchase p) {
-        String payload = p.getDeveloperPayload();
-        return true;
-    }
 
     //消费完成的回调
     private IabHelper.OnConsumeFinishedListener mConsumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
@@ -222,89 +222,95 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 Log.d(TAG, "Consumptionsuccessful. Provisioning.");
             } else {
                 //消费失败
-                complain("Error whileconsuming: " + result);
             }
         }
     };
 
     @Override
     public void receivedBroadcast() {
-
+        try {
+            mHelper.queryInventoryAsync(mGotInventoryListener);
+        } catch (IabHelper.IabAsyncInProgressException e) {
+        }
     }
 
     private void payOneMonth() {
         if (!mHelper.subscriptionsSupported()) {
-            complain("Subscriptions not supported on your device yet. Sorry!");
             return;
         }
 
         mHelper.flagEndAsync();
         try {
-            mHelper.launchPurchaseFlow(this, PAY_ONE_MONTH, RC_REQUEST, new IabHelper.OnIabPurchaseFinishedListener() {
+            mHelper.launchSubscriptionPurchaseFlow(this, PAY_ONE_MONTH, RC_REQUEST, new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
                 public void onIabPurchaseFinished(IabResult result, Purchase info) {
                     if (result.isFailure()) {
                         if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
                             // 交易取消
+                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易取消", "一个月");
+                            Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {
                             // 交易失败
-
+                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易失败", "一个月");
+                            Log.i(TAG, "onIabPurchaseFinished: 交易失败");
                         }
                     } else {
+                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一个月");
+                        Log.i(TAG, "onIabPurchaseFinished: 交易成功");
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        finish();
                     }
-//                            try {
-//                                mHelper.consumeAsync(info, mConsumeFinishedListener);
-//                            } catch (IabAsyncInProgressException e) {
-//                                e.printStackTrace();
-//                            }
                 }
-            }, "");
+            }, "dddd");
         } catch (IabAsyncInProgressException e) {
-            complain("Error launching purchase flow. Another async operation in progress.");
+        }
+
+        try {
+            mHelper.queryInventoryAsync(false, skuList, null, mGotInventoryListener);
+        } catch (IabAsyncInProgressException e) {
+            e.printStackTrace();
         }
     }
 
     private void payHalfYear() {
         if (!mHelper.subscriptionsSupported()) {
-            complain("Subscriptions not supported on your device yet. Sorry!");
             return;
         }
 
         mHelper.flagEndAsync();
         try {
-            mHelper.launchPurchaseFlow(this, PAY_HALF_YEAR, RC_REQUEST, new IabHelper.OnIabPurchaseFinishedListener() {
+            mHelper.launchSubscriptionPurchaseFlow(this, PAY_HALF_YEAR, RC_REQUEST, new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
                 public void onIabPurchaseFinished(IabResult result, Purchase info) {
                     if (result.isFailure()) {
                         if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
                             // 交易取消
+                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易取消", "半年");
+                            Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {
                             // 交易失败
-
+                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易失败", "半年");
+                            Log.i(TAG, "onIabPurchaseFinished: 交易失败");
                         }
                     } else {
+                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "半年");
+                        Log.i(TAG, "onIabPurchaseFinished: 交易成功");
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        finish();
                     }
-
-//            Log.i(TAG, "onIabPurchaseFinished:  " + result.isSuccess() + "   " + result.isFailure() + "    " + result.getMessage()
-//                    + "    " + info.getDeveloperPayload() + "   " + info.getItemType() + "   " + info.getOrderId() + "   " + info.getPackageName()
-//                    + "    " + info.getSignature() + "   " + info.getSku() + "   " + info.getToken() + "    " + info.getPurchaseState()
-//                    + "   " + info.getPurchaseTime());
-
-//            try {
-//                mHelper.consumeAsync(info, mConsumeFinishedListener);
-//            } catch (IabAsyncInProgressException e) {
-//                e.printStackTrace();
-//            }
                 }
-            }, "");
+            }, "ffff");
         } catch (IabAsyncInProgressException e) {
-            complain("Error launching purchase flow. Another async operation in progress.");
+        }
+
+        try {
+            mHelper.queryInventoryAsync(false, skuList, null, mGotInventoryListener);
+        } catch (IabAsyncInProgressException e) {
+            e.printStackTrace();
         }
     }
 

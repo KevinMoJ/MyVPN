@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,9 +25,15 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.service.WarnDialogShowService;
+import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
+import com.androapplite.shadowsocks.util.IabHelper;
+import com.androapplite.shadowsocks.util.IabResult;
+import com.androapplite.shadowsocks.util.Inventory;
+import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.shadowsocks.utils.DensityUtil;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
@@ -36,6 +43,9 @@ import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SplashActivity extends AppCompatActivity implements Handler.Callback,
@@ -75,6 +85,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     private ObjectAnimator adAnim;
     //带动画的闪屏页---------------结束
 
+    private IabHelper mIabHelper;
+    private IabBroadcastReceiver mBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +96,10 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
         mHandler = new Handler(this);
+        try {
+            checkIsVIP();
+        } catch (Exception e) {
+        }
 
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_animation_ad_flash")) {
             showAnimationAdFlash();
@@ -112,6 +128,77 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
         mHandler.sendEmptyMessage(MSG_OPINION_INTERNET_TYPE);
     }
+
+    private void checkIsVIP() {
+        final List<String> skuList = new ArrayList<>();
+        skuList.add(VIPActivity.PAY_ONE_MONTH);
+        skuList.add(VIPActivity.PAY_HALF_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
+
+        mIabHelper = new IabHelper(this, VIPActivity.PUBLICK_KEY.trim());
+        mIabHelper.enableDebugLogging(true);
+
+        mIabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                if (!result.isSuccess()) {
+                    //helper设置失败是没法支付的，此处可以弹出提示框
+                    return;
+                }
+
+                if (mIabHelper == null) return;
+
+                mBroadcastReceiver = new IabBroadcastReceiver(new IabBroadcastReceiver.IabBroadcastListener() {
+                    @Override
+                    public void receivedBroadcast() {
+                        try {
+                            mIabHelper.queryInventoryAsync(mGotInventoryListener);
+                        } catch (IabHelper.IabAsyncInProgressException e) {
+                        }
+                    }
+                });
+                IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
+                registerReceiver(mBroadcastReceiver, broadcastFilter);
+
+                // IAB is fully set up. Now, let's get an inventory of stuff we own.
+                try {
+                    //查询库存并查询可售商品详细信息
+                    mIabHelper.queryInventoryAsync(true, skuList, null, mGotInventoryListener);
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                }
+            }
+        });
+    }
+
+    IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+        @Override
+        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+            if (mIabHelper == null) return;
+
+            if (result.isFailure()) {
+                //在商品仓库中查询失败
+                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "查询失败");
+                return;
+            }
+
+            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(SplashActivity.this);
+            Purchase oneMonthPurchase = inventory.getPurchase(VIPActivity.PAY_ONE_MONTH);
+            Purchase halfYearPurchase = inventory.getPurchase(VIPActivity.PAY_HALF_YEAR);
+            if (oneMonthPurchase != null) {
+                Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
+                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "查询成功", "一个月");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                return;
+            } else if (halfYearPurchase != null) {
+                Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
+                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "查询成功", "半年");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                return;
+            } else {
+                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "没查询到");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
+            }
+        }
+    };
+
 
     private void showAnimationAdFlash() {
         if (mAdAppHelper.isSplashReady()) {
@@ -528,6 +615,15 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
         if (mRpClose != null)
             mRpClose.cancelAnimator();
+        if (mBroadcastReceiver != null)
+            unregisterReceiver(mBroadcastReceiver);
+        if (mIabHelper != null) {
+            try {
+                mIabHelper.dispose();
+            } catch (IabHelper.IabAsyncInProgressException e) {
+            }
+        }
+        mIabHelper = null;
     }
 
     @Override
