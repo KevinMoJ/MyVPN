@@ -38,8 +38,8 @@ android {
         applicationId "com.androapplite.vpn10"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 6
-        versionName "1.0.5"
+        versionCode 8
+        versionName "1.0.7"
         multiDexEnabled true
     }
 //    dexOptions {
@@ -67,6 +67,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
             debuggable false
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
     productFlavors {
