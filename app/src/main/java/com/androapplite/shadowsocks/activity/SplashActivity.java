@@ -180,7 +180,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
             if (result.isFailure()) {
                 //在商品仓库中查询失败
-                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "查询失败");
+                Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询失败");
                 return;
             }
 
@@ -189,16 +189,16 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
             Purchase halfYearPurchase = inventory.getPurchase(VIPActivity.PAY_HALF_YEAR);
             if (oneMonthPurchase != null) {
                 Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "查询成功", "一个月");
+                Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询成功", "一个月");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                 return;
             } else if (halfYearPurchase != null) {
                 Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "查询成功", "半年");
+                Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询成功", "半年");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                 return;
             } else {
-                Firebase.getInstance(SplashActivity.this).logEvent("VIP交易", "没查询到");
+                Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "没查询到");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
             }
         }
