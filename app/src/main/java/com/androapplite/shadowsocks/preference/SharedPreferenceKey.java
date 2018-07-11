@@ -28,6 +28,9 @@ public final class SharedPreferenceKey {
     public static final String CONNECTING_START_TIME = "CONNECTING_START_TIME"; // VPN开始连接的开始时间
     public static final String IS_ROCKET_SPEED_CONNECT = "IS_ROCKET_SPEED_CONNECT"; // 是否是小火箭加速
     public static final String VIP = "VIP";
+    public static final String IS_AUTOMATIC_RENEWAL_VIP = "IS_AUTOMATIC_RENEWAL_VIP"; // 是否是自动续费
+    public static final String VIP_PAY_TIME = "VIP_PAY_TIME"; // 购买VIP的时间
+    public static final String IS_VIP_PAY_ONE_MONTH = "IS_VIP_PAY_ONE_MONTH"; // 是否购买的一个月VIP
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";

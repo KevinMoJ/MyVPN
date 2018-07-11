@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -28,6 +27,7 @@ import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.vpn3.R;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     public static final int TYPE_NET_SPEED_FINISH = 104;
 
     private static final int RC_REQUEST = 10001;
-    public static String PAY_ONE_MONTH = "one_2";
-    public static String PAY_HALF_YEAR = "half_1";
+    public static String PAY_ONE_MONTH = "one_3";
+    public static String PAY_HALF_YEAR = "half_2";
 
     private IabBroadcastReceiver mBroadcastReceiver;
     private IabHelper mHelper;
@@ -149,7 +149,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     }
 
     private void initUI() {
+        String oneMonthMoney = FirebaseRemoteConfig.getInstance().getString("pay_one_month_money");
+        String halfYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_half_year_money");
+
         mServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
+        mVipOneMonthMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(oneMonthMoney)));
+        mVipHalfYearMoneyText.setText(getResources().getString(R.string.pay_half_year_bt_text, String.valueOf(halfYearMoney)));
     }
 
     public static void startVIPActivity(Context context, int type) {
@@ -229,22 +234,31 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 return;
             }
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
-            Purchase oneMonthPurchase = inventory.getPurchase(VIPActivity.PAY_ONE_MONTH);
-            Purchase halfYearPurchase = inventory.getPurchase(VIPActivity.PAY_HALF_YEAR);
+            Purchase oneMonthPurchase = inventory.getPurchase(PAY_ONE_MONTH);
+            Purchase halfYearPurchase = inventory.getPurchase(PAY_HALF_YEAR);
+//            Log.i(TAG, "onQueryInventoryFinished:  " + inventory.hasPurchase(PAY_ONE_MONTH) + "    " + inventory.hasPurchase(PAY_HALF_YEAR));
+
             if (oneMonthPurchase != null) {
-                Log.i("", "onIabPurchaseFinishedMain: We have goods");
+                Log.i(TAG, "onQueryInventoryFinished: 查询成功的finish 一个月 ");
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一个月");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneMonthPurchase.isAutoRenewing()).apply();
+                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneMonthPurchase.getPurchaseTime()).apply();
                 finish();
                 return;
             } else if (halfYearPurchase != null) {
-                Log.i("", "onIabPurchaseFinishedMain: We have goods");
+                Log.i(TAG, "onQueryInventoryFinished: 查询成功的finish 半年 ");
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "半年");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, halfYearPurchase.isAutoRenewing()).apply();
+                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, halfYearPurchase.getPurchaseTime()).apply();
                 finish();
                 return;
             } else {
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "没查询到");
+                Log.i(TAG, "onQueryInventoryFinished:没查询到 ");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
             }
         }
@@ -296,12 +310,15 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         }
                     } else {
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一个月");
-                        Log.i(TAG, "onIabPurchaseFinished: 交易成功");
+                        Log.i(TAG, "onIabPurchaseFinished: 交易成功 一个月");
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
+                        VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
-                        Toast.makeText(VIPActivity.this, getResources().getString(R.string.you_have_become_a_vip), Toast.LENGTH_SHORT).show();
                     }
                 }
             }, "dddd");
@@ -337,12 +354,15 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         }
                     } else {
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "半年");
-                        Log.i(TAG, "onIabPurchaseFinished: 交易成功");
+                        Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 半年");
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
+                        VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
-                        Toast.makeText(VIPActivity.this, getResources().getString(R.string.you_have_become_a_vip), Toast.LENGTH_SHORT).show();
                     }
                 }
             }, "ffff");
@@ -360,4 +380,18 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(SharedPreferenceKey.VIP, false);
     }
+
+//  Log.i(TAG, "onQueryInventoryFinished: PurchaseTime  " + oneMonthPurchase.getPurchaseTime() + "  DeveloperPayload: " + oneMonthPurchase.getDeveloperPayload()
+//          + "  ItemType:   " + oneMonthPurchase.getItemType() + "  OrderId:  " + oneMonthPurchase.getOrderId() + "  OriginalJson:  " + oneMonthPurchase.getOriginalJson()
+//          + "   Signature:   " + oneMonthPurchase.getSignature() + "   Sku:   " + oneMonthPurchase.getSku() + "   Token:  " + oneMonthPurchase.getToken() + "  PurchaseState:  "
+//          + oneMonthPurchase.getPurchaseState() + "  AutoRenewing:  " + oneMonthPurchase.isAutoRenewing());
+//  SkuDetails skuDetails = inventory.getSkuDetails(PAY_ONE_MONTH);
+//  Log.i(TAG, "onQueryInventoryFinished: hasDetails:  " + inventory.hasDetails(PAY_ONE_MONTH) + "  Description:   " + skuDetails.getDescription() +
+//          "   Price:   " + skuDetails.getPrice() + "   PriceCurrencyCode:  " + skuDetails.getPriceCurrencyCode() + "  Title:    " + skuDetails.getTitle() + "  Type:  " + skuDetails.getType()
+//          + "  PriceAmountMicros:  " + skuDetails.getPriceAmountMicros() + "  Sku:  " + skuDetails.getSku());
+//  Log.i(TAG, "onQueryInventoryFinished: 查询成功的finish 一个月 ");
+//
+//  onQueryInventoryFinished: PurchaseTime  1531280271124  DeveloperPayload: dddd  ItemType:   subs  OrderId:  GPA.3306-5952-9159-63663  OriginalJson:  {"orderId":"GPA.3306-5952-9159-63663","packageName":"com.androapplite.vpn10","productId":"one_2","purchaseTime":1531280271124,"purchaseState":0,"developerPayload":"dddd","purchaseToken":"obmcmldningcmghjgcekkonn.AO-J1OyvUD-p7-amKgW9E4dWVbMqum7z8ve0onhCeSPHmgPppZOQ4fCoGkNPv5-RkhoK_oMrapZ9M__Iw8tupmgJ8B42KbgZaQQ8hHVncvoOrXVM7RFSYGk","autoRenewing":true}   Signature:   ZTHEGvknH/TxzFxBEwRfBSpQOMihW0rXhc3oYWQvRtXCuBwU/kdv4Ft98Jbh6CrBWwdJiAuHIdaR2z+R56E0aQU6Kf53NS5iM3JwoHrR9m0Lg+w45cZg4nIVRcsABKoUZsHwxZiOE1zMj2OQru8izTnBn16SmqYexKfsFi09mnOPkEWK1Y+Q+TqyqdQYGWQLAWJj7tcuBg0qRa56tZcY9h1jC36Ohf9xotUEXCOJsmHARgeh50RvnRRdNveUoAy2U7CwSjmohCcvnx8sofwk98BNFwKCUn8RlxRcF3Ad3uXS+Eh5nv0Rh3WY+7gWAoJcqv1n/qFTaIRBbfYq+4Xzmg==   Sku:   one_2   Token:  obmcmldningcmghjgcekkonn.AO-J1OyvUD-p7-amKgW9E4dWVbMqum7z8ve0onhCeSPHmgPppZOQ4fCoGkNPv5-RkhoK_oMrapZ9M__Iw8tupmgJ8B42KbgZaQQ8hHVncvoOrXVM7RFSYGk  PurchaseState:  0  AutoRenewing:  true
+//  onQueryInventoryFinished: hasDetails:  true  Description:   vip   Price:   $8.99   PriceCurrencyCode:  USD  Title:    Green VPN VIP (GREEN VPN)  Type:  subs  PriceAmountMicros:  8990000  Sku:  one_2
+//  onQueryInventoryFinished: 查询成功的finish 一个月
 }

@@ -1095,10 +1095,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             about();
             firebase.logEvent("菜单", "关于");
         } else if (id == R.id.nav_vip) {
-            if (!isVIP)
-                jumpToVip(VIPActivity.TYPE_NAV);
-            else
-                Toast.makeText(this, getResources().getString(R.string.you_have_become_a_vip), Toast.LENGTH_SHORT).show();
+            jumpToVip(VIPActivity.TYPE_NAV);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -1107,7 +1104,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private void jumpToVip(int type) {
-        VIPActivity.startVIPActivity(this, type);
+        if (!isVIP)
+            VIPActivity.startVIPActivity(this, type);
+        else
+            VIPFinishActivity.startVIPFinishActivity(this, false);
     }
 
     private void rateUs(){

@@ -5,9 +5,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_bg"
+    android:background="@color/vip_finish_background"
     android:orientation="vertical"
-    tools:context="com.androapplite.shadowsocks.activity.VIPActivity">
+    tools:context="com.androapplite.shadowsocks.activity.VIPFinishActivity">
+    <ImageView
+        android:id="@+id/vip_finish_close"
+        android:layout_width="@dimen/common_50"
+        android:layout_height="@dimen/common_50"
+        android:layout_gravity="end"
+        android:padding="@dimen/common_10"
+        android:scaleType="fitXY"
+        android:src="@drawable/vip_close_bt_bg"/>
 
     <ImageView
         android:layout_width="@dimen/common_160"
@@ -35,7 +43,7 @@
             android:layout_marginLeft="@dimen/common_10"
             android:layout_marginStart="@dimen/common_10"
             android:text="@string/no_ads_at_all"
-            android:textColor="@color/primary_white_text"
+            android:textColor="@color/primary_black_text"
             android:textSize="@dimen/common_text_size_16sp"/>
     </LinearLayout>
 
@@ -61,7 +69,7 @@
             android:enabled="true"
             android:singleLine="true"
             android:text="@string/fast_secure_and_stable_servers"
-            android:textColor="@color/primary_white_text"
+            android:textColor="@color/primary_black_text"
             android:textSize="@dimen/common_text_size_16sp"/>
     </LinearLayout>
 
@@ -79,7 +87,7 @@
             android:src="@drawable/icon_server"/>
 
         <TextView
-            android:id="@+id/server_message_text"
+            android:id="@+id/vip_finish_server_message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -87,118 +95,88 @@
             android:layout_marginStart="@dimen/common_10"
             android:enabled="true"
             android:singleLine="true"
-            android:textColor="@color/primary_white_text"
+            android:textColor="@color/primary_black_text"
             android:textSize="@dimen/common_text_size_16sp"/>
     </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginEnd="@dimen/common_30"
-        android:layout_marginLeft="@dimen/common_30"
-        android:layout_marginRight="@dimen/common_30"
-        android:layout_marginStart="@dimen/common_30"
-        android:layout_marginTop="@dimen/common_20">
-
-        <ImageView
-            android:id="@+id/vip_one_month_bt"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/common_50"
-            android:layout_gravity="center_horizontal|bottom"
-            android:background="@drawable/warn_dialog_button_bg"
-            android:text="@string/accelerate_immediately"
-            android:textAllCaps="false"
-            android:textSize="@dimen/common_text_size_14sp"/>
+        android:layout_marginEnd="@dimen/common_16"
+        android:layout_marginLeft="@dimen/common_16"
+        android:layout_marginRight="@dimen/common_16"
+        android:layout_marginStart="@dimen/common_16"
+        android:layout_marginTop="@dimen/common_40">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/common_20"
-            android:layout_marginStart="@dimen/common_20"
-            android:text="1 Month"
-            android:textColor="@color/notification_bg_disconnect"
-            android:textSize="@dimen/common_text_size_14sp"/>
+            android:text="@string/your_vip_plan"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_16sp"
+            android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/vip_one_month_money_text"
+            android:id="@+id/vip_finish_pay_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/common_20"
-            android:layout_marginRight="@dimen/common_20"
-            android:textColor="@color/notification_bg_disconnect"
-            android:textSize="@dimen/common_text_size_14sp"/>
-
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_16sp"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginEnd="@dimen/common_30"
-        android:layout_marginLeft="@dimen/common_30"
-        android:layout_marginRight="@dimen/common_30"
-        android:layout_marginStart="@dimen/common_30">
-
-        <ImageView
-            android:id="@+id/vip_half_year_bt"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/common_50"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginTop="@dimen/common_15"
-            android:background="@drawable/warn_dialog_button_bg"
-            android:gravity="center_vertical"
-            android:textSize="@dimen/common_text_size_14sp"/>
-
-        <ImageView
-            android:layout_width="@dimen/common_40"
-            android:layout_height="@dimen/common_40"
-            android:layout_alignEnd="@+id/vip_half_year_bt"
-            android:layout_alignRight="@+id/vip_half_year_bt"
-            android:layout_marginEnd="@dimen/common_30"
-            android:layout_marginRight="@dimen/common_30"
-            android:src="@drawable/icon_hot"/>
+        android:layout_marginEnd="@dimen/common_16"
+        android:layout_marginLeft="@dimen/common_16"
+        android:layout_marginRight="@dimen/common_16"
+        android:layout_marginStart="@dimen/common_16"
+        android:layout_marginTop="@dimen/common_15">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/common_20"
-            android:layout_marginStart="@dimen/common_20"
-            android:text="6 Month"
-            android:textColor="@color/notification_bg_disconnect"
-            android:textSize="@dimen/common_text_size_14sp"/>
+            android:text="@string/renewed_day"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_16sp"
+            android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/vip_half_year_money_text"
+            android:id="@+id/vip_finish_pay_renewed_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/common_20"
-            android:layout_marginRight="@dimen/common_20"
-            android:textColor="@color/notification_bg_disconnect"
-            android:textSize="@dimen/common_text_size_14sp"/>
-
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_16sp"/>
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/vip_free_bt"
-        android:layout_width="@dimen/common_300"
-        android:layout_height="@dimen/common_50"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginTop="@dimen/common_10"
-        android:background="@drawable/warn_dialog_button_bg"
-        android:text="@string/accelerate_immediately"
-        android:textAllCaps="false"
-        android:textColor="@color/primary_white_text"
-        android:textSize="@dimen/common_text_size_14sp"
-        android:visibility="gone"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/common_16"
+        android:layout_marginLeft="@dimen/common_16"
+        android:layout_marginRight="@dimen/common_16"
+        android:layout_marginStart="@dimen/common_16"
+        android:layout_marginTop="@dimen/common_15">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/automatic_renewal"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/vip_finish_pay_automatic_renewal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_16sp"/>
+    </RelativeLayout>
 </LinearLayout>

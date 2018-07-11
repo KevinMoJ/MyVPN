@@ -131,9 +131,12 @@
             android:launchMode="singleTop">
         </activity>
     <activity android:name="com.androapplite.shadowsocks.activity.VIPActivity"
-        android:launchMode="singleTop">
-
+              android:launchMode="singleTop">
     </activity>
+        <activity android:name="com.androapplite.shadowsocks.activity.VIPFinishActivity"
+                  android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+                  android:launchMode="singleTop">
+        </activity>
     </application>
 
 </manifest>

@@ -260,6 +260,18 @@
         <value>true</value>
     </entry>
 
+    <!--VIP支付一个月价格-->
+    <entry>
+        <key>pay_one_month_money</key>
+        <value>2.99</value>
+    </entry>
+
+    <!--VIP支付六个月价格-->
+    <entry>
+        <key>pay_half_year_money</key>
+        <value>0.99</value>
+    </entry>
+
     <!--&lt;!&ndash;vip支付一个月的商品id&ndash;&gt;-->
     <!--<entry>-->
         <!--<key>vip_pay_one_money_id</key>-->
