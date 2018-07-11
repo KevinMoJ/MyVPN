@@ -601,6 +601,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         registerReceiver();
 //        AdAppHelper.getInstance(this).onResume();
         isVIP = mSharedPreference.getBoolean(SharedPreferenceKey.VIP, false);
+        if (!isVIP && LocalVpnService.IsRunning && mConnectFragment != null) {
+            mConnectFragment.startVIPRecommendAnimation();
+        }
         updateFlagMenuIcon();
         try {
             VpnService.prepare(this);

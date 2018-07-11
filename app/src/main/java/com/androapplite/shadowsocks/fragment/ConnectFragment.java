@@ -43,6 +43,7 @@ import java.lang.ref.WeakReference;
  */
 public class ConnectFragment extends Fragment implements View.OnClickListener, Animation.AnimationListener {
     public static final int MSG_REPEAT_VIP_ROCKET = 100;
+    public static final int MSG_GONE_VIP_VIEW = 110;
     private OnConnectActionListener mListener;
     private TextView mMessageTextView;
 
@@ -52,7 +53,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     private ImageView mConnectStatus;
     private ImageView mVIPImage;
     private TextView mFreeUsedTimeTextView;
-//    private TextView mConnectStatusText;
+    private TextView mVipRecommendView;
+    //    private TextView mConnectStatusText;
     private boolean mIsAnimating;
     private MyReceiver mMyReceiver;
     private VpnState mVpnState;
@@ -78,6 +80,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mVIPImage = (ImageView)view.findViewById(R.id.vip_start_image);
 //        mConnectStatusText = (TextView) view.findViewById(R.id.connect_status_text);
         mFreeUsedTimeTextView = (TextView) view.findViewById(R.id.free_used_time);
+        mVipRecommendView = (TextView) view.findViewById(R.id.vip_start_view);
         return view;
     }
 
@@ -112,6 +115,28 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mVIPAnimation.getAnimations().get(0).setFillAfter(true);
         mVIPImage.startAnimation(mVIPAnimation);
     }
+
+    public void startVIPRecommendAnimation() {
+        mVipRecommendView.setVisibility(View.VISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_main_vip_recommend);
+        mVipRecommendView.setAnimation(animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mHandler.sendEmptyMessageDelayed(MSG_GONE_VIP_VIEW, 4000);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+}
 
     @Override
     public void onDestroy() {
@@ -157,6 +182,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
             switch (msg.what) {
                 case MSG_REPEAT_VIP_ROCKET:
                     mVIPImage.startAnimation(mVIPAnimation);
+                    break;
+                case MSG_GONE_VIP_VIEW:
+                    mVipRecommendView.setVisibility(View.GONE);
                     break;
             }
         }
