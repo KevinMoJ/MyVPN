@@ -84,14 +84,36 @@
             />
     </LinearLayout>
 
-    <ImageView
-        android:layout_marginTop="@dimen/common_15"
-        android:id="@+id/vip_start_image"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/main_vip_pao"
-        android:scaleType="fitXY"
-        android:layout_gravity="end"
+        android:layout_marginEnd="@dimen/common_25"
         android:layout_marginRight="@dimen/common_25"
-        android:layout_marginEnd="@dimen/common_25"/>
+        android:layout_marginTop="@dimen/common_15">
+
+        <TextView
+            android:id="@+id/vip_start_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_toLeftOf="@id/vip_start_image"
+            android:layout_toStartOf="@id/vip_start_image"
+            android:background="@drawable/main_vip_view_bg"
+            android:gravity="center_horizontal"
+            android:text="VIP is faster!"
+            android:visibility="gone"
+            android:textColor="@color/primary_white_text"
+            android:textSize="@dimen/common_text_size_16sp"/>
+
+        <ImageView
+            android:id="@+id/vip_start_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/common_20"
+            android:scaleType="fitXY"
+            android:src="@drawable/main_vip_pao"/>
+    </RelativeLayout>
 </LinearLayout>
