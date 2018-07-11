@@ -125,5 +125,14 @@
     <string name="faster_servers">أسرع الخوادم</string>
     <string name="successful_disconnect">نجاح الانفصال</string>
     <string name="you_have_become_a_vip">لقد أصبحت VIP</string>
+    <string name="pay_one_month_bt_text">$ %s / Month</string>
+    <string name="pay_half_year_bt_text">$ %s / 6 Month</string>
 
+    <string name="automatic_renewal">تجديد تلقائي</string>
+    <string name="renewed_day">يوم متجدد</string>
+    <string name="your_vip_plan">خطة VIP الخاصة بك</string>
+    <string name="welcome">أهلا بك!</string>
+    <string name="dear_premium_user">عزيزي المستخدم بريميوم</string>
+    <string name="enjoy_now">استمتع الآن</string>
+    <string name="months_plan">خطة %s شهر</string>
 </resources>

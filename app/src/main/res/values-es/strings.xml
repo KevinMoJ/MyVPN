@@ -126,5 +126,14 @@
     <string name="faster_servers">FASTER SERVERS</string>
     <string name="successful_disconnect">Successful Disconnect</string>
     <string name="you_have_become_a_vip">You have become a VIP</string>
+    <string name="pay_one_month_bt_text">$ %s / Month</string>
+    <string name="pay_half_year_bt_text">$ %s / 6 Month</string>
 
+    <string name="automatic_renewal">Automatic renewal</string>
+    <string name="renewed_day">Renewed Day</string>
+    <string name="your_vip_plan">Your VIP Plan</string>
+    <string name="welcome">Welcome!</string>
+    <string name="dear_premium_user">Dear Premium User</string>
+    <string name="enjoy_now">Enjoy Now</string>
+    <string name="months_plan">%s Months Plan</string>
 </resources>
