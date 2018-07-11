@@ -1,24 +1,24 @@
 package com.androapplite.shadowsocks.fragment;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.utils.Rotate3dAnimation;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.animation.AbstractAnimator;
 
 /**
@@ -31,6 +31,8 @@ public class NetworkAccelerationFinishFragment extends Fragment implements Abstr
     private boolean mIsInterstitalClose;
     private boolean mIsNativeAdShow;
     private boolean mIsNeedRotateTick;
+    private NetworkAccelerationFinishFragmentListener mListener;
+    private ImageView mVIPRecommendImage;
 
     public NetworkAccelerationFinishFragment() {
         // Required empty public constructor
@@ -40,20 +42,55 @@ public class NetworkAccelerationFinishFragment extends Fragment implements Abstr
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_network_acceleration_finish, container, false);
+        mVIPRecommendImage =  view.findViewById(R.id.net_speed_recommend_image);
+        mVIPRecommendImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null)
+                    mListener.onVIPImageClick();
+            }
+        });
+        mVIPRecommendImage.setVisibility(VIPActivity.isVIPUser(getContext()) ? View.VISIBLE : View.GONE);
+        return view;
+    }
 
-        return inflater.inflate(R.layout.fragment_network_acceleration_finish, container, false);
+    @Override
+    public void onResume() {
+        super.onResume();
+        mVIPRecommendImage.setVisibility(!VIPActivity.isVIPUser(getContext()) ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof NetworkAccelerationFinishFragmentListener) {
+            mListener = (NetworkAccelerationFinishFragmentListener) context;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (activity instanceof NetworkAccelerationFinishFragmentListener) {
+            mListener = (NetworkAccelerationFinishFragmentListener) activity;
+        }
+    }
+
+    public interface NetworkAccelerationFinishFragmentListener {
+        void onVIPImageClick();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        if (!VIPActivity.isVIPUser(getContext())) {
-            FrameLayout container = (FrameLayout) view.findViewById(R.id.ad_view_fl);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-            Context context = view.getContext();
-            if (container != null) {
-                AdAppHelper.getInstance(context).getNative(container, params, this);
-            }
-        }
+//        if (!VIPActivity.isVIPUser(getContext())) {
+//            FrameLayout container = (FrameLayout) view.findViewById(R.id.ad_view_fl);
+//            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
+//            Context context = view.getContext();
+//            if (container != null) {
+//                AdAppHelper.getInstance(context).getNative(container, params, this);
+//            }
+//        }
     }
 
     @Override

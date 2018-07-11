@@ -41,6 +41,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     public static final int TYPE_SERVER_LIST = 101;
     public static final int TYPE_MAIN_PAO = 102;
     public static final int TYPE_NAV = 103;
+    public static final int TYPE_NET_SPEED_FINISH = 104;
 
     private static final int RC_REQUEST = 10001;
     public static String PAY_ONE_MONTH = "one_2";
@@ -55,7 +56,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private TextView mServerMessageText;
     private Button mVipFreeBt;
     private ActionBar mActionBar;
-        /*标记hhelper 是否启动*/
+    /*标记IaHelper 是否启动*/
     private boolean isStartHelper;
 
     List<String> skuList = new ArrayList<>();
@@ -85,11 +86,13 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private void analysisSource() {
         int type = getIntent().getIntExtra(TYPE, TYPE_MAIN_PAO);
         if (type == TYPE_SERVER_LIST)
-            Firebase.getInstance(this).logEvent("进入vip界面来源","服务器列表点击");
+            Firebase.getInstance(this).logEvent("进入vip界面来源", "服务器列表点击");
         else if (type == TYPE_MAIN_PAO)
-            Firebase.getInstance(this).logEvent("进入vip界面来源","主界面小泡泡");
+            Firebase.getInstance(this).logEvent("进入vip界面来源", "主界面小泡泡");
         else if (type == TYPE_NAV)
-            Firebase.getInstance(this).logEvent("进入vip界面来源","侧边栏");
+            Firebase.getInstance(this).logEvent("进入vip界面来源", "侧边栏");
+        else if (type == TYPE_NET_SPEED_FINISH)
+            Firebase.getInstance(this).logEvent("进入vip界面来源", "加速成功结果页");
     }
 
     private void initGooglePayHelper() {
@@ -106,9 +109,11 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 if (!result.isSuccess()) {
                     //helper设置失败是没法支付的，此处可以弹出提示框
                     isStartHelper = false;
+                    Log.i(TAG, "onIabSetupFinished: 初始化失败");
                     return;
                 } else {
                     isStartHelper = true;
+                    Log.i(TAG, "onIabSetupFinished: 初始化成功");
                 }
 
                 if (mHelper == null) return;

@@ -56,7 +56,7 @@ import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FULL;
 public class NetworkAccelerationActivity extends AppCompatActivity implements
         NetworkAccelerationFragment.NetworkAccelerationFragmentListener,
         LocalVpnService.onStatusChangedListener, Handler.Callback, View.OnClickListener,
-        DialogInterface.OnDismissListener{
+        DialogInterface.OnDismissListener, NetworkAccelerationFinishFragment.NetworkAccelerationFinishFragmentListener{
     private SharedPreferences mSharedPreference;
     private boolean mIsRestart;
     private MyAdStateListener mAdstateListener;
@@ -310,6 +310,12 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new NetworkAccelerationFinishFragment()).commitAllowingStateLoss();
 
+    }
+
+
+    @Override
+    public void onVIPImageClick() {
+        VIPActivity.startVIPActivity(this, VIPActivity.TYPE_NET_SPEED_FINISH);
     }
 
     @Override

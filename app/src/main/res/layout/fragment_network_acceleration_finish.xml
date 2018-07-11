@@ -1,7 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+              android:orientation="vertical"
     android:background="@android:color/white"
     tools:context="com.androapplite.shadowsocks.fragment.NetworkAccelerationFinishFragment">
 
@@ -48,12 +49,16 @@
             />
     </LinearLayout>
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/net_speed_recommend_image"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="@dimen/common_190"
+        android:scaleType="fitXY"
+        android:layout_marginTop="@dimen/common_20"
+        android:src="@drawable/net_speed_finish_vip"/>
+
+    <FrameLayout
         android:id="@+id/ad_view_fl"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:layout_gravity="bottom"
-        >
-    </FrameLayout>
-</FrameLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout>
