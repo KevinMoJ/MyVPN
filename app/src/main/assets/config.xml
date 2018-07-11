@@ -13,10 +13,19 @@
     <string name="fbn_full_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
     <string name="fbn_banner_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
 
-    <string name="admob_an_ids">{count=2},{id1=ca-app-pub-9834399249058252/3534204537,主页底部},{id2=ca-app-pub-9834399249058252/5827650796,主页底部高}</string>
-    <string name="fb_native_ids">{count=2},{id1=633231230382328_633233510382100,主页底部},{id2=633231230382328_633233697048748,主页底部高}</string>
+    <string name="admob_an_ids">
+        {count=4},{id1=ca-app-pub-9834399249058252/3534204537,主页底部},{id2=ca-app-pub-9834399249058252/5827650796,主页底部高}
+                 ,{id3=ca-app-pub-9834399249058252/3534204537,主页底部},{id4=ca-app-pub-9834399249058252/5827650796,主页底部高}
+    </string>
+    <string name="fb_native_ids">
+        {count=4},{id1=633231230382328_633233510382100,主页底部},{id2=633231230382328_633233697048748,主页底部高}
+                 ,{id3=633231230382328_633233510382100,主页底部},{id4=633231230382328_633233697048748,主页底部高}
+    </string>
 
-    <string name="native_size">{count=2},{id1=320,180},{id2=320,180}</string>
+    <string name="native_size">
+        {count=4},{id1=320,180},{id2=320,180}
+                 ,{id3=320,80},{id4=320,80}
+    </string>
     <string name="custom_ctrl">
         {serverListDomain=http://e.vpnnest.com:8080/VPNServerList/fsle},
         {serverListIP=http://54.91.244.196:8080/VPNServerList/fsle},

@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
 import com.androapplite.vpn3.R;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.ironsource.sdk.utils.Logger;
 
 import java.util.ArrayList;
@@ -53,6 +54,8 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         actionBar.setHomeAsUpIndicator(upArrow);
         actionBar.setTitle(getResources().getString(R.string.app_name).toUpperCase());
         actionBar.setElevation(0);
+
+        AdAppHelper.getInstance(this).showFullAd();
 
         initView();
         initData();

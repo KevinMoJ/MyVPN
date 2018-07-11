@@ -16,18 +16,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.vpn3.R;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class NetworkAccelerationFragment extends Fragment implements View.OnClickListener,
-        Animator.AnimatorListener{
+        Animator.AnimatorListener {
     private AnimatorSet mRocketShake;
     private NetworkAccelerationFragmentListener mListener;
     public boolean mNeedToShake = true; // 小火箭是否需要抖动
+    private FrameLayout mAdContent;
+    private boolean isNativeAddSuccess;
 
     public NetworkAccelerationFragment() {
         // Required empty public constructor
@@ -43,10 +50,32 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        view.findViewById(R.id.acc_btn).setOnClickListener(this);
+        Button rocketBt = (Button) view.findViewById(R.id.acc_btn);
+        rocketBt.setOnClickListener(this);
+        mAdContent = (FrameLayout) view.findViewById(R.id.net_speed_ad_content);
+        if (!VIPActivity.isVIPUser(getContext()))
+            addBottomAd();
+        else
+            isNativeAddSuccess = false;
+        if (!isNativeAddSuccess) {
+            RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) rocketBt.getLayoutParams();
+            rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.banner_ad_loading_icon_margin_top);
+            rocketBt.setLayoutParams(rocketBtLayoutParams);
+        }
 //        if(mNeedToShake) {
 //            rocketShake();
 //        }
+    }
+
+    private void addBottomAd() {
+        AdAppHelper adAppHelper = AdAppHelper.getInstance(getContext());
+        try {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+            isNativeAddSuccess = adAppHelper.getNative(2, mAdContent, params);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -134,6 +163,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
 
     public interface NetworkAccelerationFragmentListener {
         void onAccelerateImmediately();
+
         void onAnimationFinish();
     }
 
@@ -141,7 +171,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof NetworkAccelerationFragmentListener) {
-            mListener = (NetworkAccelerationFragmentListener)context;
+            mListener = (NetworkAccelerationFragmentListener) context;
         }
     }
 
@@ -168,8 +198,8 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        if(mRocketShake != null) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ) {
+        if (mRocketShake != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mRocketShake.resume();
             }
         }
@@ -178,8 +208,8 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
     @Override
     public void onPause() {
         super.onPause();
-        if(mRocketShake != null) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ) {
+        if (mRocketShake != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mRocketShake.pause();
             }
         }
