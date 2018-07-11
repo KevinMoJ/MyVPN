@@ -424,7 +424,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             int resId = getResources().getIdentifier(flag, "drawable", getPackageName());
             MenuItem item = mMenu.findItem(R.id.action_flag);
             if (item != null) {
-                item.setIcon(isVIP ? R.drawable.icon_vip_server : resId);
+                if (resId == R.drawable.ic_flag_global && isVIP)
+                    item.setIcon(R.drawable.icon_vip_server);
+                else
+                    item.setIcon(resId);
             }
         }
     }
@@ -601,9 +604,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         registerReceiver();
 //        AdAppHelper.getInstance(this).onResume();
         isVIP = mSharedPreference.getBoolean(SharedPreferenceKey.VIP, false);
-        if (!isVIP && LocalVpnService.IsRunning && mConnectFragment != null) {
-            mConnectFragment.startVIPRecommendAnimation();
-        }
         updateFlagMenuIcon();
         try {
             VpnService.prepare(this);
@@ -611,7 +611,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             ShadowsocksApplication.handleException(e);
         }
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        if (adAppHelper.isNativeLoaded() && mDisconnectFragment == null) {
+        if (mDisconnectFragment == null) {//adAppHelper.isNativeLoaded() &&
             addBottomAd();
         }
         adAppHelper.loadNewNative();

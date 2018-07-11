@@ -136,7 +136,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
             }
         });
-}
+    }
 
     @Override
     public void onDestroy() {
@@ -331,6 +331,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
         mVpnState = VpnState.values()[state];
         mVIPImage.setVisibility(VIPActivity.isVIPUser(getContext()) ? View.GONE : View.VISIBLE);
+        if (!VIPActivity.isVIPUser(getContext()) && LocalVpnService.IsRunning) {
+            startVIPRecommendAnimation();
+        }
         updateUI();
     }
 
