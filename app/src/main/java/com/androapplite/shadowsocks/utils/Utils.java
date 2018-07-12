@@ -23,6 +23,7 @@ public class Utils {
         wm.getDefaultDisplay().getMetrics(metric);
         return metric.widthPixels;
     }
+
     public static int getScreenHeight(Context context) {
         WindowManager wm = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
@@ -33,6 +34,7 @@ public class Utils {
 
     /**
      * 判断是否有网络连接
+     *
      * @param context
      * @return
      */
@@ -59,5 +61,23 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
+
+    public static double change(double a) {
+        return a * Math.PI / 180;
+    }
+
+    public static double changeAngle(double a) {
+        return a * 180 / Math.PI;
     }
 }

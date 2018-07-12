@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/luck_pan_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/luck_pan_ad"
+        android:background="#fff"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/common_15"
+            android:layout_marginTop="@dimen/common_15"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="Luck Pan"
+            android:textColor="#000"
+            android:textSize="15sp"/>
+
+        <com.androapplite.shadowsocks.luckPan.LuckPanLayout
+            android:id="@+id/luck_pan_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="#fff"
+            app:pan_color="#f47c7b"
+            app:pan_radius="168dp"
+            app:pan_small_circle_color="#ff0">
+            <!--luckpan:icons="@array/icons"-->
+            <com.androapplite.shadowsocks.luckPan.RotatePan
+                android:id="@+id/rotatePan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="visible"
+                app:icons="@array/icons"
+                app:names="@array/names"
+                app:pan_num="8"
+                app:rotate_color="#f15556"
+                app:rotate_color_dark="#f9aaaa"
+                app:rotate_radius="125dp"
+                app:rotate_text_size="24sp"/>
+
+            <ImageView
+                android:layout_width="83dp"
+                android:layout_height="102dp"
+                android:src="@drawable/luck_pan_point_pic"
+                android:tag="startbtn"/>
+        </com.androapplite.shadowsocks.luckPan.LuckPanLayout>
+
+        <Button
+            android:id="@+id/btn_start_luck_pan"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/common_50"
+            android:layout_marginEnd="@dimen/common_50"
+            android:layout_marginStart="@dimen/common_50"
+            android:layout_marginTop="@dimen/common_20"
+            android:background="@drawable/luck_pan_bt_bg"
+            android:gravity="center"
+            android:text="Start"
+            android:textAllCaps="false"
+            android:textColor="@color/primary_black_text"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/luck_pan_ad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

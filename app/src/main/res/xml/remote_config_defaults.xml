@@ -278,6 +278,12 @@
         <value>60</value>
     </entry>
 
+    <!--幸运转盘得到的时间当天总和最大值,单位分钟-->
+    <entry>
+        <key>luck_pan_get_free_time_max</key>
+        <value>20</value>
+    </entry>
+
     <!--&lt;!&ndash;VIP商品id集合一个月&ndash;&gt;-->
     <!--<entry>-->
         <!--<key>pay_one_month_id</key>-->

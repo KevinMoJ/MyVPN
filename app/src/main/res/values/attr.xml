@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RotatePan">
+        <attr name="pan_num"  format="integer"/>
+        <attr name="names" format="reference"/>
+        <attr name="icons"  format="reference" />
+        <attr name="rotate_radius" format="dimension"/>
+        <attr name="rotate_color" format="color"/>
+        <attr name="rotate_color_dark" format="color" />
+        <attr name="rotate_text_size" format="dimension"/>
+    </declare-styleable>
+    <declare-styleable name="LuckPanLayout">
+        <attr name="pan_color" format="color"/>
+        <attr name="pan_radius" format="dimension"></attr>
+        <attr name="pan_small_circle_color" format="color"/>
+    </declare-styleable>
+
+</resources>

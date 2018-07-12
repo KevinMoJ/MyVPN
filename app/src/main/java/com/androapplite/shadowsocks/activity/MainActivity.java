@@ -969,6 +969,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
                 }
                 return true;
+            case R.id.luck_pan:
+                LuckRotateActivity.startLuckActivity(this);
+                return true;
 //            case R.id.action_ad:
 //                Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "点击");
 //                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
