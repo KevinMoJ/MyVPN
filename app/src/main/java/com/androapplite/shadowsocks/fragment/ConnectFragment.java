@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -376,9 +377,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectFragment fragment = mReference.get();
+            final ConnectFragment fragment = mReference.get();
             if (fragment != null && fragment.isVisible()) {
-                fragment.updateFreeUsedTime();
+                if (ConnectVpnHelper.isFreeUse(fragment.getContext())) {
+                    fragment.updateFreeUsedTime();
+                }
             }
         }
     }

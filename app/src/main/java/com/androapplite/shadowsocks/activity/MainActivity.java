@@ -329,6 +329,9 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void startConnectVPN() {
         Firebase firebase = Firebase.getInstance(this);
+        if (!ConnectVpnHelper.isFreeUse(this)) // 达到免费试用的时间
+            return;
+
         if (mVpnState == VpnState.Init || mVpnState == VpnState.Stopped ||
                 mVpnState == VpnState.Error) {
             if (netWorkSpeedUtils == null) {

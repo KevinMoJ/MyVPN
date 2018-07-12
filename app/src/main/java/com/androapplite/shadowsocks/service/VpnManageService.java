@@ -104,8 +104,11 @@ public class VpnManageService extends Service implements Runnable,
         mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.FREE_USE_TIME, 0);
         if (useTime < 0) {
             mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+        } else if (freeUseTime < 0) {
+            mSharedPreference.edit().putLong(SharedPreferenceKey.FREE_USE_TIME, 0).apply();
         }
     }
 
@@ -231,6 +234,9 @@ public class VpnManageService extends Service implements Runnable,
                     case 4:
                         firebase.logEvent("VPN断开", "自动切换服务器失败", server);
                         break;
+                    case 5:
+                        firebase.logEvent("VPN断开", "达到免费用时断开", server);
+                        break;
                 }
                 sStopReason = 0;
 
@@ -265,10 +271,10 @@ public class VpnManageService extends Service implements Runnable,
     }
 
     @Override
-    public void run() {
+    public void run() { // 没秒钟都要更新用时
         long start = System.currentTimeMillis();
         long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        long differ = (start - mTimeStart) / 1000;
+        long differ = (start - mTimeStart) / 1000;  // differ是秒
         if (differ < 0) {
             differ = 1;
             mTimeStart = start;
@@ -278,6 +284,7 @@ public class VpnManageService extends Service implements Runnable,
         }
         useTime += differ;
         mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, useTime).apply();
+        mSharedPreference.edit().putLong(SharedPreferenceKey.FREE_USE_TIME, useTime).apply();
         mTimeStart = start;
         LocalBroadcastManager.getInstance(this).sendBroadcast(mUseTimeIntent);
         Log.d("VpnManageService", "use time");
@@ -429,6 +436,11 @@ public class VpnManageService extends Service implements Runnable,
 
     public static void stopVpnForSwitchProxyFailed() {
         sStopReason = 4;
+        LocalVpnService.IsRunning = false;
+    }
+
+    public static void stopVpnForFreeTimeOver() {
+        sStopReason = 5;
         LocalVpnService.IsRunning = false;
     }
 }

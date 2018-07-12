@@ -1,6 +1,7 @@
 package com.androapplite.shadowsocks.connect;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -8,6 +9,7 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -479,6 +481,34 @@ public class ConnectVpnHelper {
         }
 
         return serverConfig;
+    }
+
+    public static boolean isFreeUse(final Context context) {
+        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
+        long countDown = sharedPreferences.getLong(SharedPreferenceKey.FREE_USE_TIME, 0);
+        long freeTime = FirebaseRemoteConfig.getInstance().getLong("not_vip_user_free_use_time");
+        if (countDown > freeTime * 60 && !VIPActivity.isVIPUser(context)) {
+            VpnManageService.stopVpnForFreeTimeOver();
+            Log.i("", "updateFreeUsedTime:  达到免费用时 ");
+            new AlertDialog.Builder(context).setTitle("Exit")
+                    .setMessage("Free Use Time Over")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            VIPActivity.startVIPActivity(context, VIPActivity.TYPE_NAV);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).setCancelable(false)
+                    .show();
+            return false;
+        } else {
+            return true;
+        }
     }
 
     //当前国家有VPN服务器，但是都链接失败了，就从头到尾再从新链接一下其他国家服务器

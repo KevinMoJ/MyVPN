@@ -15,6 +15,7 @@ public final class SharedPreferenceKey {
     public static final String CONNECTING_VPN_SIGNAL = "CONNECTING_VPN_SIGNAL";
     public static final String CONNECTING_VPN_PORT = "CONNECTING_VPN_PORT";
     public static final String USE_TIME = "USE_TIME";
+    public static final String FREE_USE_TIME = "FREE_USE_TIME"; // 非VIP用户免费使用时间
     public static final String SUCCESS_CONNECT_COUNT = "SUCCESS_CONNECT_COUNT";
     public static final String FAILED_CONNECT_COUNT = "FAILED_CONNECT_COUNT";
     public static final String NOTIFICATION_DISABLE_CHECK = "NOTIFICATION_DISABLE_CHECK";

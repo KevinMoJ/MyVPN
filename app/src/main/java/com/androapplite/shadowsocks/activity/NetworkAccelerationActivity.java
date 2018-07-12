@@ -363,6 +363,10 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     }
 
     private void startAccelerate() {
+        if (!ConnectVpnHelper.isFreeUse(this)) { // 达到免费试用的时间
+            return;
+        }
+
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();

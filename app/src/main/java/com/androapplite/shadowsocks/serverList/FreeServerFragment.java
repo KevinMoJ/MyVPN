@@ -123,7 +123,6 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
         FrameLayout container = (FrameLayout) view.findViewById(R.id.free_ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
-//            container.addView(adAppHelper.getNative(), params);
             adAppHelper.getNative(container, params);
             Firebase.getInstance(getContext()).logEvent("NATIVE广告", "显示成功", "服务器列表底部");
 
@@ -338,6 +337,8 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (!ConnectVpnHelper.isFreeUse(getContext())) // 达到免费试用的时间
+            return;
 
         mListView.setItemChecked(mSelectedIndex, false);
         mSelectedIndex = position;
