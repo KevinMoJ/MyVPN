@@ -67,6 +67,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
     private AlertDialog mDisconnectDialog;
     private BroadcastReceiver mForgroundReceiver;
     private IntentFilter mForgroundReceiverIntentFilter;
+    private FrameLayout mContainer;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,7 +99,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
         if (!VIPActivity.isVIPUser(getContext()))
-            addBottomAd(view);
+            addBottomAd();
         Firebase.getInstance(getContext()).logEvent("屏幕", "服务器列表屏幕");
     }
 
@@ -111,6 +112,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
         mTransparentView = view.findViewById(R.id.free_transparent_view);
         mTransparentView.setOnClickListener(this);
 
+        mContainer = (FrameLayout) view.findViewById(R.id.free_ad_view_container);
         mListView = (ListView) view.findViewById(R.id.free_vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
         mListView.setOnItemClickListener(this);
@@ -118,12 +120,11 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
 
-    private void addBottomAd(View view) {
+    public void addBottomAd() {
         AdAppHelper adAppHelper = AdAppHelper.getInstance(getContext());
-        FrameLayout container = (FrameLayout) view.findViewById(R.id.free_ad_view_container);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
         try {
-            adAppHelper.getNative(container, params);
+            adAppHelper.getNative(mContainer, params);
             Firebase.getInstance(getContext()).logEvent("NATIVE广告", "显示成功", "服务器列表底部");
 
         } catch (Exception ex) {
@@ -133,7 +134,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_up);
-        container.startAnimation(animation);
+        mContainer.startAnimation(animation);
     }
 
     private void parseServerList() {

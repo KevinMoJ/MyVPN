@@ -139,11 +139,20 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
 //        }
     }
 
+    private void showBottomAd() {
+        Fragment fragment = mFragmentList.get(mContentViewPager.getCurrentItem());
+        if (fragment instanceof FreeServerFragment)
+            ((FreeServerFragment) fragment).addBottomAd();
+        else if (fragment instanceof VIPServerFragment)
+            ((VIPServerFragment) fragment).addBottomAd();
+    }
+
     private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
 
         @Override
         public void onPageSelected(int position) {
             refreshTextColor(position);
+            showBottomAd();
             mCurrentIndex = position;
         }
 
