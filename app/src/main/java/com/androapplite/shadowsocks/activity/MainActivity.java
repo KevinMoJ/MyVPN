@@ -63,6 +63,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.serverList.ServerListActivity;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.NetWorkSpeedUtils;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
@@ -970,7 +971,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
                 return true;
             case R.id.luck_pan:
-                LuckRotateActivity.startLuckActivity(this);
+                if (!isVIP)
+                    LuckRotateActivity.startLuckActivity(this);
+                else
+                    DialogUtils.showVIPWelcomeDialog(this, null);
+
                 return true;
 //            case R.id.action_ad:
 //                Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "点击");
