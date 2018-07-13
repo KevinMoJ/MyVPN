@@ -272,6 +272,12 @@
         <value>0.99</value>
     </entry>
 
+    <!--VIP支付一年价格-->
+    <entry>
+        <key>pay_one_year_money</key>
+        <value>0.25</value>
+    </entry>
+
     <!--非VIP用户限时使用时长,单位分钟-->
     <entry>
         <key>not_vip_user_free_use_time</key>

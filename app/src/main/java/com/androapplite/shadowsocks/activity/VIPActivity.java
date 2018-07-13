@@ -10,9 +10,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -47,6 +47,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private static final int RC_REQUEST = 10001;
     public static String PAY_ONE_MONTH = "one_3";
     public static String PAY_HALF_YEAR = "half_2";
+    public static String PAY_ONE_YEAR = "year_1";
 
     private IabBroadcastReceiver mBroadcastReceiver;
     private IabHelper mHelper;
@@ -54,8 +55,9 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private TextView mVipOneMonthMoneyText;
     private ImageView mVipHalfYearBt;
     private TextView mVipHalfYearMoneyText;
+    private ImageView mVipOneYearBt;
+    private TextView mVipOneYearMoneyText;
     private TextView mServerMessageText;
-    private Button mVipFreeBt;
     private ActionBar mActionBar;
     /*标记IaHelper 是否启动*/
     private boolean isStartHelper;
@@ -100,7 +102,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 
     private void initGooglePayHelper() {
         skuList.add(PAY_ONE_MONTH);
-        skuList.add(PAY_HALF_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
+        skuList.add(PAY_HALF_YEAR);
+        skuList.add(PAY_ONE_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
 
         mHelper = new IabHelper(this, PUBLIC_KEY.trim());
         mHelper.enableDebugLogging(true);
@@ -142,11 +145,13 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         mVipOneMonthMoneyText = (TextView) findViewById(R.id.vip_one_month_money_text);
         mVipHalfYearBt = (ImageView) findViewById(R.id.vip_half_year_bt);
         mVipHalfYearMoneyText = (TextView) findViewById(R.id.vip_half_year_money_text);
+        mVipOneYearBt = (ImageView) findViewById(R.id.vip_one_year_bt);
+        mVipOneYearMoneyText = (TextView) findViewById(R.id.vip_one_year_money_text);
         mServerMessageText = (TextView) findViewById(R.id.server_message_text);
-        mVipFreeBt = (Button) findViewById(R.id.vip_free_bt);
 
         mVipOneMonthBt.setOnClickListener(this);
         mVipHalfYearBt.setOnClickListener(this);
+        mVipOneYearBt.setOnClickListener(this);
 
         mActionBar.setTitle("VIP");
     }
@@ -154,10 +159,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private void initUI() {
         String oneMonthMoney = FirebaseRemoteConfig.getInstance().getString("pay_one_month_money");
         String halfYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_half_year_money");
+        String oneYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_one_year_money");
 
         mServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
         mVipOneMonthMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(oneMonthMoney)));
-        mVipHalfYearMoneyText.setText(getResources().getString(R.string.pay_half_year_bt_text, String.valueOf(halfYearMoney)));
+        mVipHalfYearMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(halfYearMoney)));
+        mVipOneYearMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(oneYearMoney)));
     }
 
     public static void startVIPActivity(Context context, int type) {
@@ -178,6 +185,10 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 payHalfYear();
                 break;
 
+            case R.id.vip_one_year_bt:
+                payOneYear();
+                break;
+
         }
     }
 
@@ -188,6 +199,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             finish();
             return true;
         }
+
+        if (itemId == R.id.vip_luck_pan) {
+            LuckRotateActivity.startLuckActivity(this);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -204,6 +221,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         } else {
             Log.d(TAG, "onActivityResult handled by IABUtil.");
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.vip_right_menu, menu);
+        return true;
     }
 
     @Override
@@ -239,6 +262,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
             Purchase oneMonthPurchase = inventory.getPurchase(PAY_ONE_MONTH);
             Purchase halfYearPurchase = inventory.getPurchase(PAY_HALF_YEAR);
+            Purchase oneYearPurchase = inventory.getPurchase(PAY_ONE_YEAR);
 //            Log.i(TAG, "onQueryInventoryFinished:  " + inventory.hasPurchase(PAY_ONE_MONTH) + "    " + inventory.hasPurchase(PAY_HALF_YEAR));
 
             if (oneMonthPurchase != null) {
@@ -259,6 +283,14 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, halfYearPurchase.getPurchaseTime()).apply();
                 finish();
                 return;
+            } else if (oneYearPurchase != null) {
+                Log.i(TAG, "onQueryInventoryFinished: 查询成功的finish 一年 ");
+                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一年");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneYearPurchase.isAutoRenewing()).apply();
+                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneYearPurchase.getPurchaseTime()).apply();
+                finish();
             } else {
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "没查询到");
                 Log.i(TAG, "onQueryInventoryFinished:没查询到 ");
@@ -369,6 +401,51 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                     }
                 }
             }, "ffff");
+        } catch (IabAsyncInProgressException e) {
+        }
+
+        try {
+            mHelper.queryInventoryAsync(false, skuList, null, mGotInventoryListener);
+        } catch (IabAsyncInProgressException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void payOneYear() {
+        if (!mHelper.subscriptionsSupported()) {
+            return;
+        }
+
+        mHelper.flagEndAsync();
+        try {
+            mHelper.launchSubscriptionPurchaseFlow(this, PAY_ONE_YEAR, RC_REQUEST, new IabHelper.OnIabPurchaseFinishedListener() {
+                @Override
+                public void onIabPurchaseFinished(IabResult result, Purchase info) {
+                    if (result.isFailure()) {
+                        if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
+                            // 交易取消
+                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易取消", "一年");
+                            Log.i(TAG, "onIabPurchaseFinished: 交易取消");
+                        } else {
+                            // 交易失败
+                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易失败", "一年");
+                            Log.i(TAG, "onIabPurchaseFinished: 交易失败");
+                        }
+                    } else {
+                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一年");
+                        Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 一年");
+                        //存个字段，说明是VIP用户
+                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
+                        VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
+                        finish();
+                    }
+                }
+            }, "aaaa");
         } catch (IabAsyncInProgressException e) {
         }
 
