@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
@@ -18,6 +20,7 @@ import android.widget.FrameLayout;
 import com.androapplite.shadowsocks.luckPan.LuckPanLayout;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -26,8 +29,10 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.lang.ref.WeakReference;
 
-public class LuckRotateActivity extends AppCompatActivity {
+public class LuckRotateActivity extends AppCompatActivity implements Handler.Callback {
     private static final String TAG = "LuckRotateActivity";
+    public static final int SHOW_FULL_AD = 100;
+
     private static int RESULT_TYPE_1 = 0;
     private static int RESULT_TYPE_2 = 2;
     private static int RESULT_TYPE_3 = 1;
@@ -35,16 +40,20 @@ public class LuckRotateActivity extends AppCompatActivity {
     private static int RESULT_TYPE_THANKS = 7;
     public static final int ERROR_MAX_COUNT = 5;
 
-    private Button btnStartLuck;
+    private Button mStartRotateBt;
     private FrameLayout mAdContent;
-    private LuckPanLayout luckPanLayout;
-    private int rotatePos = -1;
+    private LuckPanLayout mLuckPanLayout;
     private ActionBar mActionBar;
-    private long startLuckPanTime;
+
     private SharedPreferences mSharedPreferences;
     private AdAppHelper mAdAppHelper;
     private InterstitialAdStateListener mStateListener;
+    private Handler mHandler;
+
+    private int rotatePos = -1;
+    private long startLuckPanTime;
     private boolean isLuckPanRunning;
+    private boolean todayIsContinuePlay; // 能不能玩，不能玩就一直转到thanks，能玩的话就显示转到的时间,
 
     private int[] LuckNumbers = {RESULT_TYPE_1, RESULT_TYPE_2, RESULT_TYPE_3, RESULT_TYPE_5, RESULT_TYPE_THANKS};
 
@@ -66,25 +75,27 @@ public class LuckRotateActivity extends AppCompatActivity {
         initUI();
     }
 
-    private void initView() {
-        luckPanLayout = findViewById(R.id.luck_pan_layout);
-        mAdContent = (FrameLayout) findViewById(R.id.luck_pan_ad);
-        luckPanLayout.setAnimationEndListener(animationEndListener);
-        btnStartLuck = findViewById(R.id.btn_start_luck_pan);
-        btnStartLuck.setOnClickListener(clickListener);
-//        btnEnableClick(true);
-    }
-
-    private void initUI() {
-        mActionBar.setTitle("Luck Game");
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (!VIPActivity.isVIPUser(this))
             addBottomAd();
+    }
+
+    private void initView() {
+        mLuckPanLayout = findViewById(R.id.luck_pan_layout);
+        mAdContent = (FrameLayout) findViewById(R.id.luck_pan_ad);
+        mLuckPanLayout.setAnimationEndListener(animationEndListener);
+        mStartRotateBt = findViewById(R.id.btn_start_luck_pan);
+        mStartRotateBt.setOnClickListener(clickListener);
     }
 
     private void initData() {
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mAdAppHelper = AdAppHelper.getInstance(this);
         mStateListener = new InterstitialAdStateListener(this);
+        mAdAppHelper.addAdStateListener(mStateListener);
+        mHandler = new Handler(this);
         startLuckPanTime = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0);
 
         if (startLuckPanTime == 0) { // 新用户没数据
@@ -100,28 +111,33 @@ public class LuckRotateActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "initData: 初始化" + startLuckPanTime);
+
+        mAdAppHelper.showFullAd();
+    }
+
+    private void initUI() {
+        mActionBar.setTitle("Luck Game");
+        btnEnableClick(false);
     }
 
     private void addBottomAd() {
         try {
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
             mAdAppHelper.getNative(2, mAdContent, params);
-//            mAdAppHelper.addAdStateListener(mStateListener);
         } catch (Exception e) {
         }
     }
 
     private void btnEnableClick(boolean enableClick) {
         if (enableClick) {
-            btnStartLuck.setClickable(true);
-            btnStartLuck.setText("start");
-            btnStartLuck.setBackground(getResources().getDrawable(R.drawable.luck_pan_bt_bg));
+            mStartRotateBt.setClickable(true);
+            mStartRotateBt.setText("start");
+            mStartRotateBt.setBackground(getResources().getDrawable(R.drawable.luck_pan_bt_bg));
         } else {
-            btnStartLuck.setClickable(false);
-            btnStartLuck.setText("preparing");
-            btnStartLuck.setBackground(getResources().getDrawable(R.drawable.luck_pan_bt_pressed));
+            mStartRotateBt.setClickable(false);
+            mStartRotateBt.setText("preparing");
+            mStartRotateBt.setBackground(getResources().getDrawable(R.drawable.free_over_cancel_bt_bg));
         }
-        isLuckPanRunning = !enableClick;
     }
 
     void startRotate() {
@@ -139,17 +155,19 @@ public class LuckRotateActivity extends AppCompatActivity {
             if (DateUtils.isToday(startLuckPanTime)) {
                 //如果当天玩的结果时间之和大于约定的20分钟，就让他的结果一直为thanks
                 if (freeTime + rotateLong >= cloudFreeTimeMax) {
-                    luckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
+                    todayIsContinuePlay = false;
+                    mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
                     Log.i(TAG, "startRotate: 达到了20分钟，一直thanks " + (freeTime + rotateLong));
                     return;
                 } else {
+                    todayIsContinuePlay = true;
                     mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, rotateLong + freeTime).apply();
                     Log.i(TAG, "startRotate: 没有达到20分钟，随机显示" + (freeTime + rotateLong));
-                    luckPanLayout.rotate(rotatePos, 100);
+                    mLuckPanLayout.rotate(rotatePos, 100);
                 }
             }
         } else {
-            luckPanLayout.rotate(rotatePos, 100);
+            mLuckPanLayout.rotate(rotatePos, 100);
         }
     }
 
@@ -182,14 +200,20 @@ public class LuckRotateActivity extends AppCompatActivity {
     LuckPanLayout.AnimationEndListener animationEndListener = new LuckPanLayout.AnimationEndListener() {
         @Override
         public void endAnimation(int position) {
-            btnEnableClick(true);
-            //network error 连续超过5次 不能再继续玩
-            /*动画结束以后再次请求数据*/
-//            getLuckPanData();
+            isLuckPanRunning = false;
+            btnEnableClick(false);
+            String rotateString = getRotateString(rotatePos);
+
+            if (!todayIsContinuePlay)
+                rotateString = "thanks";
+
+            DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
+            mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
         }
 
         @Override
         public void startAnimation(int position) {
+            isLuckPanRunning = true;
             btnEnableClick(false);
         }
     };
@@ -224,6 +248,16 @@ public class LuckRotateActivity extends AppCompatActivity {
         mAdAppHelper = null;
     }
 
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case SHOW_FULL_AD:
+                mAdAppHelper.showFullAd();
+                return true;
+        }
+        return false;
+    }
+
     private static class InterstitialAdStateListener extends AdStateListener {
         private WeakReference<LuckRotateActivity> mActivityReference;
 
@@ -236,6 +270,7 @@ public class LuckRotateActivity extends AppCompatActivity {
             LuckRotateActivity activity = mActivityReference.get();
             if (activity != null) {
                 activity.addBottomAd();
+                activity.btnEnableClick(true);
             }
         }
     }

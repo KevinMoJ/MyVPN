@@ -3,6 +3,10 @@ package com.androapplite.shadowsocks.utils;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,36 +16,48 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.LuckRotateActivity;
 import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.R;
 
 
 public class DialogUtils {
+
     /*游戏获得金币的Dialog*/
-    public static Dialog showGameGetMoneyDialog(Context context, String get, String todayReward, DialogInterface.OnDismissListener dismissListener) {
+    public static Dialog showGameGetTimeDialog(Context context, String freeTime, DialogInterface.OnDismissListener dismissListener) {
         final Dialog dialog = new Dialog(context, R.style.transpanrent_theme);
         dialog.setContentView(R.layout.dialog_game_get_money_dialog);
-        dialog.setOnDismissListener(dismissListener);
-        TextView tvGet = dialog.findViewById(R.id.tv_get_money);
-        TextView tvEarnToday = dialog.findViewById(R.id.tv_earn_today);
-        TextView tvTryAgain = dialog.findViewById(R.id.tv_try_again);
-        TextView tvNoThanks = dialog.findViewById(R.id.tv_no_thanks);
-        ImageView imageView = dialog.findViewById(R.id.iv_money_icon);
+        if (dismissListener != null)
+            dialog.setOnDismissListener(dismissListener);
+        ImageView bigIcon = dialog.findViewById(R.id.dialog_free_icon);
+        TextView title = dialog.findViewById(R.id.dialog_free_title);
+        TextView message = dialog.findViewById(R.id.dialog_free_message);
+        TextView tryAgain = dialog.findViewById(R.id.dialog_free_bt);
+        boolean isWin = !freeTime.equals("thanks");
+        long TotalFreeTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
+        if (isWin) {
+            bigIcon.setImageResource(R.drawable.luck_pan_price_icon);
+            title.setText(context.getResources().getString(R.string.add_minutes, freeTime));
+        } else {
+            bigIcon.setImageResource(R.drawable.luck_pan_thanks_icon);
+            title.setText(context.getResources().getString(R.string.no_prize));
+        }
 
-        tvTryAgain.setBackground(context.getResources().getDrawable(R.drawable.luck_pan_bt_bg));
-        imageView.setImageResource(R.mipmap.ic_launcher);
-        tvGet.setText(get);
-        tvEarnToday.setText(todayReward);
-        tvTryAgain.setOnClickListener(new View.OnClickListener() {
+        message.setText(getColorText(context.getResources().getString(R.string.cumulative_use_duration, String.valueOf(TotalFreeTime)), String.valueOf(TotalFreeTime), Color.YELLOW));
+
+        tryAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
 
-        tvNoThanks.setOnClickListener(new View.OnClickListener() {
+        dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+                    return true;
+                return false;
             }
         });
         dialog.setCancelable(true);
@@ -50,10 +66,18 @@ public class DialogUtils {
         return dialog;
     }
 
+    private static SpannableString getColorText(String text, String colorText, int color) {
+        SpannableString spannableString = new SpannableString(text);
+        ForegroundColorSpan colorSpan = new ForegroundColorSpan(color);
+        spannableString.setSpan(colorSpan, text.indexOf(colorText), text.indexOf(colorText) + colorText.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannableString;
+    }
+
     public static Dialog showVIPWelcomeDialog(Context context, DialogInterface.OnDismissListener dismissListener) {
         final Dialog dialog = new Dialog(context, R.style.transpanrent_theme);
         dialog.setContentView(R.layout.dialog_vip_welcome);
-        dialog.setOnDismissListener(dismissListener);
+        if (dismissListener != null)
+            dialog.setOnDismissListener(dismissListener);
         Button vipDialogBt = (Button) dialog.findViewById(R.id.vip_dialog_bt);
         vipDialogBt.setOnClickListener(new View.OnClickListener() {
             @Override

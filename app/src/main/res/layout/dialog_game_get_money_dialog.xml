@@ -11,36 +11,34 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/iv_money_icon"
+            android:id="@+id/dialog_free_icon"
             android:layout_width="292dp"
             android:layout_height="301dp"
-            android:src="@mipmap/ic_launcher"/>
+            android:scaleType="fitXY"/>
 
         <TextView
-            android:id="@+id/tv_get_money"
+            android:id="@+id/dialog_free_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:fontFamily="sans-serif"
-            android:text="getMoney"
             android:textColor="@color/primary_white_text"
             android:textSize="24sp"
             android:textStyle="bold"
             />
 
         <TextView
-            android:id="@+id/tv_earn_today"
+            android:id="@+id/dialog_free_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
-            android:text="Already get 0.02"
             android:textColor="@color/primary_white_text"
             android:textSize="16sp"
             android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/tv_try_again"
+            android:id="@+id/dialog_free_bt"
             android:layout_width="230dp"
             android:layout_height="45dp"
             android:layout_marginTop="20dp"
@@ -51,18 +49,6 @@
             android:text="OK"
             android:textColor="@color/primary_white_text"
             android:textSize="20sp"/>
-
-        <TextView
-            android:id="@+id/tv_no_thanks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:clickable="true"
-            android:fontFamily="sans-serif"
-            android:text="no_thanks"
-            android:textColor="@color/primary_white_text"
-            android:textSize="18sp"
-            android:visibility="gone"/>
     </LinearLayout>
 
 </RelativeLayout>

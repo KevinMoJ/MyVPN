@@ -16,7 +16,7 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/common_180"
+            android:layout_height="wrap_content"
             android:scaleType="fitXY"
             android:src="@drawable/dialog_free_over_top_bg"/>
 
@@ -34,7 +34,7 @@
                 android:layout_marginStart="@dimen/common_16"
                 android:layout_marginTop="@dimen/common_20"
                 android:gravity="center"
-                android:text="The free experience has already arrived. You can also advertise when you join the VIP"
+                android:text="@string/free_over_dialog_message"
                 android:textColor="@color/primary_black_text"
                 android:textSize="@dimen/common_text_size_18sp"/>
 
@@ -46,7 +46,7 @@
                 android:layout_marginRight="@dimen/common_16"
                 android:layout_marginTop="@dimen/common_16"
                 android:background="@drawable/warn_dialog_button_bg"
-                android:text="Join VIP"
+                android:text="@string/join_vip"
                 android:textAllCaps="false"/>
 
             <Button
@@ -58,7 +58,7 @@
                 android:layout_marginRight="@dimen/common_16"
                 android:layout_marginTop="@dimen/common_16"
                 android:background="@drawable/free_over_cancel_bt_bg"
-                android:text="Cruel Rejection"
+                android:text="@string/cruel_rejection"
                 android:textAllCaps="false"
                 android:textColor="#8b8b8b"/>
 
