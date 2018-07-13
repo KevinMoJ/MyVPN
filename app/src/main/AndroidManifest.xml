@@ -141,8 +141,14 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
-        <activity android:name="com.androapplite.shadowsocks.activity.LuckRotateActivity"
-                  android:launchMode="singleTop">
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.LuckRotateActivity"
+            android:launchMode="singleTop">
+        </activity>
+        <activity android:name="com.androapplite.shadowsocks.activity.FreeTimeOverActivity"
+                  android:excludeFromRecents="true"
+                  android:launchMode="singleInstance"
+                  android:theme="@style/InactiveUser">
         </activity>
     </application>
 

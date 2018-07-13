@@ -22,7 +22,6 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
@@ -491,9 +490,8 @@ public class ConnectVpnHelper {
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         long countDown = sharedPreferences.getLong(SharedPreferenceKey.FREE_USE_TIME, 0);
         long freeTime = FirebaseRemoteConfig.getInstance().getLong("not_vip_user_free_use_time");
-        if (countDown > freeTime * 60 && !VIPActivity.isVIPUser(context)) {
-            VpnManageService.stopVpnForFreeTimeOver();
-            DialogUtils.showFreeUseOverDialog(context, type);
+        if (countDown >= freeTime * 60  && !VIPActivity.isVIPUser(context)) {
+            VpnManageService.stopVpnForFreeTimeOver(context, type);
             return false;
         } else {
             return true;

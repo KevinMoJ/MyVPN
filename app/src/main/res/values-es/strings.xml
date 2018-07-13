@@ -136,4 +136,14 @@
     <string name="dear_premium_user">Dear Premium User</string>
     <string name="enjoy_now">Enjoy Now</string>
     <string name="months_plan">%s Months Plan</string>
+
+    <string name="no_prize">No Prize</string>
+    <string name="congratulations">Congratulations</string>
+    <string name="join_vip">Join VIP</string>
+    <string name="cruel_rejection">Cruel Rejection</string>
+    <string name="wireless_traffic">Wireless traffic,unlimited time</string>
+    <string name="cumulative_use_duration">Cumulative use duration %s minutes</string>
+    <string name="luck_pan_title">Play Lucky Game to get free experience time</string>
+    <string name="free_over_dialog_message">The free experience has already arrived. You can also advertise when you join the VIP</string>
+    <string name="add_minutes">+%s Minutes</string>
 </resources>

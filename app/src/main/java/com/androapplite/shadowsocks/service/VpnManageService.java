@@ -26,8 +26,10 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.FreeTimeOverActivity;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
+import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -288,6 +290,11 @@ public class VpnManageService extends Service implements Runnable,
         mTimeStart = start;
         LocalBroadcastManager.getInstance(this).sendBroadcast(mUseTimeIntent);
         Log.d("VpnManageService", "use time");
+        long freeTime = FirebaseRemoteConfig.getInstance().getLong("not_vip_user_free_use_time");
+
+        if (useTime >= freeTime * 60) {
+            stopVpnForFreeTimeOver(this, ConnectVpnHelper.FREE_OVER_DIALOG_AUTO);
+        }
     }
 
     public static void start(Context context) {
@@ -439,8 +446,9 @@ public class VpnManageService extends Service implements Runnable,
         LocalVpnService.IsRunning = false;
     }
 
-    public static void stopVpnForFreeTimeOver() {
+    public static void stopVpnForFreeTimeOver(Context context, int type) {
         sStopReason = 5;
         LocalVpnService.IsRunning = false;
+        context.startActivity(new Intent(context, FreeTimeOverActivity.class));
     }
 }
