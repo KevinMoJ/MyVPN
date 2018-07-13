@@ -337,7 +337,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (!ConnectVpnHelper.isFreeUse(getContext())) // 达到免费试用的时间
+        if (!ConnectVpnHelper.isFreeUse(getContext(), ConnectVpnHelper.FREE_OVER_DIALOG_SERVER_LIST)) // 达到免费试用的时间
             return;
 
         mListView.setItemChecked(mSelectedIndex, false);

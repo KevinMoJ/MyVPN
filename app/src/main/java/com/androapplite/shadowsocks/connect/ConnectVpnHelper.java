@@ -1,7 +1,6 @@
 package com.androapplite.shadowsocks.connect;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -9,7 +8,6 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -24,6 +22,7 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.VpnManageService;
+import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
@@ -66,6 +65,11 @@ import okhttp3.Response;
 
 public class ConnectVpnHelper {
     private static final String TAG = "测试";
+
+    public static final int FREE_OVER_DIALOG_NET_SPEED = 100;
+    public static final int FREE_OVER_DIALOG_MAIN = 101;
+    public static final int FREE_OVER_DIALOG_SERVER_LIST = 102;
+    public static final int FREE_OVER_DIALOG_AUTO = 103;
 
     private static ConnectVpnHelper instance;
     public static final String URL_BING = "https://www.bing.com";
@@ -483,28 +487,13 @@ public class ConnectVpnHelper {
         return serverConfig;
     }
 
-    public static boolean isFreeUse(final Context context) {
+    public static boolean isFreeUse(final Context context, int type) {
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         long countDown = sharedPreferences.getLong(SharedPreferenceKey.FREE_USE_TIME, 0);
         long freeTime = FirebaseRemoteConfig.getInstance().getLong("not_vip_user_free_use_time");
         if (countDown > freeTime * 60 && !VIPActivity.isVIPUser(context)) {
             VpnManageService.stopVpnForFreeTimeOver();
-            Log.i("", "updateFreeUsedTime:  达到免费用时 ");
-            new AlertDialog.Builder(context).setTitle("Exit")
-                    .setMessage("Free Use Time Over")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            VIPActivity.startVIPActivity(context, VIPActivity.TYPE_NAV);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    }).setCancelable(false)
-                    .show();
+            DialogUtils.showFreeUseOverDialog(context, type);
             return false;
         } else {
             return true;

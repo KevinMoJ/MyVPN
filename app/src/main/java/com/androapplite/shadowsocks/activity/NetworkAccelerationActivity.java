@@ -363,7 +363,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     }
 
     private void startAccelerate() {
-        if (!ConnectVpnHelper.isFreeUse(this)) { // 达到免费试用的时间
+        if (!ConnectVpnHelper.isFreeUse(this, ConnectVpnHelper.FREE_OVER_DIALOG_NET_SPEED)) { // 达到免费试用的时间
             return;
         }
 

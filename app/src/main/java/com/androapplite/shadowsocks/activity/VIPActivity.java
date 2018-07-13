@@ -42,6 +42,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     public static final int TYPE_MAIN_PAO = 102;
     public static final int TYPE_NAV = 103;
     public static final int TYPE_NET_SPEED_FINISH = 104;
+    public static final int TYPE_FREE_TIME_OVER = 105;
 
     private static final int RC_REQUEST = 10001;
     public static String PAY_ONE_MONTH = "one_3";
@@ -93,6 +94,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             Firebase.getInstance(this).logEvent("进入vip界面来源", "侧边栏");
         else if (type == TYPE_NET_SPEED_FINISH)
             Firebase.getInstance(this).logEvent("进入vip界面来源", "加速成功结果页");
+        else if (type == TYPE_FREE_TIME_OVER)
+            Firebase.getInstance(this).logEvent("进入vip界面来源", "面试试用结束");
     }
 
     private void initGooglePayHelper() {

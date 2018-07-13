@@ -35,6 +35,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
     public boolean mNeedToShake = true; // 小火箭是否需要抖动
     private FrameLayout mAdContent;
     private boolean isNativeAddSuccess;
+    private Button mRocketBt;
 
     public NetworkAccelerationFragment() {
         // Required empty public constructor
@@ -50,17 +51,17 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Button rocketBt = (Button) view.findViewById(R.id.acc_btn);
-        rocketBt.setOnClickListener(this);
+        mRocketBt = (Button) view.findViewById(R.id.acc_btn);
+        mRocketBt.setOnClickListener(this);
         mAdContent = (FrameLayout) view.findViewById(R.id.net_speed_ad_content);
         if (!VIPActivity.isVIPUser(getContext()))
             addBottomAd();
         else
             isNativeAddSuccess = false;
         if (!isNativeAddSuccess) {
-            RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) rocketBt.getLayoutParams();
+            RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) mRocketBt.getLayoutParams();
             rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.banner_ad_loading_icon_margin_top);
-            rocketBt.setLayoutParams(rocketBtLayoutParams);
+            mRocketBt.setLayoutParams(rocketBtLayoutParams);
         }
 //        if(mNeedToShake) {
 //            rocketShake();
@@ -202,6 +203,16 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 mRocketShake.resume();
             }
+        }
+
+        if (!VIPActivity.isVIPUser(getContext()))
+            addBottomAd();
+        else
+            isNativeAddSuccess = false;
+        if (!isNativeAddSuccess) {
+            RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) mRocketBt.getLayoutParams();
+            rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.banner_ad_loading_icon_margin_top);
+            mRocketBt.setLayoutParams(rocketBtLayoutParams);
         }
     }
 

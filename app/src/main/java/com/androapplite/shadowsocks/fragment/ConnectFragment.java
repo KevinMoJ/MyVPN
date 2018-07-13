@@ -379,7 +379,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         public void onReceive(Context context, Intent intent) {
             final ConnectFragment fragment = mReference.get();
             if (fragment != null && fragment.isVisible()) {
-                if (ConnectVpnHelper.isFreeUse(fragment.getContext())) {
+                if (ConnectVpnHelper.isFreeUse(fragment.getContext(), ConnectVpnHelper.FREE_OVER_DIALOG_AUTO)) {
                     fragment.updateFreeUsedTime();
                 }
             }
