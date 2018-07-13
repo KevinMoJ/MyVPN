@@ -1,6 +1,8 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,7 +14,7 @@ import android.widget.TextView;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.view.VIPWelcomeDialog;
+import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.vpn3.R;
 
 import java.text.SimpleDateFormat;
@@ -61,7 +63,7 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
         mVipFinishServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
 
         boolean isPayOneMonth = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true);
-        mVipFinishPayType.setText(getResources().getString(R.string.months_plan, isPayOneMonth ? 1 : 6));
+        mVipFinishPayType.setText(getResources().getString(R.string.months_plan, isPayOneMonth ? "1" : "6"));
 
         long payTime = 0;
         payTime = mSharedPreferences.getLong(SharedPreferenceKey.VIP_PAY_TIME, 0);
@@ -83,11 +85,19 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
         mVipFinishPayAutomaticRenewal.setText(isAuto ? "ON" : "OFF");
 
         if (isShowVIPDialog) {
-            VIPWelcomeDialog vipWelcomeDialog = new VIPWelcomeDialog();
-            vipWelcomeDialog.show(getSupportFragmentManager(), "vipWelcomeDialog");
+            Dialog dialog = DialogUtils.showVIPWelcomeDialog(this, new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+
+                }
+            });
+
+            if (dialog.isShowing()) {
+                Firebase.getInstance(this).logEvent("VIPDialog界面", "显示");
+            }
         }
 
-        Firebase.getInstance(this).logEvent("VIPDialog界面", "显示");
+        Firebase.getInstance(this).logEvent("VIP购买成功弹窗", "显示");
     }
 
     private String getEnglishMonth(String month) {
