@@ -112,7 +112,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             mSharedPreferences.edit().putInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, 0).apply();
         }
 
-        mAdAppHelper.showFullAd();
+        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
+            mAdAppHelper.showFullAd();
+        }
     }
 
     private void initUI() {
@@ -213,7 +215,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                 rotateString = "thanks";
 
             DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
-            mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
+            if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
+                mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
+            }
         }
 
         @Override

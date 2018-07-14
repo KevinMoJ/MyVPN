@@ -15,8 +15,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
+import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.ironsource.sdk.utils.Logger;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
     private int screenWidth;
     private int screenHeight;
     private int mCurrentIndex;
+    private boolean isVIP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +57,6 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         actionBar.setHomeAsUpIndicator(upArrow);
         actionBar.setTitle(getResources().getString(R.string.app_name).toUpperCase());
         actionBar.setElevation(0);
-
-        AdAppHelper.getInstance(this).showFullAd();
 
         initView();
         initData();
@@ -107,6 +108,11 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         mFragmentList = new ArrayList<Fragment>();
         mFragmentList.add(mFreeServerFragment);
         mFragmentList.add(mVIPServerFragment);
+
+        isVIP = VIPActivity.isVIPUser(this);
+
+        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad"))
+            AdAppHelper.getInstance(this).showFullAd();
     }
 
     private void selectPage(int position, int currentPosition) {
@@ -152,7 +158,8 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         @Override
         public void onPageSelected(int position) {
             refreshTextColor(position);
-            showBottomAd();
+            if (!isVIP)
+                showBottomAd();
             mCurrentIndex = position;
         }
 

@@ -296,6 +296,18 @@
         <value>0</value>
     </entry>
 
+    <!--幸运转盘展示全屏开关-->
+    <entry>
+        <key>luck_pan_show_full_ad</key>
+        <value>true</value>
+    </entry>
+
+    <!--服务器列表全屏开关-->
+    <entry>
+        <key>server_list_show_full_ad</key>
+        <value>true</value>
+    </entry>
+
     <!--&lt;!&ndash;VIP商品id集合一个月&ndash;&gt;-->
     <!--<entry>-->
         <!--<key>pay_one_month_id</key>-->
