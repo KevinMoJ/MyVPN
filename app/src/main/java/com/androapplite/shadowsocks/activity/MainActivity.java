@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connectivity);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initDrawer(toolbar);
         initNavigationView();
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         //用来判断活跃不活跃用户所存的时间
         mSharedPreference.edit().putLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, System.currentTimeMillis()).apply();
         Firebase firebase = Firebase.getInstance(this);
-        firebase.logEvent("屏幕","主屏幕");
+        firebase.logEvent("屏幕", "主屏幕");
         checkNotification();
 
         LocalVpnService.addOnStatusChangedListener(this);
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void showInterstitialWithDelay(int msg, String adShowRate, String adDelayMin, String adDelayMinDefault, String adDelayMax, String adDelayMaxDefault ) {
+    private void showInterstitialWithDelay(int msg, String adShowRate, String adDelayMin, String adDelayMinDefault, String adDelayMax, String adDelayMaxDefault) {
         AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
         String enterAdSwitch = adAppHelper.getCustomCtrlValue(adShowRate, "1");
         float enterAdRate;
@@ -180,14 +180,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             if (adAppHelper.isFullAdLoaded()) {
                 String enterAdMinS = adAppHelper.getCustomCtrlValue(adDelayMin, adDelayMinDefault);
                 int enterAdMin;
-                try{
+                try {
                     enterAdMin = Integer.valueOf(enterAdMinS);
                 } catch (Exception e) {
                     enterAdMin = 0;
                 }
                 String enterAdMaxS = adAppHelper.getCustomCtrlValue(adDelayMax, adDelayMaxDefault);
                 int enterAdMax;
-                try{
+                try {
                     enterAdMax = Integer.valueOf(enterAdMaxS);
                 } catch (Exception e) {
                     enterAdMax = 0;
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void initNavigationView(){
+    private void initNavigationView() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setItemIconTintList(null);//取消统一着色
         navigationView.setNavigationItemSelectedListener(this);
@@ -251,14 +251,15 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private static class InterstitialAdStateListener extends AdStateListener {
         private WeakReference<MainActivity> mActivityReference;
-        InterstitialAdStateListener(MainActivity activity){
+
+        InterstitialAdStateListener(MainActivity activity) {
             mActivityReference = new WeakReference<>(activity);
         }
 
         @Override
         public void onAdLoaded(AdType adType, int index) {
             MainActivity activity = mActivityReference.get();
-            if(activity != null) {
+            if (activity != null) {
                 switch (adType.getType()) {
                     case AdType.ADMOB_NATIVE:
                     case AdType.ADMOB_BANNER:
@@ -274,8 +275,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         @Override
         public void onAdOpen(AdType adType, int index) {
             MainActivity activity = mActivityReference.get();
-            if(activity != null){
-                switch (adType.getType()){
+            if (activity != null) {
+                switch (adType.getType()) {
                     case ADMOB_FULL:
                     case AdType.FACEBOOK_FBN:
                     case AdType.FACEBOOK_FULL:
@@ -303,8 +304,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         @Override
         public void onAdClosed(AdType adType, int index) {
             MainActivity activity = mActivityReference.get();
-            if(activity != null){
-                switch (adType.getType()){
+            if (activity != null) {
+                switch (adType.getType()) {
                     case ADMOB_FULL:
                     case AdType.FACEBOOK_FBN:
                     case AdType.FACEBOOK_FULL:
@@ -320,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onConnectButtonClick() {
-       startConnectVPN();
+        startConnectVPN();
     }
 
     @Override
@@ -339,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 netWorkSpeedUtils = new NetWorkSpeedUtils(this);
             }
             netWorkSpeedUtils.startShowNetSpeed();
-            if(checkConnection(isConnectionAvailable())) {
+            if (checkConnection(isConnectionAvailable())) {
                 connectVpnServerAsync();
             }
             firebase.logEvent("连接VPN", "连接");
@@ -347,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             RealTimeLogger.answerLogEvent("click_connect_bt_count", "connect", "connect_count:" + mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0));
             //不是小火箭加速的连接
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
-            if(mSharedPreference != null) {
+            if (mSharedPreference != null) {
                 String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
                 firebase.logEvent("选择国家", nation);
             }
@@ -389,8 +390,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         startConnectVPN();
     }
 
-    private void connectVpnServerAsyncCore(){
-        if(mConnectFragment != null){
+    private void connectVpnServerAsyncCore() {
+        if (mConnectFragment != null) {
             mConnectFragment.animateConnecting();
             mVpnState = VpnState.Connecting;
         }
@@ -399,19 +400,20 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
 
-    private static class MyReceiver extends BroadcastReceiver{
+    private static class MyReceiver extends BroadcastReceiver {
         private WeakReference<MainActivity> mActivityReference;
 
-        MyReceiver(MainActivity activity){
+        MyReceiver(MainActivity activity) {
             mActivityReference = new WeakReference<>(activity);
         }
+
         @Override
         public void onReceive(Context context, Intent intent) {
             MainActivity activity = mActivityReference.get();
-            if(activity != null){
+            if (activity != null) {
                 String action = intent.getAction();
                 String serverListString = intent.getStringExtra(SharedPreferenceKey.FETCH_SERVER_LIST);
-                switch(action){
+                switch (action) {
                     case Action.SERVER_LIST_FETCH_FINISH:
                         activity.handleServerList(serverListString);
                         break;
@@ -436,18 +438,18 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void handleServerList(String serverListString){
-        if(mFetchServerListProgressDialog != null){
+    private void handleServerList(String serverListString) {
+        if (mFetchServerListProgressDialog != null) {
             mFetchServerListProgressDialog.dismiss();
             mFetchServerListProgressDialog = null;
         }
         //双重保险
-        if(!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
-            if(serverListString != null) {
+        if (!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
+            if (serverListString != null) {
                 mSharedPreference.edit().putString(SharedPreferenceKey.FETCH_SERVER_LIST, serverListString).apply();
             }
         }
-        if(!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
+        if (!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             if (mFetchServerListProgressDialog != null)
                 mFetchServerListProgressDialog.setOnDismissListener(null);
             showNoInternetSnackbar(R.string.fetch_server_list_failed, false);
@@ -459,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             } else {
                 Firebase.getInstance(this).logEvent("VPN连不上", "网络", "未知");
             }
-            if(mConnectFragment != null){
+            if (mConnectFragment != null) {
                 mConnectFragment.updateUI();
             }
             ConnectVpnHelper.getInstance(this).startTestConnectionWithOutVPN(ConnectVpnHelper.URL_BING, mConnectingConfig);
@@ -468,41 +470,41 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onAttachFragment(Fragment fragment) {
-        if(fragment instanceof ConnectFragment){
-            mConnectFragment = (ConnectFragment)fragment;
+        if (fragment instanceof ConnectFragment) {
+            mConnectFragment = (ConnectFragment) fragment;
         }
     }
 
-    private Pair<Boolean, Integer> isConnectionAvailable(){
+    private Pair<Boolean, Integer> isConnectionAvailable() {
         Pair<Boolean, Integer> result = Pair.create(true, 0);
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         Firebase firebase = Firebase.getInstance(this);
-        if(connectivityManager == null){
+        if (connectivityManager == null) {
             result = Pair.create(false, R.string.no_network);
-            firebase.logEvent("网络连接","异常","没有网络服务");
-        }else{
+            firebase.logEvent("网络连接", "异常", "没有网络服务");
+        } else {
             final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            if(activeNetworkInfo == null){
+            if (activeNetworkInfo == null) {
                 result = Pair.create(false, R.string.no_internet_message);
-                firebase.logEvent("网络连接","异常","没有网络连接");
+                firebase.logEvent("网络连接", "异常", "没有网络连接");
 
-            }else if(!activeNetworkInfo.isConnected()){
+            } else if (!activeNetworkInfo.isConnected()) {
                 result = Pair.create(false, R.string.not_available_internet);
-                firebase.logEvent("网络连接","异常","当前网络连接不可用");
+                firebase.logEvent("网络连接", "异常", "当前网络连接不可用");
             }
         }
         return result;
     }
 
-    private boolean checkConnection(Pair<Boolean, Integer> connectionStatus){
-        if(connectionStatus.first == false){
+    private boolean checkConnection(Pair<Boolean, Integer> connectionStatus) {
+        if (connectionStatus.first == false) {
             showNoInternetSnackbar(connectionStatus.second, true);
         }
         return connectionStatus.first;
     }
 
     private void clearSnackbar() {
-        if(mSnackbar != null && mSnackbar.isShown()){
+        if (mSnackbar != null && mSnackbar.isShown()) {
             mSnackbar.dismiss();
             mSnackbar = null;
         }
@@ -512,13 +514,17 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         final View decorView = findViewById(android.R.id.content);
         clearSnackbar();
         mSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_LONG);
-        if(hasAction) {
+        if (hasAction) {
             mSnackbar.setAction(android.R.string.yes, this);
         }
         mSnackbar.getView().setTag(messageId);
         mSnackbar.show();
     }
 
+    public static void startLuckRotateActivity(Context context) {
+        Intent[] intents = {new Intent(context, MainActivity.class), new Intent(context, LuckRotateActivity.class)};
+        context.startActivities(intents);
+    }
 
     @Override
     public void onClick(View v) {
@@ -632,12 +638,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         AdAppHelper.getInstance(this).onPause();
     }
 
-    private void registerReceiver(){
+    private void registerReceiver() {
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
         manager.registerReceiver(mReceiver, mIntentFilter);
     }
 
-    private void unregisterReceiver(){
+    private void unregisterReceiver() {
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
         manager.unregisterReceiver(mReceiver);
     }
@@ -645,10 +651,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public boolean handleMessage(Message msg) {
         AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        switch (msg.what){
+        switch (msg.what) {
             case MSG_REPEAT_MENU_ROCKET:
                 if (mMenu != null) {
-                    final ImageView rocketIV = (ImageView)mMenu.findItem(R.id.action_rocket).getActionView();
+                    final ImageView rocketIV = (ImageView) mMenu.findItem(R.id.action_rocket).getActionView();
                     if (rocketIV != null) {
                         rocketIV.startAnimation(mMenuRocketAnimation);
                     }
@@ -657,14 +663,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             case MSG_CONNECTION_TIMEOUT:
 //                showNoInternetSnackbar(R.string.timeout_tip, false);
                 ConnectTimeoutDialog connectTimeoutDialog = new ConnectTimeoutDialog();
-                connectTimeoutDialog.show(getSupportFragmentManager(),"connectTimeOut");
+                connectTimeoutDialog.show(getSupportFragmentManager(), "connectTimeOut");
                 long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
-                mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, error+1).apply();
+                mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, error + 1).apply();
                 mVpnState = VpnState.Error;
-                if(mConnectingConfig != null){
+                if (mConnectingConfig != null) {
                     mErrorServers.add(mConnectingConfig);
                     Firebase.getInstance(this).logEvent("VPN连不上", "VPN连接超时", mConnectingConfig.server);
-                }else {
+                } else {
                     Firebase.getInstance(this).logEvent("VPN连不上", "VPN连接超时");
                 }
                 ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -674,7 +680,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else {
                     Firebase.getInstance(this).logEvent("VPN连不上", "网络", "未知");
                 }
-                if(mConnectFragment != null){
+                if (mConnectFragment != null) {
                     mConnectFragment.setConnectResult(mVpnState);
                     mConnectFragment.updateUI();
                 }
@@ -694,7 +700,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             case MSG_NO_AVAILABE_VPN:
                 showNoInternetSnackbar(R.string.server_not_available, false);
                 mVpnState = VpnState.Error;
-                if(mConnectFragment != null){
+                if (mConnectFragment != null) {
                     mConnectFragment.setConnectResult(mVpnState);
                     mConnectFragment.updateUI();
                 }
@@ -713,13 +719,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         return true;
     }
 
-    private void prepareStartVpnBackground(){
+    private void prepareStartVpnBackground() {
         final ServerConfig serverConfig = ConnectVpnHelper.getInstance(this).findVPNServer();
-        if(serverConfig != null) {
+        if (serverConfig != null) {
             mConnectingConfig = serverConfig;
             mForegroundHandler.sendEmptyMessage(MSG_PREPARE_START_VPN_FORGROUND);
             Log.d("MainActivity", String.format("server config: %s:%d", serverConfig.server, serverConfig.port));
-        }else{
+        } else {
             boolean isValidation = ServerConfig.checkServerConfigJsonString(mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null));
             Firebase.getInstance(this).logEvent("VPN连不上", "没有可用的服务器", "服务器列表合法 " + isValidation);
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -738,7 +744,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void prepareStartService(){
+    private void prepareStartService() {
         try {
             Intent intent = VpnService.prepare(this);
             if (intent != null) {
@@ -748,11 +754,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
                 ShadowsocksApplication.debug("ss-vpn", "onActivityResult");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             showNoInternetSnackbar(R.string.not_start_vpn, false);
             ShadowsocksApplication.handleException(e);
             Firebase.getInstance(this).logEvent("VPN连不上", "VPN Prepare错误", e.getMessage());
-            if(mConnectFragment != null){
+            if (mConnectFragment != null) {
                 mConnectFragment.updateUI();
             }
         }
@@ -761,7 +767,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if(requestCode == REQUEST_CONNECT){
+            if (requestCode == REQUEST_CONNECT) {
                 if (mConnectingConfig != null) {
                     LocalVpnService.ProxyUrl = mConnectingConfig.toProxyUrl();
                     Firebase.getInstance(this).logEvent("代理", mConnectingConfig.server);
@@ -769,11 +775,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                         startService(new Intent(this, LocalVpnService.class));
                     }
                 }
-            } else if(requestCode == OPEN_SERVER_LIST){
-                ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-                if(connectivityManager != null){
+            } else if (requestCode == OPEN_SERVER_LIST) {
+                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (connectivityManager != null) {
                     NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                    if(networkInfo != null && networkInfo.isAvailable()){
+                    if (networkInfo != null && networkInfo.isAvailable()) {
                         if (!LocalVpnService.IsRunning) {
                             mIsRestart = false;
                             connectVpnServerAsync();
@@ -790,12 +796,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
 //                PromotionTracking.getInstance(this).reportSwitchCountry();
             }
-        }else{
-            if(requestCode == REQUEST_CONNECT){
+        } else {
+            if (requestCode == REQUEST_CONNECT) {
                 mVpnState = VpnState.Stopped;
                 mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
-                if(mConnectFragment != null && mConnectFragment.isAdded()){
+                if (mConnectFragment != null && mConnectFragment.isAdded()) {
                     mConnectFragment.setConnectResult(mVpnState);
                 }
                 showNoInternetSnackbar(R.string.enable_vpn_connection, true);
@@ -818,7 +824,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public void onDisconnect(DisconnectFragment disconnectFragment) {
         Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
-        if (!LocalVpnService.IsRunning){
+        if (!LocalVpnService.IsRunning) {
             //记录VPN连接开始的时间
             mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
         }
@@ -841,8 +847,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void disconnectVpnServiceAsync(){
-        if(mConnectFragment != null){
+    private void disconnectVpnServiceAsync() {
+        if (mConnectFragment != null) {
             if (LocalVpnService.IsRunning) {
                 mConnectFragment.animateStopping();
                 mVpnState = VpnState.Stopping;
@@ -860,31 +866,31 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         addBottomAd();
     }
 
-    private void checkNotification(){
+    private void checkNotification() {
         boolean isNotificationEnable = NotificationsUtils.isNotificationEnabled(this);
         boolean isNotificationDisabledCheck = mSharedPreference.getBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, false);
-        if(!isNotificationEnable){
-            if(isNotificationDisabledCheck){
-                Firebase.getInstance(this).logEvent("通知设置", "禁用","禁用未启用");
-            }else{
+        if (!isNotificationEnable) {
+            if (isNotificationDisabledCheck) {
+                Firebase.getInstance(this).logEvent("通知设置", "禁用", "禁用未启用");
+            } else {
                 Firebase.getInstance(this).logEvent("通知设置", "禁用", "禁用首次发现");
             }
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, true).apply();
 //            showNoInternetSnackbar(R.string.enable_notification, true);
 
-        }else{
+        } else {
             mSharedPreference.edit().putBoolean(SharedPreferenceKey.NOTIFICATION_DISABLE_CHECK, false).apply();
-            if(isNotificationDisabledCheck){
+            if (isNotificationDisabledCheck) {
                 Firebase.getInstance(this).logEvent("通知设置", "启用", "通过设置打开通知");
-            }else{
+            } else {
                 Firebase.getInstance(this).logEvent("通知设置", "启用", NotificationsUtils.getNotificationImportance(this));
             }
         }
     }
 
-    private void checkNotificationAndShowRemainder(){
+    private void checkNotificationAndShowRemainder() {
         boolean isNotificationEnable = NotificationsUtils.isNotificationEnabled(this);
-        if(!isNotificationEnable){
+        if (!isNotificationEnable) {
             showNoInternetSnackbar(R.string.enable_notification, true);
         }
     }
@@ -940,7 +946,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         updateFlagMenuIcon();
-        final ImageView rocketIV = (ImageView)menu.findItem(R.id.action_rocket).getActionView();
+        final ImageView rocketIV = (ImageView) menu.findItem(R.id.action_rocket).getActionView();
         if (rocketIV != null) {
             rocketIV.setScaleX(0.7f);
             rocketIV.setScaleY(0.7f);
@@ -959,7 +965,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_flag:
                 if (mVpnState == VpnState.Connecting) {
                     Toast.makeText(this, R.string.vpn_is_connecting, Toast.LENGTH_SHORT).show();
@@ -1011,7 +1017,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     @Override
     public void onAnimationEnd(Animation animation) {
         if (mMenu != null) {
-            final ImageView rocketIV = (ImageView)mMenu.findItem(R.id.action_rocket).getActionView();
+            final ImageView rocketIV = (ImageView) mMenu.findItem(R.id.action_rocket).getActionView();
             if (rocketIV != null) {
                 rocketIV.setScaleX(0.7f);
                 rocketIV.setScaleY(0.7f);
@@ -1121,7 +1127,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             VIPFinishActivity.startVIPFinishActivity(this, false);
     }
 
-    private void rateUs(){
+    private void rateUs() {
         Uri uri = Uri.parse("market://details?id=" + getPackageName());
         Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
         // To count with Play market backstack, After pressing back button,
@@ -1135,25 +1141,25 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse(getPlayStoreUrlString())));
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ShadowsocksApplication.handleException(ex);
             }
         }
     }
 
-    private void contactUs(){
-        Intent data=new Intent(Intent.ACTION_SENDTO);
+    private void contactUs() {
+        Intent data = new Intent(Intent.ACTION_SENDTO);
         data.setData(Uri.parse("mailto:watchfacedev@gmail.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.app_name));
         data.putExtra(Intent.EXTRA_TEXT, "");
         try {
             startActivity(data);
-        }catch(ActivityNotFoundException e){
+        } catch (ActivityNotFoundException e) {
             ShadowsocksApplication.handleException(e);
         }
     }
 
-    private void about(){
+    private void about() {
         PackageManager packageManager = getPackageManager();
         String packageName = getPackageName();
         try {
@@ -1171,7 +1177,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void share(){
+    private void share() {
         startActivity(new Intent(this, ShareActivity.class));
     }
 
@@ -1194,8 +1200,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private void rotatedBottomAd(){
-        FrameLayout view = (FrameLayout)findViewById(R.id.ad_view_container);
+    private void rotatedBottomAd() {
+        FrameLayout view = (FrameLayout) findViewById(R.id.ad_view_container);
         float centerX = view.getWidth() / 2.0f;
         float centerY = view.getHeight() / 2.0f;
         Rotate3dAnimation rotate3dAnimation = new Rotate3dAnimation(this, 0, 360, centerX, centerY, 0f, false, true);

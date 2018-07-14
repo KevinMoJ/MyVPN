@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -21,7 +22,8 @@ public class FreeTimeOverActivity extends AppCompatActivity {
         vipDialogBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                VIPActivity.startVIPActivity(FreeTimeOverActivity.this, VIPActivity.TYPE_FREE_TIME_OVER);
+                Intent[] intents = {new Intent(FreeTimeOverActivity.this, MainActivity.class), new Intent(FreeTimeOverActivity.this, VIPActivity.class)};
+                FreeTimeOverActivity.this.startActivities(intents);
                 firebase.logEvent("免费使用弹窗", "点击跳转vip购买界面");
                 finish();
             }
@@ -29,7 +31,7 @@ public class FreeTimeOverActivity extends AppCompatActivity {
         cancelDialogBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LuckRotateActivity.startLuckActivity(FreeTimeOverActivity.this);
+                MainActivity.startLuckRotateActivity(FreeTimeOverActivity.this);
                 firebase.logEvent("免费使用弹窗", "跳转到转盘界面");
                 finish();
             }

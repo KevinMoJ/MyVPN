@@ -48,6 +48,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     public static String PAY_ONE_MONTH = "one_3";
     public static String PAY_HALF_YEAR = "half_2";
     public static String PAY_ONE_YEAR = "year_1";
+    public static String PAY_SEVEN_FREE = "free_1";
 
     private IabBroadcastReceiver mBroadcastReceiver;
     private IabHelper mHelper;
@@ -103,7 +104,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     private void initGooglePayHelper() {
         skuList.add(PAY_ONE_MONTH);
         skuList.add(PAY_HALF_YEAR);
-        skuList.add(PAY_ONE_YEAR); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
+        skuList.add(PAY_ONE_YEAR);
+        skuList.add(PAY_SEVEN_FREE); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
 
         mHelper = new IabHelper(this, PUBLIC_KEY.trim());
         mHelper.enableDebugLogging(true);
@@ -263,6 +265,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             Purchase oneMonthPurchase = inventory.getPurchase(PAY_ONE_MONTH);
             Purchase halfYearPurchase = inventory.getPurchase(PAY_HALF_YEAR);
             Purchase oneYearPurchase = inventory.getPurchase(PAY_ONE_YEAR);
+            Purchase sevenFreePurchase = inventory.getPurchase(PAY_SEVEN_FREE);
 //            Log.i(TAG, "onQueryInventoryFinished:  " + inventory.hasPurchase(PAY_ONE_MONTH) + "    " + inventory.hasPurchase(PAY_HALF_YEAR));
 
             if (oneMonthPurchase != null) {
@@ -290,6 +293,14 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneYearPurchase.isAutoRenewing()).apply();
                 sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneYearPurchase.getPurchaseTime()).apply();
+                finish();
+            } else if (sevenFreePurchase != null) {
+                Log.i(TAG, "onQueryInventoryFinished: 查询成功的finish 一年 ");
+                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "免费试用");
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, sevenFreePurchase.isAutoRenewing()).apply();
+                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, sevenFreePurchase.getPurchaseTime()).apply();
                 finish();
             } else {
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "没查询到");
