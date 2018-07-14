@@ -8,10 +8,10 @@
 
     <string name="banner_ids">{admob=ca-app-pub-9834399249058252/3127010422},{fb=633231230382328_633233977048720}</string>
 
-    <string name="admob_full_ids">{count=2},{id1=ca-app-pub-9834399249058252/1183373364,全屏},{id2=ca-app-pub-9834399249058252/2987409628,全屏高}</string>
-    <string name="fb_full_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
-    <string name="fbn_full_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
-    <string name="fbn_banner_ids">{count=2},{id1=633231230382328_633232087048909,全屏},{id2=633231230382328_633232673715517,全屏高}</string>
+    <string name="admob_full_ids">{count=2},{id1=ca-app-pub-9834399249058252/2987409628,全屏高},{id2=ca-app-pub-9834399249058252/1183373364,全屏}</string>
+    <string name="fb_full_ids">{count=2},{id1=633231230382328_633232673715517,全屏高},{id2=633231230382328_633232087048909,全屏}</string>
+    <string name="fbn_full_ids">{count=2},{id1=633231230382328_633232673715517,全屏高},{id2=633231230382328_633232087048909,全屏}</string>
+    <string name="fbn_banner_ids">{count=2},{id1=633231230382328_633232673715517,全屏高},{id2=633231230382328_633232087048909,全屏}</string>
 
     <string name="admob_an_ids">
         {count=4},{id1=ca-app-pub-9834399249058252/3534204537,主页底部},{id2=ca-app-pub-9834399249058252/5827650796,主页底部高}
