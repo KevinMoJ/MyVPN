@@ -290,6 +290,12 @@
         <value>20</value>
     </entry>
 
+    <!--幸运转盘展示全屏广告的次数-->
+    <entry>
+        <key>luck_pan_show_full_ad_count</key>
+        <value>0</value>
+    </entry>
+
     <!--&lt;!&ndash;VIP商品id集合一个月&ndash;&gt;-->
     <!--<entry>-->
         <!--<key>pay_one_month_id</key>-->

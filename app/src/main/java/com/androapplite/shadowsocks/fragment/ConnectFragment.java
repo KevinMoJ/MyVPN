@@ -227,7 +227,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     }
 
     private void updateFreeUsedTime() {
-        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        final long countDown;
+        if (!VIPActivity.isVIPUser(getContext()))
+            countDown = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
+        else
+            countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+
         final String elapsedTime = DateUtils.formatElapsedTime(countDown);
         String freeUseTime = String.format(getString(R.string.free_used_time), elapsedTime);
         SpannableString spannableString = new SpannableString(freeUseTime);
@@ -318,7 +323,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         stopAnimation();
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mMessageTextView.setVisibility(View.VISIBLE);
-        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mLoadingView.setImageLevel(1);
 //        mConnectButton.setText(R.string.connect);

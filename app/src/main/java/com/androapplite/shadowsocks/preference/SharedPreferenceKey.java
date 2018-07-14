@@ -32,8 +32,10 @@ public final class SharedPreferenceKey {
     public static final String IS_AUTOMATIC_RENEWAL_VIP = "IS_AUTOMATIC_RENEWAL_VIP"; // 是否是自动续费
     public static final String VIP_PAY_TIME = "VIP_PAY_TIME"; // 购买VIP的时间
     public static final String IS_VIP_PAY_ONE_MONTH = "IS_VIP_PAY_ONE_MONTH"; // 是否购买的一个月VIP
-    public static final String LUCK_PAN_GET_FREE_TIME = "LUCK_PAN_GET_FREE_TIME"; // 幸运转盘转出的时间
+    public static final String LUCK_PAN_GET_FREE_TIME = "LUCK_PAN_GET_FREE_TIME"; // 幸运转盘转出的时间，存的是秒
+    public static final String LUCK_PAN_GET_FREE_TIME_TO_SHOW = "LUCK_PAN_GET_FREE_TIME_TO_SHOW"; // 幸运转盘转出的时间，用来去显示的
     public static final String LUCK_PAN_OPEN_START_TIME = "LUCK_PAN_OPEN_START_TIME"; // 幸运转盘界面点击启动的时间，用来判断是不是当天的用户
+    public static final String LUCK_PAN_SHOW_FULL_AD_COUNT = "LUCK_PAN_SHOW_FULL_AD_COUNT"; // 转盘页面显示全屏的个数
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";

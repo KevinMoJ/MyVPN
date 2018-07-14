@@ -28,6 +28,7 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.FreeTimeOverActivity;
 import com.androapplite.shadowsocks.activity.SplashActivity;
+import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.VpnState;
@@ -106,11 +107,11 @@ public class VpnManageService extends Service implements Runnable,
         mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.FREE_USE_TIME, 0);
+        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
         if (useTime < 0) {
             mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
         } else if (freeUseTime < 0) {
-            mSharedPreference.edit().putLong(SharedPreferenceKey.FREE_USE_TIME, 0).apply();
+            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0).apply();
         }
     }
 
@@ -275,26 +276,42 @@ public class VpnManageService extends Service implements Runnable,
     @Override
     public void run() { // 没秒钟都要更新用时
         long start = System.currentTimeMillis();
-        long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        long differ = (start - mTimeStart) / 1000;  // differ是秒
-        if (differ < 0) {
-            differ = 1;
-            mTimeStart = start;
-        } else if (differ > 60) {
-            differ = 60;
-            mTimeStart = start;
+        if (!VIPActivity.isVIPUser(this)) {
+            long freeTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0); // freeTime是秒
+
+            long differ = (start - mTimeStart) / 1000;  // differ是秒
+            if (differ < 0) {
+                differ = 1;
+                mTimeStart = start;
+            } else if (differ > 60) {
+                differ = 60;
+                mTimeStart = start;
+            }
+
+            freeTime -= differ;
+            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, freeTime).apply(); // 以秒的形式存储
+
+            if (freeTime <= 0)
+                stopVpnForFreeTimeOver(this, ConnectVpnHelper.FREE_OVER_DIALOG_AUTO);
+        } else {
+            long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+
+            long differ = (start - mTimeStart) / 1000;  // differ是秒
+            if (differ < 0) {
+                differ = 1;
+                mTimeStart = start;
+            } else if (differ > 60) {
+                differ = 60;
+                mTimeStart = start;
+            }
+
+            useTime += differ;
+            mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, useTime).apply();
         }
-        useTime += differ;
-        mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, useTime).apply();
-        mSharedPreference.edit().putLong(SharedPreferenceKey.FREE_USE_TIME, useTime).apply();
+
         mTimeStart = start;
         LocalBroadcastManager.getInstance(this).sendBroadcast(mUseTimeIntent);
         Log.d("VpnManageService", "use time");
-        long freeTime = FirebaseRemoteConfig.getInstance().getLong("not_vip_user_free_use_time");
-
-        if (useTime >= freeTime * 60) {
-            stopVpnForFreeTimeOver(this, ConnectVpnHelper.FREE_OVER_DIALOG_AUTO);
-        }
     }
 
     public static void start(Context context) {
