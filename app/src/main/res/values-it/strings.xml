@@ -145,4 +145,32 @@
     <string name="luck_pan_title">Play Lucky Game to get free experience time</string>
     <string name="free_over_dialog_message">The free experience has already arrived. You can also advertise when you join the VIP</string>
     <string name="add_minutes">+%s Minutes</string>
+
+    <string name="take_you_to_experience">Take you to experience the speed of Internet access</string>
+    <string name="visit_the_website_of_the_wall">Visit the website of the wall</string>
+    <string name="take_you_to_see_the_wonderful">Take you to see the wonderful world outside the wall.</string>
+    <string name="one_of_the_most_loved">One of the most loved VPNs</string>
+    <string name="fast_connection">Fast connection, stable Internet access,used people say good.</string>
+    <string name="lowest_price_online">lowest price online</string>
+    <string name="the_green_vpn_connection">The Green VPN connection is fast, the Internet is stable, and your network connection is optimized for a fast Internet experience.Your best choice!</string>
+    <string name="we_have_quality_servers">We have quality servers in many countries and regions to ensure the stability of your connection, you can easily access the walls of the site, such as:Facebook,Instagram, Whatsapp, Twitter,Netflix, etc.</string>
+    <string name="we_can_protect_your_privacy">We can protect your privacy very well,hide your real network address for all network access, and share happiness with friends, friends and relatives at any time!</string>
+    <string name="our_vip_uses_better_server">Our VIP uses a better server, and the price must be the best price for the same level of service. We hope that you can experience the best VPN service with the least amount of money.</string>
+    <string name="protect_your_privacy">Protect your privacy online Hide your real network address for all network access!</string>
+    <string name="over_the_wall_anytime">Over the wall anytime, anywhere Access web pages, social apps, games,etc. anytime, anywhere.</string>
+    <string name="protect_security_privacy_hide">Protect security privacy Hide your IP address, browse without leaving traces, completely invisible.</string>
+    <string name="green_vpn_is_an_extremely">GREEN VPN is an extremely stable and stable VPN service.</string>
+    <string name="banner_1_title">Fast internet access</string>
+    <string name="banner_2_title">Over the wall anytime, anywhere</string>
+    <string name="banner_3_title">Protect security privacy</string>
+    <string name="banner_1_message">Optimize your network connection,fast and stable online</string>
+    <string name="banner_2_message">Allows you to easily access the wall outside...</string>
+    <string name="banner_3_message">Hide your IP address and let you completely stealth</string>
+    <string name="protect_your_privacy_online">Protect your privacy online</string>
+    <string name="hide_your_real_network">Hide your real network address for all network access!</string>
+    <string name="over_the_wall_anytime_anywhere">Over the wall anytime, anywhere</string>
+    <string name="access_web_pages">Access web pages, social apps, games,etc. anytime, anywhere.</string>
+    <string name="protect_security_privacy">Protect security privacy</string>
+    <string name="hide_your_Ip_address">Hide your IP address, browse without leaving traces, completely invisible.</string>
+
 </resources>

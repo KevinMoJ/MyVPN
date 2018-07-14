@@ -145,4 +145,32 @@
     <string name="luck_pan_title">Play Lucky Game to get free experience time</string>
     <string name="free_over_dialog_message">The free experience has already arrived. You can also advertise when you join the VIP</string>
     <string name="add_minutes">+%s Minutes</string>
+
+    <string name="take_you_to_experience">يأخذك لتجربة سرعة الوصول إلى الإنترنت</string>
+    <string name="visit_the_website_of_the_wall">زيارة الموقع الإلكتروني للجدار</string>
+    <string name="take_you_to_see_the_wonderful">يأخذك لرؤية العالم الرائع خارج الجدار.</string>
+    <string name="one_of_the_most_loved">واحدة من شبكات VPN الأكثر شعبية</string>
+    <string name="fast_connection">اتصال سريع ، والوصول إلى الإنترنت مستقرة ، استخدم الناس يقولون جيدة.</string>
+    <string name="lowest_price_online">بأقل سعر عبر الإنترنت</string>
+    <string name="the_green_vpn_connection">اتصال VPN الأخضر سريع ، الإنترنت مستقر ، ويتم تحسين اتصالك بالشبكة للحصول على تجربة إنترنت سريعة. اختيارك الأفضل!</string>
+    <string name="we_have_quality_servers">لدينا خوادم عالية الجودة في العديد من البلدان والمناطق لضمان استقرار اتصالك ، يمكنك الوصول بسهولة إلى جدران الموقع ، مثل: Facebook و Instagram و Whatsapp و Twitter و Netflix وغيرها.</string>
+    <string name="we_can_protect_your_privacy">يمكننا حماية خصوصيتك بشكل جيد للغاية ، وإخفاء عنوان الشبكة الحقيقي لجميع وصول الشبكة ، ومشاركة السعادة مع الأصدقاء والأصدقاء والأقارب في أي وقت!</string>
+    <string name="our_vip_uses_better_server">يستخدم كبار الشخصيات لدينا خادمًا أفضل ، ويجب أن يكون السعر هو أفضل سعر مقابل نفس مستوى الخدمة. نأمل أن تتمكن من تجربة أفضل خدمة VPN بأقل قدر ممكن من المال.</string>
+    <string name="protect_your_privacy">حماية خصوصيتك عبر الإنترنت إخفاء عنوان الشبكة الحقيقي الخاص بك لجميع وصول الشبكة!</string>
+    <string name="over_the_wall_anytime">على الجدار في أي وقت ، في أي مكان الوصول إلى صفحات الويب ، والتطبيقات الاجتماعية ، والألعاب ، وما إلى ذلك. في اي وقت وفي اي مكان.</string>
+    <string name="protect_security_privacy_hide">حماية الخصوصية الأمنية إخفاء عنوان IP الخاص بك ، وتصفح دون ترك آثار ، غير مرئي تماما.</string>
+    <string name="green_vpn_is_an_extremely">GREEN VPN هي خدمة VPN مستقرة وثابتة للغاية.</string>
+    <string name="banner_1_title">الوصول السريع للإنترنت</string>
+    <string name="banner_2_title">على الحائط في أي وقت وفي أي مكان</string>
+    <string name="banner_3_title">حماية الخصوصية الأمنية</string>
+    <string name="banner_1_message">قم بتحسين اتصالك بالشبكة ، سريعًا ومستقرًا عبر الإنترنت</string>
+    <string name="banner_2_message">يسمح لك بسهولة الوصول إلى الجدار الخارجي ...</string>
+    <string name="banner_3_message">إخفاء عنوان IP الخاص بك وتمكنك من التخفي تماما</string>
+    <string name="protect_your_privacy_online">حماية خصوصيتك على الإنترنت</string>
+    <string name="hide_your_real_network">إخفاء عنوان الشبكة الحقيقي لجميع وصول الشبكة!</string>
+    <string name="over_the_wall_anytime_anywhere">على الحائط في أي وقت وفي أي مكان</string>
+    <string name="access_web_pages">الوصول إلى صفحات الويب والتطبيقات الاجتماعية والألعاب ، وما إلى ذلك. في اي وقت وفي اي مكان.</string>
+    <string name="protect_security_privacy">حماية الخصوصية الأمنية</string>
+    <string name="hide_your_Ip_address">إخفاء عنوان IP الخاص بك ، وتصفح دون ترك آثار ، غير مرئي تماما.</string>
+
 </resources>
