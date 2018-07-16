@@ -70,19 +70,57 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     private int[] bannerFlags;
     private String[] bannerTitles;
     private String[] bannerMessage;
+    private long luckFreeDay;
+    private long freeUseTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        checkFreeUseTime();
+
+        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        freeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
         boolean isVIP = mSharedPreferences.getBoolean(SharedPreferenceKey.VIP, false);
-        if (isVIP) {
+
+        if (isVIP || luckFreeDay > 0 || freeUseTime > 0) {
             startActivity(new Intent(this, SplashActivity.class));
             finish();
         }
         setContentView(R.layout.activity_recommend_vip);
         initView();
         initData();
+    }
+
+    private void checkFreeUseTime() {
+        long openAppTime = mSharedPreferences.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0);
+        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        freeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+        long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
+        long differ = System.currentTimeMillis() - openAppTime;
+
+        if (differ > 0) {
+            long dif = differ / 1000; // 上次打开APP的时间到这次的时间间隔
+            if (dif <= newUserFreeTime * 60) {
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, freeUseTime - dif).apply();
+                long newFreeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+                if (newFreeUseTime < 0)
+                    mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
+            } else {
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
+            }
+        }
+
+        if (differ > 0) {
+            long overDay = differ / (1000 * 60 * 60 * 24); // 上次打开APP的时间到现在的过了多少天
+            if (luckFreeDay > 0) {
+                if (overDay > luckFreeDay)
+                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
+                else
+                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, luckFreeDay - overDay).apply();
+            } else
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
+        }
     }
 
     private void initView() {

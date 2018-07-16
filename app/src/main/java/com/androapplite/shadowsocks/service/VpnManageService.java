@@ -275,23 +275,28 @@ public class VpnManageService extends Service implements Runnable,
     @Override
     public void run() { // 没秒钟都要更新用时
         long start = System.currentTimeMillis();
+        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0); // freeUseTime是秒
+
         if (!VIPActivity.isVIPUser(this)) {
-            long freeTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0); // freeTime是秒
+            if (luckFreeDay <= 0 && freeUseTime > 0) {
+                long differ = (start - mTimeStart) / 1000;  // differ是秒
+                if (differ < 0) {
+                    differ = 1;
+                    mTimeStart = start;
+                } else if (differ > 60) {
+                    differ = 60;
+                    mTimeStart = start;
+                }
 
-            long differ = (start - mTimeStart) / 1000;  // differ是秒
-            if (differ < 0) {
-                differ = 1;
-                mTimeStart = start;
-            } else if (differ > 60) {
-                differ = 60;
-                mTimeStart = start;
+                freeUseTime -= differ;
+                mSharedPreference.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, freeUseTime).apply(); // 以秒的形式存储
+
+                if (freeUseTime <= 0) {
+                    stopVpnForFreeTimeOver(this, ConnectVpnHelper.FREE_OVER_DIALOG_AUTO);
+                    mSharedPreference.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
+                }
             }
-
-            freeTime -= differ;
-            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, freeTime).apply(); // 以秒的形式存储
-
-            if (freeTime <= 0)
-                stopVpnForFreeTimeOver(this, ConnectVpnHelper.FREE_OVER_DIALOG_AUTO);
         } else {
             long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
 

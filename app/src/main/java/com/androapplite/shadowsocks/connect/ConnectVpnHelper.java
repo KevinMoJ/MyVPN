@@ -488,7 +488,7 @@ public class ConnectVpnHelper {
 
     public static boolean isFreeUse(final Context context, int type) {
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-        long freeTime = sharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
+        long freeTime = sharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
 //        long freeTime = FirebaseRemoteConfig.getInstance().getLong("not_vip_user_free_use_time"); countDown >= freeTime * 60  &&
         if (freeTime <= 0 && !VIPActivity.isVIPUser(context)) {
             VpnManageService.stopVpnForFreeTimeOver(context, type);
