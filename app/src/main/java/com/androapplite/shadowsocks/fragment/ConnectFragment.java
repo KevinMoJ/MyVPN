@@ -228,10 +228,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
     private void updateFreeUsedTime() {
         final long countDown;
-        if (!VIPActivity.isVIPUser(getContext()))
-            countDown = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
-        else
+        if (!VIPActivity.isVIPUser(getContext())) {
+            countDown = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+        } else {
             countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        }
 
         final String elapsedTime = DateUtils.formatElapsedTime(countDown);
         String freeUseTime = String.format(getString(R.string.free_used_time), elapsedTime);

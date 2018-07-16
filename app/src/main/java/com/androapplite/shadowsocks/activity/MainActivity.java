@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private void checkFreeUseTime() {
         long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
         long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
-        
+
         if (freeUseTime == 0)
             mSharedPreference.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, newUserFreeTime * 60).apply();
     }
