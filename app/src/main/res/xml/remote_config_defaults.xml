@@ -281,7 +281,7 @@
     <!--非VIP用户限时使用时长,单位分钟-->
     <entry>
         <key>not_vip_user_free_use_time</key>
-        <value>60</value>
+        <value>1</value>
     </entry>
 
     <!--幸运转盘得到的时间当天总和最大值,单位分钟-->
@@ -312,6 +312,12 @@
     <entry>
         <key>recommend_vip_hide_back</key>
         <value>false</value>
+    </entry>
+
+    <!--新用户免费用时，单位分钟-->
+    <entry>
+        <key>new_user_free_use_time</key>
+        <value>30</value>
     </entry>
 
     <!--&lt;!&ndash;VIP商品id集合一个月&ndash;&gt;-->
