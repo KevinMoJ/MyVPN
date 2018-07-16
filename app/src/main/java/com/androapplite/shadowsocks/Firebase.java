@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
+import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.bestgo.adsplugin.ads.analytics.AbstractFirebase;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -35,6 +37,8 @@ public class Firebase extends AbstractFirebase {
         if (mFireInstance == null) {
             try {
                 mFireInstance = FirebaseAnalytics.getInstance(context);
+                String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+                mFireInstance.setUserProperty("code", countryCode);
             } catch (Exception e) {
 
             }
