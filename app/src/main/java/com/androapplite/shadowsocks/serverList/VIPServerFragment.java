@@ -314,7 +314,10 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
 //            }
             if (mHasServerJson) {
                 holder.mSignalImageView.setImageResource(R.drawable.server_signal_vip);//mSignalResIds.get(nation)
-                holder.mSignalImageView.setVisibility(View.VISIBLE);
+                if (nation.equals(getString(R.string.vpn_nation_opt)))
+                    holder.mSignalImageView.setVisibility(View.GONE);
+                else
+                    holder.mSignalImageView.setVisibility(View.VISIBLE);
             } else {
                 holder.mSignalImageView.setVisibility(View.INVISIBLE);
             }

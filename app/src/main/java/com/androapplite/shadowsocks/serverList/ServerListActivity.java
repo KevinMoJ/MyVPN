@@ -2,7 +2,6 @@ package com.androapplite.shadowsocks.serverList;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,8 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
@@ -19,22 +16,21 @@ import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.ironsource.sdk.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerListActivity extends BaseShadowsocksActivity implements View.OnClickListener {
+public class ServerListActivity extends BaseShadowsocksActivity {
     private static final String TAG = "ServerListActivity";
 
-    private static final int PAGE_COUNT = 2;
+    private static final int PAGE_COUNT = 1;
 
     private ViewPager mContentViewPager;
-    private LinearLayout mServerListFreeLinear;
-    private LinearLayout mServerListVipLinear;
-    private FrameLayout mTabLineView;
+//    private LinearLayout mServerListFreeLinear;
+//    private LinearLayout mServerListVipLinear;
+//    private FrameLayout mTabLineView;
 
-    private Fragment mFreeServerFragment;
+//    private Fragment mFreeServerFragment;
     private Fragment mVIPServerFragment;
 
     private List<Fragment> mFragmentList;
@@ -56,7 +52,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
         actionBar.setTitle(getResources().getString(R.string.app_name).toUpperCase());
-        actionBar.setElevation(0);
+//        actionBar.setElevation(0);
 
         initView();
         initData();
@@ -65,7 +61,7 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
 
             @Override
             public int getCount() {
-                return 2;
+                return PAGE_COUNT;
             }
 
             @Override
@@ -76,37 +72,37 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
 
         mContentViewPager.setAdapter(mAdapter);
         mContentViewPager.setCurrentItem(0);
-        mContentViewPager.setOffscreenPageLimit(PAGE_COUNT - 1);
-        mContentViewPager.setOnPageChangeListener(mOnPageChangeListener);
+//        mContentViewPager.setOffscreenPageLimit(PAGE_COUNT - 1);
+//        mContentViewPager.setOnPageChangeListener(mOnPageChangeListener);
     }
 
     private void initView() {
-        mServerListFreeLinear = (LinearLayout) findViewById(R.id.server_list_free_linear);
-        mServerListVipLinear = (LinearLayout) findViewById(R.id.server_list_vip_linear);
-        mTabLineView = (FrameLayout) findViewById(R.id.server_list_tab_line);
+//        mServerListFreeLinear = (LinearLayout) findViewById(R.id.server_list_free_linear);
+//        mServerListVipLinear = (LinearLayout) findViewById(R.id.server_list_vip_linear);
+//        mTabLineView = (FrameLayout) findViewById(R.id.server_list_tab_line);
         mContentViewPager = (ViewPager) findViewById(R.id.activity_server_view_pager);
 
-        mServerListFreeLinear.setOnClickListener(this);
-        mServerListVipLinear.setOnClickListener(this);
+//        mServerListFreeLinear.setOnClickListener(this);
+//        mServerListVipLinear.setOnClickListener(this);
     }
 
     private void initData() {
         mTabLinearViewList = new ArrayList<>();
-        mTabLinearViewList.add(mServerListFreeLinear);
-        mTabLinearViewList.add(mServerListVipLinear);
+//        mTabLinearViewList.add(mServerListFreeLinear);
+//        mTabLinearViewList.add(mServerListVipLinear);
 
         screenWidth = getResources().getDisplayMetrics().widthPixels;
         screenHeight = getResources().getDisplayMetrics().heightPixels;
 
-        LinearLayout.LayoutParams tabLineParams = (LinearLayout.LayoutParams) mTabLineView.getLayoutParams();
-        tabLineParams.width = screenWidth / PAGE_COUNT;
-        mTabLineView.setLayoutParams(tabLineParams);
+//        LinearLayout.LayoutParams tabLineParams = (LinearLayout.LayoutParams) mTabLineView.getLayoutParams();
+//        tabLineParams.width = screenWidth / PAGE_COUNT;
+//        mTabLineView.setLayoutParams(tabLineParams);
 
-        mFreeServerFragment = new FreeServerFragment();
+//        mFreeServerFragment = new FreeServerFragment();
         mVIPServerFragment = new VIPServerFragment();
 
         mFragmentList = new ArrayList<Fragment>();
-        mFragmentList.add(mFreeServerFragment);
+//        mFragmentList.add(mFreeServerFragment);
         mFragmentList.add(mVIPServerFragment);
 
         isVIP = VIPActivity.isVIPUser(this);
@@ -115,25 +111,25 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
             AdAppHelper.getInstance(this).showFullAd();
     }
 
-    private void selectPage(int position, int currentPosition) {
-        if (position == currentPosition)
-            return;
-
-        refreshTextColor(position);
-
-        int count = Math.abs(position - currentPosition) * 50;
-        int startMargin = screenWidth / PAGE_COUNT * currentPosition;
-        int endMargin = screenWidth / PAGE_COUNT * position;
-        Logger.e("tag", "selectPage " + startMargin + " " + endMargin);
-        float offset = (endMargin - startMargin) * 1f / count;
-        for (int i = 0; i <= count; i++) {
-            LinearLayout.LayoutParams tabLineParams = (LinearLayout.LayoutParams) mTabLineView.getLayoutParams();
-            tabLineParams.leftMargin = (int) (startMargin + offset * i);
-            mTabLineView.setLayoutParams(tabLineParams);
-        }
-
-        mContentViewPager.setCurrentItem(position);
-    }
+//    private void selectPage(int position, int currentPosition) {
+//        if (position == currentPosition)
+//            return;
+//
+//        refreshTextColor(position);
+//
+//        int count = Math.abs(position - currentPosition) * 50;
+//        int startMargin = screenWidth / PAGE_COUNT * currentPosition;
+//        int endMargin = screenWidth / PAGE_COUNT * position;
+//        Logger.e("tag", "selectPage " + startMargin + " " + endMargin);
+//        float offset = (endMargin - startMargin) * 1f / count;
+//        for (int i = 0; i <= count; i++) {
+//            LinearLayout.LayoutParams tabLineParams = (LinearLayout.LayoutParams) mTabLineView.getLayoutParams();
+//            tabLineParams.leftMargin = (int) (startMargin + offset * i);
+//            mTabLineView.setLayoutParams(tabLineParams);
+//        }
+//
+//        mContentViewPager.setCurrentItem(position);
+//    }
 
     private void refreshTextColor(int position) {
 //        for (int i = 0; i < mTabTextViewList.size(); i++) {
@@ -153,42 +149,42 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
             ((VIPServerFragment) fragment).addBottomAd();
     }
 
-    private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
-
-        @Override
-        public void onPageSelected(int position) {
-            refreshTextColor(position);
-            if (!isVIP)
-                showBottomAd();
-            mCurrentIndex = position;
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            double tabWidth = screenWidth * 1.0 / PAGE_COUNT;
-            if (mCurrentIndex == position) {
-                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mTabLineView
-                        .getLayoutParams();
-                if (Build.VERSION.SDK_INT >= 17)
-                    lp.setMarginStart((int) (positionOffset * tabWidth + mCurrentIndex * tabWidth));
-                else
-                    lp.leftMargin = (int) (positionOffset * tabWidth + mCurrentIndex * tabWidth);
-                mTabLineView.setLayoutParams(lp);
-            } else if (mCurrentIndex - position == 1) {
-                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mTabLineView
-                        .getLayoutParams();
-                if (Build.VERSION.SDK_INT >= 17)
-                    lp.setMarginStart((int) ((positionOffset - 1) * tabWidth + mCurrentIndex * tabWidth));
-                else
-                    lp.leftMargin = (int) ((positionOffset - 1) * tabWidth + mCurrentIndex * tabWidth);
-                mTabLineView.setLayoutParams(lp);
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
-    };
+//    private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+//
+//        @Override
+//        public void onPageSelected(int position) {
+//            refreshTextColor(position);
+//            if (!isVIP)
+//                showBottomAd();
+//            mCurrentIndex = position;
+//        }
+//
+//        @Override
+//        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//            double tabWidth = screenWidth * 1.0 / PAGE_COUNT;
+//            if (mCurrentIndex == position) {
+//                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mTabLineView
+//                        .getLayoutParams();
+//                if (Build.VERSION.SDK_INT >= 17)
+//                    lp.setMarginStart((int) (positionOffset * tabWidth + mCurrentIndex * tabWidth));
+//                else
+//                    lp.leftMargin = (int) (positionOffset * tabWidth + mCurrentIndex * tabWidth);
+//                mTabLineView.setLayoutParams(lp);
+//            } else if (mCurrentIndex - position == 1) {
+//                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mTabLineView
+//                        .getLayoutParams();
+//                if (Build.VERSION.SDK_INT >= 17)
+//                    lp.setMarginStart((int) ((positionOffset - 1) * tabWidth + mCurrentIndex * tabWidth));
+//                else
+//                    lp.leftMargin = (int) ((positionOffset - 1) * tabWidth + mCurrentIndex * tabWidth);
+//                mTabLineView.setLayoutParams(lp);
+//            }
+//        }
+//
+//        @Override
+//        public void onPageScrollStateChanged(int arg0) {
+//        }
+//    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -212,24 +208,24 @@ public class ServerListActivity extends BaseShadowsocksActivity implements View.
         return true;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.server_list_free_linear:
-                selectPage(0, mContentViewPager.getCurrentItem());
-                break;
-            case R.id.server_list_vip_linear:
-                selectPage(1, mContentViewPager.getCurrentItem());
-                break;
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.server_list_free_linear:
+//                selectPage(0, mContentViewPager.getCurrentItem());
+//                break;
+//            case R.id.server_list_vip_linear:
+//                selectPage(1, mContentViewPager.getCurrentItem());
+//                break;
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mFreeServerFragment != null) {
-            mFreeServerFragment = null;
-        }
+//        if (mFreeServerFragment != null) {
+//            mFreeServerFragment = null;
+//        }
         if (mVIPServerFragment != null) {
             mVIPServerFragment = null;
         }
