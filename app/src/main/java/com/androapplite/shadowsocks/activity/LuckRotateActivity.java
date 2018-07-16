@@ -56,8 +56,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private boolean isLuckPanRunning;
     private boolean todayIsContinuePlay; // 能不能玩，不能玩就一直转到thanks，能玩的话就显示转到的时间,
 
-    private int[] LuckNumbers = {RESULT_TYPE_1, RESULT_TYPE_2, RESULT_TYPE_3, RESULT_TYPE_5, RESULT_TYPE_THANKS};
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,7 +149,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         int adShowCount = mSharedPreferences.getInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, 0);
         int cloudAdShowCount = (int) FirebaseRemoteConfig.getInstance().getLong("luck_pan_show_full_ad_count");
 
-        rotatePos = LuckNumbers[(int) (Math.random() * LuckNumbers.length)];
+        rotatePos = getRotatePos();
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
 
         Log.i(TAG, "startRotate: 得到的结果 " + rewardString);
@@ -179,6 +177,28 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         } else {
             mLuckPanLayout.rotate(rotatePos, 100);
         }
+    }
+
+    private int getRotatePos() {
+        int rotate = (int) (Math.random() * 100);
+        long cloudThanksProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_thanks"); // 66
+        long cloudOneProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_one"); // 20
+        long cloudTwoProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_two"); // 10
+        long cloudThreeProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_three"); // 3
+        long cloudFiveProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_five"); // 1
+
+        if (rotate >= 0 && rotate <= cloudThanksProb - 1)
+            rotate = RESULT_TYPE_THANKS;
+        else if (rotate >= cloudThanksProb && rotate <= cloudThanksProb + cloudOneProb - 1) // 85
+            rotate = RESULT_TYPE_1;
+        else if (rotate >= cloudThanksProb + cloudOneProb && rotate <= cloudThanksProb + cloudOneProb + cloudTwoProb - 1)
+            rotate = RESULT_TYPE_2;
+        else if (rotate >= cloudThanksProb + cloudOneProb + cloudTwoProb && rotate <= cloudThanksProb + cloudOneProb + cloudTwoProb + cloudThreeProb - 1)
+            rotate = RESULT_TYPE_3;
+        else if (rotate >= cloudThanksProb + cloudOneProb + cloudTwoProb + cloudThreeProb + cloudFiveProb - 1)
+            rotate = RESULT_TYPE_5;
+
+        return rotate;
     }
 
     View.OnClickListener clickListener = new View.OnClickListener() {
