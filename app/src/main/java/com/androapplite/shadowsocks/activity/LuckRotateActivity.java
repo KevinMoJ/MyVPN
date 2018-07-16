@@ -32,13 +32,14 @@ import java.lang.ref.WeakReference;
 public class LuckRotateActivity extends AppCompatActivity implements Handler.Callback {
     private static final String TAG = "LuckRotateActivity";
     public static final int SHOW_FULL_AD = 100;
+    public static final String TYPE = "TYPE";
 
     private static int RESULT_TYPE_1 = 0;
     private static int RESULT_TYPE_2 = 2;
     private static int RESULT_TYPE_3 = 1;
     private static int RESULT_TYPE_5 = 6;
     private static int RESULT_TYPE_THANKS = 7;
-    public static final int ERROR_MAX_COUNT = 5;
+    public static final int ERROR_MAX_COUNT = 10;
 
     private Button mStartRotateBt;
     private FrameLayout mAdContent;
@@ -112,14 +113,16 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             mSharedPreferences.edit().putInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, 0).apply();
         }
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
+        boolean showAd = getIntent().getBooleanExtra(TYPE, true);
+
+        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd) {
             mAdAppHelper.showFullAd();
         }
     }
 
     private void initUI() {
         mActionBar.setTitle("Luck Game");
-        btnEnableClick(false);
+        btnEnableClick(mAdAppHelper.isFullAdLoaded());
     }
 
     private void addBottomAd() {

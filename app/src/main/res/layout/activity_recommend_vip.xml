@@ -632,7 +632,7 @@
                     android:layout_marginLeft="@dimen/common_30"
                     android:layout_marginRight="@dimen/common_30"
                     android:layout_marginTop="@dimen/common_25"
-                    android:background="@drawable/seven_free_pressed"
+                    android:background="@drawable/seven_free_bt_bg"
                     android:gravity="center"
                     android:text="START 7-DAY TRIAL"
                     android:textColor="@color/primary_white_text"

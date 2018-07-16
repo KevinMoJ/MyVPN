@@ -521,8 +521,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         mSnackbar.show();
     }
 
-    public static void startLuckRotateActivity(Context context) {
-        Intent[] intents = {new Intent(context, MainActivity.class), new Intent(context, LuckRotateActivity.class)};
+    public static void startLuckRotateActivity(Context context, boolean luckRotateShowAd) {
+        Intent luckRotateIntent = new Intent(context, LuckRotateActivity.class);
+        luckRotateIntent.putExtra(LuckRotateActivity.TYPE, luckRotateShowAd);
+        Intent[] intents = {new Intent(context, MainActivity.class), luckRotateIntent};
         context.startActivities(intents);
     }
 

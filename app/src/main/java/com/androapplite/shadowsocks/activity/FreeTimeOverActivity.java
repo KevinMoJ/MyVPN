@@ -31,7 +31,7 @@ public class FreeTimeOverActivity extends AppCompatActivity {
         cancelDialogBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.startLuckRotateActivity(FreeTimeOverActivity.this);
+                MainActivity.startLuckRotateActivity(FreeTimeOverActivity.this, true);
                 firebase.logEvent("免费使用弹窗", "跳转到转盘界面");
                 finish();
             }

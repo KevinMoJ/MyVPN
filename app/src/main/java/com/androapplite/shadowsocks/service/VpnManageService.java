@@ -26,7 +26,6 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.FreeTimeOverActivity;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
@@ -466,6 +465,6 @@ public class VpnManageService extends Service implements Runnable,
     public static void stopVpnForFreeTimeOver(Context context, int type) {
         sStopReason = 5;
         LocalVpnService.IsRunning = false;
-        context.startActivity(new Intent(context, FreeTimeOverActivity.class));
+//        context.startActivity(new Intent(context, FreeTimeOverActivity.class));
     }
 }

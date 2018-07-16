@@ -61,6 +61,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     private boolean isStartHelper;
     private IabBroadcastReceiver mBroadcastReceiver;
     private List<String> skuList = new ArrayList<>();
+    private SharedPreferences mSharedPreferences;
 
     private AdAppHelper mAdAppHelper;
 
@@ -72,7 +73,8 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        boolean isVIP = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).getBoolean(SharedPreferenceKey.VIP, false);
+        mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+        boolean isVIP = mSharedPreferences.getBoolean(SharedPreferenceKey.VIP, false);
         if (isVIP) {
             startActivity(new Intent(this, SplashActivity.class));
             finish();
@@ -270,7 +272,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
             case R.id.recommend_vip_free_time_bt:
             case R.id.recommend_vip_top_free_bt:
             case R.id.recommend_vip_bottom_free_bt:
-                MainActivity.startLuckRotateActivity(this);
+                MainActivity.startLuckRotateActivity(this, false);
                 finish();
                 break;
             case R.id.recommend_vip_bottom_close:
