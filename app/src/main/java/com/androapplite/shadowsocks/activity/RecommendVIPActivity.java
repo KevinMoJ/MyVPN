@@ -31,6 +31,7 @@ import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.ArrayList;
@@ -248,11 +249,13 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public void onBackPressed() {
-        if (mRecommendVipWelcomeRoot.getVisibility() == View.VISIBLE && mScrollView.getVisibility() == View.GONE) {
-            showScrollView();
-        } else if (mRecommendVipWelcomeRoot.getVisibility() == View.GONE && mScrollView.getVisibility() == View.VISIBLE) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+        if (!FirebaseRemoteConfig.getInstance().getBoolean("recommend_vip_hide_back")) {
+            if (mRecommendVipWelcomeRoot.getVisibility() == View.VISIBLE && mScrollView.getVisibility() == View.GONE) {
+                showScrollView();
+            } else if (mRecommendVipWelcomeRoot.getVisibility() == View.GONE && mScrollView.getVisibility() == View.VISIBLE) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }
         }
     }
 
