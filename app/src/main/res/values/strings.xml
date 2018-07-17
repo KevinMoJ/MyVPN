@@ -2,6 +2,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="share">Share</string>
     <string name="connecting">Connecting</string>
+    <string name="connected">Connected</string>
     <string name="more">More</string>
 
     <string name="action_choose_server">Choose server</string>

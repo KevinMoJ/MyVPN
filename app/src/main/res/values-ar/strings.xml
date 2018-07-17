@@ -177,5 +177,6 @@
     <string name="removing_time_days">إزالة الوقت:% s يوم</string>
     <string name="make_persistent_efforts">بذل جهود مستمرة</string>
     <string name="congratulation">تهنئة</string>
+    <string name="connected">متصل</string>
 
 </resources>

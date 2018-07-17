@@ -56,7 +56,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     private ImageView mVIPImage;
     private TextView mFreeUsedTimeTextView;
     private TextView mVipRecommendView;
-    //    private TextView mConnectStatusText;
+    private TextView mConnectStatusText;
     private boolean mIsAnimating;
     private MyReceiver mMyReceiver;
     private VpnState mVpnState;
@@ -74,13 +74,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_connect, container, false);
-        mMessageTextView = (TextView)view.findViewById(R.id.message);
-        mConnectButton = (Button)view.findViewById(R.id.connect_button);
+        mMessageTextView = (TextView) view.findViewById(R.id.message);
+        mConnectButton = (Button) view.findViewById(R.id.connect_button);
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-        mLoadingView = (ImageView)view.findViewById(R.id.loading);
-        mConnectStatus = (ImageView)view.findViewById(R.id.connect_status);
-        mVIPImage = (ImageView)view.findViewById(R.id.vip_start_image);
-//        mConnectStatusText = (TextView) view.findViewById(R.id.connect_status_text);
+        mLoadingView = (ImageView) view.findViewById(R.id.loading);
+        mConnectStatus = (ImageView) view.findViewById(R.id.connect_status);
+        mVIPImage = (ImageView) view.findViewById(R.id.vip_start_image);
+        mConnectStatusText = (TextView) view.findViewById(R.id.connect_status_text);
         mFreeUsedTimeTextView = (TextView) view.findViewById(R.id.free_used_time);
         mVipRecommendView = (TextView) view.findViewById(R.id.vip_start_view);
         return view;
@@ -148,8 +148,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onClick(View v) {
-        if(mListener != null){
-            switch (v.getId()){
+        if (mListener != null) {
+            switch (v.getId()) {
                 case R.id.connect_button:
                     mListener.onConnectButtonClick();
                     break;
@@ -178,7 +178,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
     }
 
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -192,17 +192,18 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         }
     };
 
-    public interface OnConnectActionListener{
+    public interface OnConnectActionListener {
         void onConnectButtonClick();
+
         void onVIPImageClick();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof OnConnectActionListener){
+        if (context instanceof OnConnectActionListener) {
             mListener = (OnConnectActionListener) context;
-        }else{
+        } else {
             throw new ClassCastException(context.getClass().getSimpleName() + " must implement " + OnConnectActionListener.class.getSimpleName());
         }
     }
@@ -210,9 +211,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if(activity instanceof OnConnectActionListener){
+        if (activity instanceof OnConnectActionListener) {
             mListener = (OnConnectActionListener) activity;
-        }else{
+        } else {
             throw new ClassCastException(activity.getClass().getSimpleName() + " must implement " + OnConnectActionListener.class.getSimpleName());
         }
     }
@@ -224,7 +225,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         super.onDetach();
     }
 
-    private void init(){
+    private void init() {
         updateFreeUsedTime();
     }
 
@@ -267,12 +268,13 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         }
     }
 
-    public void animateConnecting(){
+    public void animateConnecting() {
         startAnimation();
 //        mConnectButton.setText(R.string.connecting);
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
         mMessageTextView.setVisibility(View.VISIBLE);
-//        mMessageTextView.setText(R.string.connecting);
+        mConnectStatusText.setVisibility(View.VISIBLE);
+        mConnectStatusText.setText(R.string.connecting);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
         setConnectingText();
@@ -288,7 +290,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
                 int currentValue = (int) animation.getAnimatedValue();
                 if (currentValue != count) {
                     count = currentValue;
-                    mMessageTextView.setText(mMessageTextStrings[count]);
+                    mConnectStatusText.setText(mMessageTextStrings[count]);
                 }
 
             }
@@ -296,10 +298,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         valueAnimator.setDuration(mMessageTextStrings.length * 400).start();
     }
 
-    private void startAnimation(){
-        if(!mIsAnimating) {
+    private void startAnimation() {
+        if (!mIsAnimating) {
             Animation currentAnimation = mLoadingView.getAnimation();
-            if(currentAnimation == null) {
+            if (currentAnimation == null) {
                 Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate);
                 mLoadingView.startAnimation(animation);
             }
@@ -307,16 +309,16 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         }
     }
 
-    private void stopAnimation(){
+    private void stopAnimation() {
         clearAnimation();
     }
 
-    private void clearAnimation(){
+    private void clearAnimation() {
         mIsAnimating = false;
         mLoadingView.clearAnimation();
     }
 
-    public void animateStopping(){
+    public void animateStopping() {
         startAnimation();
 //        mConnectButton.setText(R.string.connect);
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
@@ -326,25 +328,27 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mLoadingView.setImageLevel(0);
     }
 
-    private void connectFinish(){
+    private void connectFinish() {
         stopAnimation();
 //        mConnectButton.setText(R.string.disconnect);
         mConnectStatus.setImageResource(R.drawable.connect_success_icon);
+        mConnectStatusText.setText(getResources().getString(R.string.connected));
         mMessageTextView.setVisibility(View.GONE);
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
         mLoadingView.setImageLevel(0);
     }
 
-    private void stopFinish(){
+    private void stopFinish() {
         stopAnimation();
 //        mConnectButton.setText(R.string.connect);
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
         mMessageTextView.setVisibility(View.GONE);
+        mConnectStatusText.setVisibility(View.GONE);
         mFreeUsedTimeTextView.setVisibility(View.VISIBLE);
         updateFreeUsedTime();
     }
 
-    private void error(){
+    private void error() {
         stopAnimation();
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mMessageTextView.setVisibility(View.VISIBLE);
@@ -356,6 +360,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mLoadingView.setImageLevel(1);
 //        mConnectButton.setText(R.string.connect);
+        mConnectStatusText.setVisibility(View.GONE);
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
     }
 
@@ -385,8 +390,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         super.onDestroyView();
     }
 
-    public void updateUI(){
-        if(isVisible()) {
+    public void updateUI() {
+        if (isVisible()) {
             switch (mVpnState) {
                 case Init:
                     init();
@@ -425,6 +430,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
             }
         }
     }
+
     public void setConnectResult(VpnState state) {
         mVpnState = state;
         if (isVisible()) {
