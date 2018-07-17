@@ -98,7 +98,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         else if (type == TYPE_NET_SPEED_FINISH)
             Firebase.getInstance(this).logEvent("进入vip界面来源", "加速成功结果页");
         else if (type == TYPE_FREE_TIME_OVER)
-            Firebase.getInstance(this).logEvent("进入vip界面来源", "面试试用结束");
+            Firebase.getInstance(this).logEvent("进入vip界面来源", "免费试用结束");
     }
 
     private void initGooglePayHelper() {
@@ -273,6 +273,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一个月");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneMonthPurchase.isAutoRenewing()).apply();
                 sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneMonthPurchase.getPurchaseTime()).apply();
                 finish();
@@ -282,6 +283,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "半年");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, halfYearPurchase.isAutoRenewing()).apply();
                 sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, halfYearPurchase.getPurchaseTime()).apply();
                 finish();
@@ -291,6 +293,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一年");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneYearPurchase.isAutoRenewing()).apply();
                 sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneYearPurchase.getPurchaseTime()).apply();
                 finish();
@@ -298,7 +301,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 Log.i(TAG, "onQueryInventoryFinished: 查询成功的finish 一年 ");
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "免费试用");
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
                 sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, sevenFreePurchase.isAutoRenewing()).apply();
                 sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, sevenFreePurchase.getPurchaseTime()).apply();
                 finish();
@@ -361,8 +365,10 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
                         sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
                         VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
                     }
@@ -405,8 +411,10 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
                         sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
                         VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
                     }
@@ -421,7 +429,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             e.printStackTrace();
         }
     }
-
 
     private void payOneYear() {
         if (!mHelper.subscriptionsSupported()) {
@@ -450,8 +457,10 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
                         sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
                         VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
                     }

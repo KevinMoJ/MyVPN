@@ -63,14 +63,29 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
         mVipFinishServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
 
         boolean isPayOneMonth = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true);
-        mVipFinishPayType.setText(getResources().getString(R.string.months_plan, isPayOneMonth ? "1" : "6"));
+        boolean isPayHalfYear = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true);
+
+        if (isPayOneMonth) {
+            mVipFinishPayType.setText(getResources().getString(R.string.months_plan, "1"));
+        } else if (isPayHalfYear) {
+            mVipFinishPayType.setText(getResources().getString(R.string.months_plan, "6"));
+        } else {
+            mVipFinishPayType.setText(getResources().getString(R.string.months_plan, "12"));
+        }
 
         long payTime = 0;
         payTime = mSharedPreferences.getLong(SharedPreferenceKey.VIP_PAY_TIME, 0);
         try {
             if (payTime != 0) {
                 SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
-                String dateStr = dateformat.format(payTime + (TimeUnit.DAYS.toMillis(isPayOneMonth ? 30 : 180)));
+                String dateStr;
+                if (isPayOneMonth) {
+                    dateStr = dateformat.format(payTime + (TimeUnit.DAYS.toMillis(30)));
+                } else if (isPayHalfYear) {
+                    dateStr = dateformat.format(payTime + (TimeUnit.DAYS.toMillis(180)));
+                } else {
+                    dateStr = dateformat.format(payTime + (TimeUnit.DAYS.toMillis(365)));
+                }
                 //2018/08/10
                 String year = dateStr.substring(0, dateStr.indexOf("/"));
                 String month = dateStr.substring(dateStr.indexOf("/") + 1, dateStr.lastIndexOf("/"));

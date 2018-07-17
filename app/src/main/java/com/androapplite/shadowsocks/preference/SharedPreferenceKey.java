@@ -32,6 +32,7 @@ public final class SharedPreferenceKey {
     public static final String IS_AUTOMATIC_RENEWAL_VIP = "IS_AUTOMATIC_RENEWAL_VIP"; // 是否是自动续费
     public static final String VIP_PAY_TIME = "VIP_PAY_TIME"; // 购买VIP的时间
     public static final String IS_VIP_PAY_ONE_MONTH = "IS_VIP_PAY_ONE_MONTH"; // 是否购买的一个月VIP
+    public static final String IS_VIP_PAY_HALF_YEAR = "IS_VIP_PAY_HALF_YEAR"; // 是否购买的半年VIP
     public static final String LUCK_PAN_GET_FREE_DAY = "LUCK_PAN_GET_FREE_DAY"; // 幸运转盘转出的时间，存的是天
     public static final String LUCK_PAN_GET_DAY_TO_SHOW = "LUCK_PAN_GET_DAY_TO_SHOW"; // 幸运转盘转出的时间，用来去显示的
     public static final String NEW_USER_FREE_USER_TIME = "NEW_USER_FREE_USER_TIME"; // 新用户免费用时，30分钟,存的是秒。

@@ -363,10 +363,17 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(RecommendVIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
                         sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
-                        VIPFinishActivity.startVIPFinishActivity(RecommendVIPActivity.this, true);
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+
+                        Intent vipFinishIntent = new Intent(RecommendVIPActivity.this, VIPFinishActivity.class);
+                        vipFinishIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        vipFinishIntent.putExtra(VIPFinishActivity.TYPE_VIP_PAY_FINISH, true);
+                        Intent[] intents = {new Intent(RecommendVIPActivity.this, MainActivity.class), vipFinishIntent};
+                        RecommendVIPActivity.this.startActivities(intents);
                         finish();
                     }
                 }
