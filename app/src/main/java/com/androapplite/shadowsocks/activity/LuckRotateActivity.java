@@ -55,6 +55,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
     private int rotatePos = -1;
     private long startLuckPanTime;
+    private long cloudGetLuckFreeDay;
     private boolean isLuckPanRunning;
     private boolean todayIsContinuePlay; // 能不能玩，不能玩就一直转到thanks，能玩的话就显示转到的时间,
 
@@ -97,6 +98,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         mStateListener = new InterstitialAdStateListener(this);
         mAdAppHelper.addAdStateListener(mStateListener);
         mHandler = new Handler(this);
+        cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
         startLuckPanTime = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0);
 
         if (startLuckPanTime == 0) { // 新用户没数据
@@ -148,7 +150,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     void startRotate() {
         long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, 0);
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
-        long cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
 
         rotatePos = getRotatePos();
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
@@ -158,13 +159,13 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
-            if (getLuckFreeDays >= cloudGetLuckFreeDay) {
+            if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) {
                 todayIsContinuePlay = false;
                 mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
                 Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
             } else {
                 todayIsContinuePlay = true;
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong).apply();
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong + getLuckFreeDays).apply();
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
                 Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
                 mLuckPanLayout.rotate(rotatePos, 100);
@@ -297,9 +298,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             LuckRotateActivity activity = mActivityReference.get();
             if (activity != null) {
 //                activity.addBottomAd();
-                if (!activity.isLuckPanRunning && activity.dialog == null) {
-                    activity.btnEnableClick(true);
-                } else if (!activity.isLuckPanRunning && !activity.dialog.isShowing()) {
+                if (!activity.isLuckPanRunning) {
                     activity.btnEnableClick(true);
                 }
             }

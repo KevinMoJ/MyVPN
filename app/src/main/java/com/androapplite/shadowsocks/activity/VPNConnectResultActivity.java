@@ -109,7 +109,7 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         mResultConnectRoot.setVisibility(type == VPN_RESULT_CONNECT ? View.VISIBLE : View.GONE);
         mResultDisconnectRoot.setVisibility(type == VPN_RESULT_DISCONNECT ? View.VISIBLE : View.GONE);
         //链接成功显示全屏广告，有云控
-        if (type == VPN_RESULT_CONNECT && FirebaseRemoteConfig.getInstance().getBoolean("result_show_full_ad")) {
+        if (type == VPN_RESULT_CONNECT && FirebaseRemoteConfig.getInstance().getBoolean("result_show_full_ad") && !VIPActivity.isVIPUser(this)) {
             mAdAppHelper.showFullAd();
             Firebase.getInstance(this).logEvent("连接结果页全屏", "显示", "true");
         }
@@ -123,7 +123,6 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         if (!VIPActivity.isVIPUser(this))
             FillAdContent();
         else {
-
             if (type == VPN_RESULT_CONNECT) {
                 mVIPResultImage.setImageResource(R.drawable.vip_connect_success_icon);
                 mVIPResultText.setVisibility(View.GONE);
@@ -367,12 +366,15 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         @Override
         public void onAdLoaded(AdType adType, int index) {
             Log.i(TAG, "onAdLoaded: ");
-            switch (adType.getType()) {
-                case AdType.FACEBOOK_NATIVE:
-                case AdType.ADMOB_NATIVE_AN:
-                case AdType.ADMOB_NATIVE:
-                    FillAdContent();
-                    break;
+            if (mReference.get() != null) {
+                switch (adType.getType()) {
+                    case AdType.FACEBOOK_NATIVE:
+                    case AdType.ADMOB_NATIVE_AN:
+                    case AdType.ADMOB_NATIVE:
+                        if (!VIPActivity.isVIPUser(mReference.get()))
+                            FillAdContent();
+                        break;
+                }
             }
         }
 
