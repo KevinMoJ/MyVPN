@@ -272,7 +272,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         startAnimation();
 //        mConnectButton.setText(R.string.connecting);
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
-        mMessageTextView.setVisibility(View.VISIBLE);
+        mMessageTextView.setVisibility(View.GONE);
         mConnectStatusText.setVisibility(View.VISIBLE);
         mConnectStatusText.setText(R.string.connecting);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
@@ -412,6 +412,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
                     error();
                     break;
             }
+        }
+        if (LocalVpnService.IsRunning && mConnectStatusText.getVisibility() == View.GONE) {
+            mConnectStatusText.setVisibility(View.VISIBLE);
+            mConnectStatusText.setText(R.string.connecting);
         }
     }
 
