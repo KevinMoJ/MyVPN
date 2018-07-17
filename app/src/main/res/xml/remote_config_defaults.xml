@@ -278,22 +278,10 @@
         <value>0.25</value>
     </entry>
 
-    <!--非VIP用户限时使用时长,单位分钟-->
+    <!--幸运转盘当天得到累积的最大天数，单位天-->
     <entry>
-        <key>not_vip_user_free_use_time</key>
-        <value>1</value>
-    </entry>
-
-    <!--幸运转盘得到的时间当天总和最大值,单位分钟-->
-    <entry>
-        <key>luck_pan_get_free_time_max</key>
-        <value>20</value>
-    </entry>
-
-    <!--幸运转盘展示全屏广告的次数-->
-    <entry>
-        <key>luck_pan_show_full_ad_count</key>
-        <value>0</value>
+        <key>luck_pan_get_day</key>
+        <value>7</value>
     </entry>
 
     <!--幸运转盘展示全屏开关-->
@@ -318,6 +306,36 @@
     <entry>
         <key>new_user_free_use_time</key>
         <value>30</value>
+    </entry>
+
+    <!--转盘转到thanks概率-->
+    <entry>
+        <key>luck_rotate_thanks</key>
+        <value>66</value>
+    </entry>
+
+    <!--转盘转到1概率-->
+    <entry>
+        <key>luck_rotate_one</key>
+        <value>20</value>
+    </entry>
+
+    <!--转盘转到2概率-->
+    <entry>
+        <key>luck_rotate_two</key>
+        <value>10</value>
+    </entry>
+
+    <!--转盘转到3概率-->
+    <entry>
+        <key>luck_rotate_three</key>
+        <value>3</value>
+    </entry>
+
+    <!--转盘转到5概率-->
+    <entry>
+        <key>luck_rotate_five</key>
+        <value>1</value>
     </entry>
 
     <!--&lt;!&ndash;VIP商品id集合一个月&ndash;&gt;-->

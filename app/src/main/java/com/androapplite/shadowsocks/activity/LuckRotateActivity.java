@@ -1,5 +1,6 @@
 package com.androapplite.shadowsocks.activity;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,6 +51,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private AdAppHelper mAdAppHelper;
     private InterstitialAdStateListener mStateListener;
     private Handler mHandler;
+    private Dialog dialog;
 
     private int rotatePos = -1;
     private long startLuckPanTime;
@@ -77,8 +79,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     @Override
     protected void onResume() {
         super.onResume();
-        if (!VIPActivity.isVIPUser(this))
-            addBottomAd();
+//        if (!VIPActivity.isVIPUser(this))
+//            addBottomAd();
     }
 
     private void initView() {
@@ -105,10 +107,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             startLuckPanTime = System.currentTimeMillis();
             mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, startLuckPanTime).apply();
             Log.i(TAG, "initData: 初始化数据，打开的日期是第二天，重新保存了打开时间");
-            // 不是今天的话，就把转盘得到的时间清零
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0).apply();
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME_TO_SHOW, 0).apply();
-            mSharedPreferences.edit().putInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, 0).apply();
+            // 不是今天的话，就把转盘得到的天数清零
+            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
+            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, 0).apply();
         }
 
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
@@ -121,6 +122,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private void initUI() {
         mActionBar.setTitle("Luck Game");
         btnEnableClick(mAdAppHelper.isFullAdLoaded());
+//        btnEnableClick(true);
     }
 
     private void addBottomAd() {
@@ -144,10 +146,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     }
 
     void startRotate() {
-        long freeTime = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
-        long freeTimeShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME_TO_SHOW, 0);
-        int adShowCount = mSharedPreferences.getInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, 0);
-        int cloudAdShowCount = (int) FirebaseRemoteConfig.getInstance().getLong("luck_pan_show_full_ad_count");
+        long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, 0);
+        long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
 
         rotatePos = getRotatePos();
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
@@ -156,22 +157,16 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
-            //如果显示的广告数大于的一天最大的次数，就让他的结果一直为thanks
-            if (cloudAdShowCount == 0) {
-                todayIsContinuePlay = true;
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, rewardLong * 60 + freeTime).apply(); // 以秒的形式存储
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME_TO_SHOW, rewardLong + freeTimeShow).apply(); // 用来给dialog显示的
-                mLuckPanLayout.rotate(rotatePos, 100);
-                Log.i(TAG, "startRotate:cloudAdShowCount == 0   " + (freeTimeShow + rewardLong));
-            } else if (adShowCount > cloudAdShowCount) {
+            //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
+            if (getLuckFreeDays >= cloudGetLuckFreeDay) {
                 todayIsContinuePlay = false;
                 mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
-                Log.i(TAG, "startRotate: 广告展示达到次数，一直thanks " + (freeTime + rewardLong));
+                Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
             } else {
                 todayIsContinuePlay = true;
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, rewardLong * 60 + freeTime).apply();
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME_TO_SHOW, rewardLong + freeTimeShow).apply(); // 用来给dialog显示的
-                Log.i(TAG, "startRotate: 没有达到广告展示达到次数，随机显示" + (freeTime + rewardLong));
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong).apply();
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
+                Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
                 mLuckPanLayout.rotate(rotatePos, 100);
             }
         } else {
@@ -237,7 +232,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             if (!todayIsContinuePlay)
                 rotateString = "thanks";
 
-            DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
+            dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
             if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
                 mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
             }
@@ -285,8 +280,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         switch (msg.what) {
             case SHOW_FULL_AD:
                 mAdAppHelper.showFullAd();
-                int adShowCount = mSharedPreferences.getInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, 0);
-                mSharedPreferences.edit().putInt(SharedPreferenceKey.LUCK_PAN_SHOW_FULL_AD_COUNT, adShowCount + 1).apply();
                 return true;
         }
         return false;
@@ -303,9 +296,12 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         public void onAdLoaded(AdType adType, int index) {
             LuckRotateActivity activity = mActivityReference.get();
             if (activity != null) {
-                activity.addBottomAd();
-                if (!activity.isLuckPanRunning)
+//                activity.addBottomAd();
+                if (!activity.isLuckPanRunning && activity.dialog == null) {
                     activity.btnEnableClick(true);
+                } else if (!activity.isLuckPanRunning && !activity.dialog.isShowing()) {
+                    activity.btnEnableClick(true);
+                }
             }
         }
     }

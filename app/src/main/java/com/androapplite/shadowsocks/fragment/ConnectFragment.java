@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,6 +35,7 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.R;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.lang.ref.WeakReference;
@@ -88,7 +90,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mConnectButton.setOnClickListener(this);
         mVIPImage.setOnClickListener(this);
-
+        checkFreeUseTime(); // 用来给新用户或者免费天数用户到期后给免费使用时间
         startVIPAnimation();
         updateFreeUsedTime();
         if (LocalVpnService.IsRunning) {
@@ -228,19 +230,41 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
     private void updateFreeUsedTime() {
         final long countDown;
+        SpannableString spannableString;
+        String showTimeString;
+        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+
         if (!VIPActivity.isVIPUser(getContext())) {
-            countDown = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+            if (luckFreeDay > 0) {
+                showTimeString = String.format(getString(R.string.removing_time_days), String.valueOf(luckFreeDay));
+
+                spannableString = new SpannableString(showTimeString);
+                spannableString.setSpan(new ForegroundColorSpan(Color.YELLOW),
+                        showTimeString.indexOf(String.valueOf(luckFreeDay)),
+                        showTimeString.indexOf(String.valueOf(luckFreeDay)) + String.valueOf(luckFreeDay).length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                mFreeUsedTimeTextView.setText(spannableString);
+                return;
+            } else {
+                countDown = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+                final String elapsedTime = DateUtils.formatElapsedTime(countDown);
+
+                showTimeString = String.format(getString(R.string.removing_time), elapsedTime);
+                spannableString = new SpannableString(showTimeString);
+                spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.primary_white_text)),
+                        showTimeString.length() - elapsedTime.length(), showTimeString.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                mFreeUsedTimeTextView.setText(spannableString);
+                return;
+            }
         } else {
             countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+            String elapsedTime = DateUtils.formatElapsedTime(countDown);
+            mFreeUsedTimeTextView.setTextColor(Color.WHITE);
+            mFreeUsedTimeTextView.setText(elapsedTime);
+            return;
         }
-
-        final String elapsedTime = DateUtils.formatElapsedTime(countDown);
-        String freeUseTime = String.format(getString(R.string.free_used_time), elapsedTime);
-        SpannableString spannableString = new SpannableString(freeUseTime);
-        spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.primary_white_text)),
-                freeUseTime.length() - elapsedTime.length(), freeUseTime.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        mFreeUsedTimeTextView.setText(spannableString);
     }
 
     public void animateConnecting(){
@@ -324,11 +348,24 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         stopAnimation();
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mMessageTextView.setVisibility(View.VISIBLE);
-        final long countDown = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
+        final long countDown;
+        if (VIPActivity.isVIPUser(getContext()))
+            countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        else
+            countDown = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mLoadingView.setImageLevel(1);
 //        mConnectButton.setText(R.string.connect);
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
+    }
+
+    private void checkFreeUseTime() {
+        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
+
+        if (luckFreeDay <= 0 && freeUseTime == 0)
+            mSharedPreference.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, newUserFreeTime * 60).apply();
     }
 
     @Override

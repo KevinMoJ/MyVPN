@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         mHandlerThread = new HandlerThread("background handler");
         mHandlerThread.start();
         mBackgroundHander = new Handler(mHandlerThread.getLooper(), this);
-        checkFreeUseTime();
         //用来判断活跃不活跃用户所存的时间
         mSharedPreference.edit().putLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, System.currentTimeMillis()).apply();
         Firebase firebase = Firebase.getInstance(this);
@@ -166,14 +165,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             Firebase.getInstance(this).logEvent("主界面", "进入全屏", "显示");
             mAdMsgType = MSG_SHOW_INTERSTITIAL_ENTER;
         }
-    }
-
-    private void checkFreeUseTime() {
-        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
-        long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
-
-        if (freeUseTime == 0)
-            mSharedPreference.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, newUserFreeTime * 60).apply();
     }
 
     private void showInterstitialWithDelay(int msg, String adShowRate, String adDelayMin, String adDelayMinDefault, String adDelayMax, String adDelayMaxDefault) {

@@ -106,11 +106,11 @@ public class VpnManageService extends Service implements Runnable,
         mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         long useTime = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
-        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0);
+        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
         if (useTime < 0) {
             mSharedPreference.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
         } else if (freeUseTime < 0) {
-            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_TIME, 0).apply();
+            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
         }
     }
 

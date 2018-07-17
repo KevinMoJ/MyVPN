@@ -141,10 +141,10 @@
     <string name="join_vip">Join VIP</string>
     <string name="cruel_rejection">Cruel Rejection</string>
     <string name="wireless_traffic">Wireless traffic,unlimited time</string>
-    <string name="cumulative_use_duration">Cumulative use duration %s minutes</string>
-    <string name="luck_pan_title">Play Lucky Game to get free experience time</string>
+    <string name="cumulative_use_duration">Cumulative use duration %s days</string>
+    <string name="luck_pan_title">Play lucky game to win more free days</string>
     <string name="free_over_dialog_message">The free experience has already arrived. You can also advertise when you join the VIP</string>
-    <string name="add_minutes">+%s Minutes</string>
+    <string name="add_minutes">+%s Days</string>
     
     <string name="take_you_to_experience">Take you to experience the speed of Internet access</string>
     <string name="visit_the_website_of_the_wall">Visit the website of the wall</string>
@@ -172,6 +172,13 @@
     <string name="access_web_pages">Access web pages, social apps, games,etc. anytime, anywhere.</string>
     <string name="protect_security_privacy">Protect security privacy</string>
     <string name="hide_your_Ip_address">Hide your IP address, browse without leaving traces, completely invisible.</string>
+
+    <string name="removing_time">Removing Time: %s</string>
+    <string name="removing_time_days">Removing Time: %s days</string>
+
+    <string name="luck_pan_message">Lucky people can transfer to 7 days a day.</string>
+    <string name="make_persistent_efforts">Make persistent efforts</string>
+    <string name="congratulation">Congratulation</string>
 
 
 </resources>
