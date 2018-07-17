@@ -257,56 +257,56 @@ public class ConnectVpnHelper {
             final boolean isGlobalOption = nation.equals(defaultNation);
             ArrayList<MyCallable> tasks = new ArrayList<>();
             if (isGlobalOption) { //没有选择国家
-                if (!isVIPUser) { // 不是vip用户
-                    for (ServerConfig config : serverConfigs) {
-                        if (getCurrentConfigIsFreeServer(config)) {
-                            tasks.add(new MyCallable(this, config));
-                        }
-                    }
-                } else {// 是vip用户
-                    String countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "unkown");
-                    TypedArray nationCode = mContext.getResources().obtainTypedArray(R.array.vpn_nations_code);
-                    TypedArray nations = mContext.getResources().obtainTypedArray(R.array.vpn_nations);
+//                if (!isVIPUser) { // 不是vip用户
+//                    for (ServerConfig config : serverConfigs) {
+//                        if (getCurrentConfigIsFreeServer(config)) {
+//                            tasks.add(new MyCallable(this, config));
+//                        }
+//                    }
+//                } else {// 是vip用户
+                String countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "unkown");
+                TypedArray nationCode = mContext.getResources().obtainTypedArray(R.array.vpn_nations_code);
+                TypedArray nations = mContext.getResources().obtainTypedArray(R.array.vpn_nations);
 
 //                    测试用
 //                countryCode = "ZA";
-                    for (int k = 0; k < nationCode.length(); k++) { //通过国家code找到当地有服务器
-                        String code = nationCode.getString(k);
-                        if (countryCode.equals("FR")) //单独处理法国，因为现在暂时没有法国的服务器，法国默认连接美国
-                            break;
-                        if (countryCode.toUpperCase().equals(code)) {
-                            localNation = nations.getString(k);
-                            mIsFindLocalServer = true;
-                            mFirebase.logEvent("找到本地服务器", countryCode, localNation);
-                            break;
-                        } else {
-                            mIsFindLocalServer = false;
+                for (int k = 0; k < nationCode.length(); k++) { //通过国家code找到当地有服务器
+                    String code = nationCode.getString(k);
+                    if (countryCode.equals("FR")) //单独处理法国，因为现在暂时没有法国的服务器，法国默认连接美国
+                        break;
+                    if (countryCode.toUpperCase().equals(code)) {
+                        localNation = nations.getString(k);
+                        mIsFindLocalServer = true;
+                        mFirebase.logEvent("找到本地服务器", countryCode, localNation);
+                        break;
+                    } else {
+                        mIsFindLocalServer = false;
+                    }
+                }
+
+                if (!mIsFindLocalServer)
+                    mFirebase.logEvent("没有找到本地服务器", countryCode);
+
+                //根据国家代码 优先选择当前国家的服务器
+                if (!TextUtils.isEmpty(localNation)) {
+                    for (ServerConfig config : serverConfigs) {
+                        if (localNation.equals(config.nation)) {
+                            tasks.add(new MyCallable(this, config));
                         }
                     }
-
-                    if (!mIsFindLocalServer)
-                        mFirebase.logEvent("没有找到本地服务器", countryCode);
-
-                    //根据国家代码 优先选择当前国家的服务器
-                    if (!TextUtils.isEmpty(localNation)) {
-                        for (ServerConfig config : serverConfigs) {
-                            if (localNation.equals(config.nation)) {
+                } else {
+                    serverConfigs.remove(0); // 如果没有找到当前国家有服务器的话，先根据国家来优先链接服务器，
+                    nation = getPriorityNation(countryCode);
+                    for (ServerConfig config : serverConfigs) {
+                        if (mIsPriorityConnect) {
+                            if (nation.equals(config.nation))
                                 tasks.add(new MyCallable(this, config));
-                            }
-                        }
-                    } else {
-                        serverConfigs.remove(0); // 如果没有找到当前国家有服务器的话，先根据国家来优先链接服务器，
-                        nation = getPriorityNation(countryCode);
-                        for (ServerConfig config : serverConfigs) {
-                            if (mIsPriorityConnect) {
-                                if (nation.equals(config.nation))
-                                    tasks.add(new MyCallable(this, config));
-                            } else {
-                                tasks.add(new MyCallable(this, config));
-                            }
+                        } else {
+                            tasks.add(new MyCallable(this, config));
                         }
                     }
                 }
+//                }
             } else {
                 for (ServerConfig config : serverConfigs) {
                     if (nation.equals(config.nation)) {
@@ -415,7 +415,7 @@ public class ConnectVpnHelper {
                 }
                 for (ServerConfig config : serverConfigs) {
                     if (!isVIPUser) {
-                        if (config != null && getCurrentConfigIsFreeServer(config) && !errorsList.contains(config)) {
+                        if (config != null && !errorsList.contains(config)) {//&& getCurrentConfigIsFreeServer(config)
                             serverConfig = testServerPing(config);
                             if (serverConfig != null)
                                 return serverConfig;
@@ -462,7 +462,7 @@ public class ConnectVpnHelper {
                     vpnServerSet.add(config.server);//本地亚马逊服务器的ip添加到集合让其访问load不走代理
 
                 if (!isVIPUser) { // 不是vip用户
-                    if (config != null && getCurrentConfigIsFreeServer(config) && !errorsList.contains(config)) {
+                    if (config != null && !errorsList.contains(config)) {// && getCurrentConfigIsFreeServer(config)
                         serverConfig = testServerPing(config);
                         if (serverConfig != null) {
                             mFirebase.logEvent("非vip使用本地找到的服务器", String.format("%s--->%s--->%s", serverConfig.server, serverConfig.port, serverConfig.nation));
@@ -511,7 +511,7 @@ public class ConnectVpnHelper {
         serverConfigs.remove(0);
         for (ServerConfig config : serverConfigs) {
             if (!isVIPUser) {
-                if (config != null && getCurrentConfigIsFreeServer(config))
+                if (config != null)//&& getCurrentConfigIsFreeServer(config)
                     tasks.add(new MyCallable(this, config));
             } else {
                 tasks.add(new MyCallable(this, config));
