@@ -68,6 +68,7 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     private BroadcastReceiver mForgroundReceiver;
     private IntentFilter mForgroundReceiverIntentFilter;
     private FrameLayout mContainer;
+    private long luckFreeDay; // 转盘用户转取体验VIP的天数
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -101,6 +102,8 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
         if (!VIPActivity.isVIPUser(getContext()))
             addBottomAd();
         Firebase.getInstance(getContext()).logEvent("屏幕", "服务器列表屏幕");
+
+        luckFreeDay = mPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
     }
 
     private void initView(View view) {
@@ -313,11 +316,15 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
 //                holder.mItemView.setSelected(false);
 //            }
             if (mHasServerJson) {
-                holder.mSignalImageView.setImageResource(R.drawable.server_signal_vip);//mSignalResIds.get(nation)
-                if (nation.equals(getString(R.string.vpn_nation_opt)))
-                    holder.mSignalImageView.setVisibility(View.GONE);
-                else
-                    holder.mSignalImageView.setVisibility(View.VISIBLE);
+                if (VIPActivity.isVIPUser(getContext()) || luckFreeDay > 0) {
+                    holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
+                } else {
+                    holder.mSignalImageView.setImageResource(R.drawable.server_signal_vip);
+                    if (nation.equals(getString(R.string.vpn_nation_opt)))
+                        holder.mSignalImageView.setVisibility(View.GONE);
+                    else
+                        holder.mSignalImageView.setVisibility(View.VISIBLE);
+                }
             } else {
                 holder.mSignalImageView.setVisibility(View.INVISIBLE);
             }
@@ -335,7 +342,7 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (mPreferences.getBoolean(SharedPreferenceKey.VIP, false)) {
+        if (mPreferences.getBoolean(SharedPreferenceKey.VIP, false) || luckFreeDay > 0) {
             mListView.setItemChecked(mSelectedIndex, false);
             mSelectedIndex = position;
             String nation = mNations.get(position);
