@@ -103,7 +103,7 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             addBottomAd();
         Firebase.getInstance(getContext()).logEvent("屏幕", "服务器列表屏幕");
 
-        luckFreeDay = mPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        luckFreeDay = mPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
     }
 
     private void initView(View view) {

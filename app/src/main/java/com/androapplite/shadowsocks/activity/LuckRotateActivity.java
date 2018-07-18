@@ -116,7 +116,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             Log.i(TAG, "initData: 初始化数据，打开的日期是第二天，重新保存了打开时间");
             // 不是今天的话，就把转盘得到的天数清零
             mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, 0).apply();
+//            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
         }
 
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
@@ -159,7 +159,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     }
 
     void startRotate() {
-        long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, 0);
+        long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
 
         rotatePos = getRotatePos();
@@ -177,7 +177,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             } else {
                 todayIsContinuePlay = true;
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong + getLuckFreeDays).apply();
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
+                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
 
                 progressInt = (int) mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
                 Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));

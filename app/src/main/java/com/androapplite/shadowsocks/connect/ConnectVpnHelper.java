@@ -489,7 +489,7 @@ public class ConnectVpnHelper {
     public static boolean isFreeUse(final Context context, int type) {
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
         long freeTime = sharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
-        long luckFreeDay = sharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long luckFreeDay = sharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
 
         if (!VIPActivity.isVIPUser(context)) {
             if (freeTime > 0 || luckFreeDay > 0) {

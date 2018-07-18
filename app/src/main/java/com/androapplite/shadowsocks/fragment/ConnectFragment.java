@@ -233,7 +233,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         final long countDown;
         SpannableString spannableString;
         String showTimeString;
-        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
 
         if (!VIPActivity.isVIPUser(getContext())) {
             if (luckFreeDay > 0) {
@@ -366,7 +366,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
 
     private void checkFreeUseTime() {
         long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
-        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
 
         if (luckFreeDay <= 0 && freeUseTime == 0)

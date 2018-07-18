@@ -83,7 +83,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         checkFreeUseTime();
 
-        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         freeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
         boolean isVIP = mSharedPreferences.getBoolean(SharedPreferenceKey.VIP, false);
 
@@ -107,13 +107,13 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     private void checkFreeUseTime() {
         //用活跃用户的打开APP的时间判断上次用户打开APP的时间
         long openAppTime = mSharedPreferences.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0);
-        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         freeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
         long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
         long differ = System.currentTimeMillis() - openAppTime;
 
         if (luckFreeDay <= 0) { //没有转转盘获取时间或者获取的时间到期
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
+            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
             if (differ > 0) {
                 long dif = differ / 1000; // 上次打开APP的时间到这次的时间间隔
                 if (dif <= newUserFreeTime * 60) {// 20  15
@@ -129,12 +129,12 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
             if (differ > 0) {
                 long overDay = differ / (1000 * 60 * 60 * 24); // 上次打开APP的时间到现在的过了多少天
                 if (overDay <= luckFreeDay)
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, luckFreeDay - overDay).apply();
+                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, luckFreeDay - overDay).apply();
                 else
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
-                long newFreeUseDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
+                long newFreeUseDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
                 if (newFreeUseDay < 0)
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
+                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
 
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
             }

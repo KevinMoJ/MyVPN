@@ -35,7 +35,7 @@ public class DialogUtils {
         TextView message = dialog.findViewById(R.id.dialog_free_message);
         TextView tryAgain = dialog.findViewById(R.id.dialog_free_bt);
         boolean isWin = !freeTime.equals("thanks");
-        long TotalFreeTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, 0);
+        long TotalFreeTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         if (isWin) {
             title.setText(context.getResources().getString(R.string.add_minutes, freeTime));
             makePersistentE.setText(context.getResources().getString(R.string.congratulations));
