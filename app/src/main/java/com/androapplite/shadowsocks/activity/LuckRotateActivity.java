@@ -22,6 +22,7 @@ import com.androapplite.shadowsocks.luckPan.LuckPanLayout;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.DialogUtils;
+import com.androapplite.shadowsocks.view.LuckRotateProgressBar;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -46,6 +47,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private FrameLayout mAdContent;
     private LuckPanLayout mLuckPanLayout;
     private ActionBar mActionBar;
+    private LuckRotateProgressBar mLuckPanBar;
 
     private SharedPreferences mSharedPreferences;
     private AdAppHelper mAdAppHelper;
@@ -54,6 +56,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private Dialog dialog;
 
     private int rotatePos = -1;
+    private int progressInt;
     private long startLuckPanTime;
     private long cloudGetLuckFreeDay;
     private boolean isLuckPanRunning;
@@ -89,6 +92,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         mAdContent = (FrameLayout) findViewById(R.id.luck_pan_ad);
         mLuckPanLayout.setAnimationEndListener(animationEndListener);
         mStartRotateBt = findViewById(R.id.btn_start_luck_pan);
+        mLuckPanBar = (LuckRotateProgressBar) findViewById(R.id.luck_pan_bar);
         mStartRotateBt.setOnClickListener(clickListener);
     }
 
@@ -99,6 +103,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         mAdAppHelper.addAdStateListener(mStateListener);
         mHandler = new Handler(this);
         cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
+        mLuckPanBar.setMax((int) cloudGetLuckFreeDay);
         startLuckPanTime = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0);
 
         if (startLuckPanTime == 0) { // 新用户没数据
@@ -124,7 +129,13 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private void initUI() {
         mActionBar.setTitle("Luck Game");
         btnEnableClick(mAdAppHelper.isFullAdLoaded());
-//        btnEnableClick(true);
+        long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        mLuckPanBar.setProgress((int) getLuckFreeDays);
+
+        if (mLuckPanBar.getProgress() >= mLuckPanBar.getMax())
+            mLuckPanBar.setPicture(R.drawable.progress_bar_tip_full);
+        else
+            mLuckPanBar.setPicture(R.drawable.progress_bar_tip_normal);
     }
 
     private void addBottomAd() {
@@ -143,7 +154,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         } else {
             mStartRotateBt.setClickable(false);
             mStartRotateBt.setText("preparing");
-            mStartRotateBt.setBackground(getResources().getDrawable(R.drawable.free_over_cancel_bt_bg));
+            mStartRotateBt.setBackground(getResources().getDrawable(R.drawable.luck_pan_start_bt_gray_bg));
         }
     }
 
@@ -167,6 +178,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                 todayIsContinuePlay = true;
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong + getLuckFreeDays).apply();
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_SHOW, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
+
+                progressInt = (int) mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
                 Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
                 mLuckPanLayout.rotate(rotatePos, 100);
             }
@@ -232,6 +245,12 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
             if (!todayIsContinuePlay)
                 rotateString = "thanks";
+
+            if (!rotateString.equals("thanks")) {
+                mLuckPanBar.setProgress(progressInt);
+                if (mLuckPanBar.getProgress() >= mLuckPanBar.getMax())
+                    mLuckPanBar.setPicture(R.drawable.progress_bar_tip_full);
+            }
 
             dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
             if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {

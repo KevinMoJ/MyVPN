@@ -13,24 +13,12 @@
         android:layout_above="@id/luck_pan_ad"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/luck_pan_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/common_15"
-            android:layout_marginTop="@dimen/common_15"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:text="@string/luck_pan_title"
-            android:textColor="@color/primary_black_text"
-            android:textSize="@dimen/common_text_size_15sp"
-            android:textStyle="bold"/>
-
         <com.androapplite.shadowsocks.luckPan.LuckPanLayout
             android:id="@+id/luck_pan_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/common_10"
             android:background="#fff"
             app:pan_color="#f47c7b"
             app:pan_radius="168dp"
@@ -58,6 +46,31 @@
                 android:tag="startbtn"/>
         </com.androapplite.shadowsocks.luckPan.LuckPanLayout>
 
+        <com.androapplite.shadowsocks.view.LuckRotateProgressBar
+            android:id="@+id/luck_pan_bar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginLeft="@dimen/common_20"
+            android:layout_marginRight="@dimen/common_20"
+            android:layout_marginTop="@dimen/common_10"
+            app:animMode="ANIM_NULL"
+            app:backGroundColor="#dadada"
+            app:drawable="@drawable/progress_bar_tip_normal"
+            app:drawableHeightOffset="0dp"
+            app:gradientEndColor="#fff338"
+            app:gradientStartColor="#ffd338"
+            app:halfDrawableHeight="15dp"
+            app:halfDrawableWidth="15dp"
+            app:isGradient="true"
+            app:isSetBar="true"
+            app:progressHeight="15dp"
+            app:progressHeightOffset="0dp"
+            app:roundX="8dp"
+            app:roundY="8dp"/>
+
+        <!--app:backgroundDrawable="@drawable/progress_bar_gray_bg"-->
+        <!--app:barDrawable="@drawable/warndialog_button_bg_normal"-->
+
         <Button
             android:id="@+id/btn_start_luck_pan"
             android:layout_width="match_parent"
@@ -73,11 +86,21 @@
             android:textSize="20sp"/>
 
         <TextView
+            android:id="@+id/luck_pan_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/common_15"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="@string/luck_pan_title"
+            android:textColor="@color/primary_black_text"
+            android:textSize="@dimen/common_text_size_15sp"/>
+
+        <TextView
             android:id="@+id/luck_pan_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/common_15"
-            android:layout_marginTop="@dimen/common_15"
+            android:layout_marginTop="@dimen/common_5"
             android:fontFamily="sans-serif"
             android:gravity="center"
             android:text="@string/luck_pan_message"
