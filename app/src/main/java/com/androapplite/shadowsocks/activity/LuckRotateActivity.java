@@ -17,7 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.luckPan.LuckPanLayout;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -35,6 +37,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private static final String TAG = "LuckRotateActivity";
     public static final int SHOW_FULL_AD = 100;
     public static final String TYPE = "TYPE";
+    public static final String START = "start";
+    public static final String PREPAR = "preparing";
 
     private static int RESULT_TYPE_1 = 0;
     private static int RESULT_TYPE_2 = 2;
@@ -54,6 +58,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private InterstitialAdStateListener mStateListener;
     private Handler mHandler;
     private Dialog dialog;
+    private Firebase mFirebase;
 
     private int rotatePos = -1;
     private int progressInt;
@@ -99,6 +104,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private void initData() {
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mAdAppHelper = AdAppHelper.getInstance(this);
+        mFirebase = Firebase.getInstance(this);
         mStateListener = new InterstitialAdStateListener(this);
         mAdAppHelper.addAdStateListener(mStateListener);
         mHandler = new Handler(this);
@@ -127,7 +133,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     }
 
     private void initUI() {
-        mActionBar.setTitle("Luck Game");
+        mActionBar.setTitle("Lucky Game");
         btnEnableClick(mAdAppHelper.isFullAdLoaded());
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
         mLuckPanBar.setProgress((int) getLuckFreeDays);
@@ -148,17 +154,18 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
     private void btnEnableClick(boolean enableClick) {
         if (enableClick) {
-            mStartRotateBt.setClickable(true);
-            mStartRotateBt.setText("start");
+//            mStartRotateBt.setClickable(true);
+            mStartRotateBt.setText(START);
             mStartRotateBt.setBackground(getResources().getDrawable(R.drawable.luck_pan_bt_bg));
         } else {
-            mStartRotateBt.setClickable(false);
-            mStartRotateBt.setText("preparing");
+//            mStartRotateBt.setClickable(false);
+            mStartRotateBt.setText(PREPAR);
             mStartRotateBt.setBackground(getResources().getDrawable(R.drawable.luck_pan_start_bt_gray_bg));
         }
     }
 
     void startRotate() {
+        mFirebase.logEvent("开始游戏", "转盘按钮", "点击");
         long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
 
@@ -170,6 +177,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
+            mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
             if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) {
                 todayIsContinuePlay = false;
                 mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
@@ -215,7 +223,10 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btn_start_luck_pan:
-                    startRotate();
+                    if (mStartRotateBt.getText().equals(START))
+                        startRotate();
+                    else
+                        Toast.makeText(LuckRotateActivity.this, getResources().getString(R.string.please_try_it_later), Toast.LENGTH_SHORT).show();
                     break;
             }
         }

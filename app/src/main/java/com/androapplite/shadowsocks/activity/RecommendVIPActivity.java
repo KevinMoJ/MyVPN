@@ -69,6 +69,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     private SharedPreferences mSharedPreferences;
 
     private AdAppHelper mAdAppHelper;
+    private Firebase mFirebase;
 
     private int[] bannerImages;
     private int[] bannerFlags;
@@ -193,6 +194,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
         mAdAppHelper.loadNewInterstitial();
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
+        mFirebase = Firebase.getInstance(this);
         try {
             checkIsVIP();
         } catch (Exception e) {
@@ -232,11 +234,11 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                 if (!result.isSuccess()) {
                     //helper设置失败是没法支付的，此处可以弹出提示框
                     isStartHelper = false;
-                    Log.i("SplashActivity", "onIabSetupFinished: 初始化失败 ");
+                    Log.i(TAG, "onIabSetupFinished: 初始化失败 ");
                     return;
                 } else {
                     isStartHelper = true;
-                    Log.i("SplashActivity", "onIabSetupFinished: 初始化成功 ");
+                    Log.i(TAG, "onIabSetupFinished: 初始化成功 ");
                 }
 
                 if (mIabHelper == null) return;
@@ -324,8 +326,10 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     public void onBackPressed() {
         if (!FirebaseRemoteConfig.getInstance().getBoolean("recommend_vip_hide_back")) {
             if (mRecommendVipWelcomeRoot.getVisibility() == View.VISIBLE && mScrollView.getVisibility() == View.GONE) {
+                mFirebase.logEvent("三个轮播图界", "back键", "点击");
                 showScrollView();
             } else if (mRecommendVipWelcomeRoot.getVisibility() == View.GONE && mScrollView.getVisibility() == View.VISIBLE) {
+                mFirebase.logEvent("长图界面", "back键", "点击");
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
             }
@@ -336,22 +340,26 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.recommend_vip_close:
+                mFirebase.logEvent("三个轮播图界关闭按钮", "按钮", "点击");
                 showScrollView();
                 break;
 
             case R.id.recommend_vip_seven_day_bt:
             case R.id.recommend_vip_top_seven_bt:
             case R.id.recommend_vip_bottom_seven_bt:
+                mFirebase.logEvent("免费试用七天按钮", "按钮", "点击");
                 payFreeSeven();
                 break;
 
             case R.id.recommend_vip_free_time_bt:
             case R.id.recommend_vip_top_free_bt:
             case R.id.recommend_vip_bottom_free_bt:
+                mFirebase.logEvent("推荐页转盘按钮", "按钮", "点击");
                 MainActivity.startLuckRotateActivity(this, false);
                 finish();
                 break;
             case R.id.recommend_vip_bottom_close:
+                mFirebase.logEvent("长图页关闭按钮", "按钮", "点击");
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
                 break;
@@ -383,7 +391,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                         }
                     } else {
                         Firebase.getInstance(RecommendVIPActivity.this).logEvent("VIP交易", "交易成功", "免费试用");
-                        Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 半年");
+                        Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 免费试用");
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(RecommendVIPActivity.this);
                         sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();

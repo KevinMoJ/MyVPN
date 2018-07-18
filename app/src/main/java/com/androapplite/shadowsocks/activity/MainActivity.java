@@ -326,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public void onVIPImageClick() {
+        Firebase.getInstance(this).logEvent("主页面小泡泡", "图片", "点击");
         jumpToVip(VIPActivity.TYPE_MAIN_PAO);
     }
 
@@ -979,10 +980,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
                 return true;
             case R.id.luck_pan:
-                if (!isVIP)
+                if (!isVIP) {
+                    Firebase.getInstance(this).logEvent("主界面转盘按钮", "按钮", "点击");
                     LuckRotateActivity.startLuckActivity(this);
-                else
+                } else {
+                    Firebase.getInstance(this).logEvent("主界面转盘按钮", "会员", "点击");
                     DialogUtils.showVIPWelcomeDialog(this, null);
+                }
 
                 return true;
 //            case R.id.action_ad:
@@ -1123,9 +1127,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     private void jumpToVip(int type) {
-        if (!isVIP)
+        if (!isVIP) {
+            Firebase.getInstance(this).logEvent("侧边栏点击", "vip", "点击");
             VIPActivity.startVIPActivity(this, type);
-        else
+        } else
             VIPFinishActivity.startVIPFinishActivity(this, false);
     }
 

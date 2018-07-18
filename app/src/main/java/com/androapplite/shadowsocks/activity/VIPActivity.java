@@ -217,6 +217,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         }
 
         if (itemId == R.id.vip_luck_pan) {
+            Firebase.getInstance(this).logEvent("VIP购买界面", "转盘按钮", "点击");
             LuckRotateActivity.startLuckActivity(this);
             return true;
         }

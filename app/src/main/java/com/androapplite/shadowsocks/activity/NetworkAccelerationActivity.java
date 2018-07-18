@@ -56,7 +56,7 @@ import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FULL;
 public class NetworkAccelerationActivity extends AppCompatActivity implements
         NetworkAccelerationFragment.NetworkAccelerationFragmentListener,
         LocalVpnService.onStatusChangedListener, Handler.Callback, View.OnClickListener,
-        DialogInterface.OnDismissListener, NetworkAccelerationFinishFragment.NetworkAccelerationFinishFragmentListener{
+        DialogInterface.OnDismissListener, NetworkAccelerationFinishFragment.NetworkAccelerationFinishFragmentListener {
     private SharedPreferences mSharedPreference;
     private boolean mIsRestart;
     private MyAdStateListener mAdstateListener;
@@ -139,14 +139,14 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     if (adAppHelper.isFullAdLoaded()) {
                         String netAccAdMinS = adAppHelper.getCustomCtrlValue("net_acc_ad_min", "500");
                         int netAccAdMin;
-                        try{
+                        try {
                             netAccAdMin = Integer.valueOf(netAccAdMinS);
                         } catch (Exception e) {
                             netAccAdMin = 0;
                         }
                         String netAccAdMaxS = adAppHelper.getCustomCtrlValue("net_acc_ad_max", "500");
                         int netAccAdMax;
-                        try{
+                        try {
                             netAccAdMax = Integer.valueOf(netAccAdMaxS);
                         } catch (Exception e) {
                             netAccAdMax = 0;
@@ -166,6 +166,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     private static class InterstitialADDelayShow extends AdStateListener {
         private WeakReference<NetworkAccelerationActivity> mReference;
+
         InterstitialADDelayShow(NetworkAccelerationActivity activity) {
             mReference = new WeakReference<>(activity);
         }
@@ -178,7 +179,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     case ADMOB_FULL:
                     case FACEBOOK_FBN:
                     case FACEBOOK_FULL:
-                        if (!activity.mIsInterstitialAdShowed && ! activity.mIsInterstitialAdShowedAnimateFinish) {
+                        if (!activity.mIsInterstitialAdShowed && !activity.mIsInterstitialAdShowedAnimateFinish) {
 //                            AdAppHelper.getInstance(activity).showFullAd();
                             if (activity.mNeedShowInterstitialAd) {
                                 Firebase.getInstance(activity).logEvent("全屏", "网络加速进入", "true");
@@ -286,14 +287,14 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             if (adAppHelper.isFullAdLoaded()) {
                 String netAccAdEndMinS = adAppHelper.getCustomCtrlValue("net_acc_ad_end_min", "500");
                 int netAccAdEndMin;
-                try{
+                try {
                     netAccAdEndMin = Integer.valueOf(netAccAdEndMinS);
                 } catch (Exception e) {
                     netAccAdEndMin = 0;
                 }
                 String netAccAdEndMaxS = adAppHelper.getCustomCtrlValue("net_acc_ad_end_max", "500");
                 int netAccAdEndMax;
-                try{
+                try {
                     netAccAdEndMax = Integer.valueOf(netAccAdEndMaxS);
                 } catch (Exception e) {
                     netAccAdEndMax = 0;
@@ -315,6 +316,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     @Override
     public void onVIPImageClick() {
+        Firebase.getInstance(this).logEvent("加速成功结果页", "vip按钮", "点击");
         VIPActivity.startVIPActivity(this, VIPActivity.TYPE_NET_SPEED_FINISH);
     }
 
@@ -323,7 +325,8 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         if (isRunning) {
             Fragment fragment = getCurrentFragment();
             if (fragment instanceof NetworkAccelerationFragment) {
-                ((NetworkAccelerationFragment)fragment).rocketFly();
+                ((NetworkAccelerationFragment) fragment).rocketFly();
+                Firebase.getInstance(this).logEvent("网络加速", "加速", "加速成功");
             }
             mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
         } else {
@@ -333,7 +336,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             } else {
                 Fragment fragment = getCurrentFragment();
                 if (getCurrentFragment() instanceof NetworkAccelerationFragment) {
-                    ((NetworkAccelerationFragment)fragment).stopShake();
+                    ((NetworkAccelerationFragment) fragment).stopShake();
                 }
             }
         }
@@ -352,7 +355,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     @Override
     public void onAccelerateImmediately() {
-        Firebase.getInstance(this).logEvent("网络加速", "立即加速");
+        Firebase.getInstance(this).logEvent("网络加速", "加速", "立即加速");
         mSharedPreference.edit().putInt("CLICK_SPEED_BT_COUNT", mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0) + 1).apply();
         RealTimeLogger.answerLogEvent("click_speed_bt_count", "speed", "click_count:" + mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0));
         if (LocalVpnService.IsRunning)
@@ -462,7 +465,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     case FACEBOOK_FULL:
                         Fragment fragment = activity.getCurrentFragment();
                         if (fragment instanceof NetworkAccelerationFinishFragment) {
-                            ((NetworkAccelerationFinishFragment)fragment).animate();
+                            ((NetworkAccelerationFinishFragment) fragment).animate();
                         } else if (fragment instanceof NetworkAccelerationFragment) {
                             Intent intent = activity.getIntent();
                             boolean auto = intent.getBooleanExtra(EXTRA_AUTO, false);
@@ -485,7 +488,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     case FACEBOOK_FULL:
                         Fragment fragment = activity.getCurrentFragment();
                         if (fragment instanceof NetworkAccelerationFinishFragment) {
-                            ((NetworkAccelerationFinishFragment)fragment).animate();
+                            ((NetworkAccelerationFinishFragment) fragment).animate();
                         }
                         break;
                 }
@@ -495,14 +498,14 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     private void showNoInternetSnackbar(@StringRes int messageId, boolean hasAction) {
         Fragment fragment = getCurrentFragment();
-        if (fragment instanceof NetworkAccelerationFragment){
+        if (fragment instanceof NetworkAccelerationFragment) {
             ((NetworkAccelerationFragment) fragment).mNeedToShake = true;
             ((NetworkAccelerationFragment) fragment).stopShake();
         }
         final View decorView = findViewById(android.R.id.content);
         clearSnackbar();
         mSnackbar = Snackbar.make(decorView, messageId, Snackbar.LENGTH_LONG);
-        if(hasAction) {
+        if (hasAction) {
             mSnackbar.setAction(android.R.string.yes, this);
         }
         mSnackbar.getView().setTag(messageId);
@@ -510,7 +513,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     }
 
     private void clearSnackbar() {
-        if(mSnackbar != null && mSnackbar.isShown()){
+        if (mSnackbar != null && mSnackbar.isShown()) {
             mSnackbar.dismiss();
             mSnackbar = null;
         }
@@ -537,11 +540,11 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     case Action.SERVER_LIST_FETCH_FINISH:
                         activity.handleServerList();
                         break;
-                    case  Action.ACTION_NO_AVAILABLE_VPN:
+                    case Action.ACTION_NO_AVAILABLE_VPN:
                         activity.showNoInternetSnackbar(R.string.timeout_tip, false);
                         Fragment fragment = activity.getCurrentFragment();
                         if (fragment instanceof NetworkAccelerationFragment) {
-                            ((NetworkAccelerationFragment)fragment).stopShake();
+                            ((NetworkAccelerationFragment) fragment).stopShake();
                         }
                         break;
                 }
@@ -574,7 +577,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         }
     }
 
-    private void prepareStartService(){
+    private void prepareStartService() {
         try {
             Intent intent = VpnService.prepare(this);
             if (intent != null) {
@@ -584,13 +587,13 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                 onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null);
                 ShadowsocksApplication.debug("ss-vpn", "onActivityResult");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             showNoInternetSnackbar(R.string.not_start_vpn, false);
             ShadowsocksApplication.handleException(e);
             Firebase.getInstance(this).logEvent("VPN连不上", "VPN Prepare错误", e.getMessage());
             Fragment fragment = getCurrentFragment();
             if (fragment instanceof NetworkAccelerationFragment) {
-                ((NetworkAccelerationFragment)fragment).stopShake();
+                ((NetworkAccelerationFragment) fragment).stopShake();
             }
         }
     }
@@ -598,15 +601,15 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if(requestCode == REQUEST_CONNECT){
+            if (requestCode == REQUEST_CONNECT) {
                 new SwitchServerBackground().start();
             }
-        }else{
-            if(requestCode == REQUEST_CONNECT){
+        } else {
+            if (requestCode == REQUEST_CONNECT) {
                 showNoInternetSnackbar(R.string.enable_vpn_connection, true);
                 Fragment fragment = getCurrentFragment();
                 if (fragment instanceof NetworkAccelerationFragment) {
-                    ((NetworkAccelerationFragment)fragment).stopShake();
+                    ((NetworkAccelerationFragment) fragment).stopShake();
                 }
 
             }
