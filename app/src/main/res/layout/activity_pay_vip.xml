@@ -87,6 +87,7 @@
             android:layout_marginStart="@dimen/common_10"
             android:enabled="true"
             android:singleLine="true"
+            android:text="@string/you_can_use_more_server"
             android:textColor="@color/primary_white_text"
             android:textSize="@dimen/common_text_size_15sp"/>
     </LinearLayout>

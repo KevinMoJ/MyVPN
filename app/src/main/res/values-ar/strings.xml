@@ -141,7 +141,7 @@
     <string name="join_vip">Join VIP</string>
     <string name="cruel_rejection">Cruel Rejection</string>
     <string name="wireless_traffic">Wireless traffic,unlimited time</string>
-    <string name="cumulative_use_duration">Cumulative use duration %s days</string>
+    <string name="cumulative_use_duration">You have won a total of %s days</string>
     <string name="luck_pan_title">العب لعبة الحظ للفوز المزيد من الأيام المجانية</string>
     <string name="free_over_dialog_message">The free experience has already arrived. You can also advertise when you join the VIP</string>
     <string name="add_minutes">+%s Days</string>
@@ -178,5 +178,7 @@
     <string name="make_persistent_efforts">بذل جهود مستمرة</string>
     <string name="congratulation">تهنئة</string>
     <string name="connected">متصل</string>
+    <string name="you_can_use_more_server">يمكنك استخدام أكثر من ملقمات</string>
+    <string name="please_try_it_later">الرجاء المحاولة في وقت لاحق</string>
 
 </resources>

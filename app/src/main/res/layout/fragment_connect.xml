@@ -53,7 +53,7 @@
         android:layout_marginBottom="@dimen/common_10"
         android:layout_marginTop="@dimen/common_4"
         android:textColor="@color/primary_white_text"
-        android:textSize="@dimen/common_text_size_12sp"
+        android:textSize="@dimen/common_text_size_14sp"
         android:visibility="gone"/>
 
     <LinearLayout

@@ -178,7 +178,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         String halfYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_half_year_money");
         String oneYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_one_year_money");
 
-        mServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
         mVipOneMonthMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(oneMonthMoney)));
         mVipHalfYearMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(halfYearMoney)));
         mVipOneYearMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(oneYearMoney)));

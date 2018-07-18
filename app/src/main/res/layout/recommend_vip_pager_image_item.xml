@@ -11,8 +11,8 @@
         android:id="@+id/pager_icon"
         android:layout_width="@dimen/common_200"
         android:layout_height="@dimen/common_200"
-        android:scaleType="centerCrop"
-        android:src="@drawable/recommend_rocket_icon"/>
+        android:scaleType="fitXY"
+        android:src="@drawable/recommend_vpn_icon"/>
 
     <TextView
         android:id="@+id/pager_title"

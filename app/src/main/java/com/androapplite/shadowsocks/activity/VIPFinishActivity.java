@@ -60,7 +60,6 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void initUI() {
-        mVipFinishServerMessageText.setText(getResources().getString(R.string.more_than_countries, String.valueOf(3)));
 
         boolean isPayOneMonth = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true);
         boolean isPayHalfYear = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true);
