@@ -338,17 +338,38 @@
         <value>1</value>
     </entry>
 
-    <!--&lt;!&ndash;VIP商品id集合一个月&ndash;&gt;-->
-    <!--<entry>-->
-        <!--<key>pay_one_month_id</key>-->
-        <!--<value>[{"id":"one_1"},]</value>-->
-    <!--</entry>-->
 
-    <!--&lt;!&ndash;VIP商品id集合半年&ndash;&gt;-->
-    <!--<entry>-->
-        <!--<key>pay_one_month_id</key>-->
-        <!--<value>[{"id":"one_1"},]</value>-->
-    <!--</entry>-->
+
+    <!--集合是所有商品的id的集合，没个商品的id在每次更新商品的时候都要更新一下云端的配置，把云端的配置成最新的id，记得下次发包的时候更新一下本地的信息-->
+    <!--VIP商品id集合-->
+    <entry>
+        <key>pay_id_list</key>
+        <value>[{"id":"one_1"},{"id":"one_2"},{"id":"one_3"},{"id":"half_1"},{"id":"half_2"},{"id":"year_1"},{"id":"free_1"}]</value>
+    </entry>
+
+    <!--VIP商品id一个月-->
+    <entry>
+        <key>pay_one_month_id</key>
+        <value>one_3</value>
+    </entry>
+
+    <!--VIP商品id半年-->
+    <entry>
+        <key>pay_half_year_id</key>
+        <value>half_2</value>
+    </entry>
+
+    <!--VIP商品id一年-->
+    <entry>
+        <key>pay_one_year_id</key>
+        <value>year_1</value>
+    </entry>
+
+    <!--VIP商品id免费试用-->
+    <entry>
+        <key>pay_free_id</key>
+        <value>free_1</value>
+    </entry>
 
 
 </defaultsMap>

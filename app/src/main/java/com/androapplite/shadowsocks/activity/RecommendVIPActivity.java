@@ -34,6 +34,9 @@ import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +64,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     /*标记IaHelper 是否启动*/
     private boolean isStartHelper;
     private IabBroadcastReceiver mBroadcastReceiver;
+
     private List<String> skuList = new ArrayList<>();
     private SharedPreferences mSharedPreferences;
 
@@ -201,10 +205,24 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void checkIsVIP() {
-        skuList.add(VIPActivity.PAY_ONE_MONTH);
-        skuList.add(VIPActivity.PAY_HALF_YEAR);
-        skuList.add(VIPActivity.PAY_ONE_YEAR);
-        skuList.add(VIPActivity.PAY_SEVEN_FREE); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
+//        skuList.add(VIPActivity.PAY_ONE_MONTH);// 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
+//        skuList.add("one_2");
+//        skuList.add(VIPActivity.PAY_HALF_YEAR);
+//        skuList.add("half_1");
+//        skuList.add(VIPActivity.PAY_ONE_YEAR);
+//        skuList.add(VIPActivity.PAY_SEVEN_FREE);
+
+        String priorityList = FirebaseRemoteConfig.getInstance().getString("pay_id_list");
+        try {
+            JSONArray rootJsonArray = new JSONArray(priorityList);
+            for (int i = 0; i < rootJsonArray.length(); i++) {
+                JSONObject jsonObject = (JSONObject) rootJsonArray.get(i);
+                String payId = jsonObject.getString("id");
+                skuList.add(payId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         mIabHelper = new IabHelper(this, VIPActivity.PUBLIC_KEY.trim());
         mIabHelper.enableDebugLogging(true);
@@ -252,49 +270,52 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
 
             if (result.isFailure()) {
                 //在商品仓库中查询失败
-                Firebase.getInstance(RecommendVIPActivity.this).logEvent("欢迎页检查VIP", "查询失败");
+                Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询失败");
 //                Log.i("SplashActivity", "onQueryInventoryFinished: 查询失败 ");
                 return;
             }
 
             SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(RecommendVIPActivity.this);
-            Purchase oneMonthPurchase = inventory.getPurchase(VIPActivity.PAY_ONE_MONTH);
-            Purchase halfYearPurchase = inventory.getPurchase(VIPActivity.PAY_HALF_YEAR);
-            Purchase oneYearPurchase = inventory.getPurchase(VIPActivity.PAY_ONE_YEAR);
-            Purchase sevenFreePurchase = inventory.getPurchase(VIPActivity.PAY_SEVEN_FREE);
-            if (oneMonthPurchase != null) {
-                Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                Firebase.getInstance(RecommendVIPActivity.this).logEvent("欢迎页检查VIP", "查询成功", "一个月");
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneMonthPurchase.isAutoRenewing()).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneMonthPurchase.getPurchaseTime()).apply();
-                return;
-            } else if (halfYearPurchase != null) {
-                Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                Firebase.getInstance(RecommendVIPActivity.this).logEvent("欢迎页检查VIP", "查询成功", "半年");
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, halfYearPurchase.isAutoRenewing()).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, halfYearPurchase.getPurchaseTime()).apply();
-                return;
-            } else if (oneYearPurchase != null) {
-                Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                Firebase.getInstance(RecommendVIPActivity.this).logEvent("欢迎页检查VIP", "查询成功", "一年");
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, oneYearPurchase.isAutoRenewing()).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, oneYearPurchase.getPurchaseTime()).apply();
-            } else if (sevenFreePurchase != null) {
-                Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                Firebase.getInstance(RecommendVIPActivity.this).logEvent("欢迎页检查VIP", "查询成功", "免费试用");
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, sevenFreePurchase.isAutoRenewing()).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, sevenFreePurchase.getPurchaseTime()).apply();
-            } else {
-                Firebase.getInstance(RecommendVIPActivity.this).logEvent("欢迎页检查VIP", "没查询到");
-                sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
+            for (String s : skuList) {
+                Purchase purchase = inventory.getPurchase(s);
+                if (purchase != null) {
+                    if (purchase.getSku().contains("one")) {
+                        Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
+                        Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "一个月");
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                    } else if (purchase.getSku().contains("half")) {
+                        Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
+                        Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "半年");
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                    } else if (purchase.getSku().contains("year")) {
+                        Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
+                        Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "一年");
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                    } else if (purchase.getSku().contains("free")) {
+                        Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
+                        Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "试用7天");
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
+                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                    } else {
+                        Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "没查询到");
+                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
+                    }
+                }
             }
         }
     };
@@ -342,9 +363,12 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
             return;
         }
 
+        // 每次发布商品的id要从云端配置并且拉取，每次发包之前记得更新本地上次发布的商品
+        String freeSku = FirebaseRemoteConfig.getInstance().getString("pay_free_id");
+
         mIabHelper.flagEndAsync();
         try {
-            mIabHelper.launchSubscriptionPurchaseFlow(this, VIPActivity.PAY_SEVEN_FREE, 10001, new IabHelper.OnIabPurchaseFinishedListener() {
+            mIabHelper.launchSubscriptionPurchaseFlow(this, freeSku, 10001, new IabHelper.OnIabPurchaseFinishedListener() {
                 @Override
                 public void onIabPurchaseFinished(IabResult result, Purchase info) {
                     if (result.isFailure()) {
