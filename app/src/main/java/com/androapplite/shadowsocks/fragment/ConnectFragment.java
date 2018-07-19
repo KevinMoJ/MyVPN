@@ -186,24 +186,26 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
                     mVIPImage.startAnimation(mVIPAnimation);
                     break;
                 case MSG_GONE_VIP_VIEW:
-                    Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_main_vip_recommend_hide);
-                    mVipRecommendView.setAnimation(animation);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+                    if (isVisible() && isAdded() && getContext() != null) {
+                        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.anim_main_vip_recommend_hide);
+                        mVipRecommendView.setAnimation(animation);
+                        animation.setAnimationListener(new Animation.AnimationListener() {
+                            @Override
+                            public void onAnimationStart(Animation animation) {
 
-                        }
+                            }
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            mVipRecommendView.setVisibility(View.GONE);
-                        }
+                            @Override
+                            public void onAnimationEnd(Animation animation) {
+                                mVipRecommendView.setVisibility(View.GONE);
+                            }
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
+                            @Override
+                            public void onAnimationRepeat(Animation animation) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                     break;
             }
         }
