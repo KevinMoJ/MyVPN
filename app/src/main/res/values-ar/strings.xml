@@ -136,15 +136,15 @@
     <string name="enjoy_now">استمتع الآن</string>
     <string name="months_plan">خطة %s شهر</string>
 
-    <string name="no_prize">No Prize</string>
-    <string name="congratulations">Congratulations</string>
-    <string name="join_vip">Join VIP</string>
-    <string name="cruel_rejection">Cruel Rejection</string>
-    <string name="wireless_traffic">Wireless traffic,unlimited time</string>
-    <string name="cumulative_use_duration">You have won a total of %s days</string>
+    <string name="no_prize">لا توجد جائزة</string>
+    <string name="congratulations">تهانينا</string>
+    <string name="join_vip">انضم كبار الشخصيات</string>
+    <string name="cruel_rejection">رفض القاسية</string>
+    <string name="wireless_traffic">حركة المرور اللاسلكية، ووقت غير محدود</string>
+    <string name="cumulative_use_duration">كنت قد فاز إجمالي أيام %s</string>
     <string name="luck_pan_title">العب لعبة الحظ للفوز المزيد من الأيام المجانية</string>
-    <string name="free_over_dialog_message">The free experience has already arrived. You can also advertise when you join the VIP</string>
-    <string name="add_minutes">+%s Days</string>
+    <string name="free_over_dialog_message">وقد وصل بالفعل تجربة مجانية. يمكنك أيضا الإعلان عند الانضمام لكبار الشخصيات</string>
+    <string name="add_minutes">+ يوم %s</string>
 
     <string name="take_you_to_experience">يأخذك لتجربة سرعة الوصول إلى الإنترنت</string>
     <string name="visit_the_website_of_the_wall">زيارة الموقع الإلكتروني للجدار</string>
@@ -180,5 +180,7 @@
     <string name="connected">متصل</string>
     <string name="you_can_use_more_server">يمكنك استخدام أكثر من ملقمات</string>
     <string name="please_try_it_later">الرجاء المحاولة في وقت لاحق</string>
+    <string name="free_seven_vip_bt_text">بدء محاكمة 7 أيام</string>
+    <string name="luck_rotate_vip_bt_text">وقت الوصول المجاني</string>
 
 </resources>

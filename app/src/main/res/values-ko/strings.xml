@@ -180,5 +180,7 @@
     <string name="connected">Connected</string>
     <string name="you_can_use_more_server">You can use more servers</string>
     <string name="please_try_it_later">Please try it later</string>
+    <string name="free_seven_vip_bt_text">START 7-DAY TRIAL</string>
+    <string name="luck_rotate_vip_bt_text">FREE ACCESS TIME</string>
 
 </resources>
