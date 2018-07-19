@@ -173,8 +173,8 @@
     <string name="protect_security_privacy">حماية الخصوصية الأمنية</string>
     <string name="hide_your_Ip_address">إخفاء عنوان IP الخاص بك ، وتصفح دون ترك آثار ، غير مرئي تماما.</string>
     <string name="luck_pan_message">يمكن للأشخاص المحظوظين الانتقال إلى 7 أيام في اليوم.</string>
-    <string name="removing_time">إزالة الوقت:% s</string>
-    <string name="removing_time_days">إزالة الوقت:% s يوم</string>
+    <string name="removing_time">إزالة الوقت:%s</string>
+    <string name="removing_time_days">إزالة الوقت:%s يوم</string>
     <string name="make_persistent_efforts">بذل جهود مستمرة</string>
     <string name="congratulation">تهنئة</string>
     <string name="connected">متصل</string>
