@@ -105,7 +105,7 @@
             android:layout_toStartOf="@id/vip_start_image"
             android:background="@drawable/main_vip_view_bg"
             android:gravity="center_horizontal"
-            android:text="VIP is faster!"
+            android:text="@string/vip_is_the_faster"
             android:textColor="@color/primary_white_text"
             android:textSize="@dimen/common_text_size_16sp"
             android:visibility="gone"/>

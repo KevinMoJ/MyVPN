@@ -907,8 +907,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     public void onBackPressed() {
         final Firebase firebase = Firebase.getInstance(this);
 
-        mExitAlertDialog = new AlertDialog.Builder(this).setTitle("Exit")
-                .setMessage("Would you like to exit VPN?")
+        mExitAlertDialog = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.exit))
+                .setMessage(getResources().getString(R.string.exit_vpn))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

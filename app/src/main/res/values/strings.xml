@@ -184,5 +184,8 @@
     <string name="please_try_it_later">Please try it later</string>
     <string name="free_seven_vip_bt_text">START 7-DAY TRIAL</string>
     <string name="luck_rotate_vip_bt_text">FREE ACCESS TIME</string>
+    <string name="vip_is_the_faster">VIP is faster!</string>
+    <string name="exit_vpn">Would you like to exit VPN?</string>
+    <string name="exit">Exit</string>
 
 </resources>

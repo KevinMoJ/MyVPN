@@ -182,5 +182,8 @@
     <string name="please_try_it_later">الرجاء المحاولة في وقت لاحق</string>
     <string name="free_seven_vip_bt_text">بدء محاكمة 7 أيام</string>
     <string name="luck_rotate_vip_bt_text">وقت الوصول المجاني</string>
+    <string name="vip_is_the_faster">VIP هو أسرع!</string>
+    <string name="exit_vpn">هل ترغب في إنهاء VPN؟</string>
+    <string name="exit">خروج</string>
 
 </resources>
