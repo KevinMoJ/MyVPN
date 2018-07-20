@@ -177,21 +177,22 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
-            mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
             if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) {
                 todayIsContinuePlay = false;
                 mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
+                mFirebase.logEvent("开始游戏", "转盘得到的天数", "一直thanks");
                 Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
             } else {
                 todayIsContinuePlay = true;
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong + getLuckFreeDays).apply();
                 mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
-
+                mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
                 progressInt = (int) mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
                 Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
                 mLuckPanLayout.rotate(rotatePos, 100);
             }
         } else {
+            mFirebase.logEvent("开始游戏", "转盘得到的天数", "thanks");
             mLuckPanLayout.rotate(rotatePos, 100);
         }
     }
