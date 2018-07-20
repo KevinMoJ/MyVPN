@@ -127,8 +127,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd && mAdAppHelper.isFullAdLoaded()) {
             mAdAppHelper.showFullAd();
+            mFirebase.logEvent("幸运转盘", "全屏", "进入显示");
         }
     }
 
@@ -332,7 +333,24 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                 if (!activity.isLuckPanRunning) {
                     activity.btnEnableClick(true);
                 }
+                activity.mFirebase.logEvent("幸运转盘","全屏","加载");
             }
+        }
+
+        @Override
+        public void onAdClick(AdType adType, int index) {
+            LuckRotateActivity activity = mActivityReference.get();
+            if (activity != null) {
+                switch (adType.getType()) {
+                    case AdType.ADMOB_FULL:
+                    case AdType.FACEBOOK_FBN:
+                    case AdType.FACEBOOK_FULL:
+                    case AdType.RECOMMEND_AD:
+                        activity.mFirebase.logEvent("幸运转盘", "全屏", "点击");
+                        break;
+                }
+            }
+
         }
     }
 }
