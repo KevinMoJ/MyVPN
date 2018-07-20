@@ -204,6 +204,19 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
             ServerListFetcherService.fetchServerListAsync(this);
         VpnManageService.start(this);
         Firebase.getInstance(this).logEvent("当前网络类型", "类型", InternetUtil.getNetworkState(RecommendVIPActivity.this));
+
+        VpnManageService.start(this);
+        Firebase firebase = Firebase.getInstance(this);
+        firebase.logEvent("屏幕", "VPN推荐屏幕");
+        Intent intent = getIntent();
+        if (intent != null) {
+            String source = intent.getStringExtra("source");
+            if (source != null) {
+                firebase.logEvent("打开app来源", source);
+            } else {
+                firebase.logEvent("打开app来源", "图标");
+            }
+        }
     }
 
     private void checkIsVIP() {
