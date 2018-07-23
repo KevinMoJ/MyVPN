@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
+import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
@@ -61,7 +62,13 @@ public class IpCountryIntentService extends IntentService {
                     countryCode = getCountryByTelephonyManager();
                     if (countryCode == null) {
                         countryCode = getResources().getConfiguration().locale.getCountry();
+                        if (countryCode != null)
+                            Firebase.getInstance(this).logEvent("通过默认语言", "成功");
+                    } else {
+                        Firebase.getInstance(this).logEvent("通过电话管理者", "成功");
                     }
+                } else {
+                    Firebase.getInstance(this).logEvent("通过网址", "成功");
                 }
                 try {
                     String ipString = jsonObject.getString("query");

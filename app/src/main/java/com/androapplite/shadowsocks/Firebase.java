@@ -46,7 +46,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, String action) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         Bundle bundle = new Bundle();
         bundle.putString("action", cutStringIfNecessary(action));
@@ -55,7 +55,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, String action, String label) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         Bundle bundle = new Bundle();
         bundle.putString(validateKey(action), cutStringIfNecessary(label));
@@ -64,7 +64,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, String action, long value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         Bundle bundle = new Bundle();
         bundle.putLong(validateKey(action), value);
@@ -73,7 +73,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, String action, double value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         Bundle bundle = new Bundle();
         bundle.putDouble(validateKey(action), value);
@@ -82,7 +82,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, long value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         Bundle bundle = new Bundle();
         bundle.putLong("value", value);
@@ -91,7 +91,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, double value) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         Bundle bundle = new Bundle();
         bundle.putDouble("value", value);
@@ -100,7 +100,7 @@ public class Firebase extends AbstractFirebase {
 
     public void logEvent(String category, Bundle values) {
         FirebaseAnalytics firebaseAnalytics = instance.getFirebaseAnalytics();
-        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "null");
+        String countryCode = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         mFireInstance.setUserProperty("code", countryCode);
         firebaseAnalytics.logEvent(validateKey(category), values);
     }
