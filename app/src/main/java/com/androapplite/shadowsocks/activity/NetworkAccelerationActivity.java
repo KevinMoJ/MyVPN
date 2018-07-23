@@ -363,10 +363,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         Firebase.getInstance(this).logEvent("网络加速", "加速", "立即加速");
         mSharedPreference.edit().putInt("CLICK_SPEED_BT_COUNT", mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0) + 1).apply();
         RealTimeLogger.answerLogEvent("click_speed_bt_count", "speed", "click_count:" + mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0));
-        if (LocalVpnService.IsRunning)
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, true).apply();
-        else
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
+        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, true).apply();
         startAccelerate();
     }
 
