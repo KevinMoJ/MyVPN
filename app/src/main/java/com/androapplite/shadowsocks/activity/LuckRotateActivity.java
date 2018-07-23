@@ -135,7 +135,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
     private void initUI() {
         mActionBar.setTitle("Lucky Game");
-        btnEnableClick(mAdAppHelper.isFullAdLoaded());
+        btnEnableClick(mAdAppHelper.isFullAdLoaded(), true);
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
         mLuckPanBar.setProgress((int) getLuckFreeDays);
 
@@ -153,7 +153,10 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         }
     }
 
-    private void btnEnableClick(boolean enableClick) {
+    private void btnEnableClick(boolean enableClick, boolean isInitBt) {
+        if (isInitBt)
+            mFirebase.logEvent("幸运转盘", "进入按钮准备情况", String.valueOf(enableClick));
+
         if (enableClick) {
 //            mStartRotateBt.setClickable(true);
             mStartRotateBt.setText(START);
@@ -166,7 +169,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     }
 
     private void startRotate() {
-        mFirebase.logEvent("开始游戏", "转盘按钮", "点击");
         long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
 
@@ -225,10 +227,13 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btn_start_luck_pan:
-                    if (mStartRotateBt.getText().equals(START))
+                    if (mStartRotateBt.getText().equals(START)) {
+                        mFirebase.logEvent("开始游戏", "转盘按钮", "点击");
                         startRotate();
-                    else
+                    } else {
+                        mFirebase.logEvent("开始游戏", "转盘按钮准备", "点击");
                         Toast.makeText(LuckRotateActivity.this, getResources().getString(R.string.please_try_it_later), Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
         }
@@ -253,7 +258,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         @Override
         public void endAnimation(int position) {
             isLuckPanRunning = false;
-            btnEnableClick(false);
+            btnEnableClick(false, false);
             String rotateString = getRotateString(rotatePos);
 
             if (!todayIsContinuePlay)
@@ -276,7 +281,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         @Override
         public void startAnimation(int position) {
             isLuckPanRunning = true;
-            btnEnableClick(false);
+            btnEnableClick(false, false);
         }
     };
 
@@ -315,6 +320,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         switch (msg.what) {
             case SHOW_FULL_AD:
                 mAdAppHelper.showFullAd();
+                mFirebase.logEvent("幸运转盘", "结果全屏", "显示");
                 return true;
         }
         return false;
@@ -333,7 +339,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             if (activity != null) {
 //                activity.addBottomAd();
                 if (!activity.isLuckPanRunning) {
-                    activity.btnEnableClick(true);
+                    activity.btnEnableClick(true, false);
                 }
                 activity.mFirebase.logEvent("幸运转盘", "全屏", "加载");
             }
