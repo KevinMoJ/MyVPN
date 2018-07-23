@@ -165,7 +165,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         }
     }
 
-    void startRotate() {
+    private void startRotate() {
         mFirebase.logEvent("开始游戏", "转盘按钮", "点击");
         long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
         long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
@@ -178,7 +178,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
-            if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) {
+            if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) { // 5 + 2 > 7
                 todayIsContinuePlay = false;
                 mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
                 mFirebase.logEvent("开始游戏", "转盘得到的天数", "一直thanks");
@@ -265,9 +265,11 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                     mLuckPanBar.setPicture(R.drawable.progress_bar_tip_full);
             }
 
-            dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
-            if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
-                mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
+            if (!isFinishing()) {
+                dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
+                if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
+                    mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
+                }
             }
         }
 
@@ -333,7 +335,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                 if (!activity.isLuckPanRunning) {
                     activity.btnEnableClick(true);
                 }
-                activity.mFirebase.logEvent("幸运转盘","全屏","加载");
+                activity.mFirebase.logEvent("幸运转盘", "全屏", "加载");
             }
         }
 

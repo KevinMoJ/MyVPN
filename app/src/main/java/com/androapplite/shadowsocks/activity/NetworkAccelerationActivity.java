@@ -130,37 +130,39 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                 ((NetworkAccelerationFragment) fragment).rocketShake();
                 startAccelerate();
             } else {
-                String netAccAdS = mAdAppHelper.getCustomCtrlValue("net_acc_ad", "1");
-                float netAccAd;
-                try {
-                    netAccAd = Float.parseFloat(netAccAdS);
-                } catch (Exception e) {
-                    netAccAd = 0;
-                }
-                if (Math.random() < netAccAd) {
-                    mNeedShowInterstitialAd = true;
-                    if (mAdAppHelper.isFullAdLoaded()) {
-                        String netAccAdMinS = mAdAppHelper.getCustomCtrlValue("net_acc_ad_min", "500");
-                        int netAccAdMin;
-                        try {
-                            netAccAdMin = Integer.valueOf(netAccAdMinS);
-                        } catch (Exception e) {
-                            netAccAdMin = 0;
-                        }
-                        String netAccAdMaxS = mAdAppHelper.getCustomCtrlValue("net_acc_ad_max", "500");
-                        int netAccAdMax;
-                        try {
-                            netAccAdMax = Integer.valueOf(netAccAdMaxS);
-                        } catch (Exception e) {
-                            netAccAdMax = 0;
-                        }
+                if (mAdAppHelper != null) {
+                    String netAccAdS = mAdAppHelper.getCustomCtrlValue("net_acc_ad", "1");
+                    float netAccAd;
+                    try {
+                        netAccAd = Float.parseFloat(netAccAdS);
+                    } catch (Exception e) {
+                        netAccAd = 0;
+                    }
+                    if (Math.random() < netAccAd) {
+                        mNeedShowInterstitialAd = true;
+                        if (mAdAppHelper.isFullAdLoaded()) {
+                            String netAccAdMinS = mAdAppHelper.getCustomCtrlValue("net_acc_ad_min", "500");
+                            int netAccAdMin;
+                            try {
+                                netAccAdMin = Integer.valueOf(netAccAdMinS);
+                            } catch (Exception e) {
+                                netAccAdMin = 0;
+                            }
+                            String netAccAdMaxS = mAdAppHelper.getCustomCtrlValue("net_acc_ad_max", "500");
+                            int netAccAdMax;
+                            try {
+                                netAccAdMax = Integer.valueOf(netAccAdMaxS);
+                            } catch (Exception e) {
+                                netAccAdMax = 0;
+                            }
 //                        mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdMax + netAccAdMin));
-                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !VIPActivity.isVIPUser(this))
-                            mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
-                    } else {
-                        mInterstitialAdDelayShow = new InterstitialADDelayShow(this);
-                        mAdAppHelper.addAdStateListener(mInterstitialAdDelayShow);
-                        mAdAppHelper.loadNewInterstitial();
+                            if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !VIPActivity.isVIPUser(this))
+                                mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
+                        } else {
+                            mInterstitialAdDelayShow = new InterstitialADDelayShow(this);
+                            mAdAppHelper.addAdStateListener(mInterstitialAdDelayShow);
+                            mAdAppHelper.loadNewInterstitial();
+                        }
                     }
                 }
             }
