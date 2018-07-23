@@ -299,7 +299,19 @@
     <!--VIP推荐页面的back键是否屏蔽-->
     <entry>
         <key>recommend_vip_hide_back</key>
-        <value>false</value>
+        <value>true</value>
+    </entry>
+
+    <!--VIP推荐页面进入转盘是否显示全屏-->
+    <entry>
+        <key>recommend_vip_enter_luck_pan_show_full_ad</key>
+        <value>true</value>
+    </entry>
+
+    <!--VIP推荐页面取消交易是否显示全屏-->
+    <entry>
+        <key>recommend_vip_cancel_pay_show_full_ad</key>
+        <value>true</value>
     </entry>
 
     <!--新用户免费用时，单位分钟-->
