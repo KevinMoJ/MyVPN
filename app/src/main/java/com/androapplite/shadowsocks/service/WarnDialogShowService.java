@@ -20,6 +20,7 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -43,6 +44,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
 
     private long startTime;
     private boolean isWifiConnected;
+    private long previousShowTime;//幸运转盘弹窗上一次出现的时间
 
     public WarnDialogShowService() {
 
@@ -54,6 +56,9 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         startTime = System.currentTimeMillis();
+        long openLuckPanTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0);
+        if (!DateUtils.isToday(openLuckPanTime))
+            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0).apply();
         mHandler = new Handler(this);
         registerWarnDialogReceiver();
 
@@ -275,6 +280,23 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                     }
                     startTime = System.currentTimeMillis();
                 }
+
+                if (FirebaseRemoteConfig.getInstance().getBoolean("is_luck_rotate_dialog_show")) {
+                    // 当当天的转转盘天数没有达到7天的时候，每隔一个小时弹一次弹窗，弹出的弹窗要带出全屏，如果没有全屏的话就下一分钟进行弹，直到弹出弹窗为止，弹出的时间
+                    //开始计时，当弹出的
+                    long todayGetFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+                    long cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
+                    long cloudLuckPanShowSpaceTime = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_dialog_first_show_space_minutes");
+
+                    if ((todayGetFreeDay < cloudGetLuckFreeDay) && Utils.isScreenOn(WarnDialogShowService.this)
+                            && WarnDialogUtil.isSpaceTimeShow(previousShowTime, cloudLuckPanShowSpaceTime) && !WarnDialogActivity.activityIsShowing
+                            && WarnDialogUtil.isAppBackground() && WarnDialogUtil.isAdLoaded(WarnDialogShowService.this, true)) {
+                        previousShowTime = System.currentTimeMillis();
+                        WarnDialogActivity.start(WarnDialogShowService.this, WarnDialogActivity.LUCK_ROTATE_DIALOG);
+                    }
+                }
+
+
             }
         }
     }

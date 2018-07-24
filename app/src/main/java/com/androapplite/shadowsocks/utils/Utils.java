@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
+import android.os.PowerManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -61,6 +63,16 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static boolean isScreenOn(Context context) {
+        PowerManager powerManager = (PowerManager) context.getSystemService(context.POWER_SERVICE);
+        if (powerManager != null) {
+            return Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT_WATCH
+                    ? powerManager.isScreenOn()
+                    : powerManager.isInteractive();
+        } else
+            return false;
     }
 
     public static int dip2px(Context context, float dpValue) {

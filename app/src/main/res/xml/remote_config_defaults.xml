@@ -84,6 +84,18 @@
         <value>120</value>
     </entry>
 
+    <!--转盘弹窗显示控制-->
+    <entry>
+        <key>is_luck_rotate_dialog_show</key>
+        <value>true</value>
+    </entry>
+
+    <!--转盘弹窗弹出时第二次弹窗弹出距离第一次弹窗弹出的时间间隔-->
+    <entry>
+        <key>luck_rotate_dialog_first_show_space_minutes</key>
+        <value>60</value>
+    </entry>
+
     <!--WarnDialog弹窗误点和back键屏蔽控制-->
     <entry>
         <key>is_warn_dialog_back_use</key>
@@ -99,7 +111,7 @@
     <!--WarnDialog弹窗全屏广告显示控制-->
     <entry>
         <key>is_warn_dialog_full_ad_show</key>
-        <value>false</value>
+        <value>true</value>
     </entry>
 
     <!--网速不好弹窗的上传速度控制-->

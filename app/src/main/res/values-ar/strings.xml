@@ -185,5 +185,8 @@
     <string name="vip_is_the_faster">VIP هو أسرع!</string>
     <string name="exit_vpn">هل ترغب في إنهاء VPN؟</string>
     <string name="exit">خروج</string>
+    <string name="luck_rotate_dialog_message">لا يزال لديك فرصه لتحويل القرص الدوار للفوز بجائزه كبيره اليوم ~ تعال وجرب حظك! الجائزة الكبرى تنتظرك!</string>
+    <string name="luck_rotate_dialog_bt_text">جرب حظك</string>
+    <string name="luck_rotate_dialog_cancel_text">التخلي عن الفرصة</string>
 
 </resources>

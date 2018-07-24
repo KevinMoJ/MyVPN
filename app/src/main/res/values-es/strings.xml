@@ -186,5 +186,8 @@
     <string name="vip_is_the_faster">VIP is faster!</string>
     <string name="exit_vpn">Would you like to exit VPN?</string>
     <string name="exit">Exit</string>
+    <string name="luck_rotate_dialog_message">You still have the chance to turn the turntable to win the big prize today~ Come and try your luck! The grand prize is waiting for you!</string>
+    <string name="luck_rotate_dialog_bt_text">TRY YOU LUCK</string>
+    <string name="luck_rotate_dialog_cancel_text">GIVE UP THE OPPORTUNITY</string>
 
 </resources>

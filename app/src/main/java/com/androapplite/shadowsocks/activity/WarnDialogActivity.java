@@ -36,6 +36,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     public static final int DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG = 1002;
     public static final int UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG = 1003;
     public static final int NET_SPEED_LOW_DIALOG = 1004;
+    public static final int LUCK_ROTATE_DIALOG = 1005;
 
     private RelativeLayout mWarnDialogRoot;
     private ImageView mWarnDialogBg;
@@ -50,6 +51,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     private BottomAdStateListener mAdStateListener;
     private Handler mHandler;
     private boolean isFullAdShow;
+    public static boolean activityIsShowing;
 
     private int type;
 
@@ -65,6 +67,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initDate() {
+        activityIsShowing = true;
         type = getIntent().getIntExtra(SHOW_DIALOG_TYPE, UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
         mAdAppHelper = AdAppHelper.getInstance(this);
         mHandler = new Handler(this);
@@ -109,6 +112,11 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mWarnDialogBtn.setText(R.string.vpn_acceleration);
             mWarnDialogCancel.setText(R.string.indifferent);
             mWarnDialogBg.setImageResource(R.drawable.inactive_user_bg);
+        } else if (type == LUCK_ROTATE_DIALOG) {
+            mWarnDialogMessage.setText(R.string.luck_rotate_dialog_message);
+            mWarnDialogBtn.setText(R.string.luck_rotate_dialog_bt_text);
+            mWarnDialogCancel.setText(R.string.luck_rotate_dialog_cancel_text);
+            mWarnDialogBg.setImageResource(R.drawable.luck_rotate_dialog_bg);
         }
 
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded() && !VIPActivity.isVIPUser(this)) {
@@ -135,6 +143,9 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             case NET_SPEED_LOW_DIALOG:
                 Firebase.getInstance(this).logEvent("大弹窗", "显示", "网速低");
                 break;
+            case LUCK_ROTATE_DIALOG:
+                Firebase.getInstance(this).logEvent("大弹窗", "显示", "幸运转盘");
+                break;
         }
     }
 
@@ -155,6 +166,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             case R.id.warn_dialog_btn:
                 if (type == NET_SPEED_LOW_DIALOG)
                     NetworkAccelerationActivity.start(this, true);
+                else if (type == LUCK_ROTATE_DIALOG)
+                    MainActivity.startLuckRotateActivity(this, true);
                 else
                     startMainActivity();
                 firebase.logEvent("大弹窗", "进入APP");
@@ -169,6 +182,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     if (result) {
                         if (type == NET_SPEED_LOW_DIALOG)
                             NetworkAccelerationActivity.start(this, true);
+                        else if (type == LUCK_ROTATE_DIALOG)
+                            MainActivity.startLuckRotateActivity(this, true);
                         else
                             startMainActivity();
                         firebase.logEvent("大弹窗", "进入APP");
@@ -178,6 +193,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             case R.id.warn_dialog_bg:
                 if (type == NET_SPEED_LOW_DIALOG)
                     NetworkAccelerationActivity.start(this, true);
+                else if (type == LUCK_ROTATE_DIALOG)
+                    MainActivity.startLuckRotateActivity(this, true);
                 else
                     startMainActivity();
                 firebase.logEvent("大弹窗", "进入APP");
@@ -212,6 +229,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        activityIsShowing = false;
         if (mAdStateListener != null) {
             mAdAppHelper.removeAdStateListener(mAdStateListener);
             mAdStateListener = null;
@@ -276,13 +294,13 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     case AdType.FACEBOOK_NATIVE:
                     case AdType.FACEBOOK_FBN_BANNER:
                     case AdType.ADMOB_NATIVE_AN:
-                        Firebase.getInstance(mReference.get()).logEvent("native广告", "显示", "点击");
+                        Firebase.getInstance(mReference.get()).logEvent("大弹窗native广告", "显示", "点击");
                         break;
                     case AdType.ADMOB_FULL:
                     case AdType.ADMOB_NATIVE_FULL:
                     case AdType.FACEBOOK_FULL:
                     case AdType.FACEBOOK_FBN:
-                        Firebase.getInstance(mReference.get()).logEvent("全屏广告", "显示", "点击");
+                        Firebase.getInstance(mReference.get()).logEvent("大弹窗全屏广告", "显示", "点击");
                         break;
                 }
                 AdAppHelper.getInstance(activity).removeAdStateListener(this);
