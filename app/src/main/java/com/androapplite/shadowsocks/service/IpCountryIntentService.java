@@ -59,11 +59,16 @@ public class IpCountryIntentService extends IntentService {
             if (jsonObject != null) {
                 countryCode = getCountryCodeByIp(jsonObject);
                 if (countryCode == null) {
+                    Firebase.getInstance(this).logEvent("通过网址", "失败");
                     countryCode = getCountryByTelephonyManager();
                     if (countryCode == null) {
+                        Firebase.getInstance(this).logEvent("通过电话管理者", "失败");
                         countryCode = getResources().getConfiguration().locale.getCountry();
-                        if (countryCode != null)
+                        if (countryCode != null) {
                             Firebase.getInstance(this).logEvent("通过默认语言", "成功");
+                        } else {
+                            Firebase.getInstance(this).logEvent("通过默认语言", "失败");
+                        }
                     } else {
                         Firebase.getInstance(this).logEvent("通过电话管理者", "成功");
                     }
