@@ -13,6 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <com.androapplite.shadowsocks.view.SnowFlakesLayout
+        android:id="@+id/main_snow_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <!--抽屉-->
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

@@ -37,6 +37,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,6 +68,7 @@ import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.NetWorkSpeedUtils;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
+import com.androapplite.shadowsocks.view.SnowFlakesLayout;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -80,8 +82,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
-
-import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
 
 public class MainActivity extends AppCompatActivity implements ConnectFragment.OnConnectActionListener,
         Handler.Callback, View.OnClickListener, DialogInterface.OnDismissListener,
@@ -119,13 +119,16 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private int mAdMsgType;
     private FullAdStatusListener mFullAdStatusListener;
     private NetWorkSpeedUtils netWorkSpeedUtils;
+    private SnowFlakesLayout mSnowFlakesLayout;
     private boolean isVIP;
+    private boolean isExitAnimShow;//退出动画是否显示
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connectivity);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mSnowFlakesLayout = (SnowFlakesLayout) findViewById(R.id.main_snow_layout);
         setSupportActionBar(toolbar);
         initDrawer(toolbar);
         initNavigationView();
@@ -247,76 +250,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
         });
         toggle.syncState();
-    }
-
-    private static class InterstitialAdStateListener extends AdStateListener {
-        private WeakReference<MainActivity> mActivityReference;
-
-        InterstitialAdStateListener(MainActivity activity) {
-            mActivityReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdLoaded(AdType adType, int index) {
-            MainActivity activity = mActivityReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case AdType.ADMOB_NATIVE:
-                    case AdType.ADMOB_BANNER:
-                    case AdType.FACEBOOK_BANNER:
-                    case AdType.FACEBOOK_NATIVE:
-                    case AdType.FACEBOOK_FBN_BANNER:
-                        activity.addBottomAd();
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onAdOpen(AdType adType, int index) {
-            MainActivity activity = mActivityReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case AdType.FACEBOOK_FBN:
-                    case AdType.FACEBOOK_FULL:
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onAdClick(AdType adType, int index) {
-            MainActivity activity = mActivityReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case AdType.ADMOB_FULL:
-                    case AdType.ADMOB_NATIVE_FULL:
-                    case AdType.FACEBOOK_FULL:
-                    case AdType.FACEBOOK_FBN:
-                        Firebase.getInstance(activity).logEvent("主界面", "全屏", "点击");
-                        break;
-                }
-                AdAppHelper.getInstance(activity).removeAdStateListener(this);
-            }
-        }
-
-        @Override
-        public void onAdClosed(AdType adType, int index) {
-            MainActivity activity = mActivityReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case AdType.FACEBOOK_FBN:
-                    case AdType.FACEBOOK_FULL:
-                        if (activity.mExitAlertDialog == null && activity.mVpnState == VpnState.Connected) {
-                            activity.rotatedBottomAd();
-                        }
-                        break;
-                }
-            }
-
-        }
     }
 
     @Override
@@ -904,9 +837,85 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     }
 
     @Override
-    public void onBackPressed() {
-        final Firebase firebase = Firebase.getInstance(this);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            if (isExitAnimShow) {
+                isExitAnimShow = false;
+                mSnowFlakesLayout.stopSnowingClear();
+            } else {
+                showAnim(1);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
+    private void showAnim(int index) {//=0表示进入动画；=1表示退出动画
+        switch (index) {
+            case 0:
+//      进入动画的操作
+                break;
+            case 1:
+                if (isVIP) {
+                    exitAppDialog();
+                    break;
+                }
+
+                if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
+                    if (AdAppHelper.getInstance(this).isFullAdLoaded()) {
+                        exitAppDialog();
+                        break;
+                    } else {
+                        AdAppHelper.getInstance(this).loadNewInterstitial();
+                        initSnowFlakes(1);
+                        break;
+                    }
+                } else {
+                    exitAppDialog();
+                }
+        }
+    }
+
+    private void initSnowFlakes(final int index) {
+        isExitAnimShow = true;
+        mSnowFlakesLayout.init();
+        mSnowFlakesLayout.setWholeAnimateTiming(5000);
+        mSnowFlakesLayout.setAnimateDuration(3000);
+        mSnowFlakesLayout.setGenerateSnowTiming(100);
+        mSnowFlakesLayout.setImageResourceID(R.drawable.icon_music_small);
+        mSnowFlakesLayout.setEnableRandomCurving(true);
+        mSnowFlakesLayout.setEnableAlphaFade(true);
+        mSnowFlakesLayout.setFlakesEndListener(new SnowFlakesLayout.FlakesEndListener() {
+            @Override
+            public void onEndListener() {
+                isExitAnimShow = false;
+                if (index == 0) {
+                    Firebase.getInstance(MainActivity.this).logEvent("进入广告未显示", "进入弹窗显示");
+                } else {
+                    Firebase.getInstance(MainActivity.this).logEvent("退出广告未显示", "退出弹窗显示");
+                    exitAppDialog();
+                }
+            }
+        });
+
+        if (index == 0) {
+            mSnowFlakesLayout.startSnowing(SnowFlakesLayout.LEFT_BOTTOM);
+        } else {
+            mSnowFlakesLayout.startSnowing(SnowFlakesLayout.RIGHT_BOTTOM);
+        }
+    }
+
+    private void exitAppDialog() {
+        isExitAnimShow = false;
+        if (!isVIP && AdAppHelper.getInstance(this).isFullAdLoaded() && FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
+//            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
+//            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
+            AdAppHelper.getInstance(this).showFullAd();
+            Firebase.getInstance(this).logEvent("主界面", "退出全屏", "显示");
+            mAdMsgType = MSG_SHOW_INTERSTITIAL_EXIT;
+        }
+
+        final Firebase firebase = Firebase.getInstance(this);
         mExitAlertDialog = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.exit))
                 .setMessage(getResources().getString(R.string.exit_vpn))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -930,13 +939,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 })
                 .setCancelable(false)
                 .show();
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad") && !isVIP) {
-//            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
-//            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
-            AdAppHelper.getInstance(this).showFullAd();
-            Firebase.getInstance(this).logEvent("主界面", "退出全屏", "显示");
-            mAdMsgType = MSG_SHOW_INTERSTITIAL_EXIT;
-        }
     }
 
     @Override
