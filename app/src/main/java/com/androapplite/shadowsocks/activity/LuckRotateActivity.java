@@ -24,7 +24,7 @@ import com.androapplite.shadowsocks.luckPan.LuckPanLayout;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.DialogUtils;
-import com.androapplite.shadowsocks.view.LuckRotateProgressBar;
+import com.androapplite.shadowsocks.luckPan.LuckRotateProgressBar;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -176,7 +176,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
 
         Log.i(TAG, "startRotate: 得到的结果 " + rewardString);
-
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
@@ -358,7 +357,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                         break;
                 }
             }
-
         }
     }
 }

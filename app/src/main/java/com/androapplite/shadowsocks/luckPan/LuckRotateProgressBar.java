@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.view;
+package com.androapplite.shadowsocks.luckPan;
 
 import android.content.Context;
 import android.content.res.TypedArray;
