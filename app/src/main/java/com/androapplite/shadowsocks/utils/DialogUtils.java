@@ -16,8 +16,6 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.LuckRotateActivity;
 import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.vpn3.R;
 
 
@@ -35,7 +33,7 @@ public class DialogUtils {
         TextView message = dialog.findViewById(R.id.dialog_free_message);
         TextView tryAgain = dialog.findViewById(R.id.dialog_free_bt);
         boolean isWin = !freeTime.equals("thanks");
-        long TotalFreeTime = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
+        long TotalFreeTime = RuntimeSettings.getLuckPanGetRecord();
         if (isWin) {
             title.setText(context.getResources().getString(R.string.add_minutes, freeTime));
             makePersistentE.setText(context.getResources().getString(R.string.congratulations));

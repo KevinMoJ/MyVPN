@@ -19,6 +19,7 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.BuildConfig;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.utils.ServiceUtils;
@@ -131,7 +132,7 @@ public class ServerListFetcherService extends IntentService{
                         if (result != null && result.second != null) {
                             mUrl = result.first;
                             mServerListJsonString = result.second;
-                            mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, true).apply();
+                            RuntimeSettings.setFetchServerListAtServer(true);
                             break;
                         }
                     }
@@ -168,7 +169,7 @@ public class ServerListFetcherService extends IntentService{
 //                            if (result != null) {
 //                                mUrl = result.first;
 //                                mServerListJsonString = result.second;
-//                                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+//                                RuntimeSettings.setFetchServerListAtServer(false);
 //                                break;
 //                            }
 //                        }
@@ -195,7 +196,7 @@ public class ServerListFetcherService extends IntentService{
             //使用remote config
             if (mServerListJsonString == null){
                 mServerListJsonString = ServerConfig.shuffleRemoteConfig();
-                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+                RuntimeSettings.setFetchServerListAtServer(false);
                 if(mServerListJsonString != null) {
                     urlKey = "remote_config";
                 }
@@ -204,8 +205,8 @@ public class ServerListFetcherService extends IntentService{
             //使用旧的server list
             if(mServerListJsonString == null || mServerListJsonString.isEmpty()) {
                 SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-                mServerListJsonString = sharedPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
-                mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+                mServerListJsonString = RuntimeSettings.getServerList();
+                RuntimeSettings.setFetchServerListAtServer(false);
                 if (mServerListJsonString != null) {
                     urlKey = "旧的server list";
                 }
@@ -219,7 +220,7 @@ public class ServerListFetcherService extends IntentService{
                     InputStreamReader isr = new InputStreamReader(inputStream);
                     BufferedReader br = new BufferedReader(isr);
                     mServerListJsonString = br.readLine();
-                    mSharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false).apply();
+                    RuntimeSettings.setFetchServerListAtServer(false);
                     urlKey = "local_config";
 
                 } catch (IOException e) {
@@ -229,7 +230,7 @@ public class ServerListFetcherService extends IntentService{
 
             if (mServerListJsonString != null) {
                 SharedPreferences.Editor editor = DefaultSharedPrefeencesUtil.getDefaultSharedPreferencesEditor(this);
-                editor.putString(SharedPreferenceKey.FETCH_SERVER_LIST, mServerListJsonString).apply();
+                RuntimeSettings.setServerList(mServerListJsonString);
             }else{
                 urlKey = "没有任何可用的服务器列表";
             }

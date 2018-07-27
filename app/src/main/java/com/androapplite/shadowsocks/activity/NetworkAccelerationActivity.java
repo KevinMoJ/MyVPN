@@ -38,6 +38,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -156,7 +157,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                                 netAccAdMax = 0;
                             }
 //                        mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdMax + netAccAdMin));
-                            if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !VIPActivity.isVIPUser(this))
+                            if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !RuntimeSettings.isVIP())
                                 mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
                         } else {
                             mInterstitialAdDelayShow = new InterstitialADDelayShow(this);
@@ -305,7 +306,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     netAccAdEndMax = 0;
                 }
 //                mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdEndMax + netAccAdEndMin));
-                if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad") && !VIPActivity.isVIPUser(this)) {
+                if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad") && !RuntimeSettings.isVIP()) {
                     mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
                 }
             } else {
@@ -333,7 +334,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                 ((NetworkAccelerationFragment) fragment).rocketFly();
                 Firebase.getInstance(this).logEvent("网络加速", "加速", "加速成功");
             }
-            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
+            RuntimeSettings.setVPNState(VpnState.Connected.ordinal());
         } else {
             if (mIsRestart) {
                 mIsRestart = false;
@@ -363,7 +364,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         Firebase.getInstance(this).logEvent("网络加速", "加速", "立即加速");
         mSharedPreference.edit().putInt("CLICK_SPEED_BT_COUNT", mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0) + 1).apply();
         RealTimeLogger.answerLogEvent("click_speed_bt_count", "speed", "click_count:" + mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0));
-        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, true).apply();
+        RuntimeSettings.setRocketSpeedConnect(true);
         startAccelerate();
     }
 
@@ -384,13 +385,13 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                     VpnManageService.stopVpnByUserSwitchProxy();
                     VpnNotification.gSupressNotification = true;
                 }
-                mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connecting.ordinal()).apply();
+                RuntimeSettings.setAutoSwitchProxy(false);
+                RuntimeSettings.setVPNState(VpnState.Connecting.ordinal());
             } else {
                 showNoInternetSnackbar(R.string.no_internet_message, false);
             }
         }
-        mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connecting.ordinal()).apply();
+        RuntimeSettings.setVPNState(VpnState.Connecting.ordinal());
     }
 
     private Fragment getCurrentFragment() {
@@ -417,7 +418,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     private void connectVpnServerAsync() {
         if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             prepareStartService();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
+            RuntimeSettings.setAutoSwitchProxy(false);
         } else {
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
             ServerListFetcherService.fetchServerListAsync(this);

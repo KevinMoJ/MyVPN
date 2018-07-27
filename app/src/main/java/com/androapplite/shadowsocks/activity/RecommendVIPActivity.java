@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.service.WarnDialogShowService;
@@ -29,6 +28,7 @@ import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.shadowsocks.utils.InternetUtil;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -88,9 +88,9 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         checkFreeUseTime();
 
-        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
-        freeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
-        boolean isVIP = mSharedPreferences.getBoolean(SharedPreferenceKey.VIP, false);
+        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
+        freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
+        boolean isVIP = RuntimeSettings.isVIP();
 
         if (isVIP) {
             startActivity(new Intent(this, SplashActivity.class));
@@ -111,37 +111,37 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
 
     private void checkFreeUseTime() {
         //用活跃用户的打开APP的时间判断上次用户打开APP的时间
-        long openAppTime = mSharedPreferences.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0);
-        luckFreeDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
-        freeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+        long openAppTime = RuntimeSettings.getOpenAppToDecideInactiveTime();
+        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
+        freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
         long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
         long differ = System.currentTimeMillis() - openAppTime;
 
         if (luckFreeDay <= 0) { //没有转转盘获取时间或者获取的时间到期
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
+            RuntimeSettings.setLuckPanGetRecord(0);
             if (differ > 0) {
                 long dif = differ / 1000; // 上次打开APP的时间到这次的时间间隔
                 if (dif <= newUserFreeTime * 60) {// 20  15
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, freeUseTime - dif).apply();
-                    long newFreeUseTime = mSharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+                    RuntimeSettings.setNewUserFreeUseTime(freeUseTime - dif);
+                    long newFreeUseTime = RuntimeSettings.getNewUserFreeUseTime();
                     if (newFreeUseTime < 0)
-                        mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
+                        RuntimeSettings.setNewUserFreeUseTime(0);
                 } else {
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
+                    RuntimeSettings.setNewUserFreeUseTime(0);
                 }
             }
         } else { // 有幸运转盘转到的时间，但是这次打开APP要更新一下
             if (differ > 0) {
                 long overDay = differ / (1000 * 60 * 60 * 24); // 上次打开APP的时间到现在的过了多少天
                 if (overDay <= luckFreeDay)
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, luckFreeDay - overDay).apply();
+                    RuntimeSettings.setLuckPanGetRecord(luckFreeDay - overDay);
                 else
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
-                long newFreeUseDay = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
+                    RuntimeSettings.setLuckPanGetRecord(0);
+                long newFreeUseDay = RuntimeSettings.getLuckPanGetRecord();
                 if (newFreeUseDay < 0)
-                    mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
+                    RuntimeSettings.setLuckPanGetRecord(0);
 
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0).apply();
+                RuntimeSettings.setNewUserFreeUseTime(0);
             }
         }
     }
@@ -296,45 +296,44 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                 return;
             }
 
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(RecommendVIPActivity.this);
             for (String s : skuList) {
                 Purchase purchase = inventory.getPurchase(s);
                 if (purchase != null) {
                     if (purchase.getSku().contains("one")) {
                         Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "一个月");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(true);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("half")) {
                         Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "半年");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(false);
+                        RuntimeSettings.setVIPPayHalfYear(true);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("year")) {
                         Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "一年");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(false);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("free")) {
                         Log.i("RecommendVIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "查询成功", "试用7天");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(true);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else {
                         Firebase.getInstance(RecommendVIPActivity.this).logEvent("推荐VIP页检查VIP", "没查询到");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
+                        RuntimeSettings.setVIP(false);
                     }
                 }
             }
@@ -418,12 +417,12 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 免费试用");
                         //存个字段，说明是VIP用户
                         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(RecommendVIPActivity.this);
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(true);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(info.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(info.getPurchaseTime());
+                        RuntimeSettings.setUseTime(0);
 
                         Intent vipFinishIntent = new Intent(RecommendVIPActivity.this, VIPFinishActivity.class);
                         vipFinishIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

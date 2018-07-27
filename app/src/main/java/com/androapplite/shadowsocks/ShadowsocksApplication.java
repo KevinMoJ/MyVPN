@@ -15,6 +15,7 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.IpCountryIntentService;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -86,8 +87,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
     }
 
     private void checkVpnState(){
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        int stateValue = sharedPreferences.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
+        int stateValue = RuntimeSettings.getVPNState();
         Log.d("ShadowsocksApplication", "vpn state: " + stateValue);
         if (stateValue >= 0 && stateValue < VpnState.values().length) {
             VpnState state = VpnState.values()[stateValue];

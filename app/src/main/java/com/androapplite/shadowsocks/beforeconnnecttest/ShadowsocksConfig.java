@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.beforeConnnectTest;
+package com.androapplite.shadowsocks.beforeconnnecttest;
 
 import com.vm.shadowsocks.tunnel.shadowsocks.CryptFactory;
 import com.vm.shadowsocks.tunnel.shadowsocks.ICrypt;

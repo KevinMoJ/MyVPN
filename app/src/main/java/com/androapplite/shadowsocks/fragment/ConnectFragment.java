@@ -29,11 +29,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
@@ -252,9 +251,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         final long countDown;
         SpannableString spannableString;
         String showTimeString;
-        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
+        long luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
 
-        if (!VIPActivity.isVIPUser(getContext())) {
+        if (!RuntimeSettings.isVIP()) {
             if (luckFreeDay > 0) {
                 showTimeString = String.format(getString(R.string.removing_time_days), String.valueOf(luckFreeDay));
 
@@ -267,7 +266,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
                 mFreeUsedTimeTextView.setText(spannableString);
                 return;
             } else {
-                countDown = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+                countDown = RuntimeSettings.getNewUserFreeUseTime();
                 final String elapsedTime = DateUtils.formatElapsedTime(countDown);
 
                 showTimeString = String.format(getString(R.string.removing_time), elapsedTime);
@@ -279,7 +278,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
                 return;
             }
         } else {
-            countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+            countDown = RuntimeSettings.getUseTime();
             String elapsedTime = DateUtils.formatElapsedTime(countDown);
             mFreeUsedTimeTextView.setTextColor(Color.WHITE);
             mFreeUsedTimeTextView.setText(elapsedTime);
@@ -372,10 +371,10 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mMessageTextView.setVisibility(View.VISIBLE);
         final long countDown;
-        if (VIPActivity.isVIPUser(getContext()))
-            countDown = mSharedPreference.getLong(SharedPreferenceKey.USE_TIME, 0);
+        if (RuntimeSettings.isVIP())
+            countDown = RuntimeSettings.getUseTime();
         else
-            countDown = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
+            countDown = RuntimeSettings.getNewUserFreeUseTime();
         mMessageTextView.setText(DateUtils.formatElapsedTime(countDown));
         mLoadingView.setImageLevel(1);
 //        mConnectButton.setText(R.string.connect);
@@ -384,21 +383,21 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     }
 
     private void checkFreeUseTime() {
-        long freeUseTime = mSharedPreference.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
-        long luckFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
+        long freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
+        long luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
         long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
 
         if (luckFreeDay <= 0 && freeUseTime == 0)
-            mSharedPreference.edit().putLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, newUserFreeTime * 60).apply();
+            RuntimeSettings.setNewUserFreeUseTime(newUserFreeTime * 60);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
+        int state = RuntimeSettings.getVPNState();
         mVpnState = VpnState.values()[state];
-        mVIPImage.setVisibility(VIPActivity.isVIPUser(getContext()) ? View.GONE : View.VISIBLE);
-        if (!VIPActivity.isVIPUser(getContext()) && LocalVpnService.IsRunning) {
+        mVIPImage.setVisibility(RuntimeSettings.isVIP() ? View.GONE : View.VISIBLE);
+        if (!RuntimeSettings.isVIP() && LocalVpnService.IsRunning) {
             startVIPRecommendAnimation();
         }
         updateUI();

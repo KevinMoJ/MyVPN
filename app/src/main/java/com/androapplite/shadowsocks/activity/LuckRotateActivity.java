@@ -20,11 +20,11 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.luckPan.LuckPanLayout;
+import com.androapplite.shadowsocks.luckpan.LuckPanLayout;
+import com.androapplite.shadowsocks.luckpan.LuckRotateProgressBar;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.DialogUtils;
-import com.androapplite.shadowsocks.luckPan.LuckRotateProgressBar;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -110,18 +110,18 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         mHandler = new Handler(this);
         cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
         mLuckPanBar.setMax((int) cloudGetLuckFreeDay);
-        startLuckPanTime = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0);
+        startLuckPanTime = RuntimeSettings.getLuckPanOpenStartTime();
 
         if (startLuckPanTime == 0) { // 新用户没数据
             startLuckPanTime = System.currentTimeMillis();
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, startLuckPanTime).apply();
+            RuntimeSettings.setLuckPanOpenStartTime(startLuckPanTime);
             Log.i(TAG, "initData: 初始化数据，打开的日期是新用户" + startLuckPanTime);
         } else if (!DateUtils.isToday(startLuckPanTime)) { // 第二天打开的用户 保存的时间不是今天
             startLuckPanTime = System.currentTimeMillis();
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, startLuckPanTime).apply();
+            RuntimeSettings.setLuckPanOpenStartTime(startLuckPanTime);
             Log.i(TAG, "initData: 初始化数据，打开的日期是第二天，重新保存了打开时间");
             // 不是今天的话，就把转盘得到的天数清零
-            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0).apply();
+            RuntimeSettings.setLuckPanFreeDay(0);
 //            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
         }
 
@@ -136,7 +136,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private void initUI() {
         mActionBar.setTitle("Lucky Game");
         btnEnableClick(mAdAppHelper.isFullAdLoaded(), true);
-        long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
         mLuckPanBar.setProgress((int) getLuckFreeDays);
 
         if (mLuckPanBar.getProgress() >= mLuckPanBar.getMax())
@@ -169,8 +169,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     }
 
     private void startRotate() {
-        long freeDaysToShow = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
-        long getLuckFreeDays = mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+        long freeDaysToShow = RuntimeSettings.getLuckPanGetRecord();
+        long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
 
         rotatePos = getRotatePos();
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
@@ -186,10 +186,10 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                 Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
             } else {
                 todayIsContinuePlay = true;
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, rewardLong + getLuckFreeDays).apply();
-                mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, rewardLong + freeDaysToShow).apply(); // 用来给dialog显示的
+                RuntimeSettings.setLuckPanFreeDay(rewardLong + getLuckFreeDays);
+                RuntimeSettings.setLuckPanGetRecord(rewardLong + freeDaysToShow); // 用来给dialog显示的
                 mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
-                progressInt = (int) mSharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+                progressInt = (int) RuntimeSettings.getLuckPanFreeDay();
                 Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
                 mLuckPanLayout.rotate(rotatePos, 100);
             }

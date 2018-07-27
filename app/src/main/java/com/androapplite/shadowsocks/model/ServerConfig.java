@@ -7,10 +7,7 @@ import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.VIPActivity;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
@@ -49,7 +46,7 @@ public class ServerConfig implements Parcelable {
     private static ServerConfig addGlobalConfig(Resources resources) {
         String city = resources.getString(R.string.vpn_name_opt);
         String ip = resources.getString(R.string.vpn_server_opt);
-        String icon = resources.getResourceEntryName(VIPActivity.isVIPUser(ShadowsocksApplication.getGlobalContext()) ? R.drawable.icon_vip_server : R.drawable.ic_flag_global);
+        String icon = resources.getResourceEntryName(RuntimeSettings.isVIP() ? R.drawable.icon_vip_server : R.drawable.ic_flag_global);
         String country = resources.getString(R.string.vpn_nation_opt);
         return new ServerConfig(city, country, ip, SINAL_IMAGES.length - 1, icon);
     }
@@ -111,7 +108,7 @@ public class ServerConfig implements Parcelable {
                     int index = nameList.indexOf(city);
                     if (index > -1) {
                         String country = nations.getString(index);
-                        String icon = resources.getResourceEntryName(icons.getResourceId(index, VIPActivity.isVIPUser(ShadowsocksApplication.getGlobalContext()) ? R.drawable.icon_vip_server : R.drawable.ic_flag_global));
+                        String icon = resources.getResourceEntryName(icons.getResourceId(index, RuntimeSettings.isVIP() ? R.drawable.icon_vip_server : R.drawable.ic_flag_global));
                         for (int j = 0; j < ptJsonArray.length(); j++) {
                             ServerConfig ServerConfig = new ServerConfig(city, country, ip, ld, Integer.parseInt(ptJsonArray.getString(j)), icon);
                             arrayList.add(ServerConfig);
@@ -119,7 +116,7 @@ public class ServerConfig implements Parcelable {
                     }
                 }
             }
-            boolean isFetchToServer = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context).getBoolean(SharedPreferenceKey.IS_FETCH_SERVER_LIST_AT_SERVER, false);
+            boolean isFetchToServer = RuntimeSettings.getFetchServerListAtServer();
             if (isFetchToServer)
                 Collections.sort(arrayList, listCompare);
             else
@@ -165,23 +162,21 @@ public class ServerConfig implements Parcelable {
     }
 
     public void saveInSharedPreference(SharedPreferences sharedPreferences) {
-        sharedPreferences.edit()
-                .putString(SharedPreferenceKey.CONNECTING_VPN_NAME, name)
-                .putString(SharedPreferenceKey.CONNECTING_VPN_SERVER, server)
-                .putString(SharedPreferenceKey.CONNECTING_VPN_FLAG, flag)
-                .putString(SharedPreferenceKey.CONNECTING_VPN_NATION, name)
-                .putInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, signal)
-                .putInt(SharedPreferenceKey.CONNECTING_VPN_PORT, port)
-                .apply();
+        RuntimeSettings.setConnectingVPNName(name);
+        RuntimeSettings.setConnectingVPNServer(server);
+        RuntimeSettings.setConnectingVPNFlag(flag);
+        RuntimeSettings.setConnectingVPNNation(nation);
+        RuntimeSettings.setConnectingVPNSignal(signal);
+        RuntimeSettings.setConnectingVPNPort(port);
     }
 
     public static ServerConfig loadFromSharedPreference(SharedPreferences sharedPreferences) {
-        String city = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, null);
-        String ip = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_SERVER, null);
-        String icon = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_FLAG, null);
-        String country = sharedPreferences.getString(SharedPreferenceKey.CONNECTING_VPN_NATION, null);
-        int load = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_SIGNAL, 0);
-        int port = sharedPreferences.getInt(SharedPreferenceKey.CONNECTING_VPN_PORT, DEFAULT_PORT);
+        String city = RuntimeSettings.getConnectingVPNName(null);
+        String ip = RuntimeSettings.getConnectingVPNServer();
+        String icon = RuntimeSettings.getConnectingVPNFlag();
+        String country = RuntimeSettings.getConnectingVPNNation();
+        int load = RuntimeSettings.getConnectingVPNSignal();
+        int port = RuntimeSettings.getConnectingVPNPort(DEFAULT_PORT);
         if (city != null && ip != null && icon != null && country != null) {
             return new ServerConfig(city, country, ip, load, port, icon);
         } else {

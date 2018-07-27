@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -24,8 +23,7 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.RecommendVIPActivity;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -127,19 +125,17 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
     }
 
     private void showNetSpeedLowWarnDialog(long receivedSpeed, long sendSpeed) {
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(mService);
-
         //针对用户网速低于一定值的时候弹窗(暂时写上低于500的时候)，一天弹一次，有云控控制弹不弹，弹的次数也可以云控控制
-        long date = sharedPreferences.getLong(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_TIME, 0);
-        long lastShowTime = sharedPreferences.getLong(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_TIME, 0);
-        int showCount = sharedPreferences.getInt(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT, 0);
+        long date = RuntimeSettings.getNetSpeedLowDialogShowTime();
+        long lastShowTime = RuntimeSettings.getNetSpeedLowDialogShowTime();
+        int showCount = RuntimeSettings.getNetSpeedLowDialogShowCount();
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_show_count");
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_space_minutes");
         int firstShowSpaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_first_show_space_minutes");
         long cloudUpload = FirebaseRemoteConfig.getInstance().getLong("net_speed_low_upload");
         long cloudDownload = FirebaseRemoteConfig.getInstance().getLong("net_speed_low_download");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
-        long vpnStartTime = sharedPreferences.getLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, 0);
+        long vpnStartTime = RuntimeSettings.getVPNStartConnectTime();
 
         if (WarnDialogUtil.isAdLoaded(ShadowsocksApplication.getGlobalContext(), false) && hour_of_day > 9 && hour_of_day < 23
                 && System.currentTimeMillis() - vpnStartTime >= TimeUnit.MINUTES.toMillis(firstShowSpaceTime)
@@ -147,19 +143,19 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 && (receivedSpeed <= cloudDownload || sendSpeed <= cloudUpload)) {
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
-                sharedPreferences.edit().putInt(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
+                RuntimeSettings.setNetSpeedLowDialogShowCount(showCount);
+                RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
                 WarnDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             } else if (DateUtils.isToday(date) && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
-                sharedPreferences.edit().putInt(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
+                RuntimeSettings.setNetSpeedLowDialogShowCount(showCount);
+                RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
                 WarnDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
-                sharedPreferences.edit().putInt(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_COUNT, 1).apply();
-                sharedPreferences.edit().putLong(SharedPreferenceKey.NET_SPEED_LOW_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
+                RuntimeSettings.setNetSpeedLowDialogShowCount(1);
+                RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
                 WarnDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             }

@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -103,13 +103,13 @@ public class VPNConnectResultActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        long startConnectDuration = mSharedPreference.getLong(SharedPreferenceKey.CONNECTING_START_TIME, 0);
+        long startConnectDuration = RuntimeSettings.getVPNStartTime();
         int type = mGetIntent.getIntExtra(VPV_RESULT_TYPE, VPN_RESULT_CONNECT);
 
         mResultConnectRoot.setVisibility(type == VPN_RESULT_CONNECT ? View.VISIBLE : View.GONE);
         mResultDisconnectRoot.setVisibility(type == VPN_RESULT_DISCONNECT ? View.VISIBLE : View.GONE);
         //链接成功显示全屏广告，有云控
-        if (type == VPN_RESULT_CONNECT && FirebaseRemoteConfig.getInstance().getBoolean("result_show_full_ad") && !VIPActivity.isVIPUser(this)) {
+        if (type == VPN_RESULT_CONNECT && FirebaseRemoteConfig.getInstance().getBoolean("result_show_full_ad") && !RuntimeSettings.isVIP()) {
             mAdAppHelper.showFullAd();
             Firebase.getInstance(this).logEvent("连接结果页全屏", "显示", "true");
         }
@@ -120,7 +120,7 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         else if (type == VPN_RESULT_CONNECT)
             mActionBar.setTitle("");
 
-        if (!VIPActivity.isVIPUser(this))
+        if (!RuntimeSettings.isVIP())
             FillAdContent();
         else {
             if (type == VPN_RESULT_CONNECT) {
@@ -371,7 +371,7 @@ public class VPNConnectResultActivity extends AppCompatActivity {
                     case AdType.FACEBOOK_NATIVE:
                     case AdType.ADMOB_NATIVE_AN:
                     case AdType.ADMOB_NATIVE:
-                        if (!VIPActivity.isVIPUser(mReference.get()))
+                        if (!RuntimeSettings.isVIP())
                             FillAdContent();
                         break;
                 }

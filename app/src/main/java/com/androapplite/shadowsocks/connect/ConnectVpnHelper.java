@@ -13,8 +13,7 @@ import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.activity.VIPActivity;
-import com.androapplite.shadowsocks.beforeConnnectTest.ShadowSocksProxyRunnable;
+import com.androapplite.shadowsocks.beforeconnnecttest.ShadowSocksProxyRunnable;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.PriorityConfig;
 import com.androapplite.shadowsocks.model.ServerConfig;
@@ -24,6 +23,7 @@ import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -132,13 +132,13 @@ public class ConnectVpnHelper {
         mFirebase = Firebase.getInstance(mContext);
         mSocksProxyRunnable = new ShadowSocksProxyRunnable();
         vpnServerSet = new HashSet<>();
-        isVIPUser = VIPActivity.isVIPUser(mContext);
+        isVIPUser = RuntimeSettings.isVIP();
     }
 
     private void switchProxyService() {
         if (LocalVpnService.IsRunning) {
             if (mSharedPreference != null)
-                mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, true).apply();
+                RuntimeSettings.setAutoSwitchProxy(true);
             ServerConfig serverConfig = findOtherVPNServerWithOutFailServer();
             if (!errorsList.contains(currentConfig)) // 我们测试失败切换服务器还没找到合适的，用户主动点击切换服务器，我们的这块的代码继续执行就又给切换了
                 return;
@@ -205,7 +205,7 @@ public class ConnectVpnHelper {
 //            LocalVpnService.IsRunning = true;
             mContext.startService(new Intent(mContext, LocalVpnService.class));
             serverConfig.saveInSharedPreference(mSharedPreference);
-            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Connected.ordinal()).apply();
+            RuntimeSettings.setVPNState(VpnState.Connected.ordinal());
         } else {
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Action.ACTION_NO_AVAILABLE_VPN));
         }
@@ -221,7 +221,7 @@ public class ConnectVpnHelper {
         String localNation = "";
         if (serverConfigs != null && !serverConfigs.isEmpty()) {
             final String defaultNation = mContext.getString(R.string.vpn_nation_opt);
-            String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, defaultNation);
+            String nation = RuntimeSettings.getVPNNation(defaultNation);
             //处理换语言的情况
             if (!nation.equals(defaultNation)) {
                 TypedArray array = mContext.getResources().obtainTypedArray(R.array.vpn_nations);
@@ -234,23 +234,19 @@ public class ConnectVpnHelper {
                 }
                 if (i >= array.length()) {
                     nation = defaultNation;
-                    mSharedPreference.edit()
-                            .putString(SharedPreferenceKey.VPN_NATION, nation)
-                            .putString(SharedPreferenceKey.VPN_FLAG, mContext.getResources().getResourceEntryName(isVIPUser ? R.drawable.icon_vip_server : R.drawable.ic_flag_global))
-                            .apply();
+                    RuntimeSettings.setVPNNation(nation);
+                    RuntimeSettings.setFlag(mContext.getResources().getResourceEntryName(isVIPUser ? R.drawable.icon_vip_server : R.drawable.ic_flag_global));
                 }
             }
             //处理本地和服务器列表切换的问题
             String defaultName = mContext.getString(R.string.vpn_name_opt);
-            String name = mSharedPreference.getString(SharedPreferenceKey.CONNECTING_VPN_NAME, defaultName);
+            String name = RuntimeSettings.getConnectingVPNName(defaultName);
             if (!name.equals(defaultName)) {
-                String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+                String serverlist = RuntimeSettings.getServerList();
                 if (serverlist != null && !serverlist.contains(name)) {
                     nation = defaultNation;
-                    mSharedPreference.edit()
-                            .putString(SharedPreferenceKey.VPN_NATION, nation)
-                            .putString(SharedPreferenceKey.VPN_FLAG, mContext.getResources().getResourceEntryName(isVIPUser ? R.drawable.icon_vip_server : R.drawable.ic_flag_global))
-                            .apply();
+                    RuntimeSettings.setVPNNation(nation);
+                    RuntimeSettings.setFlag(mContext.getResources().getResourceEntryName(isVIPUser ? R.drawable.icon_vip_server : R.drawable.ic_flag_global));
                 }
             }
 
@@ -487,11 +483,10 @@ public class ConnectVpnHelper {
     }
 
     public static boolean isFreeUse(final Context context, int type) {
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-        long freeTime = sharedPreferences.getLong(SharedPreferenceKey.NEW_USER_FREE_USER_TIME, 0);
-        long luckFreeDay = sharedPreferences.getLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0);
+        long freeTime = RuntimeSettings.getNewUserFreeUseTime();
+        long luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
 
-        if (!VIPActivity.isVIPUser(context)) {
+        if (!RuntimeSettings.isVIP()) {
             if (freeTime > 0 || luckFreeDay > 0) {
                 return true;
             } else {
@@ -639,11 +634,11 @@ public class ConnectVpnHelper {
                             String.format("%s|%s|%s", config.server, config.nation, config.port), "time", String.valueOf(System.currentTimeMillis() - startTime));
                 }
                 Log.i(TAG, "testConnection:   链接后测试失败     " + (System.currentTimeMillis() - startTime));
-                int count = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0);
+                int count = RuntimeSettings.getTestConnectFailedCount();
                 int failCount = (int) FirebaseRemoteConfig.getInstance().getLong("connect_test_fail_count");
 
                 if (count < failCount) {
-                    mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, count + 1).apply();
+                    RuntimeSettings.setTestConnectFailedCount(count + 1);
                 } else {
                     if (!errorsList.contains(config))
                         errorsList.add(config);
@@ -691,7 +686,7 @@ public class ConnectVpnHelper {
         boolean result = false;
         int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("before_connect_test_time_out");
 //        int failCount = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0);
-        int failCount = mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0);
+        int failCount = RuntimeSettings.getTestConnectFailedCount();
 //        if (failCount >= FirebaseRemoteConfig.getInstance().getLong("connect_test_fail_count"))
 //            mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0).apply();
 
@@ -747,7 +742,7 @@ public class ConnectVpnHelper {
 
     private void resetFailCount() {
         if (mSharedPreference != null)
-            mSharedPreference.edit().putInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0).apply();
+            RuntimeSettings.setTestConnectFailedCount(0);
     }
 
     public ServerConfig getCurrentConfig() {
@@ -874,7 +869,7 @@ public class ConnectVpnHelper {
 
     private ArrayList<ServerConfig> loadServerList() {
         ArrayList<ServerConfig> result = null;
-        String serverlist = mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+        String serverlist = RuntimeSettings.getServerList();
         ArrayList<ServerConfig> serverList = null;
         if (serverlist != null) {
             serverList = ServerConfig.createServerList(mContext, serverlist); // 返回null 内部catch
@@ -984,7 +979,7 @@ public class ConnectVpnHelper {
             HttpURLConnection connection = null;
             int timeOut = (int) FirebaseRemoteConfig.getInstance().getLong("before_connect_test_time_out");
 //            timeOut = timeOut * (mHelper.mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_TIME_COUNT, 0) + 1);
-            timeOut = timeOut * (mHelper.mSharedPreference.getInt(SharedPreferenceKey.TEST_CONNECT_FAILED_COUNT, 0) + 1);
+            timeOut = timeOut * (RuntimeSettings.getTestConnectFailedCount() + 1);
             try {
                 connection = (HttpURLConnection) new URL(mURL).openConnection();
                 connection.setUseCaches(false);

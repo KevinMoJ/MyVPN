@@ -13,8 +13,8 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.DialogUtils;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 
 import java.text.SimpleDateFormat;
@@ -61,8 +61,8 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
 
     private void initUI() {
 
-        boolean isPayOneMonth = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true);
-        boolean isPayHalfYear = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true);
+        boolean isPayOneMonth = RuntimeSettings.isVIPPayOneMonth();
+        boolean isPayHalfYear = RuntimeSettings.isVIPPayHalfYear();
 
         if (isPayOneMonth) {
             mVipFinishPayType.setText(getResources().getString(R.string.months_plan, "1"));
@@ -73,7 +73,7 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
         }
 
         long payTime = 0;
-        payTime = mSharedPreferences.getLong(SharedPreferenceKey.VIP_PAY_TIME, 0);
+        payTime = RuntimeSettings.getVIPPayTime();
         try {
             if (payTime != 0) {
                 SimpleDateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd");
@@ -95,7 +95,7 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
         } catch (Exception e) {
         }
 
-        boolean isAuto = mSharedPreferences.getBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, true);
+        boolean isAuto = RuntimeSettings.isAutoRenewalVIP();
         mVipFinishPayAutomaticRenewal.setText(isAuto ? "ON" : "OFF");
 
         if (isShowVIPDialog) {

@@ -20,6 +20,7 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -56,9 +57,9 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         countryCode = mSharedPreference.getString(SharedPreferenceKey.COUNTRY_CODE, "未知");
         startTime = System.currentTimeMillis();
-        long openLuckPanTime = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0);
+        long openLuckPanTime = RuntimeSettings.getLuckPanOpenStartTime();
         if (!DateUtils.isToday(openLuckPanTime))
-            mSharedPreference.edit().putLong(SharedPreferenceKey.LUCK_PAN_OPEN_START_TIME, 0).apply();
+            RuntimeSettings.setLuckPanOpenStartTime(0);
         mHandler = new Handler(this);
         registerWarnDialogReceiver();
 
@@ -87,13 +88,13 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
 
 
     private void monitorWifiStateChangeDialog() {
-        long date = mSharedPreference.getLong(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_TIME, 0);
-        long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_TIME, 0);
-        int showCount = mSharedPreference.getInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, 0);
+        long date = RuntimeSettings.getWifiDialogShowTime();
+        long lastShowTime = RuntimeSettings.getWifiDialogShowTime();
+        int showCount = RuntimeSettings.getWifiDialogShowCount();
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_count");
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_space_minutes");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
-        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        boolean isInactiveUser = !DateUtils.isToday(RuntimeSettings.getOpenAppToDecideInactiveTime());
         if (mAdStateListener == null)
             mAdStateListener = new WarnDialogAdStateListener();
 
@@ -106,19 +107,19 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
             //新用户第一次没有数据的时候弹窗
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
-                mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-                mSharedPreference.edit().putLong(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
+                RuntimeSettings.setWifiDialogShowCount(showCount);
+                RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
                 WarnDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
-                mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, showCount).apply();
-                mSharedPreference.edit().putLong(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
+                RuntimeSettings.setWifiDialogShowCount(showCount);
+                RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
                 WarnDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
-                mSharedPreference.edit().putInt(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_COUNT, 1).apply();
-                mSharedPreference.edit().putLong(SharedPreferenceKey.WIFI_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
+                RuntimeSettings.setWifiDialogShowCount(1);
+                RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
                 WarnDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             }
@@ -126,32 +127,32 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     }
 
     private void monitorDevelopedCountryInactiveUserDialog() {
-        long date = mSharedPreference.getLong(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, 0);
-        long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, 0);
-        int showCount = mSharedPreference.getInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0);
+        long date = RuntimeSettings.getDevelopedCountryInactiveUserDialogShowTime();
+        long lastShowTime = RuntimeSettings.getDevelopedCountryInactiveUserDialogShowTime();
+        int showCount = RuntimeSettings.getDevelopedCountryInactiveUserDialogShowCount();
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_show_count");
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_space_minutes");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
-        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        boolean isInactiveUser = !DateUtils.isToday(RuntimeSettings.getOpenAppToDecideInactiveTime());
 
         //默认2小时冷却,间隔可以配置,并且判断为不活跃用户 开始跳转时间为当地6:00 - 23:00
         if (WarnDialogUtil.isAdLoaded(this, false) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime)
                 && isInactiveUser && hour_of_day >= 18 && hour_of_day <= 23) {
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
-                mSharedPreference.edit().putLong(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
+                RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
                 WarnDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
-                mSharedPreference.edit().putLong(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
+                RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
                 WarnDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
-                mSharedPreference.edit().putLong(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.DEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 1).apply();
+                RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
+                RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
                 WarnDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             }
@@ -159,31 +160,31 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     }
 
     private void monitorUndevelopedCountryInactiveUserDialog() {
-        long date = mSharedPreference.getLong(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, 0);
-        long lastShowTime = mSharedPreference.getLong(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, 0);
-        int showCount = mSharedPreference.getInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 0);
+        long date = RuntimeSettings.getUndevelopedCountryInactiveUserDialogShowTime();
+        long lastShowTime = RuntimeSettings.getUndevelopedCountryInactiveUserDialogShowTime();
+        int showCount = RuntimeSettings.getUndevelopedCountryInactiveUserDialogShowCount();
         int count = (int) FirebaseRemoteConfig.getInstance().getLong("undeveloped_country_inactive_user_dialog_show_count");
         int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("is_undeveloped_country_inactive_user_dialog_space_minutes");
         long hour_of_day = WarnDialogUtil.getHourOrDay();
-        boolean isInactiveUser = !DateUtils.isToday(mSharedPreference.getLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, 0));
+        boolean isInactiveUser = !DateUtils.isToday(RuntimeSettings.getOpenAppToDecideInactiveTime());
 
         //默认2小时冷却,间隔可以配置,并且判断为不活跃用户 开始跳转时间为当地6:00 - 23:00
         if (WarnDialogUtil.isAdLoaded(this, false) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser && hour_of_day >= 18 && hour_of_day <= 23) {
             if (date == 0 && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
-                mSharedPreference.edit().putLong(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(showCount);
+                RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
                 WarnDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
-                mSharedPreference.edit().putLong(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, showCount).apply();
+                RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(showCount);
+                RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
                 WarnDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
-                mSharedPreference.edit().putLong(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_TIME, System.currentTimeMillis()).apply();
-                mSharedPreference.edit().putInt(SharedPreferenceKey.UNDEVELOPED_COUNTRY_INACTIVE_USER_WARN_DIALOG_SHOW_COUNT, 1).apply();
+                RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(1);
+                RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
                 WarnDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             }
@@ -284,13 +285,15 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 if (FirebaseRemoteConfig.getInstance().getBoolean("is_luck_rotate_dialog_show")) {
                     // 当当天的转转盘天数没有达到7天的时候，每隔一个小时弹一次弹窗，弹出的弹窗要带出全屏，如果没有全屏的话就下一分钟进行弹，直到弹出弹窗为止，弹出的时间
                     //开始计时，当弹出的
-                    long todayGetFreeDay = mSharedPreference.getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
+                    long todayGetFreeDay = RuntimeSettings.getLuckPanFreeDay();
                     long cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
                     long cloudLuckPanShowSpaceTime = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_dialog_first_show_space_minutes");
+                    long hour_of_day = WarnDialogUtil.getHourOrDay();
 
                     if ((todayGetFreeDay < cloudGetLuckFreeDay) && Utils.isScreenOn(WarnDialogShowService.this)
                             && WarnDialogUtil.isSpaceTimeShow(previousShowTime, cloudLuckPanShowSpaceTime) && !WarnDialogActivity.activityIsShowing
-                            && WarnDialogUtil.isAppBackground() && WarnDialogUtil.isAdLoaded(WarnDialogShowService.this, true)) {
+                            && WarnDialogUtil.isAppBackground() && WarnDialogUtil.isAdLoaded(WarnDialogShowService.this, true)
+                            && hour_of_day >= 18 && hour_of_day <= 23) {
                         previousShowTime = System.currentTimeMillis();
                         WarnDialogActivity.start(WarnDialogShowService.this, WarnDialogActivity.LUCK_ROTATE_DIALOG);
                     }

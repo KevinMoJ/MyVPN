@@ -3,7 +3,6 @@ package com.androapplite.shadowsocks.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver.IabBroadcastListener;
 import com.androapplite.shadowsocks.util.IabHelper;
@@ -26,6 +23,7 @@ import com.androapplite.shadowsocks.util.IabHelper.IabAsyncInProgressException;
 import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
@@ -276,45 +274,44 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询失败");
                 return;
             }
-            SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
             for (String s : skuList) {
                 Purchase purchase = inventory.getPurchase(s);
                 if (purchase != null) {
                     if (purchase.getSku().contains("one")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一个月");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(true);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("half")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "半年");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(false);
+                        RuntimeSettings.setVIPPayHalfYear(true);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("year")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一年");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(false);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("free")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "试用7天");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, purchase.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, purchase.getPurchaseTime()).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(true);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else {
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "没查询到");
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, false).apply();
+                        RuntimeSettings.setVIP(false);
                     }
                 }
             }
@@ -371,13 +368,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一个月");
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功 一个月");
                         //存个字段，说明是VIP用户
-                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(true);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(info.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(info.getPurchaseTime());
+                        RuntimeSettings.setUseTime(0);
                         VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
                     }
@@ -419,13 +415,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "半年");
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 半年");
                         //存个字段，说明是VIP用户
-                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(false);
+                        RuntimeSettings.setVIPPayHalfYear(true);
+                        RuntimeSettings.setAutoRenewalVIP(info.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(info.getPurchaseTime());
+                        RuntimeSettings.setUseTime(0);
                         VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
                     }
@@ -467,13 +462,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一年");
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 一年");
                         //存个字段，说明是VIP用户
-                        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(VIPActivity.this);
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.VIP, true).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_ONE_MONTH, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_VIP_PAY_HALF_YEAR, false).apply();
-                        sharedPreferences.edit().putBoolean(SharedPreferenceKey.IS_AUTOMATIC_RENEWAL_VIP, info.isAutoRenewing()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.VIP_PAY_TIME, info.getPurchaseTime()).apply();
-                        sharedPreferences.edit().putLong(SharedPreferenceKey.USE_TIME, 0).apply();
+                        RuntimeSettings.setVIP(true);
+                        RuntimeSettings.setVIPPayOneMonth(false);
+                        RuntimeSettings.setVIPPayHalfYear(false);
+                        RuntimeSettings.setAutoRenewalVIP(info.isAutoRenewing());
+                        RuntimeSettings.setVIPPayTime(info.getPurchaseTime());
+                        RuntimeSettings.setUseTime(0);
                         VIPFinishActivity.startVIPFinishActivity(VIPActivity.this, true);
                         finish();
                     }
@@ -487,11 +481,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         } catch (IabAsyncInProgressException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean isVIPUser(Context context) {
-        SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(context);
-        return sharedPreferences.getBoolean(SharedPreferenceKey.VIP, false);
     }
 
 //  Log.i(TAG, "onQueryInventoryFinished: PurchaseTime  " + oneMonthPurchase.getPurchaseTime() + "  DeveloperPayload: " + oneMonthPurchase.getDeveloperPayload()

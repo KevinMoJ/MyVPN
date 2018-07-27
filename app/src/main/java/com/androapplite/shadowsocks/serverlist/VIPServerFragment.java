@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.serverList;
+package com.androapplite.shadowsocks.serverlist;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -35,10 +35,10 @@ import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -51,7 +51,7 @@ import java.util.HashMap;
  * Created by Kiven.Mo on 2018/7/5.
  */
 
-public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
+public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener,
         DialogInterface.OnClickListener, AbsListView.OnScrollListener, View.OnClickListener {
 
     private SharedPreferences mPreferences;
@@ -68,6 +68,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
     private BroadcastReceiver mForgroundReceiver;
     private IntentFilter mForgroundReceiverIntentFilter;
     private FrameLayout mContainer;
+    private long luckFreeDay; // 转盘用户转取体验VIP的天数
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.free_server_fragment, null);
+        View view = inflater.inflate(R.layout.vip_server_fragment, null);
         initView(view);
         initData(view);
 
@@ -91,29 +92,31 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
 
         parseServerList();
 
-        String serverList = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext()).getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+        String serverList = RuntimeSettings.getServerList();
         if (serverList != null && serverList.length() > 2) {
             mHasServerJson = true;
         } else {
             mHasServerJson = false;
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
-        if (!VIPActivity.isVIPUser(getContext()))
+        if (!RuntimeSettings.isVIP())
             addBottomAd();
         Firebase.getInstance(getContext()).logEvent("屏幕", "服务器列表屏幕");
+
+        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
     }
 
     private void initView(View view) {
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.free_swipe_refresh);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.vip_swipe_refresh);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_purple, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mTransparentView = view.findViewById(R.id.free_transparent_view);
+        mTransparentView = view.findViewById(R.id.vip_transparent_view);
         mTransparentView.setOnClickListener(this);
 
-        mContainer = (FrameLayout) view.findViewById(R.id.free_ad_view_container);
-        mListView = (ListView) view.findViewById(R.id.free_vpn_server_list);
+        mContainer = (FrameLayout) view.findViewById(R.id.vip_ad_view_container);
+        mListView = (ListView) view.findViewById(R.id.vip_vpn_server_list);
         mListView.setAdapter(new ServerListAdapter());
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
@@ -143,9 +146,9 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
             mFlags = new ArrayList<>();
             mSignalResIds = new HashMap<>();
             mPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext());
-            mNation = mPreferences.getString(SharedPreferenceKey.VPN_NATION, getString(R.string.vpn_nation_opt));
+            mNation = RuntimeSettings.getVPNNation(getString(R.string.vpn_nation_opt));
 
-            String serverListJson = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+            String serverListJson = RuntimeSettings.getServerList();
             ArrayList<ServerConfig> serverConfigs = null;
             if (serverListJson != null) {
                 serverConfigs = ServerConfig.createServerList(getContext(), serverListJson);
@@ -155,19 +158,13 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
                 // 返回的服务器列表已经排序好了 是根据负载从低到高的顺序排列的，
                 // 在这里遍历每一个服务器，然后添加到相应的国家，所以默认第一个就是负载最低的，
                 // 如果负载最低的还是很高就默认为这个国家的所有服务器都满了
-                // 不是VIP的界面就让他展示美国和德国的两个国家服务器
                 for (ServerConfig serverConfig : serverConfigs) {
-                    if (serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_us))
-                            || serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_de))
-                            || serverConfig.nation.equals(getResources().getString(R.string.vpn_nation_opt))) {
-
-                        if (!mNations.contains(serverConfig.nation)) {
-                            mNations.add(serverConfig.nation);
-                            mFlags.add(serverConfig.flag);
-                            mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
-                            if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
-                                Firebase.getInstance(getContext()).logEvent("加载服务器列表满载", serverConfig.nation);
-                        }
+                    if (!mNations.contains(serverConfig.nation)) {
+                        mNations.add(serverConfig.nation);
+                        mFlags.add(serverConfig.flag);
+                        mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
+                        if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
+                            Firebase.getInstance(getContext()).logEvent("加载服务器列表满载", serverConfig.nation);
                     }
                 }
             }
@@ -177,7 +174,6 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
             mListView.setItemChecked(mSelectedIndex, true);
         }
     }
-
 
     public void disconnectToRefresh(String position) {
         if (LocalVpnService.IsRunning) {
@@ -203,7 +199,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
     private void disconnectVpnServiceAsync() {
         if (LocalVpnService.IsRunning) {
             VpnManageService.stopVpnByUser();
-            DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(getContext()).edit().putInt(SharedPreferenceKey.VPN_STATE, VpnState.Stopped.ordinal()).apply();
+            RuntimeSettings.setVPNState(VpnState.Stopped.ordinal());
             ConnectVpnHelper.getInstance(getContext()).clearErrorList();
             ConnectVpnHelper.getInstance(getContext()).release();
         }
@@ -246,7 +242,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.free_transparent_view:
+            case R.id.vip_transparent_view:
                 Toast.makeText(getContext(), R.string.updating_please_try_it_later, Toast.LENGTH_SHORT).show();
                 break;
         }
@@ -262,7 +258,7 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
                         mSwipeRefreshLayout.setRefreshing(false);
                         mTransparentView.setVisibility(View.GONE);
                         parseServerList();
-                        String serverList = mPreferences.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null);
+                        String serverList = RuntimeSettings.getServerList();
                         if (serverList != null && serverList.length() > 2) {
                             mHasServerJson = true;
                         } else {
@@ -294,11 +290,11 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
-            ViewHolder holder;
+            ServerListAdapter.ViewHolder holder;
             final Context context = parent.getContext();
             if (convertView != null) {
                 view = convertView;
-                holder = (ViewHolder) view.getTag();
+                holder = (ServerListAdapter.ViewHolder) view.getTag();
             } else {
                 view = View.inflate(context, R.layout.item_popup_vpn_server, null);
                 holder = new ViewHolder();
@@ -320,8 +316,15 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
 //                holder.mItemView.setSelected(false);
 //            }
             if (mHasServerJson) {
-                holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
-                holder.mSignalImageView.setVisibility(View.VISIBLE);
+                if (RuntimeSettings.isVIP() || luckFreeDay > 0) {
+                    holder.mSignalImageView.setImageResource(mSignalResIds.get(nation));
+                } else {
+                    holder.mSignalImageView.setImageResource(R.drawable.server_signal_vip);
+                    if (nation.equals(getString(R.string.vpn_nation_opt)))
+                        holder.mSignalImageView.setVisibility(View.GONE);
+                    else
+                        holder.mSignalImageView.setVisibility(View.VISIBLE);
+                }
             } else {
                 holder.mSignalImageView.setVisibility(View.INVISIBLE);
             }
@@ -334,35 +337,39 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
             View mItemView;
             ImageView mSignalImageView;
         }
+
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (!ConnectVpnHelper.isFreeUse(getContext(), ConnectVpnHelper.FREE_OVER_DIALOG_SERVER_LIST)) // 达到免费试用的时间
-            return;
-
-        mListView.setItemChecked(mSelectedIndex, false);
-        mSelectedIndex = position;
-        String nation = mNations.get(position);
-        String flag = mFlags.get(position);
-        int resid = mSignalResIds.get(mNations.get(position));
-        if (resid == R.drawable.server_signal_full) {
-            Toast.makeText(getContext(), R.string.server_list_full_toast, Toast.LENGTH_SHORT).show();
-            Firebase.getInstance(getContext()).logEvent("点击满载服务器", nation);
-        } else {
+        if (RuntimeSettings.isVIP() || luckFreeDay > 0) {
+            mListView.setItemChecked(mSelectedIndex, false);
+            mSelectedIndex = position;
+            String nation = mNations.get(position);
+            String flag = mFlags.get(position);
+//        int resid = mSignalResIds.get(mNations.get(position));
+//        if (resid == R.drawable.server_signal_full) {
+//            Toast.makeText(getContext(), R.string.server_list_full_toast, Toast.LENGTH_SHORT).show();
+//            Firebase.getInstance(getContext()).logEvent("点击满载服务器", nation);
+//        } else {
             mListView.setItemChecked(position, true);
-            mPreferences.edit().putString(SharedPreferenceKey.VPN_NATION, nation)
-                    .putString(SharedPreferenceKey.VPN_FLAG, flag)
-                    .apply();
+            RuntimeSettings.setVPNNation(nation);
+            RuntimeSettings.setFlag(flag);
             getActivity().setResult(Activity.RESULT_OK);
             ConnectVpnHelper.getInstance(getContext()).release();
             mPreferences.edit().putInt("CLICK_SERVER_LIST_COUNT", mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0) + 1).apply();
             RealTimeLogger.answerLogEvent("server_list_click_connect_count", "click", "click_count:" + mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0));
             //不是小火箭加速的链接
-            mPreferences.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
+            RuntimeSettings.setRocketSpeedConnect(false);
             getActivity().finish();
             Firebase.getInstance(getContext()).logEvent("选择国家", nation);
+        } else {
+            jumpToVip();
         }
+    }
+
+    private void jumpToVip() {
+        VIPActivity.startVIPActivity(getContext(), VIPActivity.TYPE_SERVER_LIST);
     }
 
     @Override
@@ -395,3 +402,4 @@ public class FreeServerFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 }
+

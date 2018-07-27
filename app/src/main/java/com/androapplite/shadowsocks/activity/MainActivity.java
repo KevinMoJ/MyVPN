@@ -61,12 +61,13 @@ import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.serverList.ServerListActivity;
+import com.androapplite.shadowsocks.serverlist.ServerListActivity;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.NetWorkSpeedUtils;
 import com.androapplite.shadowsocks.utils.RealTimeLogger;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.shadowsocks.view.SnowFlakesLayout;
 import com.androapplite.vpn3.R;
@@ -142,22 +143,22 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         mHandlerThread.start();
         mBackgroundHander = new Handler(mHandlerThread.getLooper(), this);
         //用来判断活跃不活跃用户所存的时间
-        mSharedPreference.edit().putLong(SharedPreferenceKey.OPEN_APP_TIME_TO_DECIDE_INACTIVE_USER, System.currentTimeMillis()).apply();
+        RuntimeSettings.setOpenAppToDecideInactiveTime(System.currentTimeMillis());
         Firebase firebase = Firebase.getInstance(this);
         firebase.logEvent("屏幕", "主屏幕");
         checkNotification();
 
         LocalVpnService.addOnStatusChangedListener(this);
-        int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
+        int state = RuntimeSettings.getVPNState();
         mVpnState = VpnState.values()[state];
         if (LocalVpnService.IsRunning && mVpnState != VpnState.Connected) {
             mVpnState = VpnState.Connected;
-            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+            RuntimeSettings.setVPNState(mVpnState.ordinal());
         } else if (!LocalVpnService.IsRunning && mVpnState != VpnState.Stopped && mVpnState != VpnState.Init) {
             mVpnState = VpnState.Stopped;
-            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+            RuntimeSettings.setVPNState(mVpnState.ordinal());
         }
-        isVIP = mSharedPreference.getBoolean(SharedPreferenceKey.VIP, false);
+        isVIP = RuntimeSettings.isVIP();
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
         final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         adAppHelper.checkUpdate(this);
@@ -281,13 +282,12 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mSharedPreference.edit().putInt("CLICK_CONNECT_BT_COUNT", mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0) + 1).apply();
             RealTimeLogger.answerLogEvent("click_connect_bt_count", "connect", "connect_count:" + mSharedPreference.getInt("CLICK_CONNECT_BT_COUNT", 0));
             //不是小火箭加速的连接
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false).apply();
+            RuntimeSettings.setRocketSpeedConnect(false);
             if (mSharedPreference != null) {
-                String nation = mSharedPreference.getString(SharedPreferenceKey.VPN_NATION, "空");
+                String nation = RuntimeSettings.getVPNNation("空");
                 firebase.logEvent("选择国家", nation);
             }
-            if (mSharedPreference != null)
-                mSharedPreference.edit().putLong(SharedPreferenceKey.VPN_CONNECT_START_TIME, System.currentTimeMillis()).apply();
+            RuntimeSettings.setVPNStartConnectTime(System.currentTimeMillis());
 //            PromotionTracking.getInstance(this).reportClickConnectButtonCount();
         } else {
             mDisconnectFragment = new DisconnectFragment();
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         //当拉不到服务器列表的时候重新拉一次  && mConnectingConfig != null
         if (mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             connectVpnServerAsyncCore();
-            mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
+            RuntimeSettings.setAutoSwitchProxy(false);
         } else {
             mFetchServerListProgressDialog = ProgressDialog.show(this, null, getString(R.string.fetch_server_list), true, false);
             ServerListFetcherService.fetchServerListAsync(this);
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         //双重保险
         if (!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
             if (serverListString != null) {
-                mSharedPreference.edit().putString(SharedPreferenceKey.FETCH_SERVER_LIST, serverListString).apply();
+                RuntimeSettings.setServerList(serverListString);
             }
         }
         if (!mSharedPreference.contains(SharedPreferenceKey.FETCH_SERVER_LIST)) {
@@ -549,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         checkConnection(isConnectionAvailable());
         registerReceiver();
 //        AdAppHelper.getInstance(this).onResume();
-        isVIP = mSharedPreference.getBoolean(SharedPreferenceKey.VIP, false);
+        isVIP = RuntimeSettings.isVIP();
         updateFlagMenuIcon();
         try {
             VpnService.prepare(this);
@@ -561,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             addBottomAd();
         }
         adAppHelper.loadNewNative();
-        int state = mSharedPreference.getInt(SharedPreferenceKey.VPN_STATE, VpnState.Init.ordinal());
+        int state = RuntimeSettings.getVPNState();
         mVpnState = VpnState.values()[state];
         if (mConnectFragment != null)
             mConnectFragment.setConnectResult(mVpnState);
@@ -600,8 +600,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 //                showNoInternetSnackbar(R.string.timeout_tip, false);
                 ConnectTimeoutDialog connectTimeoutDialog = new ConnectTimeoutDialog();
                 connectTimeoutDialog.show(getSupportFragmentManager(), "connectTimeOut");
-                long error = mSharedPreference.getLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, 0);
-                mSharedPreference.edit().putLong(SharedPreferenceKey.FAILED_CONNECT_COUNT, error + 1).apply();
                 mVpnState = VpnState.Error;
                 if (mConnectingConfig != null) {
                     mErrorServers.add(mConnectingConfig);
@@ -630,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 prepareStartService();
                 break;
             case MSG_TEST_CONNECT_STATUS:
-                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false))
+                if (!RuntimeSettings.isAutoSwitchProxy())
                     ConnectVpnHelper.getInstance(this).startConnectAfterFirstTest();
                 break;
             case MSG_NO_AVAILABE_VPN:
@@ -662,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             mForegroundHandler.sendEmptyMessage(MSG_PREPARE_START_VPN_FORGROUND);
             Log.d("MainActivity", String.format("server config: %s:%d", serverConfig.server, serverConfig.port));
         } else {
-            boolean isValidation = ServerConfig.checkServerConfigJsonString(mSharedPreference.getString(SharedPreferenceKey.FETCH_SERVER_LIST, null));
+            boolean isValidation = ServerConfig.checkServerConfigJsonString(RuntimeSettings.getServerList());
             Firebase.getInstance(this).logEvent("VPN连不上", "没有可用的服务器", "服务器列表合法 " + isValidation);
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             if (connectivityManager != null) {
@@ -723,11 +721,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                             mIsRestart = true;
                         }
                         mBackgroundHander.removeMessages(MSG_TEST_CONNECT_STATUS);
-                        mSharedPreference.edit().putBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false).apply();
+                        RuntimeSettings.setAutoSwitchProxy(false);
                         VpnManageService.stopVpnByUserSwitchProxy();
                         VpnNotification.gSupressNotification = true;
                         mVpnState = VpnState.Connecting;
-                        mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+                        RuntimeSettings.setVPNState(mVpnState.ordinal());
                     }
                 }
 //                PromotionTracking.getInstance(this).reportSwitchCountry();
@@ -735,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         } else {
             if (requestCode == REQUEST_CONNECT) {
                 mVpnState = VpnState.Stopped;
-                mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+                RuntimeSettings.setVPNState(mVpnState.ordinal());
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 if (mConnectFragment != null && mConnectFragment.isAdded()) {
                     mConnectFragment.setConnectResult(mVpnState);
@@ -762,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         Firebase.getInstance(this).logEvent("连接VPN", "断开", "确认断开");
         if (!LocalVpnService.IsRunning) {
             //记录VPN连接开始的时间
-            mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
+            RuntimeSettings.setVPNStartTime(System.currentTimeMillis());
         }
 
         ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
@@ -777,7 +775,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             netWorkSpeedUtils = null;
         }
         mVpnState = VpnState.Stopped;
-        mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+        RuntimeSettings.setVPNState(mVpnState.ordinal());
         if (mConnectFragment != null) {
             mConnectFragment.setConnectResult(mVpnState);
         }
@@ -1052,15 +1050,15 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mErrorServers.clear();
                 boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
-                if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
+                if (!RuntimeSettings.isAutoSwitchProxy()
                         && isFullConnectSuccessAdShow && !isVIP) {
                     AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
                     adAppHelper.showFullAd();
-                } else if (!mSharedPreference.getBoolean(SharedPreferenceKey.IS_AUTO_SWITCH_PROXY, false)
+                } else if (!RuntimeSettings.isAutoSwitchProxy()
                         && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")
-                        && !mSharedPreference.getBoolean(SharedPreferenceKey.IS_ROCKET_SPEED_CONNECT, false)) {
+                        && !RuntimeSettings.isRocketSpeedConnect()) {
                     //记录VPN连接开始的时间
-                    mSharedPreference.edit().putLong(SharedPreferenceKey.CONNECTING_START_TIME, System.currentTimeMillis()).apply();
+                    RuntimeSettings.setVPNStartTime(System.currentTimeMillis());
                     startResultActivity(VPNConnectResultActivity.VPN_RESULT_CONNECT);
                 }
                 mVpnState = VpnState.Connected;
@@ -1076,7 +1074,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     connectVpnServerAsync();
                 }
             }
-            mSharedPreference.edit().putInt(SharedPreferenceKey.VPN_STATE, mVpnState.ordinal()).apply();
+            RuntimeSettings.setVPNState(mVpnState.ordinal());
             if (mConnectFragment != null) {
                 mConnectFragment.setConnectResult(mVpnState);
             }

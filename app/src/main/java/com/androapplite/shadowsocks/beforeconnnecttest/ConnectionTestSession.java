@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.beforeConnnectTest;
+package com.androapplite.shadowsocks.beforeconnnecttest;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;

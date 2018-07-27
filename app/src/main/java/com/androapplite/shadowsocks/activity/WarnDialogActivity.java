@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -119,10 +120,10 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mWarnDialogBg.setImageResource(R.drawable.luck_rotate_dialog_bg);
         }
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded() && !VIPActivity.isVIPUser(this)) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded() && !RuntimeSettings.isVIP()) {
             mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INTERSTITIAL_AD, 800);
             isFullAdShow = true;
-        } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show") && mAdAppHelper.isNativeLoaded() && !VIPActivity.isVIPUser(this)) {
+        } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show") && mAdAppHelper.isNativeLoaded() && !RuntimeSettings.isVIP()) {
             addBottomAd();
             Firebase.getInstance(this).logEvent("大弹窗", "广告", "native加载");
             isFullAdShow = false;
@@ -272,7 +273,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     case AdType.FACEBOOK_FBN_BANNER:
                     case AdType.ADMOB_NATIVE_AN:
                         if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show")) {
-                            if (!activity.isFullAdShow && !VIPActivity.isVIPUser(WarnDialogActivity.this)) {
+                            if (!activity.isFullAdShow && !RuntimeSettings.isVIP()) {
                                 activity.addBottomAd();
                                 Firebase.getInstance(activity).logEvent("大弹窗", "广告", "native加载");
                             }

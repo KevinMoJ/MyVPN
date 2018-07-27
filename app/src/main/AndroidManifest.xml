@@ -65,7 +65,7 @@
         <service android:name="com.androapplite.shadowsocks.service.ServerListFetcherService"/>
 
         <activity
-            android:name="com.androapplite.shadowsocks.serverList.ServerListActivity"
+            android:name="com.androapplite.shadowsocks.serverlist.ServerListActivity"
             android:label="@string/server_list"/>
         <activity
             android:name="com.androapplite.shadowsocks.activity.ShareActivity"

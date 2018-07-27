@@ -13,7 +13,7 @@
         android:layout_above="@id/luck_pan_ad"
         android:orientation="vertical">
 
-        <com.androapplite.shadowsocks.luckPan.LuckPanLayout
+        <com.androapplite.shadowsocks.luckpan.LuckPanLayout
             android:id="@+id/luck_pan_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             app:pan_radius="168dp"
             app:pan_small_circle_color="#ff0">
             <!--luckpan:icons="@array/icons"-->
-            <com.androapplite.shadowsocks.luckPan.RotatePan
+            <com.androapplite.shadowsocks.luckpan.RotatePan
                 android:id="@+id/rotatePan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,9 +44,9 @@
                 android:layout_height="102dp"
                 android:src="@drawable/luck_pan_point_pic"
                 android:tag="startbtn"/>
-        </com.androapplite.shadowsocks.luckPan.LuckPanLayout>
+        </com.androapplite.shadowsocks.luckpan.LuckPanLayout>
 
-        <com.androapplite.shadowsocks.luckPan.LuckRotateProgressBar
+        <com.androapplite.shadowsocks.luckpan.LuckRotateProgressBar
             android:id="@+id/luck_pan_bar"
             android:layout_width="match_parent"
             android:layout_height="30dp"

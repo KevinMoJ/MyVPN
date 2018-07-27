@@ -21,7 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.activity.VIPActivity;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 
@@ -54,7 +54,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
         mRocketBt = (Button) view.findViewById(R.id.acc_btn);
         mRocketBt.setOnClickListener(this);
         mAdContent = (FrameLayout) view.findViewById(R.id.net_speed_ad_content);
-        if (!VIPActivity.isVIPUser(getContext()))
+        if (!RuntimeSettings.isVIP())
             addBottomAd();
         else
             isNativeAddSuccess = false;
@@ -205,7 +205,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
             }
         }
 
-        if (!VIPActivity.isVIPUser(getContext()))
+        if (!RuntimeSettings.isVIP())
             addBottomAd();
         else
             isNativeAddSuccess = false;

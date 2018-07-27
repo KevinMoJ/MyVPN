@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.serverList;
+package com.androapplite.shadowsocks.serverlist;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
-import com.androapplite.shadowsocks.activity.VIPActivity;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -115,7 +115,7 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 //        mFragmentList.add(mFreeServerFragment);
         mFragmentList.add(mVIPServerFragment);
 
-        isVIP = VIPActivity.isVIPUser(this);
+        isVIP = RuntimeSettings.isVIP();
 
         if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad") && mAdAppHelper.isFullAdLoaded()) {
             mAdAppHelper.showFullAd();

@@ -17,8 +17,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.androapplite.shadowsocks.activity.VIPActivity;
 import com.androapplite.shadowsocks.utils.Rotate3dAnimation;
+import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.animation.AbstractAnimator;
@@ -53,14 +53,14 @@ public class NetworkAccelerationFinishFragment extends Fragment implements Abstr
                     mListener.onVIPImageClick();
             }
         });
-        mVIPRecommendImage.setVisibility(VIPActivity.isVIPUser(getContext()) ? View.VISIBLE : View.GONE);
+        mVIPRecommendImage.setVisibility(RuntimeSettings.isVIP() ? View.VISIBLE : View.GONE);
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mVIPRecommendImage.setVisibility(!VIPActivity.isVIPUser(getContext()) ? View.VISIBLE : View.GONE);
+        mVIPRecommendImage.setVisibility(!RuntimeSettings.isVIP() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class NetworkAccelerationFinishFragment extends Fragment implements Abstr
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        if (!VIPActivity.isVIPUser(getContext())) {
+        if (!RuntimeSettings.isVIP()) {
             FrameLayout container = (FrameLayout) view.findViewById(R.id.ad_view_fl);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
             Context context = view.getContext();

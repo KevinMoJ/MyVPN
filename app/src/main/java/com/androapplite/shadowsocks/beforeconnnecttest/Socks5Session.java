@@ -1,4 +1,4 @@
-package com.androapplite.shadowsocks.beforeConnnectTest;
+package com.androapplite.shadowsocks.beforeconnnecttest;
 
 import android.support.annotation.IntDef;
 
