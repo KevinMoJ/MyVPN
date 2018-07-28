@@ -160,8 +160,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
         isVIP = RuntimeSettings.isVIP();
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.checkUpdate(this);
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad") && !isVIP) {
 //            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
 //            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);

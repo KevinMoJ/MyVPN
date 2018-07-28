@@ -27,15 +27,6 @@
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="Google"/>
-        <meta-data
-            android:name="app_license"
-            android:value="7db18c5448e87e93a4f0d21745fb51ca"/>
-
-        <provider
-            android:name="com.duapps.ad.stats.DuAdCacheProvider"
-            android:authorities="${applicationId}.DuAdCacheProvider"
-            android:exported="false">
-        </provider>
 
         <!-- 完全覆盖区-Start -->
         <!-- android:taskAffinity="com.bestgo.ads.task" -->
@@ -97,13 +88,13 @@
             android:name="com.androapplite.shadowsocks.service.IpCountryIntentService"
             android:exported="false"/>
 
-        <receiver
-            android:name="com.androapplite.shadowsocks.broadcast.MyMultipleReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
-            </intent-filter>
-        </receiver>
+        <!--<receiver-->
+            <!--android:name="com.androapplite.shadowsocks.broadcast.MyMultipleReceiver"-->
+            <!--android:exported="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.android.vending.INSTALL_REFERRER"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <activity
             android:name="com.androapplite.shadowsocks.activity.WarnDialogActivity"
