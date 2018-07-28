@@ -78,7 +78,7 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         NativeAd facebookAd = availableNativeAd.facebookAd;
         NativeAppInstallAd admobAppInstallAd = availableNativeAd.admobAppInstallAd;
         NativeContentAd admobContentAd = availableNativeAd.admobContentAd;
-        AdConfig.RecommendAdItem item = mAdAppHelper.getRecommendItem();
+//        AdConfig.RecommendAdItem item = mAdAppHelper.getRecommendItem();
 
         View view = null;
         if (facebookAd != null)
@@ -90,8 +90,8 @@ public class DisconnectFragment extends DialogFragment implements View.OnClickLi
         else if (admobContentAd != null)
             view = populateContentAdView(admobContentAd);
 
-        else if (item != null)
-            view = populateRecommendAdView(item);
+//        else if (item != null)
+//            view = populateRecommendAdView(item);
 
         mAdLayout.removeAllViews();
 

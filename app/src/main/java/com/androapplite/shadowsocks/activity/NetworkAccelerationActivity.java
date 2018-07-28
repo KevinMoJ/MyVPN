@@ -28,6 +28,7 @@ import android.view.View;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ad.AdFullType;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.fragment.NetworkAccelerationFinishFragment;
@@ -41,18 +42,12 @@ import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdType;
-import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 import com.vm.shadowsocks.core.VpnNotification;
 
 import java.lang.ref.WeakReference;
-
-import static com.bestgo.adsplugin.ads.AdType.ADMOB_FULL;
-import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FBN;
-import static com.bestgo.adsplugin.ads.AdType.FACEBOOK_FULL;
 
 public class NetworkAccelerationActivity extends AppCompatActivity implements
         NetworkAccelerationFragment.NetworkAccelerationFragmentListener,
@@ -62,8 +57,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     private SharedPreferences mSharedPreference;
     private boolean mIsRestart;
-    private MyAdStateListener mAdstateListener;
-    private AdAppHelper mAdAppHelper;
     private Snackbar mSnackbar;
     private BroadcastReceiver mBroadcastReceiver;
     private ProgressDialog mFetchServerListProgressDialog;
@@ -72,13 +65,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     private static final int MSG_DELAY_SHOW_INSTITIAL_AD = 1;
     private static int REQUEST_CONNECT = 1;
     private static final String EXTRA_AUTO = "EXTRA_AUTO";
-    private InterstitialADDelayShow mInterstitialAdDelayShow;
-    private boolean mIsInterstitialAdShowed;
-    private boolean mNeedShowInterstitialAd;
-    private boolean mNeedShowInterstitialAdAnimateFinish;
-    private boolean mIsInterstitialAdShowedAnimateFinish;
-    private InterstitialADDelayShow mInterstitialAdDelayShowAnimateFinish;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,9 +79,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         actionBar.setHomeAsUpIndicator(upArrow);
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new NetworkAccelerationFragment()).commitAllowingStateLoss();
         AdAppHelper.getInstance(this).loadNewNative();
-        mAdstateListener = new MyAdStateListener(this);
-        mAdAppHelper = AdAppHelper.getInstance(this);
-        mAdAppHelper.addAdStateListener(mAdstateListener);
         LocalVpnService.addOnStatusChangedListener(this);
 
         if (mSharedPreference == null) {
@@ -109,9 +92,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         intentFilter.addAction(Action.ACTION_NO_AVAILABLE_VPN);
         intentFilter.addAction(Action.SERVER_LIST_FETCH_FINISH);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
-//        mHandler = new Handler(this);
-        Firebase.getInstance(this).logEvent("屏幕", "网络加速");
-
     }
 
     @Override
@@ -124,144 +104,23 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
                 mHandler = new Handler(this);
             }
 
-
             Intent intent = getIntent();
             boolean autoAccelerate = intent.getBooleanExtra(EXTRA_AUTO, false);
             if (autoAccelerate) {
                 ((NetworkAccelerationFragment) fragment).rocketShake();
                 startAccelerate();
-            } else {
-                if (mAdAppHelper != null) {
-                    String netAccAdS = mAdAppHelper.getCustomCtrlValue("net_acc_ad", "1");
-                    float netAccAd;
-                    try {
-                        netAccAd = Float.parseFloat(netAccAdS);
-                    } catch (Exception e) {
-                        netAccAd = 0;
-                    }
-                    if (Math.random() < netAccAd) {
-                        mNeedShowInterstitialAd = true;
-                        if (mAdAppHelper.isFullAdLoaded()) {
-                            String netAccAdMinS = mAdAppHelper.getCustomCtrlValue("net_acc_ad_min", "500");
-                            int netAccAdMin;
-                            try {
-                                netAccAdMin = Integer.valueOf(netAccAdMinS);
-                            } catch (Exception e) {
-                                netAccAdMin = 0;
-                            }
-                            String netAccAdMaxS = mAdAppHelper.getCustomCtrlValue("net_acc_ad_max", "500");
-                            int netAccAdMax;
-                            try {
-                                netAccAdMax = Integer.valueOf(netAccAdMaxS);
-                            } catch (Exception e) {
-                                netAccAdMax = 0;
-                            }
-//                        mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdMax + netAccAdMin));
-                            if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !RuntimeSettings.isVIP())
-                                mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
-                        } else {
-                            mInterstitialAdDelayShow = new InterstitialADDelayShow(this);
-                            mAdAppHelper.addAdStateListener(mInterstitialAdDelayShow);
-                            mAdAppHelper.loadNewInterstitial();
-                        }
-                    }
-                }
             }
-        }
-    }
-
-    private static class InterstitialADDelayShow extends AdStateListener {
-        private WeakReference<NetworkAccelerationActivity> mReference;
-
-        InterstitialADDelayShow(NetworkAccelerationActivity activity) {
-            mReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdLoaded(AdType adType, int index) {
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case FACEBOOK_FBN:
-                    case FACEBOOK_FULL:
-                        if (!activity.mIsInterstitialAdShowed && !activity.mIsInterstitialAdShowedAnimateFinish) {
-//                            AdAppHelper.getInstance(activity).showFullAd();
-                            if (activity.mNeedShowInterstitialAd) {
-                                Firebase.getInstance(activity).logEvent("小火箭加速全屏", "网络加速进入", "true");
-                            } else if (activity.mNeedShowInterstitialAdAnimateFinish) {
-                                Firebase.getInstance(activity).logEvent("小火箭加速全屏", "网络加速动画结束", "true");
-                            }
-                            AdAppHelper.getInstance(activity).removeAdStateListener(this);
-                        }
-                        break;
-                }
-
-            }
-        }
-
-        @Override
-        public void onAdLoadFailed(AdType adType, int index, String reason) {
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case FACEBOOK_FBN:
-                    case FACEBOOK_FULL:
-                        if (activity.mNeedShowInterstitialAd) {
-                            Firebase.getInstance(activity).logEvent("小火箭加速全屏", "网络加速进入", "false");
-                        } else if (activity.mNeedShowInterstitialAdAnimateFinish) {
-                            Firebase.getInstance(activity).logEvent("小火箭加速全屏", "网络加速动画结束", "false");
-                        }
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onAdOpen(AdType adType, int index) {
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case FACEBOOK_FBN:
-                    case FACEBOOK_FULL:
-                        if (activity.mNeedShowInterstitialAd) {
-                            activity.mIsInterstitialAdShowed = true;
-                        } else if (activity.mNeedShowInterstitialAdAnimateFinish) {
-                            activity.mIsInterstitialAdShowedAnimateFinish = true;
-                        }
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onAdClosed(AdType adType, int index) {
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case FACEBOOK_FBN:
-                    case FACEBOOK_FULL:
-                        if (activity.mNeedShowInterstitialAd) {
-                            activity.mIsInterstitialAdShowed = false;
-                            activity.mNeedShowInterstitialAd = false;
-                        } else if (activity.mNeedShowInterstitialAdAnimateFinish) {
-                            activity.mIsInterstitialAdShowedAnimateFinish = false;
-                            activity.mNeedShowInterstitialAdAnimateFinish = false;
-                        }
-                        break;
-                }
+            if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !RuntimeSettings.isVIP()) {
+                Message message = mHandler.obtainMessage();
+                message.what = MSG_DELAY_SHOW_INSTITIAL_AD;
+                message.arg1 = 0;
+                mHandler.sendMessage(message);
             }
         }
     }
 
     @Override
     protected void onDestroy() {
-        if (mAdstateListener != null) {
-            AdAppHelper.getInstance(this).removeAdStateListener(mAdstateListener);
-        }
         if (mBroadcastReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         }
@@ -269,54 +128,18 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
         }
-        if (mInterstitialAdDelayShow != null) {
-            AdAppHelper.getInstance(this).removeAdStateListener(mInterstitialAdDelayShow);
-        }
-        if (mInterstitialAdDelayShowAnimateFinish != null) {
-            AdAppHelper.getInstance(this).removeAdStateListener(mInterstitialAdDelayShowAnimateFinish);
-        }
         super.onDestroy();
     }
 
     @Override
     public void onAnimationFinish() { // 小火箭起飞动画结束的回调
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        String netAccAdEndS = adAppHelper.getCustomCtrlValue("net_acc_end_ad", "1");
-        float netAccAdEnd;
-        try {
-            netAccAdEnd = Float.parseFloat(netAccAdEndS);
-        } catch (Exception e) {
-            netAccAdEnd = 0;
-        }
-        if (Math.random() < netAccAdEnd) {
-            mNeedShowInterstitialAdAnimateFinish = true;
-            if (adAppHelper.isFullAdLoaded()) {
-                String netAccAdEndMinS = adAppHelper.getCustomCtrlValue("net_acc_ad_end_min", "500");
-                int netAccAdEndMin;
-                try {
-                    netAccAdEndMin = Integer.valueOf(netAccAdEndMinS);
-                } catch (Exception e) {
-                    netAccAdEndMin = 0;
-                }
-                String netAccAdEndMaxS = adAppHelper.getCustomCtrlValue("net_acc_ad_end_max", "500");
-                int netAccAdEndMax;
-                try {
-                    netAccAdEndMax = Integer.valueOf(netAccAdEndMaxS);
-                } catch (Exception e) {
-                    netAccAdEndMax = 0;
-                }
-//                mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INSTITIAL_AD, (long) (Math.random() * netAccAdEndMax + netAccAdEndMin));
-                if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad") && !RuntimeSettings.isVIP()) {
-                    mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INSTITIAL_AD);
-                }
-            } else {
-                mInterstitialAdDelayShowAnimateFinish = new InterstitialADDelayShow(this);
-                adAppHelper.addAdStateListener(mInterstitialAdDelayShowAnimateFinish);
-                adAppHelper.loadNewInterstitial();
-            }
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad") && !RuntimeSettings.isVIP()) {
+            Message message = mHandler.obtainMessage();
+            message.what = MSG_DELAY_SHOW_INSTITIAL_AD;
+            message.arg1 = 1;
+            mHandler.sendMessage(message);
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new NetworkAccelerationFinishFragment()).commitAllowingStateLoss();
-
     }
 
 
@@ -434,89 +257,14 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
-            case MSG_DELAY_SHOW_INSTITIAL_AD:
-                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-                if (!mIsInterstitialAdShowed && !mIsInterstitialAdShowedAnimateFinish) {
-                    adAppHelper.showFullAd();
-                    if (mNeedShowInterstitialAd) {
-                        Firebase.getInstance(this).logEvent("网络加速进入", "全屏", "显示");
-                    } else if (mNeedShowInterstitialAdAnimateFinish) {
-                        Firebase.getInstance(this).logEvent("网络加速动画结束", "全屏", "显示");
-                    }
-                }
+            case MSG_DELAY_SHOW_INSTITIAL_AD: // 0 进入  1 加速成功
+                if (msg.arg1 == 0)
+                    AdAppHelper.getInstance(this).showFullAd(AdFullType.ROCKET_SPEED_ENTER_FULL_AD);
+                else if (msg.arg1 == 1)
+                    AdAppHelper.getInstance(this).showFullAd(AdFullType.ROCKET_SPEED_FINISH_FULL_AD);
                 break;
         }
-
         return true;
-    }
-
-    private static class MyAdStateListener extends AdStateListener {
-        WeakReference<NetworkAccelerationActivity> mReference;
-
-        MyAdStateListener(NetworkAccelerationActivity activity) {
-            mReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdClosed(AdType adType, int index) {
-
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case FACEBOOK_FBN:
-                    case FACEBOOK_FULL:
-                        Fragment fragment = activity.getCurrentFragment();
-                        if (fragment instanceof NetworkAccelerationFinishFragment) {
-                            ((NetworkAccelerationFinishFragment) fragment).animate();
-                        } else if (fragment instanceof NetworkAccelerationFragment) {
-                            Intent intent = activity.getIntent();
-                            boolean auto = intent.getBooleanExtra(EXTRA_AUTO, false);
-                            if (auto) {
-                                activity.startAccelerate();
-                            }
-                        }
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onAdLoadFailed(AdType adType, int index, String reason) {
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case ADMOB_FULL:
-                    case FACEBOOK_FBN:
-                    case FACEBOOK_FULL:
-                        Fragment fragment = activity.getCurrentFragment();
-                        if (fragment instanceof NetworkAccelerationFinishFragment) {
-                            ((NetworkAccelerationFinishFragment) fragment).animate();
-                        }
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onAdClick(AdType adType, int index) {
-            NetworkAccelerationActivity activity = mReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case AdType.ADMOB_FULL:
-                    case AdType.FACEBOOK_FBN:
-                    case AdType.FACEBOOK_FULL:
-                    case AdType.RECOMMEND_AD:
-                        if (activity.mNeedShowInterstitialAd) {
-                            Firebase.getInstance(activity).logEvent("网络加速进入", "全屏", "点击");
-                        } else if (activity.mNeedShowInterstitialAdAnimateFinish) {
-                            Firebase.getInstance(activity).logEvent("加速动画结束", "全屏", "点击");
-                        }
-                        break;
-                }
-            }
-
-        }
     }
 
     private void showNoInternetSnackbar(@StringRes int messageId, boolean hasAction) {
@@ -643,14 +391,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     protected void onStop() {
         if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
-        }
-        if (mInterstitialAdDelayShow != null) {
-            AdAppHelper.getInstance(this).removeAdStateListener(mInterstitialAdDelayShow);
-            mInterstitialAdDelayShow = null;
-        }
-        if (mInterstitialAdDelayShowAnimateFinish != null) {
-            AdAppHelper.getInstance(this).removeAdStateListener(mInterstitialAdDelayShowAnimateFinish);
-            mInterstitialAdDelayShowAnimateFinish = null;
         }
         super.onStop();
     }

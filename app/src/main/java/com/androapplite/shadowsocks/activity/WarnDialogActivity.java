@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ad.AdFullType;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -247,8 +248,19 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_DELAY_SHOW_INTERSTITIAL_AD:
-                mAdAppHelper.showFullAd();
-                Firebase.getInstance(this).logEvent("大弹窗", "广告", "全屏加载");
+                String adType = "";
+                if (type == LUCK_ROTATE_DIALOG)
+                    adType = AdFullType.CLOUD_LUCK_ROTATE_FULL_AD;
+                else if (type == NET_SPEED_LOW_DIALOG)
+                    adType = AdFullType.CLOUD_NET_SPEED_FULL_AD;
+                else if (type == CONNECT_PUBLIC_WIFI_DIALOG)
+                    adType = AdFullType.CLOUD_WIFI_DIALOG_FULL_AD;
+                else if (type == DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG)
+                    adType = AdFullType.CLOUD_DEVELOPED_USER_FULL_AD;
+                else if (type == UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG)
+                    adType = AdFullType.CLOUD_UNDEVELOPED_USER_FULL_AD;
+
+                mAdAppHelper.showFullAd(adType);
                 break;
         }
         return true;

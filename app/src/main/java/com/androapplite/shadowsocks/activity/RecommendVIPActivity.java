@@ -18,6 +18,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ad.AdFullType;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
@@ -31,15 +32,12 @@ import com.androapplite.shadowsocks.utils.InternetUtil;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdType;
-import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +71,6 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
 
     private AdAppHelper mAdAppHelper;
     private Firebase mFirebase;
-    private FullAdStateListener mStateListener;
 
     private int[] bannerImages;
     private int[] bannerFlags;
@@ -193,13 +190,11 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
         mRecommendVipPager.setAdapter(myAdapter);
         mRecommendVipPager.setCurrentItem(0);
         mRecommendVipPager.setOffscreenPageLimit(mItemBeans.size() - 1);
-        mStateListener = new FullAdStateListener(this);
 
         mAdAppHelper = AdAppHelper.getInstance(this);
         mAdAppHelper.loadNewInterstitial();
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
-        mAdAppHelper.addAdStateListener(mStateListener);
         mFirebase = Firebase.getInstance(this);
         try {
             checkIsVIP();
@@ -402,9 +397,8 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                         if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
                             // 交易取消
                             Firebase.getInstance(RecommendVIPActivity.this).logEvent("VIP交易", "交易取消", "免费试用");
-                            if (mAdAppHelper.isFullAdLoaded() && FirebaseRemoteConfig.getInstance().getBoolean("recommend_vip_cancel_pay_show_full_ad")) {
-                                mAdAppHelper.showFullAd();
-                                mFirebase.logEvent("推荐VIP页", "全屏", "显示");
+                            if (FirebaseRemoteConfig.getInstance().getBoolean("recommend_vip_cancel_pay_show_full_ad")) {
+                                mAdAppHelper.showFullAd(AdFullType.CANCEL_FREE_VIP_FULL_AD);
                             }
                             Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {
@@ -474,24 +468,6 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
             if (mIabHelper != null) {
                 mIabHelper.disposeWhenFinished();
                 mIabHelper = null;
-            }
-        }
-
-        mAdAppHelper.removeAdStateListener(mStateListener);
-    }
-
-    private static class FullAdStateListener extends AdStateListener {
-        private WeakReference<RecommendVIPActivity> mActivityReference;
-
-        FullAdStateListener(RecommendVIPActivity activity) {
-            mActivityReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdClick(AdType adType, int index) {
-            RecommendVIPActivity activity = mActivityReference.get();
-            if (activity != null) {
-                activity.mFirebase.logEvent("推荐VIP页", "全屏", "点击");
             }
         }
     }

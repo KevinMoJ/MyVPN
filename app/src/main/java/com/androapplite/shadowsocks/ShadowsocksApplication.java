@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.activity.MainActivity;
@@ -15,14 +14,11 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.IpCountryIntentService;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.VpnNotification;
 
@@ -30,8 +26,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Locale;
-
-import io.fabric.sdk.android.Fabric;
 
 
 /**
@@ -46,9 +40,6 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
         if (BuildConfig.DEBUG) {
             //谷歌插页广告导致资源泄露
 //            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -62,18 +53,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
 //                    .build());
         }
         gContext = getApplicationContext();
-        FirebaseApp.initializeApp(this);
-        AdAppHelper.GA_RESOURCE_ID = R.xml.ga_tracker;
-        AdAppHelper.FIREBASE = Firebase.getInstance(this);
-
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        if (displayMetrics.density * 320 >= displayMetrics.widthPixels) {
-            AdAppHelper.NATIVE_ADMOB_WIDTH_LIST = new int[1];
-            AdAppHelper.NATIVE_ADMOB_WIDTH_LIST[0] = 280;
-        }
-
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-        adAppHelper.init(null);
+        AdUtils.initAdHelper(this);
         mHomeWathcer = new HomeWatcher(this);
         mHomeWathcer.setOnHomePressedListener(this);
         checkVpnState();

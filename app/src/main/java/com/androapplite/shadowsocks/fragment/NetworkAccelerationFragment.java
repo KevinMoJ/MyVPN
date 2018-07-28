@@ -60,7 +60,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
             isNativeAddSuccess = false;
         if (!isNativeAddSuccess) {
             RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) mRocketBt.getLayoutParams();
-            rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.banner_ad_loading_icon_margin_top);
+            rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
             mRocketBt.setLayoutParams(rocketBtLayoutParams);
         }
 //        if(mNeedToShake) {
@@ -211,7 +211,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
             isNativeAddSuccess = false;
         if (!isNativeAddSuccess) {
             RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) mRocketBt.getLayoutParams();
-            rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.banner_ad_loading_icon_margin_top);
+            rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
             mRocketBt.setLayoutParams(rocketBtLayoutParams);
         }
     }

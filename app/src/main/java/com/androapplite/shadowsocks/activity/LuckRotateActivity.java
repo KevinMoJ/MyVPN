@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ad.AdFullType;
 import com.androapplite.shadowsocks.luckpan.LuckPanLayout;
 import com.androapplite.shadowsocks.luckpan.LuckRotateProgressBar;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -127,9 +128,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd && mAdAppHelper.isFullAdLoaded()) {
-            mAdAppHelper.showFullAd();
-            mFirebase.logEvent("幸运转盘", "全屏", "进入显示");
+        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd) {
+            mAdAppHelper.showFullAd(AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
         }
     }
 
@@ -318,7 +318,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case SHOW_FULL_AD:
-                mAdAppHelper.showFullAd();
+                mAdAppHelper.showFullAd(AdFullType.LUCK_ROTATE_PLAY_FULL_AD);
                 mFirebase.logEvent("幸运转盘", "结果全屏", "显示");
                 return true;
         }

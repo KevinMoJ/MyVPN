@@ -11,16 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
+import com.androapplite.shadowsocks.ad.AdFullType;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdType;
-import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +36,6 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 
     private List<Fragment> mFragmentList;
     private List<LinearLayout> mTabLinearViewList;
-
-    private AdAppHelper mAdAppHelper;
-    private FullAdStatusListener mStatusListener;
 
     private int screenWidth;
     private int screenHeight;
@@ -95,9 +89,6 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 
     private void initData() {
         mTabLinearViewList = new ArrayList<>();
-        mStatusListener = new FullAdStatusListener(this);
-        mAdAppHelper = AdAppHelper.getInstance(this);
-        mAdAppHelper.addAdStateListener(mStatusListener);
 //        mTabLinearViewList.add(mServerListFreeLinear);
 //        mTabLinearViewList.add(mServerListVipLinear);
 
@@ -117,9 +108,8 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 
         isVIP = RuntimeSettings.isVIP();
 
-        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad") && mAdAppHelper.isFullAdLoaded()) {
-            mAdAppHelper.showFullAd();
-            Firebase.getInstance(this).logEvent("服务器列表全屏", "全屏", "显示");
+        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad") ) {
+            AdAppHelper.getInstance(this).showFullAd(AdFullType.SERVER_LIST_ENTER_FULL_AD);
         }
     }
 
@@ -240,43 +230,6 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 //        }
         if (mVIPServerFragment != null) {
             mVIPServerFragment = null;
-        }
-
-        if (mAdAppHelper != null) {
-            mAdAppHelper.removeAdStateListener(mStatusListener);
-            mStatusListener = null;
-            mAdAppHelper = null;
-        }
-    }
-
-
-    private class FullAdStatusListener extends AdStateListener {
-        private WeakReference<ServerListActivity> mReference;
-
-        FullAdStatusListener(ServerListActivity activity) {
-            mReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdClick(AdType adType, int index) {
-            ServerListActivity activity = mReference.get();
-            switch (adType.getType()) {
-                case AdType.ADMOB_FULL:
-                case AdType.FACEBOOK_FBN:
-                case AdType.FACEBOOK_FULL:
-                case AdType.RECOMMEND_AD:
-                    Firebase.getInstance(activity).logEvent("服务器列表全屏", "全屏", "点击");
-                    AdAppHelper.getInstance(activity).removeAdStateListener(this);
-                    break;
-                case AdType.ADMOB_NATIVE:
-                case AdType.ADMOB_NATIVE_AN:
-                case AdType.ADMOB_NATIVE_EN:
-                case AdType.BATMOBI_NATIVE:
-                case AdType.FACEBOOK_BANNER:
-                case AdType.FACEBOOK_NATIVE:
-                    Firebase.getInstance(activity).logEvent("服务器列表native", "native", "点击");
-                    break;
-            }
         }
     }
 }

@@ -53,6 +53,7 @@ import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.NotificationsUtils;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ad.AdFullType;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
@@ -72,8 +73,6 @@ import com.androapplite.shadowsocks.view.ConnectTimeoutDialog;
 import com.androapplite.shadowsocks.view.SnowFlakesLayout;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdType;
-import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
@@ -104,11 +103,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private static final int MSG_PREPARE_START_VPN_FORGROUND = 3;
     private static final int MSG_NO_AVAILABE_VPN = 4;
     private static final int MSG_REPEAT_MENU_ROCKET = 5;
-    public static final int MSG_SHOW_AD_BUTTON_RECOMMEND = 6;
-    public static final int MSG_SHOW_AD_BUTTON_FULL = 7;
     public static final int MSG_TEST_CONNECT_STATUS = 8;
-    public static final int MSG_SHOW_INTERSTITIAL_ENTER = 9;
-    public static final int MSG_SHOW_INTERSTITIAL_EXIT = 10;
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private Menu mMenu;
@@ -117,8 +112,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private AlertDialog mExitAlertDialog;
     private DisconnectFragment mDisconnectFragment;
     private AnimationSet mMenuRocketAnimation;
-    private int mAdMsgType;
-    private FullAdStatusListener mFullAdStatusListener;
     private NetWorkSpeedUtils netWorkSpeedUtils;
     private SnowFlakesLayout mSnowFlakesLayout;
     private boolean isVIP;
@@ -161,46 +154,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         isVIP = RuntimeSettings.isVIP();
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad") && !isVIP) {
-//            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_ENTER, "enter_ad", "enter_ad_min", "200", "enter_ad_max", "200");
-//            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_ENTER);
-            AdAppHelper.getInstance(this).showFullAd();
-            Firebase.getInstance(this).logEvent("主界面", "进入全屏", "显示");
-            mAdMsgType = MSG_SHOW_INTERSTITIAL_ENTER;
-        }
-    }
-
-    private void showInterstitialWithDelay(int msg, String adShowRate, String adDelayMin, String adDelayMinDefault, String adDelayMax, String adDelayMaxDefault) {
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        String enterAdSwitch = adAppHelper.getCustomCtrlValue(adShowRate, "1");
-        float enterAdRate;
-        try {
-            enterAdRate = Float.parseFloat(enterAdSwitch);
-        } catch (Exception e) {
-            enterAdRate = 0;
-        }
-        if (Math.random() < enterAdRate) {
-            if (adAppHelper.isFullAdLoaded()) {
-                String enterAdMinS = adAppHelper.getCustomCtrlValue(adDelayMin, adDelayMinDefault);
-                int enterAdMin;
-                try {
-                    enterAdMin = Integer.valueOf(enterAdMinS);
-                } catch (Exception e) {
-                    enterAdMin = 0;
-                }
-                String enterAdMaxS = adAppHelper.getCustomCtrlValue(adDelayMax, adDelayMaxDefault);
-                int enterAdMax;
-                try {
-                    enterAdMax = Integer.valueOf(enterAdMaxS);
-                } catch (Exception e) {
-                    enterAdMax = 0;
-                }
-//                mForegroundHandler.sendEmptyMessageDelayed(msg, (long) (Math.random() * enterAdMax + enterAdMin));
-                mForegroundHandler.sendEmptyMessage(msg);
-                if (mFullAdStatusListener == null)
-                    mFullAdStatusListener = new FullAdStatusListener(this);
-                mAdMsgType = msg;
-                adAppHelper.addAdStateListener(mFullAdStatusListener);
-            }
+            AdAppHelper.getInstance(this).showFullAd(AdFullType.MAIN_ENTER_FULL_AD);
         }
     }
 
@@ -505,48 +459,13 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
     }
 
-    private class FullAdStatusListener extends AdStateListener {
-        private WeakReference<MainActivity> mReference;
-
-        FullAdStatusListener(MainActivity activity) {
-            mReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdClick(AdType adType, int index) {
-            MainActivity activity = mReference.get();
-            switch (adType.getType()) {
-                case AdType.ADMOB_FULL:
-                case AdType.FACEBOOK_FBN:
-                case AdType.FACEBOOK_FULL:
-                case AdType.RECOMMEND_AD:
-                    switch (activity.mAdMsgType) {
-                        case MSG_SHOW_AD_BUTTON_FULL:
-                            Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮全屏");
-                            break;
-                        case MSG_SHOW_AD_BUTTON_RECOMMEND:
-                            Firebase.getInstance(activity).logEvent("全屏广告", "点击", "主界面广告按钮线上互推全屏");
-                            break;
-                        case MSG_SHOW_INTERSTITIAL_ENTER:
-                            Firebase.getInstance(activity).logEvent("主界面", "进入全屏", "点击");
-                            break;
-                        case MSG_SHOW_INTERSTITIAL_EXIT:
-                            Firebase.getInstance(activity).logEvent("主界面", "退出全屏", "点击");
-                            break;
-                    }
-                    AdAppHelper.getInstance(activity).removeAdStateListener(this);
-                    break;
-            }
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
         checkNotificationAndShowRemainder();
         checkConnection(isConnectionAvailable());
         registerReceiver();
-//        AdAppHelper.getInstance(this).onResume();
+        AdAppHelper.getInstance(this).onResume();
         isVIP = RuntimeSettings.isVIP();
         updateFlagMenuIcon();
         try {
@@ -554,11 +473,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         } catch (Exception e) {
             ShadowsocksApplication.handleException(e);
         }
-        final AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
         if (mDisconnectFragment == null) {//adAppHelper.isNativeLoaded() &&
             addBottomAd();
         }
-        adAppHelper.loadNewNative();
+        AdAppHelper.getInstance(getApplicationContext()).loadNewNative();
         int state = RuntimeSettings.getVPNState();
         mVpnState = VpnState.values()[state];
         if (mConnectFragment != null)
@@ -584,7 +502,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     @Override
     public boolean handleMessage(Message msg) {
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
         switch (msg.what) {
             case MSG_REPEAT_MENU_ROCKET:
                 if (mMenu != null) {
@@ -637,15 +554,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mConnectFragment.updateUI();
                 }
                 break;
-            case MSG_SHOW_INTERSTITIAL_ENTER:
-                adAppHelper.showFullAd();
-                Firebase.getInstance(this).logEvent("主界面", "进入全屏", "显示");
-                break;
-            case MSG_SHOW_INTERSTITIAL_EXIT:
-                adAppHelper.showFullAd();
-                Firebase.getInstance(this).logEvent("主界面", "退出全屏", "显示");
-                break;
-
         }
 
         return true;
@@ -903,12 +811,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void exitAppDialog() {
         isExitAnimShow = false;
-        if (!isVIP && AdAppHelper.getInstance(this).isFullAdLoaded() && FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
-//            mBackgroundHander.sendEmptyMessage(MSG_SHOW_INTERSTITIAL_EXIT);
-//            showInterstitialWithDelay(MSG_SHOW_INTERSTITIAL_EXIT, "exit_ad", "exit_ad_min", "200", "exit_ad_max", "200");
-            AdAppHelper.getInstance(this).showFullAd();
-            Firebase.getInstance(this).logEvent("主界面", "退出全屏", "显示");
-            mAdMsgType = MSG_SHOW_INTERSTITIAL_EXIT;
+        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
+            AdAppHelper.getInstance(this).showFullAd(AdFullType.MAIN_EXIT_FULL_AD);
         }
 
         final Firebase firebase = Firebase.getInstance(this);
@@ -987,27 +891,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
 
                 return true;
-//            case R.id.action_ad:
-//                Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "点击");
-//                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-//                if (mFullAdStatusListener == null)
-//                    mFullAdStatusListener = new FullAdStatusListener(this);
-//                adAppHelper.addAdStateListener(mFullAdStatusListener);
-//
-//                if (adAppHelper.isFullAdLoaded()) {
-//                    adAppHelper.showFullAd();
-//                    mAdMsgType = MSG_SHOW_AD_BUTTON_FULL;
-//                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上全屏");
-//                } else if (adAppHelper.isRecommendAdLoaded()) {
-//                    adAppHelper.showFullAd();
-//                    mAdMsgType = MSG_SHOW_AD_BUTTON_RECOMMEND;
-//                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "线上互推");
-//                } else {
-//                    startActivity(new Intent(this, RecommendActivity.class));
-//                    Firebase.getInstance(this).logEvent("主界面广告按钮", "显示", "本地互推");
-//                    Log.i("ssss", "onClick:   本地互推");
-//                }
-//                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -1050,8 +933,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
                 if (!RuntimeSettings.isAutoSwitchProxy()
                         && isFullConnectSuccessAdShow && !isVIP) {
-                    AdAppHelper adAppHelper = AdAppHelper.getInstance(getApplicationContext());
-                    adAppHelper.showFullAd();
+                    AdAppHelper.getInstance(getApplicationContext()).showFullAd(AdFullType.CONNECT_SUCCESS_FULL_AD);
                 } else if (!RuntimeSettings.isAutoSwitchProxy()
                         && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")
                         && !RuntimeSettings.isRocketSpeedConnect()) {
@@ -1192,9 +1074,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             container.setVisibility(View.VISIBLE);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
             try {
-                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-//            container.addView(adAppHelper.getNative(), params);
-                adAppHelper.getNative(container, params);
+                AdAppHelper.getInstance(this).getNative(container, params);
                 Firebase.getInstance(this).logEvent("NATIVE广告", "显示成功", "首页底部");
             } catch (Exception ex) {
                 ShadowsocksApplication.handleException(ex);

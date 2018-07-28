@@ -139,7 +139,7 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         NativeAd facebookAd = availableNativeAd.facebookAd;
         NativeAppInstallAd admobAppInstallAd = availableNativeAd.admobAppInstallAd;
         NativeContentAd admobContentAd = availableNativeAd.admobContentAd;
-        AdConfig.RecommendAdItem item = mAdAppHelper.getRecommendItem();
+//        AdConfig.RecommendAdItem item = mAdAppHelper.getRecommendItem();
 
         View view = null;
         if (facebookAd != null) {
@@ -151,8 +151,9 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         } else if (admobContentAd != null) {
             view = populateContentAdView(admobContentAd);
             Firebase.getInstance(this).logEvent("链接结果页", "广告", "线上广告显示成功");
-        } else if (item != null)
-            view = populateRecommendAdView(item);
+        }
+//        else if (item != null)
+//            view = populateRecommendAdView(item);
 
         if (view != null) {
             mResultAdRoot.removeAllViews();
