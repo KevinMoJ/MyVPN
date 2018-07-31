@@ -31,6 +31,9 @@ import io.fabric.sdk.android.Fabric;
 
 public class AdUtils {
     private static final String TAG = "AdUtils";
+    public static final int FULL_AD_GOOD = 0;
+    public static final int FULL_AD_BAD = 1;
+    private static AdAppHelper adAppHelper;
 
     public static void initAdHelper(final Context context) {
         //初始化facebook sdk
@@ -39,19 +42,20 @@ public class AdUtils {
         AppEventsLogger.activateApp(context);
         Fabric.with(context, new Crashlytics());
         FirebaseApp.initializeApp(context);
+        adAppHelper = AdAppHelper.getInstance(context);
 //        AdAppHelper.FACEBOOK = FacebookAnalytics.getInstance(context);
         try {
             initAd(context);
-            AdAppHelper.getInstance(context).init("");
+            adAppHelper.init("");
 
-            AdAppHelper.getInstance(context).setAdAutoShowListener(new AdAutoShowListener() {
+            adAppHelper.setAdAutoShowListener(new AdAutoShowListener() {
                 @Override
                 public void onFullAdReady() {
                     Log.i(TAG, "onFullAdReady:  广告准备好 ");
                 }
             });
             //添加监听广告成功回调
-            AdAppHelper.getInstance(context).addAdStateListener(new AdStateListener() {
+            adAppHelper.addAdStateListener(new AdStateListener() {
 
                 @Override
                 public void onAdOpen(AdType adType, int index) {
@@ -106,6 +110,15 @@ public class AdUtils {
                         case AdFullType.CANCEL_FREE_VIP_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "免费会员取消", "广告显示");
                             break;
+                        case AdFullType.CONNECT_RESULT_ACTIVITY_FULL_AD:
+                            Firebase.getInstance(context).logEvent("全屏广告", "连接结果页全屏", "广告显示");
+                            break;
+                        case AdFullType.DISCONNECT_RESULT_ACTIVITY_FULL_AD:
+                            Firebase.getInstance(context).logEvent("全屏广告", "断开结果页全屏", "广告显示");
+                            break;
+                        case AdFullType.SERVER_LIST_SWITCH_SUCCESS:
+                            Firebase.getInstance(context).logEvent("全屏广告", "服务器列表切换", "广告显示");
+                            break;
                     }
                 }
 
@@ -121,7 +134,7 @@ public class AdUtils {
 
                 }
             });
-            AdAppHelper.getInstance(context).setAdReadyListener(new AdReadyListener() {
+            adAppHelper.setAdReadyListener(new AdReadyListener() {
                 @Override
                 public void onFullAdReady(int index) {
                     Log.i(TAG, "onFullAdReady:   全屏广告准备好");
@@ -146,6 +159,13 @@ public class AdUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static AdAppHelper getAdAppHelper() {
+        if (adAppHelper == null) {
+            return AdAppHelper.getInstance(ShadowsocksApplication.getGlobalContext());
+        } else
+            return adAppHelper;
     }
 
     /**

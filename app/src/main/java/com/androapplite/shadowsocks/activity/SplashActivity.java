@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
@@ -99,7 +100,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdAppHelper = AdAppHelper.getInstance(this);
-        mAdAppHelper.loadNewInterstitial();
+        mAdAppHelper.loadFullAd(AdUtils.FULL_AD_GOOD, 5);
+        mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 50);
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
         mHandler = new Handler(this);
@@ -461,7 +463,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                     startLockAnim();
                 } else {
                     mTvTitle.setVisibility(View.VISIBLE);
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
+                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
                         startMainActivity();
                     } else if (!Utils.isConnected(SplashActivity.this)) {
                         startMainActivity();
@@ -499,7 +501,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (wholeProcess) {
                     startTextDownAnim();
                 } else {
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
+                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
                         startMainActivity();
                     } else {
                         startTextDownAnim();
@@ -557,7 +559,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (wholeProcess) {
                     startNativeAnim();
                 } else {
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
+                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
                         startMainActivity();
                     } else {
                         startNativeAnim();
@@ -613,8 +615,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_AD_LOADED_CHECK:
-                Log.d("SplanshActivity", "mAdAppHelper.isFullAdLoaded() " + mAdAppHelper.isFullAdLoaded());
-                if (mAdAppHelper.isFullAdLoaded() || msg.arg1 > 4) {
+                Log.d("SplanshActivity", "mAdAppHelper.isFullAdLoaded() " + mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD));
+                if (mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD) || msg.arg1 > 4) {
                     startMainActivity();
                 } else {
                     Message message = Message.obtain();
@@ -625,7 +627,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 break;
 
             case MSG_CHECK_ENTER:
-                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded()) {
+                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
                     mRpClose.cancelAnimator();
                     startMainActivity();
                 } else
@@ -702,7 +704,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     @Override
     public void endAnim() {
         mHandler.removeCallbacksAndMessages(null);
-        if (mAdAppHelper.isFullAdLoaded()) {
+        if (mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
             startMainActivity();
         } else {
             mHandler.postDelayed(new Runnable() {
@@ -715,7 +717,15 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = null;
+        if (RuntimeSettings.isVIP())
+            intent = new Intent(this, MainActivity.class);
+        else if (RuntimeSettings.getLuckPanGetRecord() > 0)
+            intent = new Intent(this, MainActivity.class);
+        else if (RuntimeSettings.getNewUserFreeUseTime() > 0)
+            intent = new Intent(this, MainActivity.class);
+        else
+            intent = new Intent(this, RecommendVIPActivity.class);
         startActivity(intent);
         finish();
     }

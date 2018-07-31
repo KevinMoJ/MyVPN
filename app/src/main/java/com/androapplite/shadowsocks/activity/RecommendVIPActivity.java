@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
@@ -90,14 +91,14 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
         boolean isVIP = RuntimeSettings.isVIP();
 
         if (isVIP) {
-            startActivity(new Intent(this, SplashActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {
             if (luckFreeDay > 0) {
-                startActivity(new Intent(this, SplashActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 finish();
             } else if (luckFreeDay <= 0 && freeUseTime > 0) {
-                startActivity(new Intent(this, SplashActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 finish();
             }
         }
@@ -192,7 +193,8 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
         mRecommendVipPager.setOffscreenPageLimit(mItemBeans.size() - 1);
 
         mAdAppHelper = AdAppHelper.getInstance(this);
-        mAdAppHelper.loadNewInterstitial();
+        mAdAppHelper.loadFullAd(AdUtils.FULL_AD_GOOD, 5);
+        mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 50);
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
         mFirebase = Firebase.getInstance(this);
@@ -398,7 +400,7 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
                             // 交易取消
                             Firebase.getInstance(RecommendVIPActivity.this).logEvent("VIP交易", "交易取消", "免费试用");
                             if (FirebaseRemoteConfig.getInstance().getBoolean("recommend_vip_cancel_pay_show_full_ad")) {
-                                mAdAppHelper.showFullAd(AdFullType.CANCEL_FREE_VIP_FULL_AD);
+                                mAdAppHelper.showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.CANCEL_FREE_VIP_FULL_AD);
                             }
                             Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {

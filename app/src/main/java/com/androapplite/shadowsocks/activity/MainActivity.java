@@ -54,6 +54,7 @@ import com.androapplite.shadowsocks.NotificationsUtils;
 import com.androapplite.shadowsocks.Rotate3dAnimation;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.fragment.ConnectFragment;
@@ -104,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private static final int MSG_NO_AVAILABE_VPN = 4;
     private static final int MSG_REPEAT_MENU_ROCKET = 5;
     public static final int MSG_TEST_CONNECT_STATUS = 8;
+    public static final int MSG_VPN_DELAYED_DISCONNECT = 9; // vpn延时断开，为了去加载广告
+    public static final int MSG_DELAYED_UPDATE_VPN_CONNECT_STATE = 10; // vpn延时更新主界面按钮的状态，为了去加载广告
     private static int REQUEST_CONNECT = 1;
     private static int OPEN_SERVER_LIST = 2;
     private Menu mMenu;
@@ -154,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         isVIP = RuntimeSettings.isVIP();
         mConnectingConfig = ServerConfig.loadFromSharedPreference(mSharedPreference);
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_enter_ad") && !isVIP) {
-            AdAppHelper.getInstance(this).showFullAd(AdFullType.MAIN_ENTER_FULL_AD);
+            AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.MAIN_ENTER_FULL_AD);
         }
     }
 
@@ -227,6 +230,10 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 netWorkSpeedUtils = new NetWorkSpeedUtils(this);
             }
             netWorkSpeedUtils.startShowNetSpeed();
+            long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
+            if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD))
+                AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
+
             if (checkConnection(isConnectionAvailable())) {
                 connectVpnServerAsync();
             }
@@ -423,6 +430,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else if (mVpnState == VpnState.Stopping) {
                     Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
                 } else {
+                    if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     Firebase.getInstance(this).logEvent("菜单", "小火箭");
                     NetworkAccelerationActivity.start(this, false);
                 }
@@ -554,6 +563,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mConnectFragment.updateUI();
                 }
                 break;
+
+            case MSG_VPN_DELAYED_DISCONNECT:
+                VpnManageService.stopVpnByUser();
+                disconnectVpnServiceAsync();
+                break;
+            case MSG_DELAYED_UPDATE_VPN_CONNECT_STATE:
+                updateVPNConnectUIState();
+                break;
         }
 
         return true;
@@ -620,6 +637,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 if (connectivityManager != null) {
                     NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isAvailable()) {
+                        //为了广告的加载，在服务器列表切换的时候更新链接时间
+                        RuntimeSettings.setVPNStartConnectTime(System.currentTimeMillis());
                         if (!LocalVpnService.IsRunning) {
                             mIsRestart = false;
                             connectVpnServerAsync();
@@ -658,6 +677,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         if (mMenuRocketAnimation != null) {
             mMenuRocketAnimation.cancel();
         }
+        AdAppHelper.getInstance(this).appQuit();
         super.onDestroy();
     }
 
@@ -671,7 +691,33 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
         ConnectVpnHelper.getInstance(MainActivity.this).clearErrorList();
         ConnectVpnHelper.getInstance(MainActivity.this).release();
-        disconnectVpnServiceAsync();
+        long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
+        if (mConnectFragment != null) {
+            if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+                AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
+                mForegroundHandler.sendEmptyMessageDelayed(MSG_VPN_DELAYED_DISCONNECT, cloudLoadAdTime * 1000);
+                if (LocalVpnService.IsRunning) {
+                    mConnectFragment.animateStopping();
+                    mVpnState = VpnState.Stopping;
+                } else {
+                    mVpnState = VpnState.Stopped;
+                    mConnectFragment.setConnectResult(mVpnState);
+                }
+            } else {
+                if (LocalVpnService.IsRunning) {
+                    mConnectFragment.animateStopping();
+                    mVpnState = VpnState.Stopping;
+                    VpnManageService.stopVpnByUser();
+                } else {
+                    mVpnState = VpnState.Stopped;
+                    mConnectFragment.setConnectResult(mVpnState);
+                }
+                disconnectVpnServiceAsync();
+            }
+        }
+    }
+
+    private void disconnectVpnServiceAsync() {
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")) {
             startResultActivity(VPNConnectResultActivity.VPN_RESULT_DISCONNECT);
         }
@@ -684,19 +730,6 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         RuntimeSettings.setVPNState(mVpnState.ordinal());
         if (mConnectFragment != null) {
             mConnectFragment.setConnectResult(mVpnState);
-        }
-    }
-
-    private void disconnectVpnServiceAsync() {
-        if (mConnectFragment != null) {
-            if (LocalVpnService.IsRunning) {
-                mConnectFragment.animateStopping();
-                mVpnState = VpnState.Stopping;
-                VpnManageService.stopVpnByUser();
-            } else {
-                mVpnState = VpnState.Stopped;
-                mConnectFragment.setConnectResult(mVpnState);
-            }
         }
     }
 
@@ -766,11 +799,11 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
 
                 if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
-                    if (AdAppHelper.getInstance(this).isFullAdLoaded()) {
+                    if (AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
                         exitAppDialog();
                         break;
                     } else {
-                        AdAppHelper.getInstance(this).loadNewInterstitial();
+                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
                         initSnowFlakes(1);
                         break;
                     }
@@ -812,7 +845,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
     private void exitAppDialog() {
         isExitAnimShow = false;
         if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
-            AdAppHelper.getInstance(this).showFullAd(AdFullType.MAIN_EXIT_FULL_AD);
+            AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.MAIN_EXIT_FULL_AD);
         }
 
         final Firebase firebase = Firebase.getInstance(this);
@@ -877,12 +910,16 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else if (mVpnState == VpnState.Stopping) {
                     Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
                 } else {
+                    if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
                     Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
                 }
                 return true;
             case R.id.luck_pan:
                 if (!isVIP) {
+                    if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     Firebase.getInstance(this).logEvent("主界面转盘按钮", "按钮", "点击");
                     LuckRotateActivity.startLuckActivity(this);
                 } else {
@@ -918,33 +955,54 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     }
 
+    private void updateVPNConnectUIState() {
+        mConnectingConfig.saveInSharedPreference(mSharedPreference);
+        if (!AdAppHelper.getInstance(this).isFullAdLoaded(0)) {
+            rotatedBottomAd();
+        }
+        mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
+        mErrorServers.clear();
+        boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
+        if (!RuntimeSettings.isAutoSwitchProxy()
+                && isFullConnectSuccessAdShow && !isVIP) {
+            AdAppHelper.getInstance(getApplicationContext()).showFullAd(AdFullType.CONNECT_SUCCESS_FULL_AD);
+        } else if (!RuntimeSettings.isAutoSwitchProxy()
+                && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")
+                && !RuntimeSettings.isRocketSpeedConnect()) {
+            //记录VPN连接开始的时间
+            RuntimeSettings.setVPNStartTime(System.currentTimeMillis());
+            startResultActivity(VPNConnectResultActivity.VPN_RESULT_CONNECT);
+        }
+        mVpnState = VpnState.Connected;
+        Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
+        if (FirebaseRemoteConfig.getInstance().getBoolean("open_connect_test"))
+            mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
+
+        RuntimeSettings.setVPNState(mVpnState.ordinal());
+        if (mConnectFragment != null) {
+            mConnectFragment.setConnectResult(mVpnState);
+        }
+
+        updateFlagMenuIcon();
+    }
+
     @Override
     public void onStatusChanged(String status, Boolean isRunning) {
         if (ConnectVpnHelper.getInstance(this).getCurrentConfig() != null)
             mConnectingConfig = ConnectVpnHelper.getInstance(this).getCurrentConfig();
         if (mConnectingConfig != null && mSharedPreference != null) {
             if (isRunning) {
-                mConnectingConfig.saveInSharedPreference(mSharedPreference);
-                if (!AdAppHelper.getInstance(this).isFullAdLoaded()) {
-                    rotatedBottomAd();
+                if (!RuntimeSettings.isRocketSpeedConnect()) {
+                    long diff = System.currentTimeMillis() - RuntimeSettings.getVPNStartConnectTime();
+                    long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time") * 1000;
+                    if (diff < cloudLoadAdTime) {
+                        mForegroundHandler.sendEmptyMessageDelayed(MSG_DELAYED_UPDATE_VPN_CONNECT_STATE, cloudLoadAdTime - diff);
+                    } else {
+                        updateVPNConnectUIState();
+                    }
+                } else {
+                    updateVPNConnectUIState();
                 }
-                mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
-                mErrorServers.clear();
-                boolean isFullConnectSuccessAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_full_connect_success_ad");
-                if (!RuntimeSettings.isAutoSwitchProxy()
-                        && isFullConnectSuccessAdShow && !isVIP) {
-                    AdAppHelper.getInstance(getApplicationContext()).showFullAd(AdFullType.CONNECT_SUCCESS_FULL_AD);
-                } else if (!RuntimeSettings.isAutoSwitchProxy()
-                        && FirebaseRemoteConfig.getInstance().getBoolean("is_show_native_result_full")
-                        && !RuntimeSettings.isRocketSpeedConnect()) {
-                    //记录VPN连接开始的时间
-                    RuntimeSettings.setVPNStartTime(System.currentTimeMillis());
-                    startResultActivity(VPNConnectResultActivity.VPN_RESULT_CONNECT);
-                }
-                mVpnState = VpnState.Connected;
-                Firebase.getInstance(this).logEvent("VPN链接成功", mConnectingConfig.nation, mConnectingConfig.server);
-                if (FirebaseRemoteConfig.getInstance().getBoolean("open_connect_test"))
-                    mBackgroundHander.sendEmptyMessageDelayed(MSG_TEST_CONNECT_STATUS, TimeUnit.SECONDS.toMillis(5));
             } else {
                 mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);
                 mVpnState = VpnState.Stopped;
@@ -953,13 +1011,14 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                     mVpnState = VpnState.Connecting;
                     connectVpnServerAsync();
                 }
-            }
-            RuntimeSettings.setVPNState(mVpnState.ordinal());
-            if (mConnectFragment != null) {
-                mConnectFragment.setConnectResult(mVpnState);
-            }
 
-            updateFlagMenuIcon();
+                RuntimeSettings.setVPNState(mVpnState.ordinal());
+                if (mConnectFragment != null) {
+                    mConnectFragment.setConnectResult(mVpnState);
+                }
+
+                updateFlagMenuIcon();
+            }
         }
     }
 

@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
+import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.Utils;
@@ -109,9 +111,11 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         mResultConnectRoot.setVisibility(type == VPN_RESULT_CONNECT ? View.VISIBLE : View.GONE);
         mResultDisconnectRoot.setVisibility(type == VPN_RESULT_DISCONNECT ? View.VISIBLE : View.GONE);
         //链接成功显示全屏广告，有云控
-        if (type == VPN_RESULT_CONNECT && FirebaseRemoteConfig.getInstance().getBoolean("result_show_full_ad") && !RuntimeSettings.isVIP()) {
-            mAdAppHelper.showFullAd();
-            Firebase.getInstance(this).logEvent("连接结果页全屏", "显示", "true");
+        if (FirebaseRemoteConfig.getInstance().getBoolean("result_show_full_ad") && !RuntimeSettings.isVIP()) {
+            if (type == VPN_RESULT_CONNECT)
+                mAdAppHelper.showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.CONNECT_RESULT_ACTIVITY_FULL_AD);
+            else if (type == VPN_RESULT_DISCONNECT)
+                mAdAppHelper.showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.DISCONNECT_RESULT_ACTIVITY_FULL_AD);
         }
 
         updateDuration(System.currentTimeMillis() - startConnectDuration);
@@ -139,7 +143,7 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         NativeAd facebookAd = availableNativeAd.facebookAd;
         NativeAppInstallAd admobAppInstallAd = availableNativeAd.admobAppInstallAd;
         NativeContentAd admobContentAd = availableNativeAd.admobContentAd;
-//        AdConfig.RecommendAdItem item = mAdAppHelper.getRecommendItem();
+        AdConfig.RecommendAdItem item = mAdAppHelper.getRecommendItem();
 
         View view = null;
         if (facebookAd != null) {
@@ -151,9 +155,8 @@ public class VPNConnectResultActivity extends AppCompatActivity {
         } else if (admobContentAd != null) {
             view = populateContentAdView(admobContentAd);
             Firebase.getInstance(this).logEvent("链接结果页", "广告", "线上广告显示成功");
-        }
-//        else if (item != null)
-//            view = populateRecommendAdView(item);
+        } else if (item != null)
+            view = populateRecommendAdView(item);
 
         if (view != null) {
             mResultAdRoot.removeAllViews();

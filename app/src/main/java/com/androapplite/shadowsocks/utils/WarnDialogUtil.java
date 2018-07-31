@@ -3,6 +3,7 @@ package com.androapplite.shadowsocks.utils;
 import android.content.Context;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
@@ -32,14 +33,14 @@ public class WarnDialogUtil {
 
         } else if (cloudFullAdShow) {
             if (isLoadAd) {
-                if (adAppHelper.isFullAdLoaded())
+                if (adAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD))
                     return true;
                 else {
-                    adAppHelper.loadNewInterstitial();
+                    adAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 5);
                     return false;
                 }
             } else
-                return adAppHelper.isFullAdLoaded();
+                return adAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD);
         } else
             return true;
     }

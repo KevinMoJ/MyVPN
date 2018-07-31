@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
 import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -31,7 +32,7 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 //    private LinearLayout mServerListVipLinear;
 //    private FrameLayout mTabLineView;
 
-//    private Fragment mFreeServerFragment;
+    //    private Fragment mFreeServerFragment;
     private Fragment mVIPServerFragment;
 
     private List<Fragment> mFragmentList;
@@ -108,8 +109,8 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 
         isVIP = RuntimeSettings.isVIP();
 
-        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad") ) {
-            AdAppHelper.getInstance(this).showFullAd(AdFullType.SERVER_LIST_ENTER_FULL_AD);
+        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad")) {
+            AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_BAD, AdFullType.SERVER_LIST_ENTER_FULL_AD);
         }
     }
 

@@ -263,7 +263,13 @@
     <!--广告结果页显示是否带全屏-->
     <entry>
         <key>result_show_full_ad</key>
-        <value>false</value>
+        <value>true</value>
+    </entry>
+
+    <!--主页链接的时候加载广告的时间-->
+    <entry>
+        <key>main_load_full_ad_time</key>
+        <value>8</value>
     </entry>
 
     <!--5.0一下是否测试-->

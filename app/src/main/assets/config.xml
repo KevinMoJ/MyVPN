@@ -39,4 +39,19 @@
         {welcome_ad=1},{welcome_ad_min=5000},{welcome_ad_max=0},
     </string>
     <string name="splash_ctrl">{exe=1},{fb=},{admob=ca-app-pub-9834399249058252/5827650796}</string>
+
+    <string name="admob_position_full_ids">
+        {count=2},
+        {pos1=ca-app-pub-9834399249058252/1260963592;ca-app-pub-9834399249058252/8925090371,好的},
+        {pos2=ca-app-pub-9834399249058252/6649021648;ca-app-pub-9834399249058252/7032165023,坏的}
+    </string>
+    <string name="fb_position_full_ids">
+        {count=5},
+        {pos1=,进入},
+        {pos2=,退出},
+        {pos3=,应用内},
+        {pos4=,应用外},
+        {pos5=,云通知}
+    </string>
+
 </map>

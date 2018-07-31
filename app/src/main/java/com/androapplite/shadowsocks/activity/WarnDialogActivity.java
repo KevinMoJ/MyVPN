@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
@@ -121,7 +122,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mWarnDialogBg.setImageResource(R.drawable.luck_rotate_dialog_bg);
         }
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded() && !RuntimeSettings.isVIP()) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD) && !RuntimeSettings.isVIP()) {
             mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INTERSTITIAL_AD, 800);
             isFullAdShow = true;
         } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show") && mAdAppHelper.isNativeLoaded() && !RuntimeSettings.isVIP()) {
@@ -260,7 +261,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                 else if (type == UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG)
                     adType = AdFullType.CLOUD_UNDEVELOPED_USER_FULL_AD;
 
-                mAdAppHelper.showFullAd(adType);
+                mAdAppHelper.showFullAd(AdUtils.FULL_AD_BAD, adType);
                 break;
         }
         return true;

@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.luckpan.LuckPanLayout;
 import com.androapplite.shadowsocks.luckpan.LuckRotateProgressBar;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -128,13 +129,13 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
 
         if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd && !RuntimeSettings.isVIP()) {
-            mAdAppHelper.showFullAd(AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
+            mAdAppHelper.showFullAd(AdUtils.FULL_AD_BAD, AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
         }
     }
 
     private void initUI() {
         mActionBar.setTitle("Lucky Game");
-        btnEnableClick(mAdAppHelper.isFullAdLoaded(), true);
+        btnEnableClick(mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD), true);
         long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
         mLuckPanBar.setProgress((int) getLuckFreeDays);
 
@@ -317,7 +318,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case SHOW_FULL_AD:
-                mAdAppHelper.showFullAd(AdFullType.LUCK_ROTATE_PLAY_FULL_AD);
+                mAdAppHelper.showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.LUCK_ROTATE_PLAY_FULL_AD);
                 mFirebase.logEvent("幸运转盘", "结果全屏", "显示");
                 return true;
         }

@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.VIPActivity;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.ServerConfig;
@@ -347,11 +348,10 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             mSelectedIndex = position;
             String nation = mNations.get(position);
             String flag = mFlags.get(position);
-//        int resid = mSignalResIds.get(mNations.get(position));
-//        if (resid == R.drawable.server_signal_full) {
-//            Toast.makeText(getContext(), R.string.server_list_full_toast, Toast.LENGTH_SHORT).show();
-//            Firebase.getInstance(getContext()).logEvent("点击满载服务器", nation);
-//        } else {
+            long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
+            if (!AdAppHelper.getInstance(getContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD))
+                AdAppHelper.getInstance(getContext()).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
+
             mListView.setItemChecked(position, true);
             RuntimeSettings.setVPNNation(nation);
             RuntimeSettings.setFlag(flag);

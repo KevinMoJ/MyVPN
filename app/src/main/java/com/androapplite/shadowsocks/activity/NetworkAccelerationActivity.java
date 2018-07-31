@@ -29,6 +29,7 @@ import android.view.View;
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.ad.AdFullType;
+import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.fragment.NetworkAccelerationFinishFragment;
@@ -200,6 +201,8 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isAvailable()) {
+                if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                    AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                 if (!LocalVpnService.IsRunning) {
                     mIsRestart = false;
                     connectVpnServerAsync();
@@ -259,9 +262,9 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         switch (msg.what) {
             case MSG_DELAY_SHOW_INSTITIAL_AD: // 0 进入  1 加速成功
                 if (msg.arg1 == 0)
-                    AdAppHelper.getInstance(this).showFullAd(AdFullType.ROCKET_SPEED_ENTER_FULL_AD);
+                    AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_BAD, AdFullType.ROCKET_SPEED_ENTER_FULL_AD);
                 else if (msg.arg1 == 1)
-                    AdAppHelper.getInstance(this).showFullAd(AdFullType.ROCKET_SPEED_FINISH_FULL_AD);
+                    AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_BAD, AdFullType.ROCKET_SPEED_FINISH_FULL_AD);
                 break;
         }
         return true;

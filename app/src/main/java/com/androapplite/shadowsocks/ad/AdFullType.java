@@ -17,6 +17,9 @@ public class AdFullType {
     public static final String ROCKET_SPEED_FINISH_FULL_AD = "ROCKET_SPEED_FINISH_FULL_AD";
     public static final String SERVER_LIST_ENTER_FULL_AD = "SERVER_LIST_ENTER_FULL_AD";
     public static final String CANCEL_FREE_VIP_FULL_AD = "CANCEL_FREE_VIP_FULL_AD";
+    public static final String CONNECT_RESULT_ACTIVITY_FULL_AD = "CONNECT_RESULT_ACTIVITY_FULL_AD";
+    public static final String DISCONNECT_RESULT_ACTIVITY_FULL_AD = "DISCONNECT_RESULT_ACTIVITY_FULL_AD";
+    public static final String SERVER_LIST_SWITCH_SUCCESS = "SERVER_LIST_SWITCH_SUCCESS";
 
     /**
      * 云弹窗的广告的type

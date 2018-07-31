@@ -18,6 +18,7 @@ import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.BuildConfig;
 import com.androapplite.vpn3.R;
+import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.VpnNotification;
@@ -31,12 +32,13 @@ import java.util.Locale;
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends Application implements HomeWatcher.OnHomePressedListener, Application.ActivityLifecycleCallbacks{
+public class ShadowsocksApplication extends Application implements HomeWatcher.OnHomePressedListener, Application.ActivityLifecycleCallbacks {
     private HomeWatcher mHomeWathcer;
     private int mOpenActivities;
     private boolean mIsFirstOpen;
 
     private static Context gContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -66,7 +68,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         registerActivityLifecycleCallbacks(this);
     }
 
-    private void checkVpnState(){
+    private void checkVpnState() {
         int stateValue = RuntimeSettings.getVPNState();
         Log.d("ShadowsocksApplication", "vpn state: " + stateValue);
         if (stateValue >= 0 && stateValue < VpnState.values().length) {
@@ -77,16 +79,16 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         }
     }
 
-    public static final void debug(@NonNull String tag, @NonNull String msg){
-        if(BuildConfig.DEBUG){
+    public static final void debug(@NonNull String tag, @NonNull String msg) {
+        if (BuildConfig.DEBUG) {
             Log.d(tag, msg);
         }
     }
 
-    public static final void handleException(@NonNull Throwable throwable){
-        if(BuildConfig.DEBUG){
+    public static final void handleException(@NonNull Throwable throwable) {
+        if (BuildConfig.DEBUG) {
             throwable.printStackTrace();
-        }else{
+        } else {
             Crashlytics.logException(throwable);
         }
     }
@@ -100,7 +102,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
 
     @Override
     public void onHomePressed() {
-        Firebase.getInstance(this).logEvent("按键","Home");
+        Firebase.getInstance(this).logEvent("按键", "Home");
     }
 
     @Override
@@ -141,6 +143,7 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         mOpenActivities--;
         if (mOpenActivities == 0) {
             mIsFirstOpen = true;
+            AdAppHelper.getInstance(this).appQuit();
         }
     }
 
