@@ -110,7 +110,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 } else {
                     String text = mService.getString(R.string.notification_no_time, tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
                     try {
-                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_low_dialog_show"))
+                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_low_dialog_show") && !RuntimeSettings.isVIP())
                             showNetSpeedLowWarnDialog(tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
                     } catch (Exception e) {
                     }

@@ -123,12 +123,11 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             Log.i(TAG, "initData: 初始化数据，打开的日期是第二天，重新保存了打开时间");
             // 不是今天的话，就把转盘得到的天数清零
             RuntimeSettings.setLuckPanFreeDay(0);
-//            mSharedPreferences.edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, 0).apply();
         }
 
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd) {
+        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd && !RuntimeSettings.isVIP()) {
             mAdAppHelper.showFullAd(AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
         }
     }
@@ -271,7 +270,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
             if (!isFinishing()) {
                 dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
-                if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad")) {
+                if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && !RuntimeSettings.isVIP()) {
                     mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
                 }
             }

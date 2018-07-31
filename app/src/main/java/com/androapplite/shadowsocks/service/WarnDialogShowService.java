@@ -194,7 +194,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     private class WarnDialogAdStateListener extends AdStateListener {
         @Override
         public void onAdLoaded(AdType adType, int index) {
-            if (isWifiConnected && !LocalVpnService.IsRunning) {
+            if (isWifiConnected && !LocalVpnService.IsRunning && !RuntimeSettings.isVIP()) {
                 monitorWifiStateChangeDialog();
                 AdAppHelper.getInstance(WarnDialogShowService.this).removeAdStateListener(mAdStateListener);
             }
@@ -253,7 +253,8 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                     //wifi链接一天弹两次
                     if (FirebaseRemoteConfig.getInstance().getBoolean("is_wifi_dialog_show")
                             && !TextUtils.isEmpty(wifiInfo.getSSID())
-                            && !LocalVpnService.IsRunning) {
+                            && !LocalVpnService.IsRunning
+                            && !RuntimeSettings.isVIP()) {
                         Log.i(TAG, "onReceive:   " + wifiInfo.getSSID());
                         //这个状态会执行两次，没有发现解决的好办法，为了只起一个界面延迟做一下跳转，在handler里面做removeMessages
                         mHandler.sendEmptyMessageDelayed(MSG_WIFI_CONNECTED, 2000);
@@ -267,7 +268,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 }
             } else if (Intent.ACTION_TIME_TICK.equals(action)) {
                 // 15分钟执行一次检查
-                if (System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(15)) {
+                if ((System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(15)) && !RuntimeSettings.isVIP()) {
                     if (FirebaseRemoteConfig.getInstance().getBoolean("is_developed_country_inactive_user_dialog_show")
                             && (countryCode.equals("US") || countryCode.equals("DE") || countryCode.equals("GB") || countryCode.equals("AU"))
                             && !LocalVpnService.IsRunning) {
@@ -282,7 +283,7 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                     startTime = System.currentTimeMillis();
                 }
 
-                if (FirebaseRemoteConfig.getInstance().getBoolean("is_luck_rotate_dialog_show")) {
+                if (FirebaseRemoteConfig.getInstance().getBoolean("is_luck_rotate_dialog_show") && !RuntimeSettings.isVIP()) {
                     // 当当天的转转盘天数没有达到7天的时候，每隔一个小时弹一次弹窗，弹出的弹窗要带出全屏，如果没有全屏的话就下一分钟进行弹，直到弹出弹窗为止，弹出的时间
                     //开始计时，当弹出的
                     long todayGetFreeDay = RuntimeSettings.getLuckPanFreeDay();
