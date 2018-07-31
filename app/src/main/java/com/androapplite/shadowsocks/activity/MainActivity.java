@@ -849,29 +849,31 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         }
 
         final Firebase firebase = Firebase.getInstance(this);
-        mExitAlertDialog = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.exit))
-                .setMessage(getResources().getString(R.string.exit_vpn))
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                        firebase.logEvent("主页", "退出", "确定");
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        firebase.logEvent("主页", "退出", "取消");
-                    }
-                })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        mExitAlertDialog = null;
-                    }
-                })
-                .setCancelable(false)
-                .show();
+        if (!isFinishing()) {
+            mExitAlertDialog = new AlertDialog.Builder(this).setTitle(getResources().getString(R.string.exit))
+                    .setMessage(getResources().getString(R.string.exit_vpn))
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                            firebase.logEvent("主页", "退出", "确定");
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            firebase.logEvent("主页", "退出", "取消");
+                        }
+                    })
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            mExitAlertDialog = null;
+                        }
+                    })
+                    .setCancelable(false)
+                    .show();
+        }
     }
 
     @Override
