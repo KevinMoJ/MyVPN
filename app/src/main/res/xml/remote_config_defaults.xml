@@ -93,7 +93,13 @@
     <!--转盘弹窗弹出时第二次弹窗弹出距离第一次弹窗弹出的时间间隔-->
     <entry>
         <key>luck_rotate_dialog_first_show_space_minutes</key>
-        <value>60</value>
+        <value>120</value>
+    </entry>
+
+    <!--转盘弹窗一天弹出的次数-->
+    <entry>
+        <key>luck_rotate_dialog_show_count</key>
+        <value>3</value>
     </entry>
 
     <!--WarnDialog弹窗误点和back键屏蔽控制-->
@@ -135,7 +141,7 @@
     <!--闪屏页是否展示带动画的闪屏-->
     <entry>
         <key>is_show_animation_ad_flash</key>
-        <value>false</value>
+        <value>true</value>
     </entry>
 
     <!--链接负载配置-->

@@ -21,6 +21,7 @@ import android.text.style.ForegroundColorSpan;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
+import com.androapplite.shadowsocks.activity.LoadingDialogActivity;
 import com.androapplite.shadowsocks.activity.RecommendVIPActivity;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
@@ -146,18 +147,18 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 RuntimeSettings.setNetSpeedLowDialogShowCount(showCount);
                 RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
-                WarnDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
+                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             } else if (DateUtils.isToday(date) && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
                 RuntimeSettings.setNetSpeedLowDialogShowCount(showCount);
                 RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
-                WarnDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
+                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setNetSpeedLowDialogShowCount(1);
                 RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
-                WarnDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
+                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             }
         }
     }

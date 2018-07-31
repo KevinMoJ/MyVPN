@@ -53,6 +53,14 @@ public class RuntimeSettings {
         return getSharedPreferences().getInt(SharedPreferenceKey.LUCK_PAN_CLICK_START_COUNT, 0);
     }
 
+    public static void setLuckPanDialogShowCount(int count) {
+        getSharedPreferences().edit().putInt(SharedPreferenceKey.LUCK_PAN_DIALOG_SHOW_COUNT, count).apply();
+    }
+
+    public static int getLuckPanDialogShowCount() {
+        return getSharedPreferences().getInt(SharedPreferenceKey.LUCK_PAN_DIALOG_SHOW_COUNT, 0);
+    }
+
     public static void setLuckPanGetRecord(long day) {
         getSharedPreferences().edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, day).apply();
     }

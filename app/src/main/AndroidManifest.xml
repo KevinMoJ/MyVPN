@@ -88,13 +88,13 @@
             android:name="com.androapplite.shadowsocks.service.IpCountryIntentService"
             android:exported="false"/>
 
-        <!--<receiver-->
-            <!--android:name="com.androapplite.shadowsocks.broadcast.MyMultipleReceiver"-->
-            <!--android:exported="true">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.android.vending.INSTALL_REFERRER"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <!-- <receiver -->
+        <!-- android:name="com.androapplite.shadowsocks.broadcast.MyMultipleReceiver" -->
+        <!-- android:exported="true"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.android.vending.INSTALL_REFERRER"/> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
 
         <activity
             android:name="com.androapplite.shadowsocks.activity.WarnDialogActivity"
@@ -136,18 +136,24 @@
             android:name="com.androapplite.shadowsocks.activity.LuckRotateActivity"
             android:launchMode="singleTop">
         </activity>
-        <activity android:name="com.androapplite.shadowsocks.activity.FreeTimeOverActivity"
-                  android:excludeFromRecents="true"
-                  android:launchMode="singleInstance"
-                  android:theme="@style/InactiveUser">
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.FreeTimeOverActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/InactiveUser">
         </activity>
-        <activity android:name="com.androapplite.shadowsocks.activity.RecommendVIPActivity"
-                  android:theme="@style/InactiveUser" >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
+        <activity
+            android:name="com.androapplite.shadowsocks.activity.RecommendVIPActivity"
+            android:theme="@style/InactiveUser">
 
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN"/> -->
+
+            <!-- <category android:name="android.intent.category.LAUNCHER"/> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity android:name="com.androapplite.shadowsocks.activity.LoadingDialogActivity"
+                  android:theme="@style/InactiveUser">
         </activity>
     </application>
 
