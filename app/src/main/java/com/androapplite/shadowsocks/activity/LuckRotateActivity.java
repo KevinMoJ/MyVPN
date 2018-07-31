@@ -29,11 +29,7 @@ import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdType;
-import com.bestgo.adsplugin.ads.listener.AdStateListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-
-import java.lang.ref.WeakReference;
 
 public class LuckRotateActivity extends AppCompatActivity implements Handler.Callback {
     private static final String TAG = "LuckRotateActivity";
@@ -57,7 +53,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
     private SharedPreferences mSharedPreferences;
     private AdAppHelper mAdAppHelper;
-    private InterstitialAdStateListener mStateListener;
     private Handler mHandler;
     private Dialog dialog;
     private Firebase mFirebase;
@@ -107,8 +102,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         mAdAppHelper = AdAppHelper.getInstance(this);
         mFirebase = Firebase.getInstance(this);
-        mStateListener = new InterstitialAdStateListener(this);
-        mAdAppHelper.addAdStateListener(mStateListener);
         mHandler = new Handler(this);
         cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
         mLuckPanBar.setMax((int) cloudGetLuckFreeDay);
@@ -124,6 +117,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             Log.i(TAG, "initData: 初始化数据，打开的日期是第二天，重新保存了打开时间");
             // 不是今天的话，就把转盘得到的天数清零
             RuntimeSettings.setLuckPanFreeDay(0);
+            RuntimeSettings.setClickRotateStartCount(0);//点击转盘按钮的次数，不是同一天清零
         }
 
         boolean showAd = getIntent().getBooleanExtra(TYPE, true);
@@ -131,11 +125,14 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd && !RuntimeSettings.isVIP()) {
             mAdAppHelper.showFullAd(AdUtils.FULL_AD_BAD, AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
         }
+
+        if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD))
+            AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
     }
 
     private void initUI() {
         mActionBar.setTitle("Lucky Game");
-        btnEnableClick(mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD), true);
+        btnEnableClick(true, true);
         long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
         mLuckPanBar.setProgress((int) getLuckFreeDays);
 
@@ -172,10 +169,19 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         long freeDaysToShow = RuntimeSettings.getLuckPanGetRecord();
         long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
 
-        rotatePos = getRotatePos();
+//        rotatePos = getRotatePos();
+        if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+            rotatePos = RESULT_TYPE_THANKS;
+            AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
+        } else {
+            RuntimeSettings.setClickRotateStartCount(RuntimeSettings.getClickRotateStartCount() + 1);
+            rotatePos = getPlayRotatePosition();
+        }
+
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
 
-        Log.i(TAG, "startRotate: 得到的结果 " + rewardString);
+//        Log.i(TAG, "startRotate: 得到的结果 " + rewardString + "     " + AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)
+//                + "    " + RuntimeSettings.getClickRotateStartCount());
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
@@ -238,6 +244,28 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         }
     };
 
+    private int getPlayRotatePosition() {
+        int todayGetCount = RuntimeSettings.getClickRotateStartCount();
+        if (todayGetCount <= 3)
+            return RESULT_TYPE_THANKS;
+        else if (todayGetCount == 4)
+            return RESULT_TYPE_1;
+        else if (todayGetCount <= 6)
+            return RESULT_TYPE_THANKS;
+        else if (todayGetCount == 7)
+            return RESULT_TYPE_1;
+        else if (todayGetCount == 8)
+            return RESULT_TYPE_THANKS;
+        else if (todayGetCount == 9)
+            return RESULT_TYPE_2;
+        else if (todayGetCount <= 12)
+            return RESULT_TYPE_THANKS;
+        else if (todayGetCount == 13)
+            return RESULT_TYPE_3;
+        else
+            return RESULT_TYPE_THANKS;
+    }
+
     private String getRotateString(int pos) {
         String s = "";
         if (pos == 0)
@@ -257,7 +285,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         @Override
         public void endAnimation(int position) {
             isLuckPanRunning = false;
-            btnEnableClick(false, false);
             String rotateString = getRotateString(rotatePos);
 
             if (!todayIsContinuePlay)
@@ -275,6 +302,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                     mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
                 }
             }
+            btnEnableClick(true, true);
         }
 
         @Override
@@ -310,8 +338,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mAdAppHelper.removeAdStateListener(mStateListener);
-        mAdAppHelper = null;
     }
 
     @Override
@@ -319,44 +345,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         switch (msg.what) {
             case SHOW_FULL_AD:
                 mAdAppHelper.showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.LUCK_ROTATE_PLAY_FULL_AD);
-                mFirebase.logEvent("幸运转盘", "结果全屏", "显示");
                 return true;
         }
         return false;
-    }
-
-    private static class InterstitialAdStateListener extends AdStateListener {
-        private WeakReference<LuckRotateActivity> mActivityReference;
-
-        InterstitialAdStateListener(LuckRotateActivity activity) {
-            mActivityReference = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void onAdLoaded(AdType adType, int index) {
-            LuckRotateActivity activity = mActivityReference.get();
-            if (activity != null) {
-//                activity.addBottomAd();
-                if (!activity.isLuckPanRunning) {
-                    activity.btnEnableClick(true, false);
-                }
-                activity.mFirebase.logEvent("幸运转盘", "全屏", "加载");
-            }
-        }
-
-        @Override
-        public void onAdClick(AdType adType, int index) {
-            LuckRotateActivity activity = mActivityReference.get();
-            if (activity != null) {
-                switch (adType.getType()) {
-                    case AdType.ADMOB_FULL:
-                    case AdType.FACEBOOK_FBN:
-                    case AdType.FACEBOOK_FULL:
-                    case AdType.RECOMMEND_AD:
-                        activity.mFirebase.logEvent("幸运转盘", "全屏", "点击");
-                        break;
-                }
-            }
-        }
     }
 }

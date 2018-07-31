@@ -45,6 +45,14 @@ public class RuntimeSettings {
         return getSharedPreferences().getLong(SharedPreferenceKey.LUCK_PAN_GET_FREE_DAY, 0);
     }
 
+    public static void setClickRotateStartCount(int count) {
+        getSharedPreferences().edit().putInt(SharedPreferenceKey.LUCK_PAN_CLICK_START_COUNT, count).apply();
+    }
+
+    public static int getClickRotateStartCount() {
+        return getSharedPreferences().getInt(SharedPreferenceKey.LUCK_PAN_CLICK_START_COUNT, 0);
+    }
+
     public static void setLuckPanGetRecord(long day) {
         getSharedPreferences().edit().putLong(SharedPreferenceKey.LUCK_PAN_GET_DAY_TO_RECORD, day).apply();
     }

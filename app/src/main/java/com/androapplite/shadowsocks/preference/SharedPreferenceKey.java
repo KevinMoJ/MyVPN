@@ -35,6 +35,7 @@ public final class SharedPreferenceKey {
     public static final String LUCK_PAN_GET_DAY_TO_RECORD = "LUCK_PAN_GET_DAY_TO_RECORD"; // 幸运转盘转出的时间，用来去显示的和记录
     public static final String NEW_USER_FREE_USER_TIME = "NEW_USER_FREE_USER_TIME"; // 新用户免费用时，30分钟,存的是秒。
     public static final String LUCK_PAN_OPEN_START_TIME = "LUCK_PAN_OPEN_START_TIME"; // 幸运转盘界面点击启动的时间，用来判断是不是当天的用户
+    public static final String LUCK_PAN_CLICK_START_COUNT = "LUCK_PAN_CLICK_START_COUNT"; // 幸运转盘界面点击玩转盘的次数
 
     //关于各种弹窗的数据存储key
     public static final String VPN_CONNECT_START_TIME = "VPN_CONNECT_START_TIME";
