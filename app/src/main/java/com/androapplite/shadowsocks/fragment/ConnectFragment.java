@@ -342,6 +342,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
         mMessageTextView.setVisibility(View.VISIBLE);
         mMessageTextView.setText(R.string.stopping);
+        mConnectStatusText.setText(R.string.stopping);
         mFreeUsedTimeTextView.setVisibility(View.GONE);
         mLoadingView.setImageLevel(0);
     }

@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
             netWorkSpeedUtils.startShowNetSpeed();
             long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
-            if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD))
+            if (!AdUtils.isGoodFullAdReady)
                 AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
 
             if (checkConnection(isConnectionAvailable())) {
@@ -430,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else if (mVpnState == VpnState.Stopping) {
                     Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
                 } else {
-                    if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                    if (!AdUtils.isBadFullAdReady)
                         AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     Firebase.getInstance(this).logEvent("菜单", "小火箭");
                     NetworkAccelerationActivity.start(this, false);
@@ -693,7 +693,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         ConnectVpnHelper.getInstance(MainActivity.this).release();
         long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
         if (mConnectFragment != null) {
-            if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+            if (!AdUtils.isGoodFullAdReady) {
                 AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
                 mForegroundHandler.sendEmptyMessageDelayed(MSG_VPN_DELAYED_DISCONNECT, cloudLoadAdTime * 1000);
                 if (LocalVpnService.IsRunning) {
@@ -799,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 }
 
                 if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_exit_ad")) {
-                    if (AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+                    if (AdUtils.isGoodFullAdReady) {
                         exitAppDialog();
                         break;
                     } else {
@@ -912,7 +912,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else if (mVpnState == VpnState.Stopping) {
                     Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
                 } else {
-                    if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                    if (!AdUtils.isBadFullAdReady)
                         AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
                     Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
@@ -920,7 +920,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 return true;
             case R.id.luck_pan:
                 if (!isVIP) {
-                    if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                    if (!AdUtils.isBadFullAdReady)
                         AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     Firebase.getInstance(this).logEvent("主界面转盘按钮", "按钮", "点击");
                     LuckRotateActivity.startLuckActivity(this);
@@ -959,7 +959,7 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
 
     private void updateVPNConnectUIState() {
         mConnectingConfig.saveInSharedPreference(mSharedPreference);
-        if (!AdAppHelper.getInstance(this).isFullAdLoaded(0)) {
+        if (!AdUtils.isGoodFullAdReady) {
             rotatedBottomAd();
         }
         mForegroundHandler.removeMessages(MSG_CONNECTION_TIMEOUT);

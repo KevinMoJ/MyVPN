@@ -122,8 +122,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             mWarnDialogBg.setImageResource(R.drawable.luck_rotate_dialog_bg);
         }
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD) && !RuntimeSettings.isVIP()) {
-            mHandler.sendEmptyMessageDelayed(MSG_DELAY_SHOW_INTERSTITIAL_AD, 800);
+        if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show") && AdUtils.isBadFullAdReady && !RuntimeSettings.isVIP()) {
+            mHandler.sendEmptyMessage(MSG_DELAY_SHOW_INTERSTITIAL_AD);
             isFullAdShow = true;
         } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show") && mAdAppHelper.isNativeLoaded() && !RuntimeSettings.isVIP()) {
             addBottomAd();
@@ -132,8 +132,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
         }
 
         //为进入转盘界面显示广告去做请求
-        if (!mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD))
-            mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD,0);
+        if (!AdUtils.isBadFullAdReady)
+            mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 0);
     }
 
     private void analysisDialogShow() {
@@ -168,7 +168,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
         Firebase firebase = Firebase.getInstance(this);
         switch (v.getId()) {
             case R.id.warn_dialog_close:
-                firebase.logEvent("大弹窗", "取消");
+                firebase.logEvent("大弹窗", "取消", getType(type));
                 break;
             case R.id.warn_dialog_btn:
                 if (type == NET_SPEED_LOW_DIALOG)
@@ -177,14 +177,14 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     MainActivity.startLuckRotateActivity(this, true);
                 else
                     startMainActivity();
-                firebase.logEvent("大弹窗", "进入APP");
+                firebase.logEvent("大弹窗", "进入APP", getType(type));
                 break;
             case R.id.warn_dialog_root:
                 FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
                 double casualclickRate = firebaseRemoteConfig.getDouble("casual_click_rate");
                 boolean result = Math.random() < casualclickRate;
                 firebase.logEvent("大弹窗", "误点", String.valueOf(result));
-                firebase.logEvent("大弹窗", "点击空白处");
+                firebase.logEvent("大弹窗", "点击空白处", getType(type));
                 if (FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_back_use")) {
                     if (result) {
                         if (type == NET_SPEED_LOW_DIALOG)
@@ -193,7 +193,7 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                             MainActivity.startLuckRotateActivity(this, true);
                         else
                             startMainActivity();
-                        firebase.logEvent("大弹窗", "进入APP");
+                        firebase.logEvent("大弹窗", "进入APP", getType(type));
                     }
                 }
                 break;
@@ -204,13 +204,28 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
                     MainActivity.startLuckRotateActivity(this, true);
                 else
                     startMainActivity();
-                firebase.logEvent("大弹窗", "进入APP");
+                firebase.logEvent("大弹窗", "进入APP", getType(type));
                 break;
             case R.id.warn_dialog_cancel:
-                firebase.logEvent("大弹窗", "取消");
+                firebase.logEvent("大弹窗", "取消", getType(type));
                 break;
         }
         finish();
+    }
+
+    private String getType(int type) {
+        String stringType = "";
+        if (type == CONNECT_PUBLIC_WIFI_DIALOG)
+            stringType = "WiFi弹窗";
+        else if (type == LUCK_ROTATE_DIALOG)
+            stringType = "转盘弹窗";
+        else if (type == DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG)
+            stringType = "发达国家弹窗";
+        else if (type == UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG)
+            stringType = "不发达国家弹窗";
+        else if (type == NET_SPEED_LOW_DIALOG)
+            stringType = "网速慢弹窗";
+        return stringType;
     }
 
     private void startMainActivity() {

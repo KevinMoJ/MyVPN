@@ -126,7 +126,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             mAdAppHelper.showFullAd(AdUtils.FULL_AD_BAD, AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
         }
 
-        if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD))
+        if (!AdUtils.isGoodFullAdReady)
             AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
     }
 
@@ -170,9 +170,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
 
 //        rotatePos = getRotatePos();
-        if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+        if (!AdUtils.isGoodFullAdReady) {
             rotatePos = RESULT_TYPE_THANKS;
-            AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
         } else {
             RuntimeSettings.setClickRotateStartCount(RuntimeSettings.getClickRotateStartCount() + 1);
             rotatePos = getPlayRotatePosition();
@@ -180,8 +179,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
         String rewardString = getRotateString(rotatePos); // 得到转盘的结果
 
-//        Log.i(TAG, "startRotate: 得到的结果 " + rewardString + "     " + AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_GOOD)
-//                + "    " + RuntimeSettings.getClickRotateStartCount());
         if (!rewardString.equals("thanks") && !rewardString.equals("")) {
             long rewardLong = Long.parseLong(rewardString);
             //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
@@ -286,6 +283,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         public void endAnimation(int position) {
             isLuckPanRunning = false;
             String rotateString = getRotateString(rotatePos);
+
+            if (!AdUtils.isGoodFullAdReady)
+                AdAppHelper.getInstance(LuckRotateActivity.this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
 
             if (!todayIsContinuePlay)
                 rotateString = "thanks";

@@ -201,7 +201,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isAvailable()) {
-                if (!AdAppHelper.getInstance(this).isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                if (!AdUtils.isBadFullAdReady)
                     AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
                 if (!LocalVpnService.IsRunning) {
                     mIsRestart = false;

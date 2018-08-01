@@ -33,14 +33,14 @@ public class WarnDialogUtil {
 
         } else if (cloudFullAdShow) {
             if (isLoadAd) {
-                if (adAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD))
+                if (AdUtils.isBadFullAdReady)
                     return true;
                 else {
                     adAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     return false;
                 }
             } else
-                return adAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD);
+                return AdUtils.isBadFullAdReady;
         } else
             return true;
     }

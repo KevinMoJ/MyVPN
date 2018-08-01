@@ -34,6 +34,8 @@ public class AdUtils {
     public static final int FULL_AD_GOOD = 0;
     public static final int FULL_AD_BAD = 1;
     private static AdAppHelper adAppHelper;
+    public static boolean isGoodFullAdReady;
+    public static boolean isBadFullAdReady;
 
     public static void initAdHelper(final Context context) {
         //初始化facebook sdk
@@ -70,54 +72,71 @@ public class AdUtils {
                     switch (fullAdName) {
                         case AdFullType.MAIN_ENTER_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "主页进入", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.MAIN_EXIT_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "主页退出", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.CONNECT_SUCCESS_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "VPN连接成功", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.LUCK_ROTATE_ENTER_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "转盘进入", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.LUCK_ROTATE_PLAY_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "玩转盘", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.ROCKET_SPEED_ENTER_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "小火箭进入", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.ROCKET_SPEED_FINISH_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "小火箭加速完成", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.SERVER_LIST_ENTER_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "服务器列表进入", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.CLOUD_WIFI_DIALOG_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "WiFi云弹窗", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.CLOUD_NET_SPEED_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "网速低云弹窗", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.CLOUD_DEVELOPED_USER_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "发达国家不活跃云弹窗", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.CLOUD_UNDEVELOPED_USER_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "非发达国家不活跃云弹窗", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.CLOUD_LUCK_ROTATE_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "转盘云弹窗", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                         case AdFullType.CANCEL_FREE_VIP_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "免费会员取消", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.CONNECT_RESULT_ACTIVITY_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "连接结果页全屏", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.DISCONNECT_RESULT_ACTIVITY_FULL_AD:
                             Firebase.getInstance(context).logEvent("全屏广告", "断开结果页全屏", "广告显示");
+                            isGoodFullAdReady = false;
                             break;
                         case AdFullType.SERVER_LIST_SWITCH_SUCCESS:
                             Firebase.getInstance(context).logEvent("全屏广告", "服务器列表切换", "广告显示");
+                            isBadFullAdReady = false;
                             break;
                     }
                 }
@@ -138,6 +157,10 @@ public class AdUtils {
                 @Override
                 public void onFullAdReady(int index) {
                     Log.i(TAG, "onFullAdReady:   全屏广告准备好");
+                    if (index == AdUtils.FULL_AD_GOOD)
+                        isGoodFullAdReady = true;
+                    else if (index == AdUtils.FULL_AD_BAD)
+                        isBadFullAdReady = true;
 
                 }
 

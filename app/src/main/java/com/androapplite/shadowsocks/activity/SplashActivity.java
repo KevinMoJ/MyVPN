@@ -488,7 +488,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                     startLockAnim();
                 } else {
                     mTvTitle.setVisibility(View.VISIBLE);
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+                    if (AdUtils.isGoodFullAdReady) {
                         startMainActivity();
                     } else if (!Utils.isConnected(SplashActivity.this)) {
                         startMainActivity();
@@ -526,7 +526,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (wholeProcess) {
                     startTextDownAnim();
                 } else {
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+                    if (AdUtils.isGoodFullAdReady) {
                         startMainActivity();
                     } else {
                         startTextDownAnim();
@@ -584,7 +584,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (wholeProcess) {
                     startNativeAnim();
                 } else {
-                    if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+                    if (AdUtils.isGoodFullAdReady) {
                         startMainActivity();
                     } else {
                         startNativeAnim();
@@ -640,8 +640,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_AD_LOADED_CHECK:
-                Log.d("SplanshActivity", "mAdAppHelper.isFullAdLoaded() " + mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD));
-                if (mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD) || msg.arg1 > 4) {
+                if (AdUtils.isGoodFullAdReady || msg.arg1 > 4) {
                     startMainActivity();
                 } else {
                     Message message = Message.obtain();
@@ -652,7 +651,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 break;
 
             case MSG_CHECK_ENTER:
-                if (AdAppHelper.getInstance(getApplicationContext()).isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+                if (AdUtils.isGoodFullAdReady) {
                     mRpClose.cancelAnimator();
                     startMainActivity();
                 } else
@@ -737,7 +736,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     @Override
     public void endAnim() {
         mHandler.removeCallbacksAndMessages(null);
-        if (mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_GOOD)) {
+        if (AdUtils.isGoodFullAdReady) {
             startMainActivity();
         } else {
             mHandler.postDelayed(new Runnable() {
