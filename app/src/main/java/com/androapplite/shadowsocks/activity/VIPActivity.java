@@ -26,7 +26,6 @@ import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
@@ -217,8 +216,8 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         }
 
         if (itemId == R.id.vip_luck_pan) {
-            if (!AdUtils.isBadFullAdReady)
-                AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
+            //申请进入转盘进入的全屏
+            AdUtils.loadBadFullAd(0);
             Firebase.getInstance(this).logEvent("VIP购买界面", "转盘按钮", "点击");
             LuckRotateActivity.startLuckActivity(this);
             return true;

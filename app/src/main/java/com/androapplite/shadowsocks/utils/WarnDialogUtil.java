@@ -36,7 +36,8 @@ public class WarnDialogUtil {
                 if (AdUtils.isBadFullAdReady)
                     return true;
                 else {
-                    adAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 0);
+                    //申请云弹窗的全屏
+                    AdUtils.loadBadFullAd(0);
                     return false;
                 }
             } else

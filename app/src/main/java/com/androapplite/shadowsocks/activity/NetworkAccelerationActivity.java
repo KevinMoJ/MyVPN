@@ -201,8 +201,8 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isAvailable()) {
-                if (!AdUtils.isBadFullAdReady)
-                    AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
+                //申请进入小火箭加速成功后的全屏
+                AdUtils.loadBadFullAd(0);
                 if (!LocalVpnService.IsRunning) {
                     mIsRestart = false;
                     connectVpnServerAsync();

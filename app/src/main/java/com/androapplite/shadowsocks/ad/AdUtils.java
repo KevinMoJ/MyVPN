@@ -4,12 +4,9 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.animation.LinearInterpolator;
-import android.widget.FrameLayout;
 
 import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.utils.Rotate3dAnimation;
 import com.androapplite.vpn3.R;
 import com.bestgo.adsplugin.ads.AdAppHelper;
 import com.bestgo.adsplugin.ads.AdType;
@@ -24,8 +21,8 @@ import com.google.firebase.FirebaseApp;
 import io.fabric.sdk.android.Fabric;
 
 /**
- * 作者：shaobo on 2018/3/16 19:13
- * 邮箱：zhanshaobo1992@gmail.com
+ * 作者：KevinMo.J 2018/8/1
+ * 邮箱：kevinmoj@163.com
  * 描述：
  */
 
@@ -192,25 +189,6 @@ public class AdUtils {
     }
 
     /**
-     * 跳转到自动弹窗界面
-     *
-     * @param context
-     */
-    private static void jump2AutoShowActivity(Context context) {
-
-    }
-
-    /**
-     * 根据不同的种类获取不同的数据
-     *
-     * @param type
-     * @return 返回-1表示不管如何继续展示广告 =-2则不展示广告了
-     */
-    public static int getAvailaableCount(String type) {
-        return 0;
-    }
-
-    /**
      * 初始化native宽高
      *
      * @param context
@@ -227,25 +205,18 @@ public class AdUtils {
     }
 
     /**
-     * Native 动画
-     *
-     * @param frameLayout
+     * 加载好位置的广告
      */
-    public static void showNativeAnimation(final FrameLayout frameLayout) {
-        frameLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                if (frameLayout != null) {
-                    float centerX = frameLayout.getWidth() / 2.0f;
-                    float centerY = frameLayout.getHeight() / 2.0f;
-                    Rotate3dAnimation rotate3dAnimation = new Rotate3dAnimation(ShadowsocksApplication.getGlobalContext(), 180, 360, centerX, centerY, 0f, false);
-                    rotate3dAnimation.setDuration(1000);
-                    rotate3dAnimation.setFillAfter(false);
-                    rotate3dAnimation.setInterpolator(new LinearInterpolator());
-                    frameLayout.startAnimation(rotate3dAnimation);
-                }
-            }
-        });
+    public static void loadGoodFullAd(int waitSecond) {
+        if (!isGoodFullAdReady)
+            adAppHelper.loadFullAd(FULL_AD_GOOD, waitSecond);
+    }
 
+    /**
+     * 加载不好位置的广告
+     */
+    public static void loadBadFullAd(int waitSecond) {
+        if (!isBadFullAdReady)
+            adAppHelper.loadFullAd(FULL_AD_BAD, waitSecond);
     }
 }

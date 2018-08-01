@@ -231,8 +231,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
             }
             netWorkSpeedUtils.startShowNetSpeed();
             long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
-            if (!AdUtils.isGoodFullAdReady)
-                AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
+            //申请链接成功后的全屏
+            AdUtils.loadGoodFullAd((int) cloudLoadAdTime);
 
             if (checkConnection(isConnectionAvailable())) {
                 connectVpnServerAsync();
@@ -430,8 +430,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else if (mVpnState == VpnState.Stopping) {
                     Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
                 } else {
-                    if (!AdUtils.isBadFullAdReady)
-                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
+                    //申请进入小火箭加速的全屏
+                    AdUtils.loadBadFullAd(0);
                     Firebase.getInstance(this).logEvent("菜单", "小火箭");
                     NetworkAccelerationActivity.start(this, false);
                 }
@@ -694,7 +694,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
         long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
         if (mConnectFragment != null) {
             if (!AdUtils.isGoodFullAdReady) {
-                AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
+                //申请断开的全屏
+                AdUtils.loadGoodFullAd((int) cloudLoadAdTime);
                 mForegroundHandler.sendEmptyMessageDelayed(MSG_VPN_DELAYED_DISCONNECT, cloudLoadAdTime * 1000);
                 if (LocalVpnService.IsRunning) {
                     mConnectFragment.animateStopping();
@@ -803,7 +804,8 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                         exitAppDialog();
                         break;
                     } else {
-                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
+                        //申请退出应用的全屏
+                        AdUtils.loadGoodFullAd(5);
                         initSnowFlakes(1);
                         break;
                     }
@@ -912,16 +914,16 @@ public class MainActivity extends AppCompatActivity implements ConnectFragment.O
                 } else if (mVpnState == VpnState.Stopping) {
                     Toast.makeText(this, R.string.vpn_is_stopping, Toast.LENGTH_SHORT).show();
                 } else {
-                    if (!AdUtils.isBadFullAdReady)
-                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
+                    //申请进入进入服务器列表的全屏
+                    AdUtils.loadBadFullAd(0);
                     startActivityForResult(new Intent(this, ServerListActivity.class), OPEN_SERVER_LIST);
                     Firebase.getInstance(this).logEvent("菜单", "打开服务器列表");
                 }
                 return true;
             case R.id.luck_pan:
                 if (!isVIP) {
-                    if (!AdUtils.isBadFullAdReady)
-                        AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_BAD, 0);
+                    //申请进入转盘页的全屏
+                    AdUtils.loadBadFullAd(0);
                     Firebase.getInstance(this).logEvent("主界面转盘按钮", "按钮", "点击");
                     LuckRotateActivity.startLuckActivity(this);
                 } else {

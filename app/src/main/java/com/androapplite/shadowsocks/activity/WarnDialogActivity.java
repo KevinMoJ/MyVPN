@@ -131,9 +131,8 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             isFullAdShow = false;
         }
 
-        //为进入转盘界面显示广告去做请求
-        if (!AdUtils.isBadFullAdReady)
-            mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 0);
+        //申请转盘进入的全屏
+        AdUtils.loadBadFullAd(0);
     }
 
     private void analysisDialogShow() {

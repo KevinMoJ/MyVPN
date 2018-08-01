@@ -126,8 +126,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             mAdAppHelper.showFullAd(AdUtils.FULL_AD_BAD, AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
         }
 
-        if (!AdUtils.isGoodFullAdReady)
-            AdAppHelper.getInstance(this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
+        //申请玩转盘的全屏
+        AdUtils.loadGoodFullAd(5);
     }
 
     private void initUI() {
@@ -284,8 +284,8 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             isLuckPanRunning = false;
             String rotateString = getRotateString(rotatePos);
 
-            if (!AdUtils.isGoodFullAdReady)
-                AdAppHelper.getInstance(LuckRotateActivity.this).loadFullAd(AdUtils.FULL_AD_GOOD, 5);
+            //申请玩转盘的全屏
+            AdUtils.loadGoodFullAd(5);
 
             if (!todayIsContinuePlay)
                 rotateString = "thanks";

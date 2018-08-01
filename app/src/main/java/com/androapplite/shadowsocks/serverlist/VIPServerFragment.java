@@ -349,8 +349,8 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             String nation = mNations.get(position);
             String flag = mFlags.get(position);
             long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
-            if (!AdUtils.isGoodFullAdReady)
-                AdAppHelper.getInstance(getContext()).loadFullAd(AdUtils.FULL_AD_GOOD, (int) cloudLoadAdTime);
+            //申请切换成功后的全屏
+            AdUtils.loadGoodFullAd((int) cloudLoadAdTime);
 
             mListView.setItemChecked(position, true);
             RuntimeSettings.setVPNNation(nation);
