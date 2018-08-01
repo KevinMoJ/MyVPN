@@ -32,8 +32,7 @@ import java.util.Locale;
 /**
  * Created by jim on 16/5/2.
  */
-public class ShadowsocksApplication extends Application implements HomeWatcher.OnHomePressedListener, Application.ActivityLifecycleCallbacks {
-    private HomeWatcher mHomeWathcer;
+public class ShadowsocksApplication extends Application implements Application.ActivityLifecycleCallbacks {
     private int mOpenActivities;
     private boolean mIsFirstOpen;
 
@@ -56,14 +55,10 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         }
         gContext = getApplicationContext();
         AdUtils.initAdHelper(this);
-        mHomeWathcer = new HomeWatcher(this);
-        mHomeWathcer.setOnHomePressedListener(this);
         checkVpnState();
         IpCountryIntentService.startService(this);
         VpnNotification.showVpnStoppedNotificationGlobe(this, false);
         FirebaseRemoteConfig.getInstance().setDefaults(R.xml.remote_config_defaults);
-        mHomeWathcer = new HomeWatcher(this);
-        mHomeWathcer.startWatch();
         mIsFirstOpen = true;
         registerActivityLifecycleCallbacks(this);
     }
@@ -100,15 +95,6 @@ public class ShadowsocksApplication extends Application implements HomeWatcher.O
         MultiDex.install(this);
     }
 
-    @Override
-    public void onHomePressed() {
-        Firebase.getInstance(this).logEvent("按键", "Home");
-    }
-
-    @Override
-    public void onHomeLongPressed() {
-
-    }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {

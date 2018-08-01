@@ -36,7 +36,7 @@ public class WarnDialogUtil {
                 if (adAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD))
                     return true;
                 else {
-                    adAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 5);
+                    adAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 0);
                     return false;
                 }
             } else
