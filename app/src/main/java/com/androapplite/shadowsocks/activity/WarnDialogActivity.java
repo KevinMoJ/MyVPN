@@ -130,6 +130,10 @@ public class WarnDialogActivity extends AppCompatActivity implements View.OnClic
             Firebase.getInstance(this).logEvent("大弹窗", "广告", "native加载");
             isFullAdShow = false;
         }
+
+        //为进入转盘界面显示广告去做请求
+        if (!mAdAppHelper.isFullAdLoaded(AdUtils.FULL_AD_BAD))
+            mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD,0);
     }
 
     private void analysisDialogShow() {

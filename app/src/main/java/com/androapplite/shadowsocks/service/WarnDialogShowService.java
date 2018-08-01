@@ -17,7 +17,6 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.LoadingDialogActivity;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
@@ -112,18 +111,18 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 RuntimeSettings.setWifiDialogShowCount(showCount);
                 RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
                 RuntimeSettings.setWifiDialogShowCount(showCount);
                 RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setWifiDialogShowCount(1);
                 RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             }
         }
     }
@@ -145,18 +144,18 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             }
         }
     }
@@ -177,18 +176,18 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(showCount);
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(showCount);
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(1);
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
-                LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
+                LoadingDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             }
         }
     }

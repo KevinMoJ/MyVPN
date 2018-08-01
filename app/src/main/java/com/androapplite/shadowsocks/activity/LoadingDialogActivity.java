@@ -111,7 +111,6 @@ public class LoadingDialogActivity extends AppCompatActivity {
     public static void start(Context context, int type) {
         currentType = type;
         Intent intent = new Intent(context, LoadingDialogActivity.class);
-        intent.putExtra(WarnDialogActivity.SHOW_DIALOG_TYPE, type);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
