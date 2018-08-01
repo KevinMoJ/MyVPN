@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,7 +28,6 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
 import com.androapplite.shadowsocks.service.WarnDialogShowService;
-import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabHelper;
 import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
@@ -66,6 +64,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     private static final int MSG_SKIP = 101;
     private static final int MSG_SPLASH_SHOW = 102;
     private static final int MSG_OPINION_INTERNET_TYPE = 103;
+    private static final int MSG_CHECK_FREE_USE_TIME = 104;
+    private static final int MSG_CHECK_VIP = 105;
 
     private boolean splashReady;
     boolean wholeProcess = false;
@@ -90,10 +90,12 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     //带动画的闪屏页---------------结束
 
     private IabHelper mIabHelper;
-    private IabBroadcastReceiver mBroadcastReceiver;
     /*标记hhelper 是否启动*/
     private boolean isStartHelper;
     private final List<String> skuList = new ArrayList<>();
+
+    private long luckFreeDay; // 幸运转盘得到的天数
+    private long freeUseTime; // 免费试用的时间
 
 
     @Override
@@ -105,10 +107,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         mAdAppHelper.loadNewNative();
         mAdAppHelper.loadNewSplashAd();
         mHandler = new Handler(this);
-        try {
-            checkIsVIP();
-        } catch (Exception e) {
-        }
+        mHandler.sendEmptyMessage(MSG_CHECK_VIP);
+        mHandler.sendEmptyMessage(MSG_CHECK_FREE_USE_TIME);
 
         if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_animation_ad_flash")) {
             showAnimationAdFlash();
@@ -136,6 +136,43 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         }
 
         mHandler.sendEmptyMessage(MSG_OPINION_INTERNET_TYPE);
+    }
+
+    private void checkFreeUseTime() {
+        //用活跃用户的打开APP的时间判断上次用户打开APP的时间
+        long openAppTime = RuntimeSettings.getOpenAppToDecideInactiveTime();
+        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
+        freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
+        long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
+        long differ = System.currentTimeMillis() - openAppTime;
+
+        if (luckFreeDay <= 0) { //没有转转盘获取时间或者获取的时间到期
+            RuntimeSettings.setLuckPanGetRecord(0);
+            if (differ > 0) {
+                long dif = differ / 1000; // 上次打开APP的时间到这次的时间间隔
+                if (dif <= newUserFreeTime * 60) {// 20  15
+                    RuntimeSettings.setNewUserFreeUseTime(freeUseTime - dif);
+                    long newFreeUseTime = RuntimeSettings.getNewUserFreeUseTime();
+                    if (newFreeUseTime < 0)
+                        RuntimeSettings.setNewUserFreeUseTime(0);
+                } else {
+                    RuntimeSettings.setNewUserFreeUseTime(0);
+                }
+            }
+        } else { // 有幸运转盘转到的时间，但是这次打开APP要更新一下
+            if (differ > 0) {
+                long overDay = differ / (1000 * 60 * 60 * 24); // 上次打开APP的时间到现在的过了多少天
+                if (overDay <= luckFreeDay)
+                    RuntimeSettings.setLuckPanGetRecord(luckFreeDay - overDay);
+                else
+                    RuntimeSettings.setLuckPanGetRecord(0);
+                long newFreeUseDay = RuntimeSettings.getLuckPanGetRecord();
+                if (newFreeUseDay < 0)
+                    RuntimeSettings.setLuckPanGetRecord(0);
+
+                RuntimeSettings.setNewUserFreeUseTime(0);
+            }
+        }
     }
 
     private void checkIsVIP() {
@@ -174,18 +211,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 }
 
                 if (mIabHelper == null) return;
-
-                mBroadcastReceiver = new IabBroadcastReceiver(new IabBroadcastReceiver.IabBroadcastListener() {
-                    @Override
-                    public void receivedBroadcast() {
-                        try {
-                            mIabHelper.queryInventoryAsync(mGotInventoryListener);
-                        } catch (IabHelper.IabAsyncInProgressException e) {
-                        }
-                    }
-                });
-                IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
-                registerReceiver(mBroadcastReceiver, broadcastFilter);
 
                 // IAB is fully set up. Now, let's get an inventory of stuff we own.
                 try {
@@ -656,6 +681,16 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
             case MSG_OPINION_INTERNET_TYPE:
                 Firebase.getInstance(this).logEvent("当前网络类型", "类型", InternetUtil.getNetworkState(SplashActivity.this));
                 break;
+
+            case MSG_CHECK_FREE_USE_TIME:
+                checkFreeUseTime();
+                break;
+            case MSG_CHECK_VIP:
+                try {
+                    checkIsVIP();
+                } catch (Exception e) {
+                }
+                break;
         }
         return true;
     }
@@ -671,8 +706,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
             mRpClose.cancelAnimator();
 
         if (isStartHelper) {
-            if (mBroadcastReceiver != null)
-                unregisterReceiver(mBroadcastReceiver);
             if (mIabHelper != null) {
                 mIabHelper.disposeWhenFinished();
                 mIabHelper = null;

@@ -84,24 +84,24 @@ public class RecommendVIPActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        checkFreeUseTime();
+//        checkFreeUseTime();
 
-        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
-        freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
-        boolean isVIP = RuntimeSettings.isVIP();
-
-        if (isVIP) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        } else {
-            if (luckFreeDay > 0) {
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            } else if (luckFreeDay <= 0 && freeUseTime > 0) {
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            }
-        }
+//        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
+//        freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
+//        boolean isVIP = RuntimeSettings.isVIP();
+//
+//        if (isVIP) {
+//            startActivity(new Intent(this, MainActivity.class));
+//            finish();
+//        } else {
+//            if (luckFreeDay > 0) {
+//                startActivity(new Intent(this, MainActivity.class));
+//                finish();
+//            } else if (luckFreeDay <= 0 && freeUseTime > 0) {
+//                startActivity(new Intent(this, MainActivity.class));
+//                finish();
+//            }
+//        }
         setContentView(R.layout.activity_recommend_vip);
         initView();
         initData();
