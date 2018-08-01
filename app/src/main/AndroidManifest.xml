@@ -144,6 +144,7 @@
         </activity>
         <activity
             android:name="com.androapplite.shadowsocks.activity.RecommendVIPActivity"
+            android:launchMode="singleTask"
             android:theme="@style/InactiveUser">
 
             <!-- <intent-filter> -->
