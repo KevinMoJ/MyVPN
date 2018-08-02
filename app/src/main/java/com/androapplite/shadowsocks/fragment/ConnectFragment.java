@@ -89,7 +89,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mConnectButton.setOnClickListener(this);
         mVIPImage.setOnClickListener(this);
-        checkFreeUseTime(); // 用来给新用户或者免费天数用户到期后给免费使用时间
+        checkFreeUseTime(false); // 用来给新用户或者免费天数用户到期后给免费使用时间
         startVIPAnimation();
         updateFreeUsedTime();
         if (LocalVpnService.IsRunning) {
@@ -383,13 +383,14 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         mConnectStatus.setImageResource(R.drawable.connect_normal_icon);
     }
 
-    private void checkFreeUseTime() {
+    private void checkFreeUseTime(boolean isOnResume) {
         long freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
         long luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
         long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
 
-        if (luckFreeDay <= 0 && freeUseTime == 0)
+        if (luckFreeDay <= 0 && freeUseTime == 0) {
             RuntimeSettings.setNewUserFreeUseTime(newUserFreeTime * 60);
+        }
     }
 
     @Override
@@ -401,6 +402,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
         if (!RuntimeSettings.isVIP() && LocalVpnService.IsRunning) {
             startVIPRecommendAnimation();
         }
+
+        checkFreeUseTime(true);
         updateUI();
     }
 
