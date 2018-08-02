@@ -62,6 +62,12 @@ public class RotatePan extends View {
     private float textSize;
 
     private int CircleX, CircleY;
+    //5 - 45
+    //1 - 90
+    //2 - 135
+    //3 - 270
+    private int offsetAngle = 0; //角度偏移量，用来临时改变转盘的目的地位置
+    private int mDestRotate;
 
     //旋转一圈所需要的时间
     private static final long ONE_WHEEL_TIME = 500;
@@ -300,6 +306,7 @@ public class RotatePan extends View {
         int increaseDegree = lap * 360 + angle;
         long time = (lap + angle / 360) * ONE_WHEEL_TIME;
         int DesRotate = increaseDegree + InitAngle;
+        mDestRotate = DesRotate;
 
         //TODO 为了每次都能旋转到转盘的中间位置
         int offRotate = DesRotate % 360 % verPanRadius;
@@ -316,7 +323,11 @@ public class RotatePan extends View {
             public void onAnimationUpdate(ValueAnimator animation) {
                 int updateValue = (int) animation.getAnimatedValue();
                 Log.d("RotatePan", "updateValue:" + updateValue);
-                InitAngle = (updateValue % 360 + 360) % 360;
+                InitAngle = (updateValue % 360 + 360 + Math.round((offsetAngle * 1.0f * updateValue / mDestRotate))) % 360;
+                if (((LuckPanLayout) getParent()).getAnimationEndListener() != null) {
+                    ((LuckPanLayout) getParent()).setDelayTime(LuckPanLayout.DEFAULT_TIME_PERIOD);
+                    ((LuckPanLayout) getParent()).getAnimationEndListener().animationUpdate();
+                }
                 Log.d("RotatePan", "InitAngle:" + InitAngle);
                 ViewCompat.postInvalidateOnAnimation(RotatePan.this);
             }
@@ -344,6 +355,22 @@ public class RotatePan extends View {
             }
         });
         animtor.start();
+    }
+
+    /**
+     * 设置偏移量，控制当转盘转动的时候改变目的地位置
+     * @param angle 偏移量
+     */
+    public void setOffsetAngle(int angle) {
+        offsetAngle = angle;
+    }
+
+    /**
+     * 得到当前的偏移量
+     * @return
+     */
+    public int getOffsetAngle() {
+        return offsetAngle;
     }
 
     /**
@@ -405,7 +432,7 @@ public class RotatePan extends View {
         finalAnimtor.start();
     }
 
-    private int queryPosition() {
+    public int queryPosition() {
         InitAngle = (InitAngle % 360 + 360) % 360;
         int pos = InitAngle / verPanRadius;
         if (panNum == 4) pos++;

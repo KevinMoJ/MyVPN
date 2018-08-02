@@ -204,6 +204,20 @@ public class LuckPanLayout extends RelativeLayout {
         void endAnimation(int position);
 
         void startAnimation(int position);
+
+        void animationUpdate();
+    }
+
+    public void setOffsetAngle(int angle) {
+        rotatePan.setOffsetAngle(angle);
+    }
+
+    public int getOffsetAngle() {
+        return rotatePan.getOffsetAngle();
+    }
+
+    public int getRotatePos() {
+        return rotatePan.queryPosition();
     }
 
     private AnimationEndListener l;

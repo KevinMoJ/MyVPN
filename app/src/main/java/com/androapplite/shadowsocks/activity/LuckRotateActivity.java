@@ -57,12 +57,12 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private Dialog dialog;
     private Firebase mFirebase;
 
-    private int rotatePos = -1;
     private int progressInt;
     private long startLuckPanTime;
     private long cloudGetLuckFreeDay;
     private boolean isLuckPanRunning;
     private boolean todayIsContinuePlay; // 能不能玩，不能玩就一直转到thanks，能玩的话就显示转到的时间,
+    private boolean isUpdateAngle; // 是否能更新角度，保证能更新一次，防止点击的次数多次被设置，在转盘转动更新的动画中进行判断
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,40 +166,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     }
 
     private void startRotate() {
-        long freeDaysToShow = RuntimeSettings.getLuckPanGetRecord();
-        long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
-
-//        rotatePos = getRotatePos();
-        if (!AdUtils.isGoodFullAdReady) {
-            rotatePos = RESULT_TYPE_THANKS;
-        } else {
-            RuntimeSettings.setClickRotateStartCount(RuntimeSettings.getClickRotateStartCount() + 1);
-            rotatePos = getPlayRotatePosition();
-        }
-
-        String rewardString = getRotateString(rotatePos); // 得到转盘的结果
-
-        if (!rewardString.equals("thanks") && !rewardString.equals("")) {
-            long rewardLong = Long.parseLong(rewardString);
-            //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
-            if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) { // 5 + 2 > 7
-                todayIsContinuePlay = false;
-                mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
-                mFirebase.logEvent("开始游戏", "转盘得到的天数", "一直thanks");
-                Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
-            } else {
-                todayIsContinuePlay = true;
-                RuntimeSettings.setLuckPanFreeDay(rewardLong + getLuckFreeDays);
-                RuntimeSettings.setLuckPanGetRecord(rewardLong + freeDaysToShow); // 用来给dialog显示的
-                mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
-                progressInt = (int) RuntimeSettings.getLuckPanFreeDay();
-                Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
-                mLuckPanLayout.rotate(rotatePos, 100);
-            }
-        } else {
-            mFirebase.logEvent("开始游戏", "转盘得到的天数", "thanks");
-            mLuckPanLayout.rotate(rotatePos, 100);
-        }
+        isUpdateAngle = true;
+        mLuckPanLayout.setOffsetAngle(0); // 偏移到指定位置的数值侄零，等转盘转动过程中如果有广告加载成功就设置指定位置
+        mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
     }
 
     private int getRotatePos() {
@@ -241,8 +210,10 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         }
     };
 
-    private int getPlayRotatePosition() {
+    private int getPlayRotatePosition() { // 设置转盘转到指定的位置，转之前确定
+        RuntimeSettings.setClickRotateStartCount(RuntimeSettings.getClickRotateStartCount() + 1);
         int todayGetCount = RuntimeSettings.getClickRotateStartCount();
+
         if (todayGetCount <= 3)
             return RESULT_TYPE_THANKS;
         else if (todayGetCount == 4)
@@ -265,9 +236,9 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
     private String getRotateString(int pos) {
         String s = "";
-        if (pos == 0)
+        if (pos == 0 || pos == 3 || pos == 5)
             s = "1";
-        else if (pos == 2)
+        else if (pos == 2 || pos == 4)
             s = "2";
         else if (pos == 1)
             s = "3";
@@ -282,22 +253,48 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         @Override
         public void endAnimation(int position) {
             isLuckPanRunning = false;
-            String rotateString = getRotateString(rotatePos);
+            long freeDaysToShow = RuntimeSettings.getLuckPanGetRecord();
+            long getLuckFreeDays = RuntimeSettings.getLuckPanFreeDay();
+
+            String rewardString = getRotateString(mLuckPanLayout.getRotatePos()); // 得到转盘的结果
+
+            Log.i(TAG, "endAnimation:  得到转盘的结果  " + rewardString + "   转盘位置  " + mLuckPanLayout.getRotatePos()
+                    + "   转盘偏移量    " + mLuckPanLayout.getOffsetAngle() + "  点击次数  " + RuntimeSettings.getClickRotateStartCount());
+
+            if (!rewardString.equals("thanks") && !rewardString.equals("")) {
+                long rewardLong = Long.parseLong(rewardString);
+                //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
+                if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) { // 5 + 2 > 7
+                    todayIsContinuePlay = false;
+                    mFirebase.logEvent("开始游戏", "转盘得到的天数", "一直thanks");
+                    Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
+                } else {
+                    todayIsContinuePlay = true;
+                    RuntimeSettings.setLuckPanFreeDay(rewardLong + getLuckFreeDays);
+                    RuntimeSettings.setLuckPanGetRecord(rewardLong + freeDaysToShow); // 用来给dialog显示的
+                    mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
+                    Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
+                }
+            } else {
+                mFirebase.logEvent("开始游戏", "转盘得到的天数", "thanks");
+            }
 
             //申请玩转盘的全屏
             AdUtils.loadGoodFullAd(5);
 
             if (!todayIsContinuePlay)
-                rotateString = "thanks";
+                rewardString = "thanks";
 
-            if (!rotateString.equals("thanks")) {
+            progressInt = (int) RuntimeSettings.getLuckPanFreeDay();
+
+            if (!rewardString.equals("thanks")) {
                 mLuckPanBar.setProgress(progressInt);
                 if (mLuckPanBar.getProgress() >= mLuckPanBar.getMax())
                     mLuckPanBar.setPicture(R.drawable.progress_bar_tip_full);
             }
 
             if (!isFinishing()) {
-                dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rotateString, null);
+                dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rewardString, null);
                 if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && !RuntimeSettings.isVIP()) {
                     mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
                 }
@@ -310,8 +307,38 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             isLuckPanRunning = true;
             btnEnableClick(false, false);
         }
+
+        @Override
+        public void animationUpdate() {
+            if (AdUtils.isGoodFullAdReady && isUpdateAngle) {
+                isUpdateAngle = false;
+                int offsetAngle = getOffsetAngle(getPlayRotatePosition());
+                mLuckPanLayout.setOffsetAngle(offsetAngle);
+                Log.i(TAG, "animationUpdate:   设置偏移量   " + offsetAngle);
+            }
+        }
     };
 
+    //5 - 45
+    //1 - 90
+    //2 - 135
+    //3 - 270
+    //thanks - 360
+    private int getOffsetAngle(int num) { // 转盘设置偏移量，转到指定的位置，转盘转之前设置指定位置，过程中改变最终位置
+        int offsetAngle = 0;
+        if (num == RESULT_TYPE_1)
+            offsetAngle = 90;
+        else if (num == RESULT_TYPE_2)
+            offsetAngle = 135;
+        else if (num == RESULT_TYPE_3)
+            offsetAngle = 270;
+        else if (num == RESULT_TYPE_5)
+            offsetAngle = 45;
+        else if (num == RESULT_TYPE_THANKS)
+            offsetAngle = 360;
+
+        return offsetAngle;
+    }
 
     public static void startLuckActivity(Context context) {
         Intent intent = new Intent(context, LuckRotateActivity.class);
