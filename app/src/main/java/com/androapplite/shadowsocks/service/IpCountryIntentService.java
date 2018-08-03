@@ -7,11 +7,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.bestgo.adsplugin.utils.ServiceUtils;
+import com.androapplite.shadowsocks.utils.ServiceUtils;
 
 import org.json.JSONObject;
 
@@ -59,25 +58,13 @@ public class IpCountryIntentService extends IntentService {
             if (jsonObject != null) {
                 countryCode = getCountryCodeByIp(jsonObject);
                 if (countryCode == null) {
-                    Firebase.getInstance(this).logEvent("通过网址", "失败");
                     countryCode = getCountryByTelephonyManager();
                     if (countryCode == null) {
-                        Firebase.getInstance(this).logEvent("通过电话管理者", "失败");
                         countryCode = getResources().getConfiguration().locale.getCountry();
-                        if (countryCode != null) {
-                            Firebase.getInstance(this).logEvent("通过默认语言", "成功");
-                        } else {
-                            Firebase.getInstance(this).logEvent("通过默认语言", "失败");
-                        }
-                    } else {
-                        Firebase.getInstance(this).logEvent("通过电话管理者", "成功");
                     }
-                } else {
-                    Firebase.getInstance(this).logEvent("通过网址", "成功");
                 }
                 try {
                     String ipString = jsonObject.getString("query");
-//                    Firebase.getInstance(this).logEvent("国家", "本机ip", ipString);
                     int ip = convertIpStringToLong(ipString);
                     sharedPreferences.edit().putInt(SharedPreferenceKey.IP, ip).apply();
                 } catch (Exception e) {

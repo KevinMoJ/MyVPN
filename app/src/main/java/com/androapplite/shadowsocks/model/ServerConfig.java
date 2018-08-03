@@ -9,7 +9,6 @@ import android.os.Parcelable;
 
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -129,7 +128,7 @@ public class ServerConfig implements Parcelable {
     }
 
     public static String shuffleRemoteConfig() {
-        return FirebaseRemoteConfig.getInstance().getString("fetch_server_list");
+        return "[{\"ct\":\"Miami\",\"ip\":\"94.177.202.43\",\"ld\":\"7\",\"pt\":[\"40050\"]},{\"ct\":\"Tokyo\",\"ip\":\"198.13.45.183\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Frankfurt\",\"ip\":\"185.243.112.165\",\"ld\":\"0\",\"pt\":[\"40050\",\"40051\",\"40052\"]},{\"ct\":\"Miami\",\"ip\":\"185.243.112.184\",\"ld\":\"0\",\"pt\":[\"40050\",\"40051\",\"40052\"]},{\"ct\":\"Frankfurt\",\"ip\":\"62.113.254.104\",\"ld\":\"1\",\"pt\":[\"40050\",\"40051\",\"40052\"]},{\"ct\":\"Miami\",\"ip\":\"149.28.97.119\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Tokyo\",\"ip\":\"198.13.62.195\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Miami\",\"ip\":\"140.82.31.157\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Miami\",\"ip\":\"207.246.79.108\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Miami\",\"ip\":\"45.77.199.36\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Frankfurt\",\"ip\":\"62.113.254.99\",\"ld\":\"0\",\"pt\":[\"40050\",\"40051\",\"40052\"]},{\"ct\":\"Frankfurt\",\"ip\":\"62.113.255.22\",\"ld\":\"1\",\"pt\":[\"40050\",\"40051\",\"40052\"]},{\"ct\":\"Singapore\",\"ip\":\"149.28.157.206\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Frankfurt\",\"ip\":\"140.82.37.77\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Frankfurt\",\"ip\":\"209.250.238.212\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Frankfurt\",\"ip\":\"140.82.39.194\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Tokyo\",\"ip\":\"45.32.49.154\",\"ld\":\"0\",\"pt\":[\"40050\"]},{\"ct\":\"Frankfurt\",\"ip\":\"80.240.22.82\",\"ld\":\"0\",\"pt\":[\"40050\"]}]";
     }
 
     public int getSignalResId() {

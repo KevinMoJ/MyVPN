@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
@@ -107,11 +106,9 @@ public class VIPFinishActivity extends AppCompatActivity implements View.OnClick
             });
 
             if (dialog.isShowing()) {
-                Firebase.getInstance(this).logEvent("VIPDialog界面", "显示");
             }
         }
 
-        Firebase.getInstance(this).logEvent("VIP购买成功弹窗", "显示");
     }
 
     private String getEnglishMonth(String month) {

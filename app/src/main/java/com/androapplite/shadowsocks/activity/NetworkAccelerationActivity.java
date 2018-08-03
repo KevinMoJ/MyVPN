@@ -14,8 +14,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -26,10 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ad.AdFullType;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.fragment.NetworkAccelerationFinishFragment;
@@ -39,11 +34,8 @@ import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 import com.vm.shadowsocks.core.VpnNotification;
@@ -52,7 +44,7 @@ import java.lang.ref.WeakReference;
 
 public class NetworkAccelerationActivity extends AppCompatActivity implements
         NetworkAccelerationFragment.NetworkAccelerationFragmentListener,
-        LocalVpnService.onStatusChangedListener, Handler.Callback, View.OnClickListener,
+        LocalVpnService.onStatusChangedListener, View.OnClickListener,
         DialogInterface.OnDismissListener, NetworkAccelerationFinishFragment.NetworkAccelerationFinishFragmentListener {
     private static final String TAG = "NetworkAccelerationActi";
 
@@ -62,7 +54,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     private BroadcastReceiver mBroadcastReceiver;
     private ProgressDialog mFetchServerListProgressDialog;
 
-    private Handler mHandler;
     private static final int MSG_DELAY_SHOW_INSTITIAL_AD = 1;
     private static int REQUEST_CONNECT = 1;
     private static final String EXTRA_AUTO = "EXTRA_AUTO";
@@ -79,14 +70,10 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         actionBar.setHomeAsUpIndicator(upArrow);
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new NetworkAccelerationFragment()).commitAllowingStateLoss();
-        AdAppHelper.getInstance(this).loadNewNative();
         LocalVpnService.addOnStatusChangedListener(this);
 
         if (mSharedPreference == null) {
             mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        }
-        if (mHandler == null) {
-            mHandler = new Handler(this);
         }
         mBroadcastReceiver = new MyBroadcastReceiver(this);
         IntentFilter intentFilter = new IntentFilter();
@@ -101,21 +88,12 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             if (mSharedPreference == null) {
                 mSharedPreference = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
             }
-            if (mHandler == null) {
-                mHandler = new Handler(this);
-            }
 
             Intent intent = getIntent();
             boolean autoAccelerate = intent.getBooleanExtra(EXTRA_AUTO, false);
             if (autoAccelerate) {
                 ((NetworkAccelerationFragment) fragment).rocketShake();
                 startAccelerate();
-            }
-            if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_enter_ad") && !RuntimeSettings.isVIP()) {
-                Message message = mHandler.obtainMessage();
-                message.what = MSG_DELAY_SHOW_INSTITIAL_AD;
-                message.arg1 = 0;
-                mHandler.sendMessage(message);
             }
         }
     }
@@ -126,27 +104,17 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         }
         LocalVpnService.removeOnStatusChangedListener(this);
-        if (mHandler != null) {
-            mHandler.removeCallbacksAndMessages(null);
-        }
         super.onDestroy();
     }
 
     @Override
     public void onAnimationFinish() { // 小火箭起飞动画结束的回调
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_full_rocket_success_ad") && !RuntimeSettings.isVIP()) {
-            Message message = mHandler.obtainMessage();
-            message.what = MSG_DELAY_SHOW_INSTITIAL_AD;
-            message.arg1 = 1;
-            mHandler.sendMessage(message);
-        }
         getSupportFragmentManager().beginTransaction().replace(R.id.content, new NetworkAccelerationFinishFragment()).commitAllowingStateLoss();
     }
 
 
     @Override
     public void onVIPImageClick() {
-        Firebase.getInstance(this).logEvent("加速成功结果页", "vip按钮", "点击");
         VIPActivity.startVIPActivity(this, VIPActivity.TYPE_NET_SPEED_FINISH);
     }
 
@@ -156,7 +124,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
             Fragment fragment = getCurrentFragment();
             if (fragment instanceof NetworkAccelerationFragment) {
                 ((NetworkAccelerationFragment) fragment).rocketFly();
-                Firebase.getInstance(this).logEvent("网络加速", "加速", "加速成功");
             }
             RuntimeSettings.setVPNState(VpnState.Connected.ordinal());
         } else {
@@ -185,9 +152,7 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     @Override
     public void onAccelerateImmediately() {
-        Firebase.getInstance(this).logEvent("网络加速", "加速", "立即加速");
         mSharedPreference.edit().putInt("CLICK_SPEED_BT_COUNT", mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0) + 1).apply();
-        RealTimeLogger.answerLogEvent("click_speed_bt_count", "speed", "click_count:" + mSharedPreference.getInt("CLICK_SPEED_BT_COUNT", 0));
         RuntimeSettings.setRocketSpeedConnect(true);
         startAccelerate();
     }
@@ -201,8 +166,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isAvailable()) {
-                //申请进入小火箭加速成功后的全屏
-                AdUtils.loadBadFullAd(0);
                 if (!LocalVpnService.IsRunning) {
                     mIsRestart = false;
                     connectVpnServerAsync();
@@ -255,19 +218,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
     @Override
     public void onDismiss(DialogInterface dialog) {
         prepareStartService();
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case MSG_DELAY_SHOW_INSTITIAL_AD: // 0 进入  1 加速成功
-                if (msg.arg1 == 0)
-                    AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_BAD, AdFullType.ROCKET_SPEED_ENTER_FULL_AD);
-                else if (msg.arg1 == 1)
-                    AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_BAD, AdFullType.ROCKET_SPEED_FINISH_FULL_AD);
-                break;
-        }
-        return true;
     }
 
     private void showNoInternetSnackbar(@StringRes int messageId, boolean hasAction) {
@@ -364,7 +314,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
         } catch (Exception e) {
             showNoInternetSnackbar(R.string.not_start_vpn, false);
             ShadowsocksApplication.handleException(e);
-            Firebase.getInstance(this).logEvent("VPN连不上", "VPN Prepare错误", e.getMessage());
             Fragment fragment = getCurrentFragment();
             if (fragment instanceof NetworkAccelerationFragment) {
                 ((NetworkAccelerationFragment) fragment).stopShake();
@@ -392,9 +341,6 @@ public class NetworkAccelerationActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        if (mHandler != null) {
-            mHandler.removeCallbacksAndMessages(null);
-        }
         super.onStop();
     }
 }

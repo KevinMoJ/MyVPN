@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.ServerConfig;
@@ -59,28 +58,26 @@ public class ShareActivity extends AppCompatActivity {
                 }
             }
         });
-        Firebase.getInstance(this).logEvent("屏幕","分享屏幕");
     }
     //https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dqrcode
 
-    private Handler mClickTimeCountHandler = new Handler(){
+    private Handler mClickTimeCountHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             mCurClickTimes = 0;
         }
     };
 
-    public void shareByFacebook(View view){
+    public void shareByFacebook(View view) {
         ShareLinkContent content = new ShareLinkContent.Builder()
                 .setContentUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dfacebook"))
                 .build();
 
         ShareDialog shareDialog = new ShareDialog(this);
         shareDialog.show(content);
-        Firebase.getInstance(this).logEvent("分享屏幕", "facebook分享");
     }
 
-    public void shareByBluetooth(View view){
+    public void shareByBluetooth(View view) {
         ApplicationInfo app = getApplication().getApplicationInfo();
         String filePath = app.sourceDir;
 
@@ -91,34 +88,30 @@ public class ShareActivity extends AppCompatActivity {
 
         intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(filePath)));
         startActivity(Intent.createChooser(intent, "Share app"));
-        Firebase.getInstance(this).logEvent("分享屏幕", "蓝牙分享");
     }
 
-    public void moreShare(View view){
-        String url = "https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dcommon";
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-        shareIntent.setType("text/plain");
-        try {
-            startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share)));
-        }catch(ActivityNotFoundException e){
-            ShadowsocksApplication.handleException(e);
+        public void moreShare (View view){
+            String url = "https://play.google.com/store/apps/details?id=com.androapplite.vpn3&referrer=http%3A%2F%2Fa.com%3Futm_source%3Dclient%26utm_medium%3Dcommon";
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+            shareIntent.setType("text/plain");
+            try {
+                startActivity(Intent.createChooser(shareIntent, getResources().getString(R.string.share)));
+            } catch (ActivityNotFoundException e) {
+                ShadowsocksApplication.handleException(e);
+            }
         }
-        Firebase.getInstance(this).logEvent("分享屏幕", "更多分享");
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home){
-            finish();
-            Firebase.getInstance(this).logEvent("分享屏幕", "后退", "导航栏");
+        @Override
+        public boolean onOptionsItemSelected (MenuItem item){
+            if (item.getItemId() == android.R.id.home) {
+                finish();
+            }
+            return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
-    }
 
-    @Override
-    public void onBackPressed() {
-        Firebase.getInstance(this).logEvent("分享屏幕", "后退", "按键");
-        super.onBackPressed();
+        @Override
+        public void onBackPressed () {
+            super.onBackPressed();
+        }
     }
-}

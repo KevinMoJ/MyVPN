@@ -3,10 +3,6 @@ package com.androapplite.shadowsocks.utils;
 import android.content.Context;
 import android.net.TrafficStats;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.vm.shadowsocks.core.LocalVpnService;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,11 +44,6 @@ public class NetWorkSpeedUtils {
 
         lastTimeStamp = nowTimeStamp;
         lastTotalRxBytes = nowTotalRxBytes;
-
-        if (LocalVpnService.IsRunning && FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_pull")) {
-            String s = String.valueOf(speed) + "." + String.valueOf(speed2) + " kb/s";
-            Firebase.getInstance(context).logEvent("测试用户网速", s);
-        }
     }
 
     public void release() {

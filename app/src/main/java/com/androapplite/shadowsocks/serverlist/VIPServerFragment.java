@@ -13,12 +13,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -28,9 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.VIPActivity;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.ServerConfig;
@@ -38,11 +33,8 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
-import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.ArrayList;
@@ -100,9 +92,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             mHasServerJson = false;
         }
 //        mHasServerJson = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this).contains(SharedPreferenceKey.SERVER_LIST);
-        if (!RuntimeSettings.isVIP())
-            addBottomAd();
-        Firebase.getInstance(getContext()).logEvent("屏幕", "服务器列表屏幕");
 
         luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
     }
@@ -121,24 +110,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
         mListView.setAdapter(new ServerListAdapter());
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
-    }
-
-
-    public void addBottomAd() {
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
-        try {
-            adAppHelper.getNative(mContainer, params);
-            Firebase.getInstance(getContext()).logEvent("NATIVE广告", "显示成功", "服务器列表底部");
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Firebase.getInstance(getContext()).logEvent("NATIVE广告", "显示失败", "服务器列表底部");
-
-        }
-
-        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_up);
-        mContainer.startAnimation(animation);
     }
 
     private void parseServerList() {
@@ -164,8 +135,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
                         mNations.add(serverConfig.nation);
                         mFlags.add(serverConfig.flag);
                         mSignalResIds.put(serverConfig.nation, serverConfig.getSignalResId());
-                        if (serverConfig.getLoad() > FirebaseRemoteConfig.getInstance().getLong("ping_load"))
-                            Firebase.getInstance(getContext()).logEvent("加载服务器列表满载", serverConfig.nation);
                     }
                 }
             }
@@ -184,7 +153,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             mTransparentView.setVisibility(View.VISIBLE);
             ServerListFetcherService.fetchServerListAsync(getContext());
         }
-        Firebase.getInstance(getContext()).logEvent("刷新服务器列表", position);
     }
 
     @Override
@@ -207,8 +175,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     private void showDissConnectDialog() {
-        final Firebase firebase = Firebase.getInstance(getContext());
-
         mDisconnectDialog = new AlertDialog.Builder(getContext())
                 .setMessage(R.string.server_list_disconnect_title)
                 .setPositiveButton(R.string.disconnect, new DialogInterface.OnClickListener() {
@@ -218,7 +184,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
                         mSwipeRefreshLayout.setRefreshing(true);
                         mTransparentView.setVisibility(View.VISIBLE);
                         ServerListFetcherService.fetchServerListAsync(getContext());
-                        firebase.logEvent("服务器列表", "断开链接", "确定");
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -226,7 +191,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
                     public void onClick(DialogInterface dialog, int which) {
                         mSwipeRefreshLayout.setRefreshing(false);
                         mTransparentView.setVisibility(View.GONE);
-                        firebase.logEvent("服务器列表", "断开链接", "取消");
                     }
                 })
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -348,9 +312,6 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             mSelectedIndex = position;
             String nation = mNations.get(position);
             String flag = mFlags.get(position);
-            long cloudLoadAdTime = FirebaseRemoteConfig.getInstance().getLong("main_load_full_ad_time");
-            //申请切换成功后的全屏
-            AdUtils.loadGoodFullAd((int) cloudLoadAdTime);
 
             mListView.setItemChecked(position, true);
             RuntimeSettings.setVPNNation(nation);
@@ -358,11 +319,9 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
             getActivity().setResult(Activity.RESULT_OK);
             ConnectVpnHelper.getInstance(getContext()).release();
             mPreferences.edit().putInt("CLICK_SERVER_LIST_COUNT", mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0) + 1).apply();
-            RealTimeLogger.answerLogEvent("server_list_click_connect_count", "click", "click_count:" + mPreferences.getInt("CLICK_SERVER_LIST_COUNT", 0));
             //不是小火箭加速的链接
             RuntimeSettings.setRocketSpeedConnect(false);
             getActivity().finish();
-            Firebase.getInstance(getContext()).logEvent("选择国家", nation);
         } else {
             jumpToVip();
         }
@@ -376,10 +335,8 @@ public class VIPServerFragment extends Fragment implements SwipeRefreshLayout.On
     public void onClick(DialogInterface dialog, int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {
             mSwipeRefreshLayout.setRefreshing(true);
-            Firebase.getInstance(getContext()).logEvent("刷新服务器列表", "断开");
         } else if (which == DialogInterface.BUTTON_NEGATIVE) {
             mSwipeRefreshLayout.setRefreshing(false);
-            Firebase.getInstance(getContext()).logEvent("刷新服务器列表", "取消");
 
         }
     }

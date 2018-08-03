@@ -3,9 +3,6 @@ package com.androapplite.shadowsocks.utils;
 import android.content.Context;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
-import com.androapplite.shadowsocks.ad.AdUtils;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -17,33 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class WarnDialogUtil {
 
     public static boolean isAdLoaded(Context context, boolean isLoadAd) {
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(context);
-        boolean cloudNativeAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_native_ad_show");
-        boolean cloudFullAdShow = FirebaseRemoteConfig.getInstance().getBoolean("is_warn_dialog_full_ad_show");
-        if (cloudNativeAdShow) {
-            if (isLoadAd) {
-                if (adAppHelper.isNativeLoaded())
-                    return true;
-                else {
-                    adAppHelper.loadNewNative();
-                    return false;
-                }
-            } else
-                return adAppHelper.isNativeLoaded();
-
-        } else if (cloudFullAdShow) {
-            if (isLoadAd) {
-                if (AdUtils.isBadFullAdReady)
-                    return true;
-                else {
-                    //申请云弹窗的全屏
-                    AdUtils.loadBadFullAd(0);
-                    return false;
-                }
-            } else
-                return AdUtils.isBadFullAdReady;
-        } else
-            return true;
+        return true;
     }
 
     public static boolean isAppBackground() {

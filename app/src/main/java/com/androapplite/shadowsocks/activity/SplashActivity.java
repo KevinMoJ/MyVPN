@@ -10,9 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -22,8 +20,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.service.ServerListFetcherService;
 import com.androapplite.shadowsocks.service.VpnManageService;
@@ -33,14 +29,10 @@ import com.androapplite.shadowsocks.util.IabResult;
 import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.shadowsocks.utils.DensityUtil;
-import com.androapplite.shadowsocks.utils.InternetUtil;
-import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.shadowsocks.view.RoundProgress;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import org.json.JSONArray;
@@ -53,7 +45,6 @@ import java.util.List;
 public class SplashActivity extends AppCompatActivity implements Handler.Callback,
         Animator.AnimatorListener, RoundProgress.endAnimListener, View.OnClickListener {
     private static final int MSG_AD_LOADED_CHECK = 1;
-    private AdAppHelper mAdAppHelper;
     private Handler mHandler;
 
 
@@ -64,7 +55,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     private static final int MSG_SKIP = 101;
     private static final int MSG_SPLASH_SHOW = 102;
     private static final int MSG_OPINION_INTERNET_TYPE = 103;
-    private static final int MSG_CHECK_FREE_USE_TIME = 104;
     private static final int MSG_CHECK_VIP = 105;
 
     private boolean splashReady;
@@ -101,16 +91,10 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdAppHelper = AdAppHelper.getInstance(this);
-        mAdAppHelper.loadFullAd(AdUtils.FULL_AD_GOOD, 5);
-        mAdAppHelper.loadFullAd(AdUtils.FULL_AD_BAD, 50);
-        mAdAppHelper.loadNewNative();
-        mAdAppHelper.loadNewSplashAd();
         mHandler = new Handler(this);
         mHandler.sendEmptyMessage(MSG_CHECK_VIP);
-        mHandler.sendEmptyMessage(MSG_CHECK_FREE_USE_TIME);
 
-        if (FirebaseRemoteConfig.getInstance().getBoolean("is_show_animation_ad_flash")) {
+        if (true) {
             showAnimationAdFlash();
         } else {
             showNormalAdFlash();
@@ -119,60 +103,18 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         WarnDialogShowService.start(this);
         SharedPreferences sharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
         sharedPreferences.edit().putInt("SPLASH_OPEN_COUNT", sharedPreferences.getInt("SPLASH_OPEN_COUNT", 0) + 1).apply();
-        RealTimeLogger.answerLogEvent("splash_open", "open", "open_count:" + sharedPreferences.getInt("SPLASH_OPEN_COUNT", 0));
         if (!LocalVpnService.IsRunning)
             ServerListFetcherService.fetchServerListAsync(this);
         VpnManageService.start(this);
-        Firebase firebase = Firebase.getInstance(this);
-        firebase.logEvent("屏幕", "闪屏屏幕");
         Intent intent = getIntent();
         if (intent != null) {
             String source = intent.getStringExtra("source");
             if (source != null) {
-                firebase.logEvent("打开app来源", source);
             } else {
-                firebase.logEvent("打开app来源", "图标");
             }
         }
 
         mHandler.sendEmptyMessage(MSG_OPINION_INTERNET_TYPE);
-    }
-
-    private void checkFreeUseTime() {
-        //用活跃用户的打开APP的时间判断上次用户打开APP的时间
-        long openAppTime = RuntimeSettings.getOpenAppToDecideInactiveTime();
-        luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
-        freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
-        long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
-        long differ = System.currentTimeMillis() - openAppTime;
-
-        if (luckFreeDay <= 0) { //没有转转盘获取时间或者获取的时间到期
-            RuntimeSettings.setLuckPanGetRecord(0);
-            if (differ > 0) {
-                long dif = differ / 1000; // 上次打开APP的时间到这次的时间间隔
-                if (dif <= newUserFreeTime * 60) {// 20  15
-                    RuntimeSettings.setNewUserFreeUseTime(freeUseTime - dif);
-                    long newFreeUseTime = RuntimeSettings.getNewUserFreeUseTime();
-                    if (newFreeUseTime < 0)
-                        RuntimeSettings.setNewUserFreeUseTime(0);
-                } else {
-                    RuntimeSettings.setNewUserFreeUseTime(0);
-                }
-            }
-        } else { // 有幸运转盘转到的时间，但是这次打开APP要更新一下
-            if (differ > 0) {
-                long overDay = differ / (1000 * 60 * 60 * 24); // 上次打开APP的时间到现在的过了多少天
-                if (overDay <= luckFreeDay)
-                    RuntimeSettings.setLuckPanGetRecord(luckFreeDay - overDay);
-                else
-                    RuntimeSettings.setLuckPanGetRecord(0);
-                long newFreeUseDay = RuntimeSettings.getLuckPanGetRecord();
-                if (newFreeUseDay < 0)
-                    RuntimeSettings.setLuckPanGetRecord(0);
-
-                RuntimeSettings.setNewUserFreeUseTime(0);
-            }
-        }
     }
 
     private void checkIsVIP() {
@@ -183,7 +125,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 //        skuList.add(VIPActivity.PAY_ONE_YEAR);
 //        skuList.add(VIPActivity.PAY_SEVEN_FREE);
 
-        String priorityList = FirebaseRemoteConfig.getInstance().getString("pay_id_list");
+        String priorityList = "[{\"id\":\"one_1\"},{\"id\":\"one_2\"},{\"id\":\"one_3\"},{\"id\":\"one_4\"},{\"id\":\"half_1\"},{\"id\":\"half_2\"},{\"id\":\"half_4\"},{\"id\":\"year_1\"},{\"id\":\"free_1\"}]";
         try {
             JSONArray rootJsonArray = new JSONArray(priorityList);
             for (int i = 0; i < rootJsonArray.length(); i++) {
@@ -229,7 +171,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
             if (result.isFailure()) {
                 //在商品仓库中查询失败
-                Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询失败");
 //                Log.i("SplashActivity", "onQueryInventoryFinished: 查询失败 ");
                 return;
             }
@@ -239,7 +180,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (purchase != null) {
                     if (purchase.getSku().contains("one")) {
                         Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询成功", "一个月");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(true);
                         RuntimeSettings.setVIPPayHalfYear(false);
@@ -247,7 +187,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("half")) {
                         Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询成功", "半年");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(false);
                         RuntimeSettings.setVIPPayHalfYear(true);
@@ -255,7 +194,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("year")) {
                         Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询成功", "一年");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(false);
                         RuntimeSettings.setVIPPayHalfYear(false);
@@ -263,14 +201,12 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("free")) {
                         Log.i("SplashActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "查询成功", "试用7天");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(true);
                         RuntimeSettings.setVIPPayHalfYear(false);
                         RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else {
-                        Firebase.getInstance(SplashActivity.this).logEvent("欢迎页检查VIP", "没查询到");
                         RuntimeSettings.setVIP(false);
                     }
                 }
@@ -280,7 +216,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
 
 
     private void showAnimationAdFlash() {
-        if (mAdAppHelper.isSplashReady()) {
+        if (false) {
             setContentView(R.layout.flash_ad_animation_layout);
             splashReady = true;
         } else {
@@ -326,67 +262,64 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         FrameLayout frameLayout = (FrameLayout) findViewById(R.id.splash_ad_ll);
         LinearLayout centerLogoLL = (LinearLayout) findViewById(R.id.center_logo_ll);
         LinearLayout bottomLogoLL = (LinearLayout) findViewById(R.id.bottom_logo_ll);
-        if (mAdAppHelper.isSplashReady() && !RuntimeSettings.isVIP()) {
-            View view = mAdAppHelper.getSplashAd();
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
-            frameLayout.addView(view, layoutParams);
-
-            centerLogoLL.setVisibility(View.GONE);
-            frameLayout.setVisibility(View.VISIBLE);
-            bottomLogoLL.setVisibility(View.VISIBLE);
-
-            mHandler.sendMessageDelayed(msg, 3000);
-        } else {
+//        if (mAdAppHelper.isSplashReady() && !RuntimeSettings.isVIP()) {
+//            View view = mAdAppHelper.getSplashAd();
+//            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+//                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+//            frameLayout.addView(view, layoutParams);
+//
+//            centerLogoLL.setVisibility(View.GONE);
+//            frameLayout.setVisibility(View.VISIBLE);
+//            bottomLogoLL.setVisibility(View.VISIBLE);
+//
+//            mHandler.sendMessageDelayed(msg, 3000);
+//        } else {
             centerLogoLL.setVisibility(View.VISIBLE);
             frameLayout.setVisibility(View.GONE);
             bottomLogoLL.setVisibility(View.GONE);
 
             mHandler.sendMessageDelayed(msg, 1000);
-        }
+//        }
     }
 
     //加载Splash广告动画1.5s，下面的进度条开始走5s
     private void startNativeAnim() {
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        if (AdAppHelper.getInstance(this).isSplashReady()) {
-            String welcomeAd = adAppHelper.getCustomCtrlValue("welcome_ad", "1");
-            float welcomeAdRate;
-            try {
-                welcomeAdRate = Float.parseFloat(welcomeAd);
-            } catch (Exception e) {
-                welcomeAdRate = 0;
-            }
-            if (Math.random() < welcomeAdRate && !RuntimeSettings.isVIP()) {
-                View view = adAppHelper.getSplashAd();
-                Firebase.getInstance(this).logEvent("闪屏广告", "准备好", "显示");
-                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
-                mFlAd.addView(view, layoutParams);
-
-                String welcomeAdMinS = adAppHelper.getCustomCtrlValue("welcome_ad_min", "5000");
-                int welcomeAdMin;
-                try {
-                    welcomeAdMin = Integer.valueOf(welcomeAdMinS);
-                } catch (Exception e) {
-                    welcomeAdMin = 0;
-                }
-                String welcomeAdMaxS = adAppHelper.getCustomCtrlValue("welcome_ad_max", "0");
-                int welcomeAdMax;
-                try {
-                    welcomeAdMax = Integer.valueOf(welcomeAdMaxS);
-                } catch (Exception e) {
-                    welcomeAdMax = 0;
-                }
-                mHandler.sendEmptyMessageDelayed(MSG_SPLASH_SHOW, (long) (Math.random() * welcomeAdMax + welcomeAdMin));
-
-            } else {
-                mFlAd.setVisibility(View.GONE);
-                Firebase.getInstance(this).logEvent("闪屏广告", "准备好", "不显示");
-            }
-        } else {
+//        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+//        if (AdAppHelper.getInstance(this).isSplashReady()) {
+//            String welcomeAd = adAppHelper.getCustomCtrlValue("welcome_ad", "1");
+//            float welcomeAdRate;
+//            try {
+//                welcomeAdRate = Float.parseFloat(welcomeAd);
+//            } catch (Exception e) {
+//                welcomeAdRate = 0;
+//            }
+//            if (Math.random() < welcomeAdRate && !RuntimeSettings.isVIP()) {
+//                View view = adAppHelper.getSplashAd();
+//                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP);
+//                mFlAd.addView(view, layoutParams);
+//
+//                String welcomeAdMinS = adAppHelper.getCustomCtrlValue("welcome_ad_min", "5000");
+//                int welcomeAdMin;
+//                try {
+//                    welcomeAdMin = Integer.valueOf(welcomeAdMinS);
+//                } catch (Exception e) {
+//                    welcomeAdMin = 0;
+//                }
+//                String welcomeAdMaxS = adAppHelper.getCustomCtrlValue("welcome_ad_max", "0");
+//                int welcomeAdMax;
+//                try {
+//                    welcomeAdMax = Integer.valueOf(welcomeAdMaxS);
+//                } catch (Exception e) {
+//                    welcomeAdMax = 0;
+//                }
+//                mHandler.sendEmptyMessageDelayed(MSG_SPLASH_SHOW, (long) (Math.random() * welcomeAdMax + welcomeAdMin));
+//
+//            } else {
+//                mFlAd.setVisibility(View.GONE);
+//            }
+//        } else {
             mFlAd.setVisibility(View.GONE);
-            Firebase.getInstance(this).logEvent("闪屏广告", "没准备好", "不显示");
-        }
+//        }
 
         adAnim = ObjectAnimator.ofFloat(mFlAd, "translationY",
                 -Utils.getScreenHeight(this), 0, 20, -20, 10, -10, 5, -5, 0).setDuration(1500);
@@ -488,9 +421,10 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                     startLockAnim();
                 } else {
                     mTvTitle.setVisibility(View.VISIBLE);
-                    if (AdUtils.isGoodFullAdReady) {
-                        startMainActivity();
-                    } else if (!Utils.isConnected(SplashActivity.this)) {
+//                    if (AdUtils.isGoodFullAdReady) {
+//                        startMainActivity();
+//                    } else
+                        if (!Utils.isConnected(SplashActivity.this)) {
                         startMainActivity();
                     } else {
                         startLockAnim();
@@ -526,11 +460,11 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (wholeProcess) {
                     startTextDownAnim();
                 } else {
-                    if (AdUtils.isGoodFullAdReady) {
-                        startMainActivity();
-                    } else {
+//                    if (AdUtils.isGoodFullAdReady) {
+//                        startMainActivity();
+//                    } else {
                         startTextDownAnim();
-                    }
+//                    }
                 }
 
             }
@@ -584,11 +518,11 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 if (wholeProcess) {
                     startNativeAnim();
                 } else {
-                    if (AdUtils.isGoodFullAdReady) {
-                        startMainActivity();
-                    } else {
+//                    if (AdUtils.isGoodFullAdReady) {
+//                        startMainActivity();
+//                    } else {
                         startNativeAnim();
-                    }
+//                    }
                 }
 
             }
@@ -640,7 +574,7 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_AD_LOADED_CHECK:
-                if (AdUtils.isGoodFullAdReady || msg.arg1 > 4) {
+                if (true || msg.arg1 > 4) {//AdUtils.isGoodFullAdReady
                     startMainActivity();
                 } else {
                     Message message = Message.obtain();
@@ -651,10 +585,10 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 break;
 
             case MSG_CHECK_ENTER:
-                if (AdUtils.isGoodFullAdReady) {
-                    mRpClose.cancelAnimator();
-                    startMainActivity();
-                } else
+//                if (AdUtils.isGoodFullAdReady) {
+//                    mRpClose.cancelAnimator();
+//                    startMainActivity();
+//                } else
                     mHandler.sendEmptyMessageDelayed(MSG_CHECK_ENTER, CHECK_INTERNAL);
                 break;
 
@@ -678,12 +612,8 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
                 break;
 
             case MSG_OPINION_INTERNET_TYPE:
-                Firebase.getInstance(this).logEvent("当前网络类型", "类型", InternetUtil.getNetworkState(SplashActivity.this));
                 break;
 
-            case MSG_CHECK_FREE_USE_TIME:
-                checkFreeUseTime();
-                break;
             case MSG_CHECK_VIP:
                 try {
                     checkIsVIP();
@@ -736,28 +666,28 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
     @Override
     public void endAnim() {
         mHandler.removeCallbacksAndMessages(null);
-        if (AdUtils.isGoodFullAdReady) {
-            startMainActivity();
-        } else {
+//        if (AdUtils.isGoodFullAdReady) {
+//            startMainActivity();
+//        } else {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     startMainActivity();
                 }
             }, 1000);
-        }
+//        }
     }
 
     private void startMainActivity() {
         Intent intent = null;
-        if (RuntimeSettings.isVIP())
+//        if (RuntimeSettings.isVIP())
+//            intent = new Intent(this, MainActivity.class);
+//        else if (RuntimeSettings.getLuckPanGetRecord() > 0)
+//            intent = new Intent(this, MainActivity.class);
+//        else if (RuntimeSettings.getNewUserFreeUseTime() > 0)
             intent = new Intent(this, MainActivity.class);
-        else if (RuntimeSettings.getLuckPanGetRecord() > 0)
-            intent = new Intent(this, MainActivity.class);
-        else if (RuntimeSettings.getNewUserFreeUseTime() > 0)
-            intent = new Intent(this, MainActivity.class);
-        else
-            intent = new Intent(this, RecommendVIPActivity.class);
+//        else
+//            intent = new Intent(this, RecommendVIPActivity.class);
         startActivity(intent);
         finish();
     }
@@ -767,7 +697,6 @@ public class SplashActivity extends AppCompatActivity implements Handler.Callbac
         switch (v.getId()) {
             case R.id.skip_btn:
                 startMainActivity();
-                Firebase.getInstance(this).logEvent("广告界面点击跳过广告", "跳过");
                 break;
         }
     }

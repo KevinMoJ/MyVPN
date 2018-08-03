@@ -34,7 +34,6 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.lang.ref.WeakReference;
@@ -386,7 +385,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, A
     private void checkFreeUseTime(boolean isOnResume) {
         long freeUseTime = RuntimeSettings.getNewUserFreeUseTime();
         long luckFreeDay = RuntimeSettings.getLuckPanGetRecord();
-        long newUserFreeTime = FirebaseRemoteConfig.getInstance().getLong("new_user_free_use_time");
+        long newUserFreeTime = 30;
 
         if (luckFreeDay <= 0 && freeUseTime == 0) {
             RuntimeSettings.setNewUserFreeUseTime(newUserFreeTime * 60);

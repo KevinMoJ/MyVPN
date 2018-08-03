@@ -12,17 +12,14 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.model.ServerConfig;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
-import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
+import com.androapplite.shadowsocks.utils.ServiceUtils;
 import com.androapplite.vpn3.BuildConfig;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.utils.ServiceUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -110,10 +107,9 @@ public class ServerListFetcherService extends IntentService{
             mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
 //            useCustomURL();
 
-            Firebase firebase = Firebase.getInstance(this);
             ArrayList<MyCallable> tasks = new ArrayList<>(DOMAIN_URLS.size());
             for (String url: DOMAIN_URLS) {
-                tasks.add(new MyCallable(url, firebase, mHttpClient));
+                tasks.add(new MyCallable(url, mHttpClient));
             }
 
             int min = Math.min(Runtime.getRuntime().availableProcessors(), DOMAIN_URLS.size());
@@ -188,9 +184,9 @@ public class ServerListFetcherService extends IntentService{
             }
             //取结果
             if(mServerListJsonString != null && !mServerListJsonString.isEmpty()){
-                Firebase.getInstance(this).logEvent("取服务器列表成功总时间", urlKey, t2-t1);
+//                Firebase.getInstance(this).logEvent("取服务器列表成功总时间", urlKey, t2-t1);
             }else{
-                Firebase.getInstance(this).logEvent("取服务器列表失败总时间", t2-t1);
+//                Firebase.getInstance(this).logEvent("取服务器列表失败总时间", t2-t1);
             }
 
             //使用remote config
@@ -239,19 +235,16 @@ public class ServerListFetcherService extends IntentService{
             TelephonyManager manager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
             String simOperator = manager.getSimOperator();
             String iosCountry = manager.getSimCountryIso();
-            Firebase.getInstance(this).logEvent("服务器url", urlKey, String.format("%s|%s|%s", iosCountry, simOperator, localCountry));
-            Firebase.getInstance(this).logEvent("服务器url", urlKey, mUrl);
-            RealTimeLogger.getInstance(this).logEventAsync("服务器url", "url_key", urlKey, "url", mUrl, "json_string", mServerListJsonString);
-            if(mUrl != null){
-                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-                String domain = adAppHelper.getCustomCtrlValue("serverListDomain", null);
-                String ip = adAppHelper.getCustomCtrlValue("serverListIP", null);
-                if(mUrl.equals(domain)){
-                    Firebase.getInstance(this).logEvent("服务器列表地址", "domain", mUrl);
-                }else if(mUrl.equals(ip)){
-                    Firebase.getInstance(this).logEvent("服务器列表地址", "ip", mUrl);
-                }
-            }
+//            if(mUrl != null){
+//                AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
+//                String domain = adAppHelper.getCustomCtrlValue("serverListDomain", null);
+//                String ip = adAppHelper.getCustomCtrlValue("serverListIP", null);
+//                if(mUrl.equals(domain)){
+//                    Firebase.getInstance(this).logEvent("服务器列表地址", "domain", mUrl);
+//                }else if(mUrl.equals(ip)){
+//                    Firebase.getInstance(this).logEvent("服务器列表地址", "ip", mUrl);
+//                }
+//            }
 
             broadcastServerListFetchFinish();
             hasStart = false;
@@ -265,24 +258,12 @@ public class ServerListFetcherService extends IntentService{
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void useCustomURL(){
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(this);
-        String url = adAppHelper.getCustomCtrlValue("serverListDomain", DOMAIN_URL);
-        DOMAIN_URLS.set(0, url);
-        URL_KEY_MAP.put(url, "domain");
-        url = adAppHelper.getCustomCtrlValue("serverListIP", IP_URL);
-        DOMAIN_URLS.set(1, url);
-        URL_KEY_MAP.put(url, "ip");
-    }
-
     private static class MyCallable implements Callable<Pair<String, String>> {
         private String mUrl;
-        private Firebase mFirebase;
         private OkHttpClient mHttpClient;
 
-        MyCallable(String url, Firebase firebase, OkHttpClient client) {
+        MyCallable(String url, OkHttpClient client) {
             mUrl = url;
-            mFirebase = firebase;
             mHttpClient = client;
         }
         @Override
@@ -313,14 +294,6 @@ public class ServerListFetcherService extends IntentService{
             }
             long dur = System.currentTimeMillis() - t1;
 
-            if (errMsg != null)
-                mFirebase.logEvent("访问服务器列表失败", urlKey, errMsg);
-            else if (jsonString != null && !jsonString.isEmpty() && ServerConfig.checkServerConfigJsonString(jsonString))
-                mFirebase.logEvent("访问服务器列表成功", urlKey, dur);
-            else if (jsonString == null)
-                mFirebase.logEvent("访问服务器列表失败json是null", urlKey, dur);
-            else if (jsonString.isEmpty() || !ServerConfig.checkServerConfigJsonString(jsonString))
-                mFirebase.logEvent("服务器列表列表失败JSON问题", urlKey, jsonString);
             return new Pair<>(mUrl, jsonString);
         }
     }

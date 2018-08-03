@@ -19,15 +19,14 @@ import android.text.SpannableString;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.LoadingDialogActivity;
-import com.androapplite.shadowsocks.activity.RecommendVIPActivity;
+import com.androapplite.shadowsocks.activity.MainActivity;
+import com.androapplite.shadowsocks.activity.SplashActivity;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
 import com.androapplite.vpn3.R;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +46,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
 
     public VpnNotification(Service service) {
         mService = service;
-        Intent intent = new Intent(service, RecommendVIPActivity.class);
+        Intent intent = new Intent(service, SplashActivity.class);
         intent.putExtra("source", "notificaiton");
         PendingIntent pendingIntent = PendingIntent.getActivity(service, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Bitmap largeIcon = BitmapFactory.decodeResource(service.getResources(), R.drawable.notification_icon_large);
@@ -111,8 +110,8 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 } else {
                     String text = mService.getString(R.string.notification_no_time, tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
                     try {
-                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_low_dialog_show") && !RuntimeSettings.isVIP())
-                            showNetSpeedLowWarnDialog(tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
+//                        if (FirebaseRemoteConfig.getInstance().getBoolean("is_net_speed_low_dialog_show") && !RuntimeSettings.isVIP())
+//                            showNetSpeedLowWarnDialog(tcpTrafficMonitor.pPayloadReceivedSpeed, tcpTrafficMonitor.pPayloadSentSpeed);
                     } catch (Exception e) {
                     }
                     mNormalNetworkStatusBuilder.setContentText(text);
@@ -130,11 +129,11 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
         long date = RuntimeSettings.getNetSpeedLowDialogShowTime();
         long lastShowTime = RuntimeSettings.getNetSpeedLowDialogShowTime();
         int showCount = RuntimeSettings.getNetSpeedLowDialogShowCount();
-        int count = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_show_count");
-        int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_space_minutes");
-        int firstShowSpaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("net_speed_low_dialog_first_show_space_minutes");
-        long cloudUpload = FirebaseRemoteConfig.getInstance().getLong("net_speed_low_upload");
-        long cloudDownload = FirebaseRemoteConfig.getInstance().getLong("net_speed_low_download");
+        int count = (int) 2;
+        int spaceTime = 120;
+        int firstShowSpaceTime = 120;
+        long cloudUpload = 500;
+        long cloudDownload = 500;
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         long vpnStartTime = RuntimeSettings.getVPNStartConnectTime();
 
@@ -146,18 +145,15 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
                 showCount = showCount + 1;
                 RuntimeSettings.setNetSpeedLowDialogShowCount(showCount);
                 RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
                 LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             } else if (DateUtils.isToday(date) && WarnDialogUtil.isAppBackground() && showCount < count) {
                 showCount = showCount + 1;
                 RuntimeSettings.setNetSpeedLowDialogShowCount(showCount);
                 RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
                 LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setNetSpeedLowDialogShowCount(1);
                 RuntimeSettings.setNetSpeedLowDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(ShadowsocksApplication.getGlobalContext()).logEvent("大弹窗", "开始跳转", "网速低");
                 LoadingDialogActivity.start(ShadowsocksApplication.getGlobalContext(), WarnDialogActivity.NET_SPEED_LOW_DIALOG);
             }
         }
@@ -194,7 +190,7 @@ public class VpnNotification implements LocalVpnService.onStatusChangedListener 
     public static void showVpnStoppedNotificationGlobe(Context context, boolean showFullScreenIntent) {
         try {
             final Context applicationContext = context.getApplicationContext();
-            Intent intent = new Intent(applicationContext, RecommendVIPActivity.class);
+            Intent intent = new Intent(applicationContext, MainActivity.class);
             intent.putExtra("source", "notificaiton");
             PendingIntent pendingIntent = PendingIntent.getActivity(applicationContext, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             NotificationCompat.Builder errorNetworkStatusBuilder = new NotificationCompat.Builder(applicationContext, channelId);

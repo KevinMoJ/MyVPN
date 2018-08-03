@@ -16,19 +16,14 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.activity.LoadingDialogActivity;
 import com.androapplite.shadowsocks.activity.WarnDialogActivity;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
+import com.androapplite.shadowsocks.utils.ServiceUtils;
 import com.androapplite.shadowsocks.utils.Utils;
 import com.androapplite.shadowsocks.utils.WarnDialogUtil;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.ads.AdType;
-import com.bestgo.adsplugin.ads.listener.AdStateListener;
-import com.bestgo.adsplugin.utils.ServiceUtils;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import java.util.concurrent.TimeUnit;
@@ -41,7 +36,6 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
     private Handler mHandler;
     private SharedPreferences mSharedPreference;
     private WarnDialogReceiver mWarnDialogReceiver;
-    private WarnDialogAdStateListener mAdStateListener;
     private String countryCode;
 
     private long startTime;
@@ -92,16 +86,10 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         long date = RuntimeSettings.getWifiDialogShowTime();
         long lastShowTime = RuntimeSettings.getWifiDialogShowTime();
         int showCount = RuntimeSettings.getWifiDialogShowCount();
-        int count = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_count");
-        int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("wifi_dialog_show_space_minutes");
+        int count = 2;
+        int spaceTime = 120;
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         boolean isInactiveUser = !DateUtils.isToday(RuntimeSettings.getOpenAppToDecideInactiveTime());
-        if (mAdStateListener == null)
-            mAdStateListener = new WarnDialogAdStateListener();
-
-        if (!WarnDialogUtil.isAdLoaded(this, true))
-            AdAppHelper.getInstance(this).setAdStateListener(mAdStateListener);
-
         //同一天一个弹窗最多弹两次 弹的次数可以云控控制   默认2小时冷却,间隔可以配置   23:00 - 9:00 的时间段禁止弹
         if (WarnDialogUtil.isAdLoaded(this, true) && WarnDialogUtil.isSpaceTimeShow(lastShowTime, spaceTime) && isInactiveUser
                 && hour_of_day > 9 && hour_of_day < 23) {
@@ -110,18 +98,15 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 showCount = showCount + 1;
                 RuntimeSettings.setWifiDialogShowCount(showCount);
                 RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
                 LoadingDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
                 RuntimeSettings.setWifiDialogShowCount(showCount);
                 RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
                 LoadingDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setWifiDialogShowCount(1);
                 RuntimeSettings.setWifiDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "链接WiFi");
                 LoadingDialogActivity.start(this, WarnDialogActivity.CONNECT_PUBLIC_WIFI_DIALOG);
             }
         }
@@ -131,8 +116,8 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         long date = RuntimeSettings.getDevelopedCountryInactiveUserDialogShowTime();
         long lastShowTime = RuntimeSettings.getDevelopedCountryInactiveUserDialogShowTime();
         int showCount = RuntimeSettings.getDevelopedCountryInactiveUserDialogShowCount();
-        int count = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_show_count");
-        int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("developed_country_inactive_user_dialog_space_minutes");
+        int count = 2;
+        int spaceTime = 120;
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         boolean isInactiveUser = !DateUtils.isToday(RuntimeSettings.getOpenAppToDecideInactiveTime());
 
@@ -143,18 +128,15 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 showCount = showCount + 1;
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
                 LoadingDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
                 LoadingDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
                 RuntimeSettings.setDevelopedCountryInactiveUserDialogShowCount(showCount);
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "发达国家不活跃用户");
                 LoadingDialogActivity.start(this, WarnDialogActivity.DEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             }
         }
@@ -164,8 +146,8 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
         long date = RuntimeSettings.getUndevelopedCountryInactiveUserDialogShowTime();
         long lastShowTime = RuntimeSettings.getUndevelopedCountryInactiveUserDialogShowTime();
         int showCount = RuntimeSettings.getUndevelopedCountryInactiveUserDialogShowCount();
-        int count = (int) FirebaseRemoteConfig.getInstance().getLong("undeveloped_country_inactive_user_dialog_show_count");
-        int spaceTime = (int) FirebaseRemoteConfig.getInstance().getLong("is_undeveloped_country_inactive_user_dialog_space_minutes");
+        int count = 2;
+        int spaceTime = 120;
         long hour_of_day = WarnDialogUtil.getHourOrDay();
         boolean isInactiveUser = !DateUtils.isToday(RuntimeSettings.getOpenAppToDecideInactiveTime());
 
@@ -175,29 +157,16 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                 showCount = showCount + 1;
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(showCount);
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
                 LoadingDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (DateUtils.isToday(date) && showCount < count && WarnDialogUtil.isAppBackground()) {
                 showCount = showCount + 1;
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(showCount);
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
                 LoadingDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
             } else if (!DateUtils.isToday(date) && WarnDialogUtil.isAppBackground()) {
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowCount(1);
                 RuntimeSettings.setUndevelopedCountryInactiveUserDialogShowTime(System.currentTimeMillis());
-                Firebase.getInstance(this).logEvent("大弹窗", "开始跳转", "不发达国家不活跃用户");
                 LoadingDialogActivity.start(this, WarnDialogActivity.UNDEVELOPED_COUNTRY_INACTIVE_USER_DIALOG);
-            }
-        }
-    }
-
-    private class WarnDialogAdStateListener extends AdStateListener {
-        @Override
-        public void onAdLoaded(AdType adType, int index) {
-            if (isWifiConnected && !LocalVpnService.IsRunning && !RuntimeSettings.isVIP()) {
-                monitorWifiStateChangeDialog();
-                AdAppHelper.getInstance(WarnDialogShowService.this).removeAdStateListener(mAdStateListener);
             }
         }
     }
@@ -252,14 +221,12 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                         return;
                     }
                     //wifi链接一天弹两次
-                    if (FirebaseRemoteConfig.getInstance().getBoolean("is_wifi_dialog_show")
-                            && !TextUtils.isEmpty(wifiInfo.getSSID())
+                    if (!TextUtils.isEmpty(wifiInfo.getSSID())
                             && !LocalVpnService.IsRunning
                             && !RuntimeSettings.isVIP()) {
                         Log.i(TAG, "onReceive:   " + wifiInfo.getSSID());
                         //这个状态会执行两次，没有发现解决的好办法，为了只起一个界面延迟做一下跳转，在handler里面做removeMessages
                         mHandler.sendEmptyMessageDelayed(MSG_WIFI_CONNECTED, 2000);
-                        AdAppHelper.getInstance(WarnDialogShowService.this).loadNewNative();
                         isWifiConnected = true;
                     }
 
@@ -270,13 +237,11 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
             } else if (Intent.ACTION_TIME_TICK.equals(action)) {
                 // 15分钟执行一次检查
                 if ((System.currentTimeMillis() - startTime >= TimeUnit.MINUTES.toMillis(15)) && !RuntimeSettings.isVIP()) {
-                    if (FirebaseRemoteConfig.getInstance().getBoolean("is_developed_country_inactive_user_dialog_show")
-                            && (countryCode.equals("US") || countryCode.equals("DE") || countryCode.equals("GB") || countryCode.equals("AU"))
+                    if ((countryCode.equals("US") || countryCode.equals("DE") || countryCode.equals("GB") || countryCode.equals("AU"))
                             && !LocalVpnService.IsRunning) {
                         //云控控制开关并且针对发达国家（美国，德国，澳大利亚，英国）
                         monitorDevelopedCountryInactiveUserDialog();
-                    } else if (FirebaseRemoteConfig.getInstance().getBoolean("is_undeveloped_country_inactive_user_dialog_show")
-                            && !countryCode.equals("US") && !countryCode.equals("DE") && !countryCode.equals("GB") && !countryCode.equals("AU")
+                    } else if (!countryCode.equals("US") && !countryCode.equals("DE") && !countryCode.equals("GB") && !countryCode.equals("AU")
                             && !LocalVpnService.IsRunning) {
                         //针对不发达国家不活跃用户进行的弹窗
                         monitorUndevelopedCountryInactiveUserDialog();
@@ -284,29 +249,26 @@ public class WarnDialogShowService extends Service implements Handler.Callback {
                     startTime = System.currentTimeMillis();
                 }
 
-                if (FirebaseRemoteConfig.getInstance().getBoolean("is_luck_rotate_dialog_show") && !RuntimeSettings.isVIP()) {
-                    // 当当天的转转盘天数没有达到7天的时候，每隔一个小时弹一次弹窗，弹出的弹窗要带出全屏，如果没有全屏的话就下一分钟进行弹，直到弹出弹窗为止，弹出的时间
-                    //开始计时，当弹出的
-                    long todayGetFreeDay = RuntimeSettings.getLuckPanFreeDay();
-                    long cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
-                    long cloudLuckPanShowSpaceTime = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_dialog_first_show_space_minutes");
-                    long hour_of_day = WarnDialogUtil.getHourOrDay();
-                    long cloudShowCountDay = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_dialog_show_count");
-                    int showCount = RuntimeSettings.getLuckPanDialogShowCount();
+                // 当当天的转转盘天数没有达到7天的时候，每隔一个小时弹一次弹窗，弹出的弹窗要带出全屏，如果没有全屏的话就下一分钟进行弹，直到弹出弹窗为止，弹出的时间
+                //开始计时，当弹出的
+                long todayGetFreeDay = RuntimeSettings.getLuckPanFreeDay();
+                long cloudGetLuckFreeDay = 7;
+                long cloudLuckPanShowSpaceTime = 120;
+                long hour_of_day = WarnDialogUtil.getHourOrDay();
+                long cloudShowCountDay = 3;
+                int showCount = RuntimeSettings.getLuckPanDialogShowCount();
 
-                    if ((todayGetFreeDay < cloudGetLuckFreeDay) && Utils.isScreenOn(WarnDialogShowService.this)
-                            && WarnDialogUtil.isSpaceTimeShow(previousShowTime, cloudLuckPanShowSpaceTime) && !WarnDialogActivity.activityIsShowing
-                            && WarnDialogUtil.isAppBackground() && WarnDialogUtil.isAdLoaded(WarnDialogShowService.this, true)
-                            && hour_of_day >= 9 && hour_of_day <= 24 && showCount <= cloudShowCountDay) {
-                        previousShowTime = System.currentTimeMillis();
-                        LoadingDialogActivity.start(WarnDialogShowService.this, WarnDialogActivity.LUCK_ROTATE_DIALOG);
-                        RuntimeSettings.setLuckPanDialogShowCount(RuntimeSettings.getLuckPanDialogShowCount() + 1);
-                    }
-
-                    if (!DateUtils.isToday(previousShowTime))
-                        RuntimeSettings.setLuckPanDialogShowCount(0);
+                if ((todayGetFreeDay < cloudGetLuckFreeDay) && Utils.isScreenOn(WarnDialogShowService.this)
+                        && WarnDialogUtil.isSpaceTimeShow(previousShowTime, cloudLuckPanShowSpaceTime) && !WarnDialogActivity.activityIsShowing
+                        && WarnDialogUtil.isAppBackground() && WarnDialogUtil.isAdLoaded(WarnDialogShowService.this, true)
+                        && hour_of_day >= 9 && hour_of_day <= 24 && showCount <= cloudShowCountDay) {
+                    previousShowTime = System.currentTimeMillis();
+                    LoadingDialogActivity.start(WarnDialogShowService.this, WarnDialogActivity.LUCK_ROTATE_DIALOG);
+                    RuntimeSettings.setLuckPanDialogShowCount(RuntimeSettings.getLuckPanDialogShowCount() + 1);
                 }
 
+                if (!DateUtils.isToday(previousShowTime))
+                    RuntimeSettings.setLuckPanDialogShowCount(0);
 
             }
         }

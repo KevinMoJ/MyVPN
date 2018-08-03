@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.text.TextUtils;
 
-import com.androapplite.shadowsocks.Firebase;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,8 +36,6 @@ public class MyMultipleReceiver extends BroadcastReceiver {
             String referrer = intent.getStringExtra(REFERRER_PREF);
             if (referrer != null && !referrer.isEmpty()) {
                 if ("utm_source=(not%20set)&utm_medium=(not%20set)".equals(referrer)) {
-                    Firebase.getInstance(context).setUserProperty("campaign_id", "Facebook");
-                    Firebase.getInstance(context).logEvent("install", "adwords", "Facebook");
                 } else {
                     HashMap<String, String> maps = new HashMap<>();
                     String[] pairs = referrer.split("&");
@@ -60,11 +56,8 @@ public class MyMultipleReceiver extends BroadcastReceiver {
                     String network = maps.get("network");
                     String campaignId = maps.get("campaignid");
                     if ("a".equals(campaignType) && "g".equals(network) && !TextUtils.isEmpty(campaignId)) {
-                        Firebase.getInstance(context).setUserProperty("campaign_id", campaignId);
-                        Firebase.getInstance(context).logEvent("install", "adwords", campaignId);
                     }
                 }
-                Firebase.getInstance(context).logEvent("install", REFERRER_PREF, referrer);
             }
         }
     }

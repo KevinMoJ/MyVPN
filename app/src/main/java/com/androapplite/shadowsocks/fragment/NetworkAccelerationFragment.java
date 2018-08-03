@@ -21,9 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,10 +52,7 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
         mRocketBt = (Button) view.findViewById(R.id.acc_btn);
         mRocketBt.setOnClickListener(this);
         mAdContent = (FrameLayout) view.findViewById(R.id.net_speed_ad_content);
-        if (!RuntimeSettings.isVIP())
-            addBottomAd();
-        else
-            isNativeAddSuccess = false;
+        isNativeAddSuccess = false;
         if (!isNativeAddSuccess) {
             RelativeLayout.LayoutParams rocketBtLayoutParams = (RelativeLayout.LayoutParams) mRocketBt.getLayoutParams();
             rocketBtLayoutParams.bottomMargin = getResources().getDimensionPixelSize(R.dimen.activity_vertical_margin);
@@ -68,16 +63,6 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
 //        }
     }
 
-    private void addBottomAd() {
-        AdAppHelper adAppHelper = AdAppHelper.getInstance(getContext());
-        try {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-            isNativeAddSuccess = adAppHelper.getNative(2, mAdContent, params);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onClick(View v) {
@@ -205,8 +190,6 @@ public class NetworkAccelerationFragment extends Fragment implements View.OnClic
             }
         }
 
-        if (!RuntimeSettings.isVIP())
-            addBottomAd();
         else
             isNativeAddSuccess = false;
         if (!isNativeAddSuccess) {

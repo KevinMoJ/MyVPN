@@ -15,8 +15,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver;
 import com.androapplite.shadowsocks.util.IabBroadcastReceiver.IabBroadcastListener;
 import com.androapplite.shadowsocks.util.IabHelper;
@@ -26,7 +24,6 @@ import com.androapplite.shadowsocks.util.Inventory;
 import com.androapplite.shadowsocks.util.Purchase;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 
 import org.json.JSONArray;
@@ -83,24 +80,9 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         initView();
         initUI();
         initGooglePayHelper();
-        analysisSource();
         if (LocalVpnService.Instance != null) {
             LocalVpnService.Instance.isPayLoadInterface = true;
         }
-    }
-
-    private void analysisSource() {
-        int type = getIntent().getIntExtra(TYPE, TYPE_MAIN_PAO);
-        if (type == TYPE_SERVER_LIST)
-            Firebase.getInstance(this).logEvent("进入vip界面来源", "服务器列表点击");
-        else if (type == TYPE_MAIN_PAO)
-            Firebase.getInstance(this).logEvent("进入vip界面来源", "主界面小泡泡");
-        else if (type == TYPE_NAV)
-            Firebase.getInstance(this).logEvent("进入vip界面来源", "侧边栏");
-        else if (type == TYPE_NET_SPEED_FINISH)
-            Firebase.getInstance(this).logEvent("进入vip界面来源", "加速成功结果页");
-        else if (type == TYPE_FREE_TIME_OVER)
-            Firebase.getInstance(this).logEvent("进入vip界面来源", "免费试用结束");
     }
 
     private void initGooglePayHelper() {
@@ -109,7 +91,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
 //        skuList.add(PAY_ONE_YEAR);
 //        skuList.add(PAY_SEVEN_FREE); // 添加消费的SKU，此字段在Google后台有保存，用来区别当前用户是否支付，字段是商品ID
 
-        String priorityList = FirebaseRemoteConfig.getInstance().getString("pay_id_list");
+        String priorityList = "[{\"id\":\"one_1\"},{\"id\":\"one_2\"},{\"id\":\"one_3\"},{\"id\":\"one_4\"},{\"id\":\"half_1\"},{\"id\":\"half_2\"},{\"id\":\"half_4\"},{\"id\":\"year_1\"},{\"id\":\"free_1\"}]";
         try {
             JSONArray rootJsonArray = new JSONArray(priorityList);
             for (int i = 0; i < rootJsonArray.length(); i++) {
@@ -173,9 +155,9 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
     }
 
     private void initUI() {
-        String oneMonthMoney = FirebaseRemoteConfig.getInstance().getString("pay_one_month_money");
-        String halfYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_half_year_money");
-        String oneYearMoney = FirebaseRemoteConfig.getInstance().getString("pay_one_year_money");
+        String oneMonthMoney ="2.99";
+        String halfYearMoney ="2.99";
+        String oneYearMoney = "2.99";
 
         mVipOneMonthMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(oneMonthMoney)));
         mVipHalfYearMoneyText.setText(getResources().getString(R.string.pay_one_month_bt_text, String.valueOf(halfYearMoney)));
@@ -216,9 +198,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
         }
 
         if (itemId == R.id.vip_luck_pan) {
-            //申请进入转盘进入的全屏
-            AdUtils.loadBadFullAd(0);
-            Firebase.getInstance(this).logEvent("VIP购买界面", "转盘按钮", "点击");
             LuckRotateActivity.startLuckActivity(this);
             return true;
         }
@@ -274,7 +253,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             if (result.isFailure()) {
                 //在商品仓库中查询失败
                 Log.i(TAG, "onIabPurchaseFinished: 查询失败");
-                Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询失败");
                 return;
             }
             for (String s : skuList) {
@@ -282,7 +260,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                 if (purchase != null) {
                     if (purchase.getSku().contains("one")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一个月");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(true);
                         RuntimeSettings.setVIPPayHalfYear(false);
@@ -290,7 +267,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("half")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "半年");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(false);
                         RuntimeSettings.setVIPPayHalfYear(true);
@@ -298,7 +274,6 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("year")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "一年");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(false);
                         RuntimeSettings.setVIPPayHalfYear(false);
@@ -306,14 +281,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else if (purchase.getSku().contains("free")) {
                         Log.i("VIPActivity", "onIabPurchaseFinishedMain: We have goods");
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "查询成功", "试用7天");
                         RuntimeSettings.setVIP(true);
                         RuntimeSettings.setVIPPayOneMonth(true);
                         RuntimeSettings.setVIPPayHalfYear(false);
                         RuntimeSettings.setAutoRenewalVIP(purchase.isAutoRenewing());
                         RuntimeSettings.setVIPPayTime(purchase.getPurchaseTime());
                     } else {
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "没查询到");
                         RuntimeSettings.setVIP(false);
                     }
                 }
@@ -350,7 +323,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             return;
         }
 
-        String oneYearSku = FirebaseRemoteConfig.getInstance().getString("pay_one_month_id");
+        String oneYearSku = "one_1";
 
         mHelper.flagEndAsync();
         try {
@@ -360,15 +333,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                     if (result.isFailure()) {
                         if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
                             // 交易取消
-                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易取消", "一个月");
                             Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {
                             // 交易失败
-                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易失败", "一个月");
                             Log.i(TAG, "onIabPurchaseFinished: 交易失败");
                         }
                     } else {
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一个月");
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功 一个月");
                         //存个字段，说明是VIP用户
                         RuntimeSettings.setVIP(true);
@@ -397,7 +367,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             return;
         }
 
-        String halfYearSku = FirebaseRemoteConfig.getInstance().getString("pay_half_year_id");
+        String halfYearSku = "half_1";
 
         mHelper.flagEndAsync();
         try {
@@ -407,15 +377,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                     if (result.isFailure()) {
                         if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
                             // 交易取消
-                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易取消", "半年");
                             Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {
                             // 交易失败
-                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易失败", "半年");
                             Log.i(TAG, "onIabPurchaseFinished: 交易失败");
                         }
                     } else {
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "半年");
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 半年");
                         //存个字段，说明是VIP用户
                         RuntimeSettings.setVIP(true);
@@ -444,7 +411,7 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
             return;
         }
 
-        String oneYearSku = FirebaseRemoteConfig.getInstance().getString("pay_one_year_id");
+        String oneYearSku = "year_1";
 
         mHelper.flagEndAsync();
         try {
@@ -454,15 +421,12 @@ public class VIPActivity extends AppCompatActivity implements IabBroadcastListen
                     if (result.isFailure()) {
                         if (result.getResponse() == IabHelper.IABHELPER_USER_CANCELLED) {
                             // 交易取消
-                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易取消", "一年");
                             Log.i(TAG, "onIabPurchaseFinished: 交易取消");
                         } else {
                             // 交易失败
-                            Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易失败", "一年");
                             Log.i(TAG, "onIabPurchaseFinished: 交易失败");
                         }
                     } else {
-                        Firebase.getInstance(VIPActivity.this).logEvent("VIP交易", "交易成功", "一年");
                         Log.i(TAG, "onIabPurchaseFinished: 交易成功的finish 一年");
                         //存个字段，说明是VIP用户
                         RuntimeSettings.setVIP(true);

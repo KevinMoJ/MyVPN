@@ -20,8 +20,6 @@ import android.widget.ImageView;
 import com.androapplite.shadowsocks.utils.Rotate3dAnimation;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.animation.AbstractAnimator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,9 +87,6 @@ public class NetworkAccelerationFinishFragment extends Fragment implements Abstr
             FrameLayout container = (FrameLayout) view.findViewById(R.id.ad_view_fl);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER);
             Context context = view.getContext();
-            if (container != null) {
-                AdAppHelper.getInstance(context).getNative(2, container, params);
-            }
         }
     }
 

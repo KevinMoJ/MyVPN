@@ -14,13 +14,8 @@ import com.androapplite.shadowsocks.model.VpnState;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.service.IpCountryIntentService;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.BuildConfig;
-import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.crashlytics.android.Crashlytics;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.VpnNotification;
 
 import java.io.BufferedReader;
@@ -41,24 +36,10 @@ public class ShadowsocksApplication extends Application implements Application.A
     @Override
     public void onCreate() {
         super.onCreate();
-        if (BuildConfig.DEBUG) {
-            //谷歌插页广告导致资源泄露
-//            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//                    .detectAll()
-//                    .penaltyLog()
-//                    .build());
-//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//                    .detectAll()
-//                    .penaltyLog()
-//                    .penaltyDeath()
-//                    .build());
-        }
         gContext = getApplicationContext();
-        AdUtils.initAdHelper(this);
         checkVpnState();
         IpCountryIntentService.startService(this);
         VpnNotification.showVpnStoppedNotificationGlobe(this, false);
-        FirebaseRemoteConfig.getInstance().setDefaults(R.xml.remote_config_defaults);
         mIsFirstOpen = true;
         registerActivityLifecycleCallbacks(this);
     }
@@ -68,9 +49,6 @@ public class ShadowsocksApplication extends Application implements Application.A
         Log.d("ShadowsocksApplication", "vpn state: " + stateValue);
         if (stateValue >= 0 && stateValue < VpnState.values().length) {
             VpnState state = VpnState.values()[stateValue];
-            if (state == VpnState.Connected) {
-                Firebase.getInstance(this).logEvent("异常", "进程刚启动", "上次启动异常中止");
-            }
         }
     }
 
@@ -83,8 +61,6 @@ public class ShadowsocksApplication extends Application implements Application.A
     public static final void handleException(@NonNull Throwable throwable) {
         if (BuildConfig.DEBUG) {
             throwable.printStackTrace();
-        } else {
-            Crashlytics.logException(throwable);
         }
     }
 
@@ -129,7 +105,6 @@ public class ShadowsocksApplication extends Application implements Application.A
         mOpenActivities--;
         if (mOpenActivities == 0) {
             mIsFirstOpen = true;
-            AdAppHelper.getInstance(this).appQuit();
         }
     }
 
@@ -171,9 +146,6 @@ public class ShadowsocksApplication extends Application implements Application.A
                     }
                 }
                 bufferedReader.close();
-                if (lineNumber > 2 && line != null) {
-                    Firebase.getInstance(this).logEvent("TCP Record", line.trim());
-                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

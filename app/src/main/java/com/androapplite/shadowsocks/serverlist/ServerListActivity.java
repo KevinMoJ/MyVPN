@@ -12,12 +12,8 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 
 import com.androapplite.shadowsocks.activity.BaseShadowsocksActivity;
-import com.androapplite.shadowsocks.ad.AdFullType;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,10 +104,6 @@ public class ServerListActivity extends BaseShadowsocksActivity {
         mFragmentList.add(mVIPServerFragment);
 
         isVIP = RuntimeSettings.isVIP();
-
-        if (!isVIP && FirebaseRemoteConfig.getInstance().getBoolean("server_list_show_full_ad")) {
-            AdAppHelper.getInstance(this).showFullAd(AdUtils.FULL_AD_BAD, AdFullType.SERVER_LIST_ENTER_FULL_AD);
-        }
     }
 
 //    private void selectPage(int position, int currentPosition) {
@@ -142,14 +134,6 @@ public class ServerListActivity extends BaseShadowsocksActivity {
 //                mTabTextViewList.get(i).setTextColor(getResources().getColor(R.color.app_mamage_tab_text_unselected));
 //            }
 //        }
-    }
-
-    private void showBottomAd() {
-        Fragment fragment = mFragmentList.get(mContentViewPager.getCurrentItem());
-        if (fragment instanceof FreeServerFragment)
-            ((FreeServerFragment) fragment).addBottomAd();
-        else if (fragment instanceof VIPServerFragment)
-            ((VIPServerFragment) fragment).addBottomAd();
     }
 
 //    private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {

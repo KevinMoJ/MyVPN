@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -21,30 +20,23 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.SplashActivity;
 import com.androapplite.shadowsocks.broadcast.Action;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
 import com.androapplite.shadowsocks.model.VpnState;
-import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
-import com.androapplite.shadowsocks.preference.SharedPreferenceKey;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
+import com.androapplite.shadowsocks.utils.ServiceUtils;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.bestgo.adsplugin.utils.ServiceUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.core.LocalVpnService;
 import com.vm.shadowsocks.core.TcpTrafficMonitor;
 import com.vm.shadowsocks.core.VpnNotification;
 
 import java.lang.ref.WeakReference;
-import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -67,7 +59,6 @@ public class VpnManageService extends Service implements Runnable,
     private TimeTickReceiver mTimeTickReceiver;
     private static final int NOTIFICATION_ID_GRAP_SPEED = 10;
     private static final int MSG_CANCEL_NOTIFICATION = 3;
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private long mRemoteFetchStartTime;
     private boolean mIsRemoteFetchSuccess;
     private TcpTrafficMonitor mLastTcpTrafficMonitor;
@@ -102,7 +93,6 @@ public class VpnManageService extends Service implements Runnable,
         mServiceHandler.sendEmptyMessageDelayed(MSG_1_MINUTE, TimeUnit.MINUTES.toMillis(1));
         mServiceHandler.sendEmptyMessageDelayed(MSG_1_HOUR, TimeUnit.HOURS.toMillis(1));
         mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         long useTime = RuntimeSettings.getUseTime();
         long freeUseTime = RuntimeSettings.getLuckPanGetRecord();
         if (useTime < 0) {
@@ -186,7 +176,6 @@ public class VpnManageService extends Service implements Runnable,
     @Override
     public void onStatusChanged(String status, Boolean isRunning) {
         stopScheduler();
-        Firebase firebase = Firebase.getInstance(this);
         String[] parts = LocalVpnService.ProxyUrl != null ? LocalVpnService.ProxyUrl.split("@") : null;
         String server = parts != null && parts.length > 1 ? parts[1] : "没有服务器";
         if (isRunning) {
@@ -198,41 +187,31 @@ public class VpnManageService extends Service implements Runnable,
             if (!mIsRemoteFetchSuccess) {
                 fetchRemoteConfig();
             }
-            firebase.logEvent("VPN计时", "开始", server);
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null) {
-                firebase.logEvent("VPN开始", "网络", networkInfo.getTypeName());
             } else {
-                firebase.logEvent("VPN开始", "网络", "未知");
             }
         } else {
             unregisterScreenActionReceiver();
             registerTimeTickReceiver();
             if (mConnectStartTime > 0) {
                 long usetime = (System.currentTimeMillis() - mConnectStartTime) / 1000;
-                firebase.logEvent("VPN计时", server, usetime);
             }
             mIsRemoteFetchSuccess = false;
             RuntimeSettings.setVPNState(VpnState.Stopped.ordinal());
             switch (sStopReason) {
                 case 0:
-                    firebase.logEvent("VPN断开", "程序断开", server);
                     break;
                 case 1:
-                    firebase.logEvent("VPN断开", "用户主动断开", server);
                     break;
                 case 2:
-                    firebase.logEvent("VPN断开", "用户切换国家", server);
                     break;
                 case 3:
-                    firebase.logEvent("VPN断开", "自动切换服务器", server);
                     break;
                 case 4:
-                    firebase.logEvent("VPN断开", "自动切换服务器失败", server);
                     break;
                 case 5:
-                    firebase.logEvent("VPN断开", "达到免费用时断开", server);
                     break;
             }
             sStopReason = 0;
@@ -255,9 +234,7 @@ public class VpnManageService extends Service implements Runnable,
                         || mLastTcpTrafficMonitor.pNetworkError != tcpTrafficMonitor.pNetworkError) {
                     String[] parts = LocalVpnService.ProxyUrl.split("@");
                     if (parts.length > 1) {
-                        Firebase.getInstance(this).logEvent("连接过程错误", String.valueOf(tcpTrafficMonitor.pNetworkError), parts[1]);
                     } else {
-                        Firebase.getInstance(this).logEvent("连接过程错误", String.valueOf(tcpTrafficMonitor.pNetworkError), "没有服务器");
                     }
                 }
             }
@@ -324,7 +301,7 @@ public class VpnManageService extends Service implements Runnable,
 //                promotionTracking.reportUninstallDayCount();
 //                promotionTracking.reportAppInstall();
 //                promotionTracking.reportPhoneModelAndAndroidOS();
-                grabSppedCheck();
+//                grabSppedCheck();
                 break;
             case MSG_1_HOUR:
 //                promotionTracking.reportUninstallDayCount();
@@ -337,7 +314,7 @@ public class VpnManageService extends Service implements Runnable,
                 showGrabSpeedNotification(false);
                 break;
             case MSG_20_MINUTE:
-                grabSppedCheck();
+//                grabSppedCheck();
                 mServiceHandler.sendEmptyMessageDelayed(MSG_20_MINUTE, TimeUnit.MINUTES.toMillis(20));
                 break;
         }
@@ -372,26 +349,25 @@ public class VpnManageService extends Service implements Runnable,
         }
     }
 
-    private void grabSppedCheck() {
-        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        long lastFire = sp.getLong(SharedPreferenceKey.GRAB_SPEED_TIME, 0);
-        if (!DateUtils.isToday(lastFire)) {
-            String currentHourString = AdAppHelper.getInstance(this).getCustomCtrlValue("grab_speed", "-1");
-            try {
-                int currentHour = Integer.valueOf(currentHourString);
-                if (currentHour > -1 && currentHour < 24) {
-                    Calendar calendar = Calendar.getInstance();
-                    if (calendar.get(Calendar.HOUR_OF_DAY) == currentHour) {
-                        showGrabSpeedNotification(true);
-                        sp.edit().putLong(SharedPreferenceKey.GRAB_SPEED_TIME, System.currentTimeMillis()).apply();
-                        Firebase.getInstance(this).logEvent("抢网速", String.valueOf(currentHour));
-                    }
-                }
-            } catch (Exception e) {
-                ShadowsocksApplication.handleException(e);
-            }
-        }
-    }
+//    private void grabSppedCheck() {
+//        SharedPreferences sp = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
+//        long lastFire = sp.getLong(SharedPreferenceKey.GRAB_SPEED_TIME, 0);
+//        if (!DateUtils.isToday(lastFire)) {
+//            String currentHourString = AdAppHelper.getInstance(this).getCustomCtrlValue("grab_speed", "-1");
+//            try {
+//                int currentHour = Integer.valueOf(currentHourString);
+//                if (currentHour > -1 && currentHour < 24) {
+//                    Calendar calendar = Calendar.getInstance();
+//                    if (calendar.get(Calendar.HOUR_OF_DAY) == currentHour) {
+//                        showGrabSpeedNotification(true);
+//                        sp.edit().putLong(SharedPreferenceKey.GRAB_SPEED_TIME, System.currentTimeMillis()).apply();
+//                    }
+//                }
+//            } catch (Exception e) {
+//                ShadowsocksApplication.handleException(e);
+//            }
+//        }
+//    }
 
     private void showGrabSpeedNotification(boolean showFullScreenIntent) {
         try {
@@ -427,18 +403,12 @@ public class VpnManageService extends Service implements Runnable,
     }
 
     private void fetchRemoteConfig() {
-        mFirebaseRemoteConfig.fetch(300).addOnCompleteListener(this);
         mRemoteFetchStartTime = System.currentTimeMillis();
     }
 
     @Override
     public void onComplete(@NonNull Task<Void> task) {
         mIsRemoteFetchSuccess = task.isSuccessful();
-        if (mIsRemoteFetchSuccess) {
-            mFirebaseRemoteConfig.activateFetched();
-        }
-        Firebase.getInstance(this).logEvent("获取远程配置", String.valueOf(mIsRemoteFetchSuccess),
-                System.currentTimeMillis() - mRemoteFetchStartTime);
     }
 
     public static void stopVpnByUser() {

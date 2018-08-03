@@ -12,13 +12,9 @@ import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.Nullable;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.activity.MainActivity;
-import com.androapplite.shadowsocks.utils.InternetUtil;
-import com.androapplite.shadowsocks.utils.RealTimeLogger;
 import com.androapplite.vpn3.R;
-import com.crashlytics.android.Crashlytics;
 import com.vm.shadowsocks.core.ProxyConfig.IPAddress;
 import com.vm.shadowsocks.dns.DnsPacket;
 import com.vm.shadowsocks.tcpip.CommonMethods;
@@ -142,10 +138,6 @@ public class LocalVpnService extends VpnService implements Runnable {
                 if (o instanceof Throwable && IsRunning) {
                     Throwable throwable = (Throwable) o;
                     ShadowsocksApplication.handleException(throwable);
-                    Crashlytics.logException(throwable);
-                    RealTimeLogger.getInstance(this).logEventAsync("error", "error_type", ((Exception) throwable).getMessage()
-                            , "net_type", InternetUtil.getNetworkState(this));
-                    Firebase.getInstance(Instance).logEvent("Error", throwable.getMessage());
                 }
             }
         } catch (Exception e) {}

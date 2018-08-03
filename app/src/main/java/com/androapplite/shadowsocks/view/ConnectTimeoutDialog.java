@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.androapplite.shadowsocks.Firebase;
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.vpn3.R;
 
@@ -55,7 +54,6 @@ public class ConnectTimeoutDialog extends DialogFragment {
     }
 
     private void initData() {
-        Firebase.getInstance(getContext()).logEvent("链接超时弹窗", "显示");
     }
 
     @Override
@@ -98,14 +96,11 @@ public class ConnectTimeoutDialog extends DialogFragment {
                 switch (v.getId()) {
                     case R.id.dialog_connect_timeout_change:
                         mListener.onChangeServer();
-                        Firebase.getInstance(getContext()).logEvent("链接超时弹窗", "服务器列表");
                         break;
                     case R.id.dialog_connect_timeout_again:
                         mListener.onTryAgain();
-                        Firebase.getInstance(getContext()).logEvent("链接超时弹窗", "再试一次");
                         break;
                     case R.id.dialog_connect_timeout_cancel:
-                        Firebase.getInstance(getContext()).logEvent("链接超时弹窗", "取消");
                         break;
                 }
             }

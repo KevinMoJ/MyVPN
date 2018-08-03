@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
@@ -19,21 +17,15 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.androapplite.shadowsocks.Firebase;
-import com.androapplite.shadowsocks.ad.AdFullType;
-import com.androapplite.shadowsocks.ad.AdUtils;
 import com.androapplite.shadowsocks.luckpan.LuckPanLayout;
 import com.androapplite.shadowsocks.luckpan.LuckRotateProgressBar;
 import com.androapplite.shadowsocks.preference.DefaultSharedPrefeencesUtil;
 import com.androapplite.shadowsocks.utils.DialogUtils;
 import com.androapplite.shadowsocks.utils.RuntimeSettings;
 import com.androapplite.vpn3.R;
-import com.bestgo.adsplugin.ads.AdAppHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
-public class LuckRotateActivity extends AppCompatActivity implements Handler.Callback {
+public class LuckRotateActivity extends AppCompatActivity {
     private static final String TAG = "LuckRotateActivity";
-    public static final int SHOW_FULL_AD = 100;
     public static final String TYPE = "TYPE";
     public static final String START = "start";
     public static final String PREPAR = "preparing";
@@ -52,10 +44,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     private LuckRotateProgressBar mLuckPanBar;
 
     private SharedPreferences mSharedPreferences;
-    private AdAppHelper mAdAppHelper;
-    private Handler mHandler;
     private Dialog dialog;
-    private Firebase mFirebase;
 
     private int progressInt;
     private long startLuckPanTime;
@@ -100,10 +89,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
     private void initData() {
         mSharedPreferences = DefaultSharedPrefeencesUtil.getDefaultSharedPreferences(this);
-        mAdAppHelper = AdAppHelper.getInstance(this);
-        mFirebase = Firebase.getInstance(this);
-        mHandler = new Handler(this);
-        cloudGetLuckFreeDay = FirebaseRemoteConfig.getInstance().getLong("luck_pan_get_day");
+        cloudGetLuckFreeDay = 7;
         mLuckPanBar.setMax((int) cloudGetLuckFreeDay);
         startLuckPanTime = RuntimeSettings.getLuckPanOpenStartTime();
 
@@ -119,15 +105,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             RuntimeSettings.setLuckPanFreeDay(0);
             RuntimeSettings.setClickRotateStartCount(0);//点击转盘按钮的次数，不是同一天清零
         }
-
-        boolean showAd = getIntent().getBooleanExtra(TYPE, true);
-
-        if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && showAd && !RuntimeSettings.isVIP()) {
-            mAdAppHelper.showFullAd(AdUtils.FULL_AD_BAD, AdFullType.LUCK_ROTATE_ENTER_FULL_AD);
-        }
-
-        //申请玩转盘的全屏
-        AdUtils.loadGoodFullAd(5);
     }
 
     private void initUI() {
@@ -142,18 +119,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
             mLuckPanBar.setPicture(R.drawable.progress_bar_tip_normal);
     }
 
-    private void addBottomAd() {
-        try {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-            mAdAppHelper.getNative(2, mAdContent, params);
-        } catch (Exception e) {
-        }
-    }
-
     private void btnEnableClick(boolean enableClick, boolean isInitBt) {
-        if (isInitBt)
-            mFirebase.logEvent("幸运转盘", "进入按钮准备情况", String.valueOf(enableClick));
-
         if (enableClick) {
 //            mStartRotateBt.setClickable(true);
             mStartRotateBt.setText(START);
@@ -171,38 +137,14 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
         mLuckPanLayout.rotate(RESULT_TYPE_THANKS, 100);
     }
 
-    private int getRotatePos() {
-        int rotate = (int) (Math.random() * 100);
-        long cloudThanksProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_thanks"); // 66
-        long cloudOneProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_one"); // 20
-        long cloudTwoProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_two"); // 10
-        long cloudThreeProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_three"); // 3
-        long cloudFiveProb = FirebaseRemoteConfig.getInstance().getLong("luck_rotate_five"); // 1
-
-        if (rotate >= 0 && rotate <= cloudThanksProb - 1)
-            rotate = RESULT_TYPE_THANKS;
-        else if (rotate >= cloudThanksProb && rotate <= cloudThanksProb + cloudOneProb - 1) // 85
-            rotate = RESULT_TYPE_1;
-        else if (rotate >= cloudThanksProb + cloudOneProb && rotate <= cloudThanksProb + cloudOneProb + cloudTwoProb - 1)
-            rotate = RESULT_TYPE_2;
-        else if (rotate >= cloudThanksProb + cloudOneProb + cloudTwoProb && rotate <= cloudThanksProb + cloudOneProb + cloudTwoProb + cloudThreeProb - 1)
-            rotate = RESULT_TYPE_3;
-        else if (rotate >= cloudThanksProb + cloudOneProb + cloudTwoProb + cloudThreeProb + cloudFiveProb - 1)
-            rotate = RESULT_TYPE_5;
-
-        return rotate;
-    }
-
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btn_start_luck_pan:
                     if (mStartRotateBt.getText().equals(START)) {
-                        mFirebase.logEvent("开始游戏", "转盘按钮", "点击");
                         startRotate();
                     } else {
-                        mFirebase.logEvent("开始游戏", "转盘按钮准备", "点击");
                         Toast.makeText(LuckRotateActivity.this, getResources().getString(R.string.please_try_it_later), Toast.LENGTH_SHORT).show();
                     }
                     break;
@@ -266,21 +208,14 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
                 //如果当天得到的天数大于的一天最大得到的天数，就让他的结果一直为thanks
                 if (getLuckFreeDays + rewardLong > cloudGetLuckFreeDay) { // 5 + 2 > 7
                     todayIsContinuePlay = false;
-                    mFirebase.logEvent("开始游戏", "转盘得到的天数", "一直thanks");
                     Log.i(TAG, "startRotate: 得到的天数达到次数，一直thanks ");
                 } else {
                     todayIsContinuePlay = true;
                     RuntimeSettings.setLuckPanFreeDay(rewardLong + getLuckFreeDays);
                     RuntimeSettings.setLuckPanGetRecord(rewardLong + freeDaysToShow); // 用来给dialog显示的
-                    mFirebase.logEvent("开始游戏", "转盘得到的天数", String.valueOf(rewardLong));
                     Log.i(TAG, "startRotate: 没有达到得到的天数次数，随机显示" + (rewardLong + freeDaysToShow));
                 }
-            } else {
-                mFirebase.logEvent("开始游戏", "转盘得到的天数", "thanks");
             }
-
-            //申请玩转盘的全屏
-            AdUtils.loadGoodFullAd(5);
 
             if (!todayIsContinuePlay)
                 rewardString = "thanks";
@@ -295,9 +230,6 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
             if (!isFinishing()) {
                 dialog = DialogUtils.showGameGetTimeDialog(LuckRotateActivity.this, rewardString, null);
-                if (FirebaseRemoteConfig.getInstance().getBoolean("luck_pan_show_full_ad") && !RuntimeSettings.isVIP()) {
-                    mHandler.sendEmptyMessageDelayed(SHOW_FULL_AD, 5);
-                }
             }
             btnEnableClick(true, true);
         }
@@ -310,7 +242,7 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
 
         @Override
         public void animationUpdate() {
-            if (AdUtils.isGoodFullAdReady && isUpdateAngle) {
+            if (isUpdateAngle) {
                 isUpdateAngle = false;
                 int offsetAngle = getOffsetAngle(getPlayRotatePosition());
                 mLuckPanLayout.setOffsetAngle(offsetAngle);
@@ -365,15 +297,5 @@ public class LuckRotateActivity extends AppCompatActivity implements Handler.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case SHOW_FULL_AD:
-                mAdAppHelper.showFullAd(AdUtils.FULL_AD_GOOD, AdFullType.LUCK_ROTATE_PLAY_FULL_AD);
-                return true;
-        }
-        return false;
     }
 }

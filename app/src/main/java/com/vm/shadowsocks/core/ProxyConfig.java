@@ -5,7 +5,6 @@ import android.os.Build;
 
 import com.androapplite.shadowsocks.ShadowsocksApplication;
 import com.androapplite.shadowsocks.connect.ConnectVpnHelper;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.vm.shadowsocks.tcpip.CommonMethods;
 import com.vm.shadowsocks.tunnel.Config;
 import com.vm.shadowsocks.tunnel.httpconnect.HttpConnectConfig;
@@ -211,8 +210,8 @@ public class ProxyConfig {
     }
 
     public boolean needProxy(String host, int ip) {
-        boolean isGlobalMode = FirebaseRemoteConfig.getInstance().getBoolean("is_global_proxy");
-        if (ProxyConfig.IS_DEBUG){
+        boolean isGlobalMode = true;
+        if (ProxyConfig.IS_DEBUG) {
             System.out.printf("needProxy host: %s, ip: %s, globalMode: %s, isFakeIP: %s, m_outside_china_use_proxy: %s, isIPInChina: %s\n",
                     host != null ? host : "null",
                     CommonMethods.ipIntToString(ip),
@@ -241,7 +240,7 @@ public class ProxyConfig {
         }
         if (host != null) {
             Boolean stateBoolean = getDomainState(host);
-            if (ProxyConfig.IS_DEBUG){
+            if (ProxyConfig.IS_DEBUG) {
                 System.out.printf("needProxy getDomainState: %s\n", stateBoolean != null ? stateBoolean : "null");
             }
             if (stateBoolean != null) {
@@ -261,7 +260,7 @@ public class ProxyConfig {
     }
 
     public boolean needProxyForDnsQuery(String host, int ip) {
-        if (ProxyConfig.IS_DEBUG){
+        if (ProxyConfig.IS_DEBUG) {
             System.out.printf("needProxy host: %s, ip: %s, globalMode: %s, isFakeIP: %s, m_outside_china_use_proxy: %s, isIPInChina: %s\n",
                     host != null ? host : "null",
                     CommonMethods.ipIntToString(ip),
@@ -278,7 +277,7 @@ public class ProxyConfig {
         }
         if (host != null) {
             Boolean stateBoolean = getDomainState(host);
-            if (ProxyConfig.IS_DEBUG){
+            if (ProxyConfig.IS_DEBUG) {
                 System.out.printf("needProxy getDomainState: %s\n", stateBoolean != null ? stateBoolean : "null");
             }
             if (stateBoolean != null) {
